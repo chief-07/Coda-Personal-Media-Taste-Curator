@@ -1,23 +1,60 @@
 import 'dart:ui';
+import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:coda/src/features/library/presentation/library_screen.dart';
+import 'package:coda/src/features/library/presentation/widgets/library_tab_bar.dart';
 
-class CodaShell extends StatelessWidget {
+class CodaShell extends ConsumerWidget {
   const CodaShell({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final mediaQuery = MediaQuery.maybeOf(context);
     final isKeyboardOpen = mediaQuery != null && mediaQuery.viewInsets.bottom > 0;
     final bottomPadding = mediaQuery != null ? mediaQuery.padding.bottom + 16 : 16.0;
+
+    final rec = ref.watch(homeRecommendationProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFF101114),
       body: Stack(
         children: [
+          // ── Global Background ────────────────────────────
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 600),
+              child: rec != null && rec.posterUrl != null
+                  ? Transform.scale(
+                      scale: 1.2,
+                      child: ImageFiltered(
+                        key: ValueKey(rec.posterUrl),
+                        imageFilter: ImageFilter.blur(
+                          sigmaX: 80,
+                          sigmaY: 80,
+                          tileMode: TileMode.mirror,
+                        ),
+                        child: Image(
+                          image: rec.posterUrl!.startsWith('assets/')
+                              ? AssetImage(rec.posterUrl!)
+                              : NetworkImage(rec.posterUrl!) as ImageProvider,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      key: const ValueKey('empty'),
+                      color: const Color(0xFF101114),
+                    ),
+            ),
+          ),
+          Positioned.fill(
+            child: Container(color: Colors.white.withValues(alpha: 0.15)),
+          ),
           // ── Page content ─────────────────────────────────
           navigationShell,
 
@@ -30,10 +67,15 @@ class CodaShell extends StatelessWidget {
               child: Center(
                 child: _FloatingNavBar(
                   currentIndex: navigationShell.currentIndex,
-                  onTap: (index) => navigationShell.goBranch(
-                    index,
-                    initialLocation: index == navigationShell.currentIndex,
-                  ),
+                  onTap: (index) {
+                    if (index == 0) {
+                      ref.read(libraryTabProvider.notifier).setTab(LibraryTab.lists);
+                    }
+                    navigationShell.goBranch(
+                      index,
+                      initialLocation: index == navigationShell.currentIndex,
+                    );
+                  },
                 ),
               ),
             ),

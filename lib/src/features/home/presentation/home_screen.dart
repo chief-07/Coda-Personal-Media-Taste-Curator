@@ -54,39 +54,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final rec = ref.watch(homeRecommendationProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0C),
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 600),
-              child: rec != null && rec.posterUrl != null
-                  ? Transform.scale(
-                      scale: 1.2,
-                      child: ImageFiltered(
-                        key: ValueKey(rec.posterUrl),
-                        imageFilter: dart_ui.ImageFilter.blur(
-                          sigmaX: 80,
-                          sigmaY: 80,
-                          tileMode: dart_ui.TileMode.mirror,
-                        ),
-                        child: Image(
-                          image: rec.posterUrl!.startsWith('assets/')
-                              ? AssetImage(rec.posterUrl!)
-                              : NetworkImage(rec.posterUrl!) as ImageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      key: const ValueKey('empty'),
-                      color: const Color(0xFF101114),
-                    ),
-            ),
-          ),
-          Positioned.fill(
-            child: Container(color: Colors.white.withValues(alpha: 0.15)),
-          ),
           SafeArea(
             bottom: false,
             child: Column(

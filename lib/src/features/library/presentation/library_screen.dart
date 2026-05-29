@@ -1,38 +1,51 @@
+import 'package:coda/src/features/library/presentation/widgets/library_card.dart';
+import 'package:coda/src/features/library/presentation/widgets/library_tab_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LibraryScreen extends StatelessWidget {
+class LibraryTabNotifier extends Notifier<LibraryTab> {
+  @override
+  LibraryTab build() => LibraryTab.lists;
+  
+  void setTab(LibraryTab tab) => state = tab;
+}
+
+final libraryTabProvider = NotifierProvider<LibraryTabNotifier, LibraryTab>(LibraryTabNotifier.new);
+
+class LibraryScreen extends ConsumerWidget {
   const LibraryScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedTab = ref.watch(libraryTabProvider);
+
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(Icons.bookmark_border, size: 32),
-              const SizedBox(height: 20),
-              Text(
-                'Your list',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                const SizedBox(height: 24),
+                LibraryTabBar(
+                  selected: selectedTab,
+                  onSelected: (tab) => ref.read(libraryTabProvider.notifier).setTab(tab),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Saved picks will live here, and Coda can pull from them when one finally feels right.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  height: 1.45,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.68),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: LibraryCard(
+                      key: ValueKey(selectedTab),
+                      tab: selectedTab,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

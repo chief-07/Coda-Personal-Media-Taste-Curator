@@ -131,7 +131,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0A0A0C),
+        backgroundColor: Colors.transparent,
         resizeToAvoidBottomInset: true,
         body: LayoutBuilder(
           builder: (context, constraints) {
@@ -140,41 +140,6 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
 
             return Stack(
               children: [
-                // ── Full-screen blurred poster background ───────────────────
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  width: screenWidth,
-                  height: screenHeight,
-                  child: posterUrl != null
-                      ? Transform.scale(
-                          scale: 1.2,
-                          child: ImageFiltered(
-                            imageFilter: dart_ui.ImageFilter.blur(
-                              sigmaX: 80,
-                              sigmaY: 80,
-                              tileMode: dart_ui.TileMode.mirror,
-                            ),
-                            child: Image(
-                              image: posterUrl.startsWith('assets/')
-                                  ? AssetImage(posterUrl) as ImageProvider
-                                  : NetworkImage(posterUrl),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        )
-                      : Container(color: const Color(0xFF101114)),
-                ),
-
-                // ── Global 15% White Overlay (brightens all cutouts) ──────────
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  width: screenWidth,
-                  height: screenHeight,
-                  child: Container(color: Colors.white.withValues(alpha: 0.15)),
-                ),
-
                 // ── Layer 1: Full-screen Knockout mask ──────────────────────
                 Positioned.fill(
                   child: ShaderMask(
