@@ -4,6 +4,7 @@ import 'package:coda/src/features/home/presentation/home_screen.dart';
 import 'package:coda/src/features/home/presentation/pitch_screen.dart';
 import 'package:coda/src/features/library/presentation/library_screen.dart';
 import 'package:coda/src/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:coda/src/features/onboarding/presentation/taste_profile_screen.dart';
 import 'package:coda/src/features/session/presentation/current_session_screen.dart';
 import 'package:coda/src/features/shell/presentation/coda_shell.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,11 @@ final codaRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/onboarding',
       builder: (context, state) => const OnboardingScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/taste-profile',
+      builder: (context, state) => const TasteProfileScreen(),
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,

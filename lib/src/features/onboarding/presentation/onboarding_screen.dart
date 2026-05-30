@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 const _askRecommendation = Recommendation(
   id: 'ask-coda',
@@ -346,7 +347,7 @@ class _PitchLayout extends StatelessWidget {
             if (messages.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 40),
-                child: _buildChipsWrap(),
+                child: _buildChipsWrap(context),
               ),
 
             // ── Subsequent User Messages ─────────────────────────────
@@ -420,7 +421,7 @@ class _PitchLayout extends StatelessWidget {
     );
   }
 
-  Widget _buildChipsWrap() {
+  Widget _buildChipsWrap(BuildContext context) {
     final chips = ['Anime', 'Movies', 'Manga', 'Visual N', 'Books'];
 
     return Wrap(
@@ -429,7 +430,10 @@ class _PitchLayout extends StatelessWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         ...chips.map((chip) => _buildOutlineChip(chip)),
-        _buildCheckmarkButton(),
+        GestureDetector(
+          onTap: () => context.push('/taste-profile'),
+          child: _buildCheckmarkButton(),
+        ),
       ],
     );
   }
