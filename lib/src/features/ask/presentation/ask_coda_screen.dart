@@ -386,7 +386,7 @@ class _PromptBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    final isKeyboardOpen = View.of(context).viewInsets.bottom > 0;
     final safeBottom = MediaQuery.of(context).padding.bottom;
     
     final bottomPadding = isKeyboardOpen
