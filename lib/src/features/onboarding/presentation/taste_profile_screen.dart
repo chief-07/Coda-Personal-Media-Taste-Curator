@@ -652,17 +652,6 @@ class _CardLayout extends StatelessWidget {
                       ),
               ),
               
-              // ── Additional User Chat Messages ───────────────────────
-              if (messages.length > 1)
-                for (int i = 1; i < messages.length; i++)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: _buildChatBubble(messages[i]),
-                    ),
-                  ),
-
               // ── Action Buttons ───────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -692,6 +681,19 @@ class _CardLayout extends StatelessWidget {
                         ],
                       ),
               ),
+
+              // ── Additional User Chat Messages ───────────────────────
+              if (messages.length > 1) ...[
+                const SizedBox(height: 24),
+                for (int i = 1; i < messages.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: _buildChatBubble(messages[i]),
+                    ),
+                  ),
+              ],
             ],
           ],
         ),
