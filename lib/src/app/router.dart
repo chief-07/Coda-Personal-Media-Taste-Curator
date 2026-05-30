@@ -13,7 +13,7 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final codaRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/home',
+  initialLocation: '/onboarding',
   routes: [
     GoRoute(path: '/', redirect: (context, state) => '/home'),
     StatefulShellRoute.indexedStack(
