@@ -5,17 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 
-enum TasteProfileTab { you, anime, movies, manga, visualNovels, books }
-
-class TasteProfileTabNotifier extends Notifier<TasteProfileTab> {
+class TasteProfileTabNotifier extends Notifier<String> {
   @override
-  TasteProfileTab build() => TasteProfileTab.you;
+  String build() => 'You';
   
-  void setTab(TasteProfileTab tab) => state = tab;
+  void setTab(String tab) => state = tab;
 }
 
-final tasteProfileTabProvider = NotifierProvider<TasteProfileTabNotifier, TasteProfileTab>(TasteProfileTabNotifier.new);
+final tasteProfileTabProvider = NotifierProvider<TasteProfileTabNotifier, String>(TasteProfileTabNotifier.new);
 
 class TasteProfileScreen extends ConsumerWidget {
   const TasteProfileScreen({super.key});
@@ -24,6 +23,19 @@ class TasteProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedTab = ref.watch(tasteProfileTabProvider);
     final activeRec = ref.watch(homeRecommendationProvider);
+
+    // Extract selected chips from onboarding controller messages
+    final onboardingState = ref.watch(onboardingControllerProvider);
+    final messages = onboardingState.messages;
+    final lastChipsMessage = messages.reversed.firstWhere(
+      (m) => m.chips != null,
+      orElse: () => ChatMessage(chips: [], isUser: false),
+    );
+    final chips = lastChipsMessage.chips ?? [];
+    final tabsList = ['You', ...chips];
+
+    // If selectedTab is not in tabsList (e.g. state reset or out of bounds), default to 'You'
+    final activeTab = tabsList.contains(selectedTab) ? selectedTab : 'You';
 
     return Scaffold(
       backgroundColor: const Color(0xFF101114),
@@ -67,16 +79,18 @@ class TasteProfileScreen extends ConsumerWidget {
               children: [
                 const SizedBox(height: 24),
                 TasteProfileTabBar(
-                  selected: selectedTab,
+                  selected: activeTab,
                   onSelected: (tab) => ref.read(tasteProfileTabProvider.notifier).setTab(tab),
+                  tabs: tabsList,
                 ),
                 const SizedBox(height: 16),
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     child: TasteProfileCard(
-                      key: ValueKey(selectedTab),
-                      tab: selectedTab,
+                      key: ValueKey(activeTab),
+                      tab: activeTab,
+                      tabsList: tabsList,
                     ),
                   ),
                 ),
@@ -96,10 +110,12 @@ class TasteProfileTabBar extends StatefulWidget {
     super.key,
     required this.selected,
     required this.onSelected,
+    required this.tabs,
   });
 
-  final TasteProfileTab selected;
-  final ValueChanged<TasteProfileTab> onSelected;
+  final String selected;
+  final ValueChanged<String> onSelected;
+  final List<String> tabs;
 
   @override
   State<TasteProfileTabBar> createState() => _TasteProfileTabBarState();
@@ -108,15 +124,6 @@ class TasteProfileTabBar extends StatefulWidget {
 class _TasteProfileTabBarState extends State<TasteProfileTabBar> {
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
-
-  final List<TasteProfileTab> _tabs = [
-    TasteProfileTab.you,
-    TasteProfileTab.anime,
-    TasteProfileTab.movies,
-    TasteProfileTab.manga,
-    TasteProfileTab.visualNovels,
-    TasteProfileTab.books,
-  ];
 
   @override
   void initState() {
@@ -162,9 +169,8 @@ class _TasteProfileTabBarState extends State<TasteProfileTabBar> {
           physics: const BouncingScrollPhysics(),
           child: Row(
             children: [
-              for (var i = 0; i < _tabs.length; i++) ...[
-                _buildTab(_tabs[i], _tabs[i] == widget.selected),
-                if (i < _tabs.length - 1) const SizedBox(width: 0),
+              for (var i = 0; i < widget.tabs.length; i++) ...[
+                _buildTab(widget.tabs[i], widget.tabs[i] == widget.selected),
               ],
               const SizedBox(width: 32),
             ],
@@ -174,19 +180,9 @@ class _TasteProfileTabBarState extends State<TasteProfileTabBar> {
     );
   }
 
-  Widget _buildTab(TasteProfileTab tab, bool isSelected) {
-    String label;
-    switch (tab) {
-      case TasteProfileTab.you: label = 'You'; break;
-      case TasteProfileTab.anime: label = 'Anime'; break;
-      case TasteProfileTab.movies: label = 'Movies'; break;
-      case TasteProfileTab.manga: label = 'Manga'; break;
-      case TasteProfileTab.visualNovels: label = 'Visual Novel'; break;
-      case TasteProfileTab.books: label = 'Books'; break;
-    }
-
+  Widget _buildTab(String label, bool isSelected) {
     return GestureDetector(
-      onTap: () => widget.onSelected(tab),
+      onTap: () => widget.onSelected(label),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: isSelected
@@ -236,9 +232,14 @@ class _TasteProfileTabBarState extends State<TasteProfileTabBar> {
 // ── Card ─────────────────────────────────────────────────────────────
 
 class TasteProfileCard extends ConsumerStatefulWidget {
-  const TasteProfileCard({required this.tab, super.key});
+  const TasteProfileCard({
+    required this.tab,
+    required this.tabsList,
+    super.key,
+  });
   
-  final TasteProfileTab tab;
+  final String tab;
+  final List<String> tabsList;
 
   @override
   ConsumerState<TasteProfileCard> createState() => _TasteProfileCardState();
@@ -254,29 +255,27 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
   @override
   void initState() {
     super.initState();
-    switch (widget.tab) {
-      case TasteProfileTab.anime:
-        _messages = ["I usually love mecha and psychological thrillers. Stories that make me question reality, like Evangelion or Serial Experiments Lain."];
-        break;
-      case TasteProfileTab.movies:
-        _messages = ["I'm a big fan of indie dramas and sci-fi films with great cinematography."];
-        break;
-      case TasteProfileTab.manga:
-        _messages = ["I read a lot of slice-of-life and dark fantasy. Anything with incredibly detailed art."];
-        break;
-      case TasteProfileTab.visualNovels:
-        _messages = ["I enjoy deep, branching narratives with multiple endings. Sci-fi and mystery are my favorites."];
-        break;
-      case TasteProfileTab.books:
-        _messages = ["I mostly read historical fiction and high fantasy epics."];
-        break;
-      case TasteProfileTab.you:
-      default:
-        _messages = [
-          "I'm a 24 year old creative living in the city. I'm usually drawn to stories about self-discovery, beautifully animated worlds, or anything that just feels really atmospheric and grounded. I love finding hidden gems."
-        ];
-        break;
+    final tabName = widget.tab.toLowerCase();
+    if (tabName == 'anime') {
+      _messages = ["I usually love mecha and psychological thrillers. Stories that make me question reality, like Evangelion or Serial Experiments Lain."];
+    } else if (tabName == 'movies') {
+      _messages = ["I'm a big fan of indie dramas and sci-fi films with great cinematography."];
+    } else if (tabName == 'manga') {
+      _messages = ["I read a lot of slice-of-life and dark fantasy. Anything with incredibly detailed art."];
+    } else if (tabName == 'visual novel' || tabName == 'visual novels') {
+      _messages = ["I enjoy deep, branching narratives with multiple endings. Sci-fi and mystery are my favorites."];
+    } else if (tabName == 'books') {
+      _messages = ["I mostly read historical fiction and high fantasy epics."];
+    } else if (tabName == 'games') {
+      _messages = ["I love open world RPGs and narrative driven action-adventure games."];
+    } else if (tabName == 'you') {
+      _messages = [
+        "I'm a 24 year old creative living in the city. I'm usually drawn to stories about self-discovery, beautifully animated worlds, or anything that just feels really atmospheric and grounded. I love finding hidden gems."
+      ];
+    } else {
+      _messages = ["I love finding stories that have a unique atmosphere and memorable characters."];
     }
+
     _topScrollController.addListener(() {
       if (_maskScrollController.hasClients &&
           _topScrollController.offset != _maskScrollController.offset) {
@@ -357,6 +356,7 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLastTab = widget.tab == widget.tabsList.last;
 
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(64)),
@@ -390,12 +390,13 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                               messages: _messages,
                               tab: widget.tab,
                               onTellMeMore: () {
-                                final currentIndex = TasteProfileTab.values.indexOf(widget.tab);
-                                if (currentIndex < TasteProfileTab.values.length - 1) {
-                                  ref.read(tasteProfileTabProvider.notifier).setTab(TasteProfileTab.values[currentIndex + 1]);
+                                final currentIndex = widget.tabsList.indexOf(widget.tab);
+                                if (currentIndex >= 0 && currentIndex < widget.tabsList.length - 1) {
+                                  ref.read(tasteProfileTabProvider.notifier).setTab(widget.tabsList[currentIndex + 1]);
                                 }
                               },
                               onLater: () => context.go('/home'),
+                              isLastTab: isLastTab,
                             ),
                           ),
                         ),
@@ -428,12 +429,13 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                           messages: _messages,
                           tab: widget.tab,
                           onTellMeMore: () {
-                            final currentIndex = TasteProfileTab.values.indexOf(widget.tab);
-                            if (currentIndex < TasteProfileTab.values.length - 1) {
-                              ref.read(tasteProfileTabProvider.notifier).setTab(TasteProfileTab.values[currentIndex + 1]);
+                            final currentIndex = widget.tabsList.indexOf(widget.tab);
+                            if (currentIndex >= 0 && currentIndex < widget.tabsList.length - 1) {
+                              ref.read(tasteProfileTabProvider.notifier).setTab(widget.tabsList[currentIndex + 1]);
                             }
                           },
                           onLater: () => context.go('/home'),
+                          isLastTab: isLastTab,
                         ),
                       ),
                     ),
@@ -470,14 +472,16 @@ class _CardLayout extends StatelessWidget {
     required this.tab,
     required this.onTellMeMore,
     required this.onLater,
+    required this.isLastTab,
   });
 
   final bool isKnockoutLayer;
   final ScrollController scrollController;
   final List<String> messages;
-  final TasteProfileTab tab;
+  final String tab;
   final VoidCallback onTellMeMore;
   final VoidCallback onLater;
+  final bool isLastTab;
 
   @override
   Widget build(BuildContext context) {
@@ -485,85 +489,39 @@ class _CardLayout extends StatelessWidget {
     final List<String> paragraphs;
     final String systemReply1;
     final String systemReply2;
-    final bool isLastTab = tab == TasteProfileTab.books;
 
-    switch (tab) {
-      case TasteProfileTab.anime:
-        heroText = 'Tell me about your\ntaste in Anime';
-        paragraphs = [
-          "The shows you love. The ones you recommend to everyone. The ones that broke your heart.",
-          "The shows you couldn't stop thinking about. The ones you never understood the hype around. The ones that just didn't click.",
-          "The characters you connected with. The stories that stayed with you.",
-          "Tell me what keeps you coming back.",
-        ];
-        systemReply1 = "I think I've got a good sense of your taste in Anime now.";
-        systemReply2 = "I can start finding your first pick, or you can tell me a bit more about the specific things you like to improve what I recommend.";
-        break;
-      case TasteProfileTab.movies:
-        heroText = 'Tell me about your\ntaste in Movies';
-        paragraphs = [
-          "The films you love. The ones you recommend to everyone. The ones that broke your heart.",
-          "The films you couldn't stop thinking about. The ones you never understood the hype around. The ones that just didn't click.",
-          "The characters you connected with. The stories that stayed with you.",
-          "Tell me what keeps you coming back.",
-        ];
-        systemReply1 = "I think I've got a good sense of your taste in Movies now.";
-        systemReply2 = "I can start finding your first pick, or you can tell me a bit more about the specific things you like to improve what I recommend.";
-        break;
-      case TasteProfileTab.manga:
-        heroText = 'Tell me about your\ntaste in Manga';
-        paragraphs = [
-          "The series you love. The ones you recommend to everyone. The ones that broke your heart.",
-          "The series you couldn't stop thinking about. The ones you never understood the hype around. The ones that just didn't click.",
-          "The characters you connected with. The stories that stayed with you.",
-          "Tell me what keeps you coming back.",
-        ];
-        systemReply1 = "I think I've got a good sense of your taste in Manga now.";
-        systemReply2 = "I can start finding your first pick, or you can tell me a bit more about the specific things you like to improve what I recommend.";
-        break;
-      case TasteProfileTab.visualNovels:
-        heroText = 'Tell me about your\ntaste in Visual Novels';
-        paragraphs = [
-          "The novels you love. The ones you recommend to everyone. The ones that broke your heart.",
-          "The novels you couldn't stop thinking about. The ones you never understood the hype around. The ones that just didn't click.",
-          "The characters you connected with. The stories that stayed with you.",
-          "Tell me what keeps you coming back.",
-        ];
-        systemReply1 = "I think I've got a good sense of your taste in Visual Novels now.";
-        systemReply2 = "I can start finding your first pick, or you can tell me a bit more about the specific things you like to improve what I recommend.";
-        break;
-      case TasteProfileTab.books:
-        heroText = 'Tell me about your\ntaste in Books';
-        paragraphs = [
-          "The books you love. The ones you recommend to everyone. The ones that broke your heart.",
-          "The books you couldn't stop thinking about. The ones you never understood the hype around. The ones that just didn't click.",
-          "The characters you connected with. The stories that stayed with you.",
-          "Tell me what keeps you coming back.",
-        ];
-        systemReply1 = "I think I've got a good sense of your taste in Books now.";
-        systemReply2 = "We've covered everything! I'm ready to find your first pick.";
-        break;
-      case TasteProfileTab.you:
-      default:
-        heroText = 'Now, tell me about\nyou';
-        paragraphs = [
-          "I would love to know who you are.",
-          "The things that stay with you. The stories you love. The ones you didn't. The ones you couldn't stop thinking about.",
-          "Tell me what moves you. What bores you. What you're always looking for.",
-          "What stage of life you're in. How life's been treating you lately. There's no right answer.",
-          "Just tell me whatever comes to mind.",
-          "The more I get to know you, the better I'll get at finding things you'll genuinely connect with.",
-        ];
-        systemReply1 = "I think I've got a good sense of who you are now.";
-        systemReply2 = "I can start finding your first pick, or you can tell me a bit more about the specific things you like to improve what I recommend.";
-        break;
+    final String tabName = tab.toLowerCase();
+
+    if (tabName == 'you') {
+      heroText = 'Now, tell me about\nyou';
+      paragraphs = [
+        "I would love to know who you are.",
+        "The things that stay with you. The stories you love. The ones you didn't. The ones you couldn't stop thinking about.",
+        "Tell me what moves you. What bores you. What you're always looking for.",
+        "What stage of life you're in. How life's been treating you lately. There's no right answer.",
+        "Just tell me whatever comes to mind.",
+        "The more I get to know you, the better I'll get at finding things you'll genuinely connect with.",
+      ];
+      systemReply1 = "I think I've got a good sense of who you are now.";
+      systemReply2 = "I can start finding your first pick, or you can tell me a bit more about the specific things you like to improve what I recommend.";
+    } else {
+      heroText = 'Tell me about your\ntaste in $tab';
+      paragraphs = [
+        "The $tabName you love. The ones you recommend to everyone. The ones that broke your heart.",
+        "The $tabName you couldn't stop thinking about. The ones you never understood the hype around. The ones that just didn't click.",
+        "The characters you connected with. The stories that stayed with you.",
+        "Tell me what keeps you coming back.",
+      ];
+      systemReply1 = "I think I've got a good sense of your taste in $tab now.";
+      systemReply2 = isLastTab
+          ? "We've covered everything! I'm ready to find your first pick."
+          : "I can start finding your first pick, or you can tell me a bit more about the specific things you like to improve what I recommend.";
     }
-
 
     return SingleChildScrollView(
       controller: scrollController,
       physics: isKnockoutLayer
-          ? const NeverScrollableScrollPhysics()
+          ? const NeverScrollableScrollPhysics(parent: BouncingScrollPhysics())
           : const BouncingScrollPhysics(),
       padding: const EdgeInsets.only(bottom: 180),
       child: SafeArea(
