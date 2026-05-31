@@ -78,15 +78,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
-  Widget _buildFadedContent(Widget child) {
+  Widget _buildFadedContent(Widget child, double stableHeight) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double height = constraints.maxHeight;
+        final double height = stableHeight;
         
         double stopStart = 0.0;
         double stopEnd = 1.0;
         
-        if (height > 0 && !height.isInfinite) {
+        if (height > 0) {
           final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
           final isKeyboardOpen = keyboardHeight > 0;
           final safeBottom = MediaQuery.of(context).padding.bottom;
@@ -163,13 +163,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         resizeToAvoidBottomInset: false,
         body: LayoutBuilder(
           builder: (context, constraints) {
-            final screenHeight = MediaQuery.of(context).size.height;
-            final screenWidth = MediaQuery.of(context).size.width;
+            // stableHeight ignores OS window resizing when keyboard is open
+            final double stableHeight = MediaQuery.of(context).size.height + MediaQuery.of(context).viewInsets.bottom;
 
             return Stack(
               children: [
                 // ── Layer 0: Global Background ────────────────────────────
-                Positioned.fill(
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: stableHeight,
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 600),
                     child: activeRec != null && activeRec.posterUrl != null
@@ -196,12 +200,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           ),
                   ),
                 ),
-                Positioned.fill(
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: stableHeight,
                   child: Container(color: Colors.white.withValues(alpha: 0.15)),
                 ),
 
                 // ── Layer 1: Full-screen Knockout mask ──────────────────────
-                Positioned.fill(
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: stableHeight,
                   child: ShaderMask(
                     shaderCallback: (Rect bounds) {
                       return LinearGradient(
@@ -218,7 +230,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       color: Colors.transparent,
                       child: Stack(
                         children: [
-                          Positioned.fill(
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: stableHeight,
                             child: _buildFadedContent(
                               _PitchLayout(
                                 recommendation: rec,
@@ -227,6 +243,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                 messages: messages,
                                 isLoading: isLoading,
                               ),
+                              stableHeight,
                             ),
                           ),
                           Positioned(
@@ -247,10 +264,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
 
                 // ── Layer 2: Normal visible elements (overlay + real pills) ───
-                Positioned.fill(
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: stableHeight,
                   child: Stack(
                     children: [
-                      Positioned.fill(
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: stableHeight,
                         child: _buildFadedContent(
                           _PitchLayout(
                             recommendation: rec,
@@ -259,6 +284,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             messages: messages,
                             isLoading: isLoading,
                           ),
+                          stableHeight,
                         ),
                       ),
                       Positioned(
