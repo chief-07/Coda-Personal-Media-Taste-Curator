@@ -77,14 +77,18 @@ class _LibraryCardState extends State<LibraryCard> {
                     blendMode: BlendMode.srcOut,
                     child: Stack(
                       children: [
-                        Container(color: Colors.transparent),
-                        _CardLayout(
-                          isKnockoutLayer: true,
-                          scrollController: _maskScrollController,
-                          themeValue: _themeEnabled,
-                          audioValue: _audioEnabled,
-                          reduceAnimationsValue: _reduceAnimationsEnabled,
-                          currentTab: widget.tab,
+                        Positioned.fill(
+                          child: Container(color: Colors.transparent),
+                        ),
+                        Positioned.fill(
+                          child: _CardLayout(
+                            isKnockoutLayer: true,
+                            scrollController: _maskScrollController,
+                            themeValue: _themeEnabled,
+                            audioValue: _audioEnabled,
+                            reduceAnimationsValue: _reduceAnimationsEnabled,
+                            currentTab: widget.tab,
+                          ),
                         ),
                       ],
                     ),
@@ -92,16 +96,18 @@ class _LibraryCardState extends State<LibraryCard> {
                 ),
 
                 // ── Layer 2: Normal Elements ────────────────────────────────
-                _CardLayout(
-                  isKnockoutLayer: false,
-                  scrollController: _topScrollController,
-                  themeValue: _themeEnabled,
-                  audioValue: _audioEnabled,
-                  reduceAnimationsValue: _reduceAnimationsEnabled,
-                  currentTab: widget.tab,
-                  onThemeChanged: (val) => setState(() => _themeEnabled = val),
-                  onAudioChanged: (val) => setState(() => _audioEnabled = val),
-                  onReduceAnimationsChanged: (val) => setState(() => _reduceAnimationsEnabled = val),
+                Positioned.fill(
+                  child: _CardLayout(
+                    isKnockoutLayer: false,
+                    scrollController: _topScrollController,
+                    themeValue: _themeEnabled,
+                    audioValue: _audioEnabled,
+                    reduceAnimationsValue: _reduceAnimationsEnabled,
+                    currentTab: widget.tab,
+                    onThemeChanged: (val) => setState(() => _themeEnabled = val),
+                    onAudioChanged: (val) => setState(() => _audioEnabled = val),
+                    onReduceAnimationsChanged: (val) => setState(() => _reduceAnimationsEnabled = val),
+                  ),
                 ),
               ],
             ),
@@ -138,7 +144,11 @@ class _CardLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
+      controller: scrollController,
+      physics: isKnockoutLayer
+          ? const NeverScrollableScrollPhysics()
+          : const BouncingScrollPhysics(),
       padding: const EdgeInsets.only(bottom: 110),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

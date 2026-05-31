@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 
 const _askRecommendation = Recommendation(
   id: 'ask-coda',
@@ -39,9 +40,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _topScrollController = ScrollController();
   final _chatController = TextEditingController();
   final _chatFocusNode = FocusNode();
-  final List<String> _messages = [
-    'Anime, Movies, Manga\nVisual Novels, Books'
-  ];
 
   @override
   void initState() {
@@ -66,9 +64,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   void _sendMessage() {
     final text = _chatController.text.trim();
     if (text.isNotEmpty) {
-      setState(() {
-        _messages.add(text);
-      });
+      ref.read(onboardingControllerProvider.notifier).sendMessage(text);
       _chatController.clear();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_topScrollController.hasClients) {
@@ -91,8 +87,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         double stopEnd = 1.0;
         
         if (height > 0 && !height.isInfinite) {
-          final double fadeEnd = height - 70;
-          final double fadeStart = fadeEnd - 100;
+          final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+          final isKeyboardOpen = keyboardHeight > 0;
+          final safeBottom = MediaQuery.of(context).padding.bottom;
+          
+          final bottomPadding = isKeyboardOpen
+              ? keyboardHeight + 16.0
+              : safeBottom + 24.0;
+          
+          // Prompt bar container is 51.0 height. The fade should end at the top of the prompt bar container (plus a small buffer, e.g. 8px).
+          final double promptBarTop = height - bottomPadding - 51.0;
+          final double fadeEnd = promptBarTop - 8.0;
+          final double fadeStart = fadeEnd - 100.0;
+          
           stopStart = (fadeStart / height).clamp(0.0, 1.0);
           stopEnd = (fadeEnd / height).clamp(0.0, 1.0);
         }
@@ -124,6 +131,25 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final posterUrl = activeRec?.posterUrl;
     const rec = _askRecommendation;
 
+    final onboardingState = ref.watch(onboardingControllerProvider);
+    final messages = onboardingState.messages;
+    final isLoading = onboardingState.isLoading;
+
+    ref.listen(onboardingControllerProvider, (previous, next) {
+      if (previous?.messages.length != next.messages.length ||
+          previous?.isLoading != next.isLoading) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_topScrollController.hasClients) {
+            _topScrollController.animateTo(
+              _topScrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+          }
+        });
+      }
+    });
+
     return PopScope<Object?>(
       canPop: !_chatFocusNode.hasFocus,
       onPopInvokedWithResult: (didPop, result) {
@@ -134,7 +160,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: false,
         body: LayoutBuilder(
           builder: (context, constraints) {
             final screenHeight = MediaQuery.of(context).size.height;
@@ -198,7 +224,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                 recommendation: rec,
                                 isKnockoutLayer: true,
                                 scrollController: _maskScrollController,
-                                messages: _messages,
+                                messages: messages,
+                                isLoading: isLoading,
                               ),
                             ),
                           ),
@@ -229,7 +256,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             recommendation: rec,
                             isKnockoutLayer: false,
                             scrollController: _topScrollController,
-                            messages: _messages,
+                            messages: messages,
+                            isLoading: isLoading,
                           ),
                         ),
                       ),
@@ -265,21 +293,26 @@ class _PitchLayout extends StatelessWidget {
     required this.isKnockoutLayer,
     required this.scrollController,
     required this.messages,
+    required this.isLoading,
   });
 
   final Recommendation recommendation;
   final bool isKnockoutLayer;
   final ScrollController scrollController;
-  final List<String> messages;
+  final List<ChatMessage> messages;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final bottomPadding = 180.0 + keyboardHeight;
+
     return SingleChildScrollView(
       controller: scrollController,
       physics: isKnockoutLayer
-          ? const NeverScrollableScrollPhysics()
+          ? const NeverScrollableScrollPhysics(parent: BouncingScrollPhysics())
           : const BouncingScrollPhysics(),
-      padding: const EdgeInsets.only(bottom: 180),
+      padding: EdgeInsets.only(bottom: bottomPadding),
       child: SafeArea(
         top: true,
         bottom: false,
@@ -333,31 +366,34 @@ class _PitchLayout extends StatelessWidget {
               ),
             ),
 
-            // ── First User Message ───────────────────────────────────
-            if (messages.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: _buildChatBubble(messages.first),
-                ),
-              ),
+            // ── Messages List ────────────────────────────────────────
+            for (var i = 0; i < messages.length; i++) ...[
+              if (messages[i].isUser)
+                Padding(
+                  padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: _buildChatBubble(messages[i].text ?? ''),
+                  ),
+                )
+              else if (messages[i].chips != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 24, right: 24, bottom: 40),
+                  child: _buildChipsWrap(context, messages[i].chips!),
+                )
+              else
+                _buildCodaMessage(messages[i].text ?? ''),
+            ],
 
-            // ── Suggested Chips ──────────────────────────────────────
-            if (messages.isNotEmpty)
+            if (isLoading)
               Padding(
-                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 40),
-                child: _buildChipsWrap(context),
-              ),
-
-            // ── Subsequent User Messages ─────────────────────────────
-            for (var i = 1; i < messages.length; i++)
-              Padding(
-                padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: _buildChatBubble(messages[i]),
-                ),
+                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                child: isKnockoutLayer
+                    ? _buildBodyText('Coda is thinking...', Colors.black)
+                    : Opacity(
+                        opacity: 0,
+                        child: _buildBodyText('Coda is thinking...', Colors.white),
+                      ),
               ),
           ],
         ),
@@ -387,6 +423,18 @@ class _PitchLayout extends StatelessWidget {
         fontWeight: FontWeight.w700, // Bold
         height: 1.5,
       ),
+    );
+  }
+
+  Widget _buildCodaMessage(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+      child: isKnockoutLayer
+          ? _buildBodyText(text, Colors.black)
+          : Opacity(
+              opacity: 0,
+              child: _buildBodyText(text, Colors.white),
+            ),
     );
   }
 
@@ -421,15 +469,14 @@ class _PitchLayout extends StatelessWidget {
     );
   }
 
-  Widget _buildChipsWrap(BuildContext context) {
-    final chips = ['Anime', 'Movies', 'Manga', 'Visual N', 'Books'];
+  Widget _buildChipsWrap(BuildContext context, List<String> chipsList) {
 
     return Wrap(
       spacing: 8,
       runSpacing: 12,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        ...chips.map((chip) => _buildOutlineChip(chip)),
+        ...chipsList.map((chip) => _buildOutlineChip(chip)),
         GestureDetector(
           onTap: () => context.push('/taste-profile'),
           child: _buildCheckmarkButton(),
@@ -520,11 +567,12 @@ class _PromptBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isKeyboardOpen = View.of(context).viewInsets.bottom > 0;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardOpen = keyboardHeight > 0;
     final safeBottom = MediaQuery.of(context).padding.bottom;
     
     final bottomPadding = isKeyboardOpen
-        ? 16.0
+        ? keyboardHeight + 16.0
         : safeBottom + 24.0;
 
     return Padding(
