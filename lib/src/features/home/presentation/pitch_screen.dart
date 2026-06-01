@@ -195,7 +195,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
                   },
                   blendMode: BlendMode.srcOut,
                   child: Container(
-                    color: Colors.transparent,
+                    color: Colors.black.withValues(alpha: 0.01),
                     child: Stack(
                       children: [
                         Positioned.fill(

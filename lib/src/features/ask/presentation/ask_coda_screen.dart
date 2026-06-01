@@ -1,4 +1,3 @@
-import 'dart:ui' as dart_ui;
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
@@ -119,7 +118,6 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
   @override
   Widget build(BuildContext context) {
     final activeRec = ref.watch(homeRecommendationProvider);
-    final posterUrl = activeRec?.posterUrl;
     const rec = _askRecommendation;
 
     return PopScope<Object?>(
@@ -135,8 +133,6 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
         resizeToAvoidBottomInset: true,
         body: LayoutBuilder(
           builder: (context, constraints) {
-            final screenHeight = MediaQuery.of(context).size.height;
-            final screenWidth = MediaQuery.of(context).size.width;
 
             return Stack(
               children: [
@@ -155,7 +151,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
                     },
                     blendMode: BlendMode.srcOut,
                     child: Container(
-                      color: Colors.transparent,
+                      color: Colors.black.withValues(alpha: 0.01),
                       child: Stack(
                         children: [
                           Positioned.fill(

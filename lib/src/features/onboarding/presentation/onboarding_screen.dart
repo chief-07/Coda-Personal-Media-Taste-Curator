@@ -78,15 +78,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
-  Widget _buildFadedContent(Widget child, double stableHeight) {
+  Widget _buildFadedContent(Widget child) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double height = stableHeight;
+        final double height = constraints.maxHeight;
         
         double stopStart = 0.0;
         double stopEnd = 1.0;
         
-        if (height > 0) {
+        if (height > 0 && !height.isInfinite) {
           final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
           final isKeyboardOpen = keyboardHeight > 0;
           final safeBottom = MediaQuery.of(context).padding.bottom;
@@ -128,7 +128,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final activeRec = ref.watch(homeRecommendationProvider);
-    final posterUrl = activeRec?.posterUrl;
     const rec = _askRecommendation;
 
     final onboardingState = ref.watch(onboardingControllerProvider);
@@ -161,130 +160,67 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         resizeToAvoidBottomInset: false,
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            // stableHeight ignores OS window resizing when keyboard is open
-            final double stableHeight = MediaQuery.of(context).size.height + MediaQuery.of(context).viewInsets.bottom;
-
-            return Stack(
-              children: [
-                // ── Layer 0: Global Background ────────────────────────────
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: stableHeight,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 600),
-                    child: activeRec != null && activeRec.posterUrl != null
-                        ? Transform.scale(
-                            scale: 1.2,
-                            child: ImageFiltered(
-                              key: ValueKey(activeRec.posterUrl),
-                              imageFilter: dart_ui.ImageFilter.blur(
-                                sigmaX: 80,
-                                sigmaY: 80,
-                                tileMode: TileMode.mirror,
-                              ),
-                              child: Image(
-                                image: activeRec.posterUrl!.startsWith('assets/')
-                                    ? AssetImage(activeRec.posterUrl!)
-                                    : NetworkImage(activeRec.posterUrl!) as ImageProvider,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          )
-                        : Container(
-                            key: const ValueKey('empty'),
-                            color: const Color(0xFF101114),
+        body: Stack(
+          children: [
+            // ── Layer 0: Global Background ────────────────────────────
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 600),
+                child: activeRec != null && activeRec.posterUrl != null
+                    ? Transform.scale(
+                        scale: 1.2,
+                        child: ImageFiltered(
+                          key: ValueKey(activeRec.posterUrl),
+                          imageFilter: dart_ui.ImageFilter.blur(
+                            sigmaX: 80,
+                            sigmaY: 80,
+                            tileMode: TileMode.mirror,
                           ),
-                  ),
-                ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: stableHeight,
-                  child: Container(color: Colors.white.withValues(alpha: 0.15)),
-                ),
-
-                // ── Layer 1: Full-screen Knockout mask ──────────────────────
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: stableHeight,
-                  child: ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.75),
-                          Colors.black.withValues(alpha: 0.75),
-                        ],
-                      ).createShader(bounds);
-                    },
-                    blendMode: BlendMode.srcOut,
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            height: stableHeight,
-                            child: _buildFadedContent(
-                              _PitchLayout(
-                                recommendation: rec,
-                                isKnockoutLayer: true,
-                                scrollController: _maskScrollController,
-                                messages: messages,
-                                isLoading: isLoading,
-                              ),
-                              stableHeight,
-                            ),
+                          child: Image(
+                            image: activeRec.posterUrl!.startsWith('assets/')
+                                ? AssetImage(activeRec.posterUrl!)
+                                : NetworkImage(activeRec.posterUrl!) as ImageProvider,
+                            fit: BoxFit.cover,
                           ),
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            child: _PromptBar(
-                              isKnockoutLayer: true,
-                              chatController: _chatController,
-                              chatFocusNode: _chatFocusNode,
-                              onSend: () {},
-                            ),
-                          ),
-                        ],
+                        ),
+                      )
+                    : Container(
+                        key: const ValueKey('empty'),
+                        color: const Color(0xFF101114),
                       ),
-                    ),
-                  ),
-                ),
+              ),
+            ),
+            Positioned.fill(
+              child: Container(color: Colors.white.withValues(alpha: 0.15)),
+            ),
 
-                // ── Layer 2: Normal visible elements (overlay + real pills) ───
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: stableHeight,
+            // ── Layer 1: Full-screen Knockout mask ──────────────────────
+            Positioned.fill(
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.75),
+                      Colors.black.withValues(alpha: 0.75),
+                    ],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.srcOut,
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.01),
                   child: Stack(
                     children: [
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: stableHeight,
+                      Positioned.fill(
                         child: _buildFadedContent(
                           _PitchLayout(
                             recommendation: rec,
-                            isKnockoutLayer: false,
-                            scrollController: _topScrollController,
+                            isKnockoutLayer: true,
+                            scrollController: _maskScrollController,
                             messages: messages,
                             isLoading: isLoading,
                           ),
-                          stableHeight,
                         ),
                       ),
                       Positioned(
@@ -292,18 +228,48 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         right: 0,
                         bottom: 0,
                         child: _PromptBar(
-                          isKnockoutLayer: false,
+                          isKnockoutLayer: true,
                           chatController: _chatController,
                           chatFocusNode: _chatFocusNode,
-                          onSend: _sendMessage,
+                          onSend: () {},
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            );
-          },
+              ),
+            ),
+
+            // ── Layer 2: Normal visible elements (overlay + real pills) ───
+            Positioned.fill(
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: _buildFadedContent(
+                      _PitchLayout(
+                        recommendation: rec,
+                        isKnockoutLayer: false,
+                        scrollController: _topScrollController,
+                        messages: messages,
+                        isLoading: isLoading,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: _PromptBar(
+                      isKnockoutLayer: false,
+                      chatController: _chatController,
+                      chatFocusNode: _chatFocusNode,
+                      onSend: _sendMessage,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

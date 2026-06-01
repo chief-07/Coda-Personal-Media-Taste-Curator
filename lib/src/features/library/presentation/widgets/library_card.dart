@@ -47,12 +47,11 @@ class _LibraryCardState extends State<LibraryCard> {
       ), // Same radius as RecommendationCard
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: SizedBox(
-              width: double.infinity,
-              child: Stack(
-                children: [
+          return SizedBox(
+            width: double.infinity,
+            height: constraints.maxHeight,
+            child: Stack(
+              children: [
                 // ── Layer 1: Knockout Mask ──────────────────────────────────
                 Positioned.fill(
                   child: ShaderMask(
@@ -78,7 +77,7 @@ class _LibraryCardState extends State<LibraryCard> {
                     child: Stack(
                       children: [
                         Positioned.fill(
-                          child: Container(color: Colors.transparent),
+                          child: Container(color: Colors.black.withValues(alpha: 0.01)),
                         ),
                         Positioned.fill(
                           child: _CardLayout(
@@ -110,7 +109,6 @@ class _LibraryCardState extends State<LibraryCard> {
                   ),
                 ),
               ],
-            ),
             ),
           );
         },

@@ -71,7 +71,9 @@ class _RecommendationCardState extends State<RecommendationCard> {
                     blendMode: BlendMode.srcOut,
                     child: Stack(
                       children: [
-                        Container(color: Colors.transparent),
+                        Positioned.fill(
+                          child: Container(color: Colors.black.withValues(alpha: 0.01)),
+                        ),
                         _CardLayout(
                           recommendation: widget.recommendation,
                           isKnockoutLayer: true,
