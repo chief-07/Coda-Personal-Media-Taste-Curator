@@ -60,7 +60,39 @@ const callOpenAI = (messages, tools) => {
   });
 };
 
+const themeResearchCache = new Map();
+
+const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+const getCachedResearchForMessage = (messageText) => {
+  const hits = [];
+  const lowercaseMsg = messageText.toLowerCase();
+  for (const [cachedTitle, researchText] of themeResearchCache.entries()) {
+    const escaped = escapeRegExp(cachedTitle.toLowerCase());
+    const isAlphaNumericOnly = /^[a-z0-9 ]+$/i.test(cachedTitle);
+    let isMatch = false;
+    if (isAlphaNumericOnly) {
+      const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+      isMatch = regex.test(lowercaseMsg);
+    } else {
+      isMatch = lowercaseMsg.includes(cachedTitle.toLowerCase());
+    }
+    if (isMatch) {
+      hits.push({ title: cachedTitle, research: researchText });
+    }
+  }
+  return hits;
+};
+
 const researchMediaThemes = async (query) => {
+  const normalizedQuery = query.toLowerCase().trim();
+  if (themeResearchCache.has(normalizedQuery)) {
+    console.log(`[Research] Cache HIT for "${query}"`);
+    return themeResearchCache.get(normalizedQuery);
+  }
+
   let wikiSummary = "";
   let communityThemes = "";
 
@@ -142,7 +174,9 @@ const researchMediaThemes = async (query) => {
     }
   }
 
-  return `Wikipedia Summary:\n${wikiSummary || '(not found)'}\n\nCommunity Themes:\n${communityThemes || '(not found)'}`;
+  const result = `Wikipedia Summary:\n${wikiSummary || '(not found)'}\n\nCommunity Themes:\n${communityThemes || '(not found)'}`;
+  themeResearchCache.set(normalizedQuery, result);
+  return result;
 };
 
 const runTitleExtractor = async (userMessage) => {
@@ -159,28 +193,49 @@ const runTitleExtractor = async (userMessage) => {
   }
 };
 
+const triggerBackgroundResearch = (userMessage) => {
+  setImmediate(async () => {
+    try {
+      console.log(`[Background Research] Spawning title extraction for message: "${userMessage}"`);
+      const titles = await runTitleExtractor(userMessage);
+      if (titles && titles.length > 0) {
+        console.log(`[Background Research] Extracted titles to research:`, titles);
+        for (const title of titles) {
+          const normalizedTitle = title.toLowerCase().trim();
+          if (!themeResearchCache.has(normalizedTitle)) {
+            console.log(`[Background Research] Performing search for title: "${title}"`);
+            await researchMediaThemes(title);
+          } else {
+            console.log(`[Background Research] Title already cached: "${title}"`);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[Background Research Error]:', err.message);
+    }
+  });
+};
+
 const runOnboardingAgent = async (messagesPayload) => {
   // Extract user message (the last one)
   const userMessage = messagesPayload[messagesPayload.length - 1].content;
   
-  // 1. Aggressive Entity Extraction
-  const titles = await runTitleExtractor(userMessage);
+  // 1. Sync check cache for any matched titles
+  const cachedResearchHits = getCachedResearchForMessage(userMessage);
   
-  if (titles.length > 0) {
-    console.log(`[Agent] Aggressive Search Triggered for:`, titles);
-    // 2. Search Wikipedia and DDG for the titles
-    const searchPromises = titles.map(title => researchMediaThemes(title));
-    const searchResults = await Promise.all(searchPromises);
-    
-    // 3. Inject the context silently before Coda replies
-    const combinedContext = searchResults.join('\n\n---\n\n');
+  if (cachedResearchHits.length > 0) {
+    console.log(`[Agent] Synchronous Cache Hit during Chat:`, cachedResearchHits.map(h => h.title));
+    const combinedContext = cachedResearchHits.map(h => `Title: ${h.title}\nResearch:\n${h.research}`).join('\n\n---\n\n');
     messagesPayload.splice(messagesPayload.length - 1, 0, {
       role: 'system',
-      content: `[BACKGROUND RESEARCH]: The user just mentioned these titles: ${titles.join(', ')}. Here is the thematic analysis from the web (IMDb, MAL, Reddit, Wikipedia):\n${combinedContext}\n\nUse this context secretly to understand WHY the user likes these titles and finding the common psychological thread.`
+      content: `[BACKGROUND RESEARCH]: The user just mentioned these titles: ${cachedResearchHits.map(h => h.title).join(', ')}. Here is the thematic analysis from the web (IMDb, MAL, Reddit, Wikipedia):\n${combinedContext}\n\nUse this context secretly to understand WHY the user likes these titles and finding the common psychological thread.`
     });
   }
 
-  // 4. Main AI Call (no tools needed since we pre-searched)
+  // 2. Spawn async background research task for the message (do not await)
+  triggerBackgroundResearch(userMessage);
+
+  // 3. Main AI Call (runs instantly since it doesn't wait for web search)
   let responseMessage = await callOpenAI(messagesPayload, null);
 
   // Ensure JSON formatting
