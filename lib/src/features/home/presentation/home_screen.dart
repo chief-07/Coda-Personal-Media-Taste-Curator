@@ -1,4 +1,3 @@
-import 'dart:ui' as dart_ui;
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/presentation/widgets/media_type_tab_bar.dart';
@@ -28,7 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _onSwipeRight() {
-    final rec = ref.read(homeRecommendationProvider);
+    final rec = ref.read(homeRecommendationProvider).value;
     setState(() => _dragOffset = 0);
 
     if (rec != null) {
@@ -60,6 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SafeArea(
             bottom: false,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
                 MediaTypeTabBar(
@@ -69,45 +69,71 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: rec != null
-                      ? GestureDetector(
-                          onHorizontalDragUpdate: (details) {
-                            setState(() {
-                              _dragOffset += details.delta.dx;
-                            });
-                          },
-                          onHorizontalDragEnd: (details) {
-                            if (_dragOffset < -_swipeThreshold) {
-                              _onSwipeLeft();
-                            } else if (_dragOffset > _swipeThreshold) {
-                              _onSwipeRight();
-                            } else {
+                  child: rec.when(
+                    data: (data) => data != null
+                        ? GestureDetector(
+                            onHorizontalDragUpdate: (details) {
                               setState(() {
-                                _dragOffset = 0;
+                                _dragOffset += details.delta.dx;
                               });
-                            }
-                          },
-                          child: AnimatedContainer(
-                            duration: _dragOffset == 0
-                                ? const Duration(milliseconds: 300)
-                                : Duration.zero,
-                            curve: Curves.easeOut,
-                            transform: Matrix4.translationValues(
-                              _dragOffset * 0.4,
-                              0,
-                              0,
-                            )..rotateZ(_dragOffset * 0.0003),
-                            child: RecommendationCard(recommendation: rec),
-                          ),
-                        )
-                      : Center(
-                          child: Text(
-                            'No recommendation for ${selectedType.label} yet.',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.4),
+                            },
+                            onHorizontalDragEnd: (details) {
+                              if (_dragOffset < -_swipeThreshold) {
+                                _onSwipeLeft();
+                              } else if (_dragOffset > _swipeThreshold) {
+                                _onSwipeRight();
+                              } else {
+                                setState(() {
+                                  _dragOffset = 0;
+                                });
+                              }
+                            },
+                            child: AnimatedContainer(
+                              duration: _dragOffset == 0
+                                  ? const Duration(milliseconds: 300)
+                                  : Duration.zero,
+                              curve: Curves.easeOut,
+                              transform: Matrix4.translationValues(
+                                _dragOffset * 0.4,
+                                0,
+                                0,
+                              )..rotateZ(_dragOffset * 0.0003),
+                              child: RecommendationCard(recommendation: data),
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              'No recommendation for ${selectedType.label} yet.',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.4),
+                              ),
                             ),
                           ),
+                    loading: () => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircularProgressIndicator(color: Colors.white54),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Coda is thinking...',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    error: (e, st) => Center(
+                      child: Text(
+                        'Couldn\'t fetch a pick right now.',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.4),
                         ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

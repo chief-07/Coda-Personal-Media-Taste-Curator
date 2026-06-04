@@ -1,6 +1,7 @@
 enum MediaType {
   anime('Anime'),
   movie('Movies'),
+  tv('TV Shows'),
   visualNovel('Visual Novels'),
   manga('Manga'),
   game('Games'),

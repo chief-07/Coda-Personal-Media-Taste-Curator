@@ -149,7 +149,7 @@ class _CardLayout extends StatelessWidget {
                 ? _buildHeroText(Colors.black)
                 : GestureDetector(
                     onTap: () {
-                      context.push('/pitch/${recommendation.id}');
+                      context.push('/pitch/${recommendation.id}', extra: recommendation);
                     },
                     child: Opacity(
                       opacity: 0,
@@ -263,6 +263,44 @@ class _CardLayout extends StatelessWidget {
   }
 
   Widget _buildPoster() {
+    final hasHolder = recommendation.posterUrl != null && recommendation.posterUrl!.startsWith('holder:');
+    if (hasHolder) {
+      final title = recommendation.posterUrl!.substring(7);
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: recommendation.posterGradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: Colors.white.withValues(alpha: 0.9),
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.0,
+                shadows: [
+                  Shadow(
+                    offset: const Offset(2.0, 2.0),
+                    blurRadius: 10.0,
+                    color: Colors.black.withValues(alpha: 0.5),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Container(
       width: double
           .infinity, // Forces poster to span all available horizontal space up to margins

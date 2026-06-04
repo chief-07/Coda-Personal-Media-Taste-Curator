@@ -9,7 +9,7 @@ class CurrentSessionScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final recommendation =
         ref.watch(activeSessionProvider) ??
-        ref.watch(homeRecommendationProvider);
+        ref.watch(homeRecommendationProvider).value;
 
     return Scaffold(
       body: SafeArea(

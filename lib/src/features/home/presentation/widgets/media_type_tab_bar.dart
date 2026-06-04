@@ -44,6 +44,7 @@ class _MediaTypeTabBarState extends State<MediaTypeTabBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       height: 41,
       padding: const EdgeInsets.only(left: 8),
       child: ShaderMask(

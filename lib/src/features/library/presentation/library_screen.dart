@@ -26,6 +26,7 @@ class LibraryScreen extends ConsumerWidget {
           SafeArea(
             bottom: false,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
                 LibraryTabBar(

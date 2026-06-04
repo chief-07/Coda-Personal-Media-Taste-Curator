@@ -1,4 +1,6 @@
+import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/features/onboarding/data/coda_ai_service.dart';
+import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatMessage {
@@ -38,7 +40,25 @@ class OnboardingController extends Notifier<OnboardingState> {
 
   @override
   OnboardingState build() {
+    // Temporarily disabled loading saved chips on start to allow previewing
+    // final prefs = ref.watch(sharedPreferencesProvider);
+    // final savedChips = prefs.getStringList('coda_onboarding_chips');
+    // if (savedChips != null && savedChips.isNotEmpty) {
+    //   return OnboardingState(
+    //     messages: [
+    //       ChatMessage(chips: savedChips, isUser: false),
+    //     ],
+    //     isLoading: false,
+    //   );
+    // }
     return OnboardingState(
+      messages: [],
+      isLoading: false,
+    );
+  }
+
+  void reset() {
+    state = OnboardingState(
       messages: [],
       isLoading: false,
     );
@@ -70,22 +90,41 @@ class OnboardingController extends Notifier<OnboardingState> {
         updatedMessages.sublist(0, updatedMessages.length - 1), // pass previous history
       );
 
-      if (response.status == 'success' && response.chips != null) {
+      final prefs = ref.read(sharedPreferencesProvider);
+
+      if (response.memoryUpdates != null) {
+        await ref.read(livingMemoryProvider.notifier).applyUpdates(response.memoryUpdates!);
+      }
+
+      if (response.message != null) {
         final withCodaResponse = List<ChatMessage>.from(state.messages)
-          ..add(ChatMessage(chips: response.chips, isUser: false));
+          ..add(ChatMessage(
+            text: response.message,
+            chips: response.status == 'success' ? response.chips : null,
+            isUser: false,
+          ));
 
         state = state.copyWith(
           messages: withCodaResponse,
           isLoading: false,
         );
-      } else if (response.status == 'need_more' && response.message != null) {
+
+        if (response.status == 'success' && response.chips != null) {
+          await prefs.setStringList('coda_onboarding_chips', response.chips!);
+        }
+      } else if (response.chips != null) {
         final withCodaResponse = List<ChatMessage>.from(state.messages)
-          ..add(ChatMessage(text: response.message!, isUser: false));
-        
+          ..add(ChatMessage(
+            chips: response.chips,
+            isUser: false,
+          ));
+
         state = state.copyWith(
           messages: withCodaResponse,
           isLoading: false,
         );
+
+        await prefs.setStringList('coda_onboarding_chips', response.chips!);
       } else {
         state = state.copyWith(isLoading: false);
       }

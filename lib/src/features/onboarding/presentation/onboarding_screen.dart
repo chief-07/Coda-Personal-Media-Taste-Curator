@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
+import 'package:coda/src/core/memory/living_memory.dart';
 
 const _askRecommendation = Recommendation(
   id: 'ask-coda',
@@ -44,6 +45,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(livingMemoryProvider.notifier).clearMemory();
+      ref.read(onboardingControllerProvider.notifier).reset();
+    });
     _topScrollController.addListener(() {
       if (_maskScrollController.hasClients &&
           _topScrollController.offset != _maskScrollController.offset) {
@@ -127,7 +132,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final activeRec = ref.watch(homeRecommendationProvider);
+    final activeRec = ref.watch(homeRecommendationProvider).value;
     const rec = _askRecommendation;
 
     final onboardingState = ref.watch(onboardingControllerProvider);
@@ -184,9 +189,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           ),
                         ),
                       )
-                    : Container(
-                        key: const ValueKey('empty'),
-                        color: const Color(0xFF101114),
+                    : Transform.scale(
+                        scale: 1.2,
+                        key: const ValueKey('default_bg'),
+                        child: ImageFiltered(
+                          imageFilter: dart_ui.ImageFilter.blur(
+                            sigmaX: 80,
+                            sigmaY: 80,
+                            tileMode: TileMode.mirror,
+                          ),
+                          child: const Image(
+                            image: AssetImage('assets/images/default_bg.jpg'),
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ),
                       ),
               ),
             ),

@@ -151,7 +151,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
                 left: 0,
                 width: screenWidth,
                 height: screenHeight,
-                child: rec.posterUrl != null
+                child: rec.posterUrl != null && !rec.posterUrl!.startsWith('holder:')
                     ? Transform.scale(
                         scale: 1.2,
                         child: ImageFiltered(

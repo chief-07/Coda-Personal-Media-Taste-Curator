@@ -1,4 +1,3 @@
-import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:flutter/material.dart';
@@ -117,7 +116,6 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final activeRec = ref.watch(homeRecommendationProvider);
     const rec = _askRecommendation;
 
     return PopScope<Object?>(

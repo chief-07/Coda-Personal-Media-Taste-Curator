@@ -18,7 +18,7 @@ class CodaShell extends ConsumerWidget {
     final isKeyboardOpen = mediaQuery != null && mediaQuery.viewInsets.bottom > 0;
     final bottomPadding = mediaQuery != null ? mediaQuery.padding.bottom + 16 : 16.0;
 
-    final rec = ref.watch(homeRecommendationProvider);
+    final rec = ref.watch(homeRecommendationProvider).value;
 
     return Scaffold(
       backgroundColor: const Color(0xFF101114),
@@ -26,32 +26,57 @@ class CodaShell extends ConsumerWidget {
         children: [
           // ── Global Background ────────────────────────────
           Positioned.fill(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 600),
-              child: rec != null && rec.posterUrl != null
-                  ? Transform.scale(
-                      scale: 1.2,
-                      child: ImageFiltered(
-                        key: ValueKey(rec.posterUrl),
-                        imageFilter: ImageFilter.blur(
-                          sigmaX: 80,
-                          sigmaY: 80,
-                          tileMode: TileMode.mirror,
-                        ),
-                        child: Image(
-                          image: rec.posterUrl!.startsWith('assets/')
-                              ? AssetImage(rec.posterUrl!)
-                              : NetworkImage(rec.posterUrl!) as ImageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      key: const ValueKey('empty'),
-                      color: const Color(0xFF101114),
-                    ),
+            child: Transform.scale(
+              scale: 1.2,
+              child: ImageFiltered(
+                imageFilter: ImageFilter.blur(
+                  sigmaX: 80,
+                  sigmaY: 80,
+                  tileMode: TileMode.mirror,
+                ),
+                child: const Image(
+                  image: AssetImage('assets/images/default_bg.jpg'),
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ),
             ),
           ),
+          if (rec != null && rec.posterUrl != null && !rec.posterUrl!.startsWith('holder:'))
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 600),
+                child: Transform.scale(
+                  scale: 1.2,
+                  key: ValueKey(rec.posterUrl),
+                  child: ImageFiltered(
+                    imageFilter: ImageFilter.blur(
+                      sigmaX: 80,
+                      sigmaY: 80,
+                      tileMode: TileMode.mirror,
+                    ),
+                    child: Image(
+                      image: rec.posterUrl!.startsWith('assets/')
+                          ? AssetImage(rec.posterUrl!)
+                          : NetworkImage(rec.posterUrl!) as ImageProvider,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                        if (wasSynchronouslyLoaded) return child;
+                        return AnimatedOpacity(
+                          opacity: frame == null ? 0.0 : 1.0,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOut,
+                          child: child,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
           Positioned.fill(
             child: Container(color: Colors.white.withValues(alpha: 0.15)),
           ),

@@ -1,5 +1,6 @@
 import 'dart:ui' as dart_ui;
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
+import 'package:coda/src/features/onboarding/application/taste_profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,7 +23,7 @@ class TasteProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedTab = ref.watch(tasteProfileTabProvider);
-    final activeRec = ref.watch(homeRecommendationProvider);
+    final activeRec = ref.watch(homeRecommendationProvider).value;
 
     // Extract selected chips from onboarding controller messages
     final onboardingState = ref.watch(onboardingControllerProvider);
@@ -43,32 +44,57 @@ class TasteProfileScreen extends ConsumerWidget {
         children: [
           // ── Background ────────────────────────────
           Positioned.fill(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 600),
-              child: activeRec != null && activeRec.posterUrl != null
-                  ? Transform.scale(
-                      scale: 1.2,
-                      child: ImageFiltered(
-                        key: ValueKey(activeRec.posterUrl),
-                        imageFilter: dart_ui.ImageFilter.blur(
-                          sigmaX: 80,
-                          sigmaY: 80,
-                          tileMode: TileMode.mirror,
-                        ),
-                        child: Image(
-                          image: activeRec.posterUrl!.startsWith('assets/')
-                              ? AssetImage(activeRec.posterUrl!)
-                              : NetworkImage(activeRec.posterUrl!) as ImageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      key: const ValueKey('empty'),
-                      color: const Color(0xFF101114),
-                    ),
+            child: Transform.scale(
+              scale: 1.2,
+              child: ImageFiltered(
+                imageFilter: dart_ui.ImageFilter.blur(
+                  sigmaX: 80,
+                  sigmaY: 80,
+                  tileMode: TileMode.mirror,
+                ),
+                child: const Image(
+                  image: AssetImage('assets/images/default_bg.jpg'),
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ),
             ),
           ),
+          if (activeRec != null && activeRec.posterUrl != null && !activeRec.posterUrl!.startsWith('holder:'))
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 600),
+                child: Transform.scale(
+                  scale: 1.2,
+                  key: ValueKey(activeRec.posterUrl),
+                  child: ImageFiltered(
+                    imageFilter: dart_ui.ImageFilter.blur(
+                      sigmaX: 80,
+                      sigmaY: 80,
+                      tileMode: TileMode.mirror,
+                    ),
+                    child: Image(
+                      image: activeRec.posterUrl!.startsWith('assets/')
+                          ? AssetImage(activeRec.posterUrl!)
+                          : NetworkImage(activeRec.posterUrl!) as ImageProvider,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                        if (wasSynchronouslyLoaded) return child;
+                        return AnimatedOpacity(
+                          opacity: frame == null ? 0.0 : 1.0,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOut,
+                          child: child,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
           Positioned.fill(
             child: Container(color: Colors.white.withValues(alpha: 0.15)),
           ),
@@ -250,32 +276,10 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
   final _topScrollController = ScrollController();
   final _chatController = TextEditingController();
   final _chatFocusNode = FocusNode();
-  late final List<String> _messages;
 
   @override
   void initState() {
     super.initState();
-    final tabName = widget.tab.toLowerCase();
-    if (tabName == 'anime') {
-      _messages = ["I usually love mecha and psychological thrillers. Stories that make me question reality, like Evangelion or Serial Experiments Lain."];
-    } else if (tabName == 'movies') {
-      _messages = ["I'm a big fan of indie dramas and sci-fi films with great cinematography."];
-    } else if (tabName == 'manga') {
-      _messages = ["I read a lot of slice-of-life and dark fantasy. Anything with incredibly detailed art."];
-    } else if (tabName == 'visual novel' || tabName == 'visual novels') {
-      _messages = ["I enjoy deep, branching narratives with multiple endings. Sci-fi and mystery are my favorites."];
-    } else if (tabName == 'books') {
-      _messages = ["I mostly read historical fiction and high fantasy epics."];
-    } else if (tabName == 'games') {
-      _messages = ["I love open world RPGs and narrative driven action-adventure games."];
-    } else if (tabName == 'you') {
-      _messages = [
-        "I'm a 24 year old creative living in the city. I'm usually drawn to stories about self-discovery, beautifully animated worlds, or anything that just feels really atmospheric and grounded. I love finding hidden gems."
-      ];
-    } else {
-      _messages = ["I love finding stories that have a unique atmosphere and memorable characters."];
-    }
-
     _topScrollController.addListener(() {
       if (_maskScrollController.hasClients &&
           _topScrollController.offset != _maskScrollController.offset) {
@@ -296,9 +300,7 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
   void _sendMessage() {
     final text = _chatController.text.trim();
     if (text.isNotEmpty) {
-      setState(() {
-        _messages.add(text);
-      });
+      ref.read(tasteProfileControllerProvider.notifier).sendMessage(widget.tab, text);
       _chatController.clear();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_topScrollController.hasClients) {
@@ -357,6 +359,10 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
   @override
   Widget build(BuildContext context) {
     final bool isLastTab = widget.tab == widget.tabsList.last;
+    final tabState = ref.watch(tasteProfileControllerProvider).tabs[widget.tab.toLowerCase()] ?? TasteProfileTabState(messages: [], showButtons: false, isLoading: false);
+    final messages = tabState.messages;
+    final showButtons = tabState.showButtons;
+    final isLoading = tabState.isLoading;
 
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(64)),
@@ -387,15 +393,24 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                             _CardLayout(
                               isKnockoutLayer: true,
                               scrollController: _maskScrollController,
-                              messages: _messages,
+                              messages: messages,
+                              showButtons: showButtons,
+                              isLoading: isLoading,
                               tab: widget.tab,
-                              onTellMeMore: () {
+                              onTellMeMore: () async {
                                 final currentIndex = widget.tabsList.indexOf(widget.tab);
                                 if (currentIndex >= 0 && currentIndex < widget.tabsList.length - 1) {
+                                  await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
                                   ref.read(tasteProfileTabProvider.notifier).setTab(widget.tabsList[currentIndex + 1]);
                                 }
                               },
-                              onLater: () => context.go('/home'),
+                              onLater: () async {
+                                await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
+                                if (isLastTab) {
+                                  await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
+                                }
+                                if (context.mounted) context.go('/home');
+                              },
                               isLastTab: isLastTab,
                             ),
                           ),
@@ -426,15 +441,24 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                         _CardLayout(
                           isKnockoutLayer: false,
                           scrollController: _topScrollController,
-                          messages: _messages,
+                          messages: messages,
+                          showButtons: showButtons,
+                          isLoading: isLoading,
                           tab: widget.tab,
-                          onTellMeMore: () {
+                          onTellMeMore: () async {
                             final currentIndex = widget.tabsList.indexOf(widget.tab);
                             if (currentIndex >= 0 && currentIndex < widget.tabsList.length - 1) {
+                              await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
                               ref.read(tasteProfileTabProvider.notifier).setTab(widget.tabsList[currentIndex + 1]);
                             }
                           },
-                          onLater: () => context.go('/home'),
+                          onLater: () async {
+                                await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
+                                if (isLastTab) {
+                                  await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
+                                }
+                                if (context.mounted) context.go('/home');
+                              },
                           isLastTab: isLastTab,
                         ),
                       ),
@@ -469,6 +493,8 @@ class _CardLayout extends StatelessWidget {
     required this.isKnockoutLayer,
     required this.scrollController,
     required this.messages,
+    required this.showButtons,
+    required this.isLoading,
     required this.tab,
     required this.onTellMeMore,
     required this.onLater,
@@ -477,7 +503,9 @@ class _CardLayout extends StatelessWidget {
 
   final bool isKnockoutLayer;
   final ScrollController scrollController;
-  final List<String> messages;
+  final List<ChatMessage> messages;
+  final bool showButtons;
+  final bool isLoading;
   final String tab;
   final VoidCallback onTellMeMore;
   final VoidCallback onLater;
@@ -579,38 +607,41 @@ class _CardLayout extends StatelessWidget {
               ),
             ),
 
-            // ── First User Chat Message (Mock) ───────────────────────
-            if (messages.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: _buildChatBubble(messages.first),
+            // ── Dynamic Messages List (skip first message, which is static Coda greeting) ──
+            for (var i = 1; i < messages.length; i++) ...[
+              if (messages[i].isUser)
+                Padding(
+                  padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: _buildChatBubble(messages[i].text ?? ""),
+                  ),
+                )
+              else if (messages[i].text != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                  child: isKnockoutLayer
+                      ? _buildBodyText(messages[i].text!, Colors.black)
+                      : Opacity(
+                          opacity: 0,
+                          child: _buildBodyText(messages[i].text!, Colors.white),
+                        ),
                 ),
-              ),
+            ],
 
-            // ── System Follow-up ─────────────────────────────────────
-            if (messages.isNotEmpty) ...[
+            if (isLoading)
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
                 child: isKnockoutLayer
-                    ? _buildBodyText(systemReply1, Colors.black)
+                    ? _buildBodyText('Coda is thinking...', Colors.black)
                     : Opacity(
                         opacity: 0,
-                        child: _buildBodyText(systemReply1, Colors.white),
+                        child: _buildBodyText('Coda is thinking...', Colors.white),
                       ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 32),
-                child: isKnockoutLayer
-                    ? _buildBodyText(systemReply2, Colors.black)
-                    : Opacity(
-                        opacity: 0,
-                        child: _buildBodyText(systemReply2, Colors.white),
-                      ),
-              ),
-              
-              // ── Action Buttons ───────────────────────────────────────
+
+            // ── Action Buttons ───────────────────────────────────────
+            if (showButtons)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: isLastTab
@@ -638,21 +669,7 @@ class _CardLayout extends StatelessWidget {
                           ),
                         ],
                       ),
-              ),
-
-              // ── Additional User Chat Messages ───────────────────────
-              if (messages.length > 1) ...[
-                const SizedBox(height: 24),
-                for (int i = 1; i < messages.length; i++)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: _buildChatBubble(messages[i]),
-                    ),
-                  ),
-              ],
-            ],
+              )
           ],
         ),
       ),
