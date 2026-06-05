@@ -73,30 +73,30 @@ router.post('/', async (req, res) => {
 
       // 2c. Kitsu — structured title search with ratings + synopsis
       console.log('[Recommend]   2c. Searching Kitsu...');
-      for (const query of search_queries.slice(0, 2)) {
+      for (const query of search_queries.slice(0, 3)) {
         const kitsuSnippets = await searchService.fetchKitsuAnimeSnippets(query);
         scrapedSnippets = scrapedSnippets.concat(kitsuSnippets);
         console.log(`[Recommend]   Kitsu "${query}": ${kitsuSnippets.length} snippets`);
-        if (scrapedSnippets.length >= 12) break;
+        if (scrapedSnippets.length >= 16) break;
       }
 
       // 2d. AniList search — score, genres, tags, similar titles
       console.log('[Recommend]   2d. Searching AniList...');
-      for (const query of search_queries.slice(0, 2)) {
+      for (const query of search_queries.slice(0, 3)) {
         const aniListSnippets = await searchService.fetchAniListAnimeSnippets(query);
         scrapedSnippets = scrapedSnippets.concat(aniListSnippets);
         console.log(`[Recommend]   AniList Search "${query}": ${aniListSnippets.length} snippets`);
-        if (scrapedSnippets.length >= 16) break;
+        if (scrapedSnippets.length >= 20) break;
       }
 
       // 2e. Web search (DDG → Yahoo → Bing) — for broader discovery
-      if (scrapedSnippets.length < 10) {
+      if (scrapedSnippets.length < 15) {
         console.log('[Recommend]   2e. Web search for broader discovery...');
         for (const query of search_queries) {
           const webSnippets = await searchService.scrapeForums(query);
           scrapedSnippets = scrapedSnippets.concat(webSnippets);
           console.log(`[Recommend]   Web "${query}": ${webSnippets.length} snippets`);
-          if (scrapedSnippets.length >= 16) break;
+          if (scrapedSnippets.length >= 20) break;
         }
       }
 
@@ -107,7 +107,7 @@ router.post('/', async (req, res) => {
         const webSnippets = await searchService.scrapeForums(query);
         scrapedSnippets = scrapedSnippets.concat(webSnippets);
         console.log(`[Recommend]   Web "${query}": ${webSnippets.length} snippets`);
-        if (scrapedSnippets.length >= 8) break;
+        if (scrapedSnippets.length >= 20) break;
       }
     }
 

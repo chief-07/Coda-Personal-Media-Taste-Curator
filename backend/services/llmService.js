@@ -73,8 +73,18 @@ You will be given a user's Taste Profile (core identity, recent context, and gua
 Your job is to:
 1. Synthesize this into a highly specific Master Directive.
 2. Determine the "media_type" (which MUST be EXACTLY "${requestedMediaType}").
-3. Generate an array of 2-3 web search queries to find human-vetted recommendations.
+3. Generate an array of exactly 5 distinct, highly targeted web search queries to find human-vetted recommendations.
 4. If the media_type is "anime", extract up to 2 specific favorite anime titles that they love from their profile in "mal_anime_titles" ONLY if they directly align with the user's current request/craving in "recent_context". If no specific favorite anime titles in their profile are relevant to the current request, set "mal_anime_titles" to an empty array [].
+
+**SEARCH QUERY CRITERIA:**
+- You MUST generate exactly 5 search queries.
+- Each query must target a different angle of the user's profile:
+  1. Specific Taste Alignment (e.g. searching for similar genres/vibes to the user's stated category favorites like Tsukihime, Katawa Shoujo, or Steins;Gate).
+  2. Global/Psychological Profile Alignment (projecting their overall temperament, core needs, age/demographic context, and emotional triggers onto the requested media type).
+  3. Structural/Narrative Similarities (e.g. searching for complex character routing, school life with trauma, deep emotional casts).
+  4. Thematic/Genre Isolation (e.g. searching for specific narrative themes like love and loss, existential sci-fi, time travel, or tragedy).
+  5. Vibe/Atmosphere & Local Context (matching their current mood, time of day/weather, or specific atmospheric preferences like "cool night Ghibli vibe" or "late night slow-burn").
+- All queries must be site-constrained (e.g. site:vndb.org, site:reddit.com/r/visualnovels, site:reddit.com/r/MovieSuggestions, etc.) depending on the media type.
 
 **CRITICAL MEDIA FORMAT ALIGNMENT:**
 - The requested media format is strictly: "${requestedMediaType}".
@@ -82,7 +92,7 @@ Your job is to:
 - You MUST ignore any active cravings, references, or context in "recent_context" that pertain to other media formats. If the requested format is "${requestedMediaType}", do not generate queries or recommendations for other types. If the user was recently looking for something else (e.g. visual novels) but the current requested format is "${requestedMediaType}" (e.g. anime), ignore the visual novel context completely.
 
 **SCENARIO A / SCENARIO B LOGIC:**
-Read the "core_identity" field, which contains general temperament and a section like "Specific Tastes in <Media Format Label>: <tastes>".
+- Read the "core_identity" field, which contains general temperament and a section like "Specific Tastes in <Media Format Label>: <tastes>".
 - **Scenario A (Active Category is Empty)**: If the Specific Tastes section for the requested media type is "None" or empty, this is Scenario A. You MUST map the user's global identity traits (personality, age group, emotional triggers, preferred vibes/themes) to project recommendations onto the requested format "${requestedMediaType}". Make queries that would fit their temperament in "${requestedMediaType}".
 - **Scenario B (Active Category is Populated)**: If the Specific Tastes section for the requested media type has actual preferences (not "None"), this is Scenario B. You must combine their global profile, specific category tastes, and any cross-media thematic connections to generate highly specific search queries.
 
@@ -105,7 +115,7 @@ Read the "core_identity" field, which contains general temperament and a section
 Respond ONLY with a JSON object:
 {
   "media_type": "${requestedMediaType}",
-  "search_queries": ["query1", "query2"],
+  "search_queries": ["query1", "query2", "query3", "query4", "query5"],
   "master_directive": "A 2-sentence summary of exactly what to look for and why.",
   "mal_anime_titles": ["title1", "title2"]
 }
@@ -199,7 +209,8 @@ RULES — CRITICALLY IMPORTANT:
 3. Connect the dots. From the media they love, deduce:
    - What type of person are they? (e.g. "An introspective thinker seeking cathartic resolution through character-driven dramas.")
    - What do they value? (e.g. "Values narrative stakes, deep characters with trauma, and stories that leave a lasting emotional impact.")
-   - Cross-media connections: "Bridges their love of Steins;Gate and Interstellar through a fascination with emotional sci-fi where characters bend time/space for love."
+   - Cross-media and cultural/geographic connections (CRITICAL): Analyze their favorite works across categories (e.g., if they like Anime and also mention Visual Novels like Tsukihime or Katawa Shoujo, explicitly identify their strong preference for Japanese media aesthetics, character tropes, sub-genres like nakige/utsuge, and visual novel/light novel storytelling styles).
+   - Cross-media connections: "Bridges their love of Steins;Gate, Tsukihime, and Katawa Shoujo through a fascination with Japanese media aesthetics, school-life/sci-fi settings, and characters dealing with trauma."
 4. The "global_identity_overwrite" should be 2-4 clean, deeply insightful sentences — no bullet soup.
 ${categoryInstruction}
 6. Keep "recent_context_overwrite" tightly focused on what they want RIGHT NOW.
@@ -286,9 +297,12 @@ You are the Coda Profile Harmonizer.
 Your job is to read the user's entire 'Living Memory' containing their global identity preferences and category-specific taste profiles, along with the background research on the specific media titles they enjoy.
 You will perform a global harmonization pass:
 1. Decode the person: Who are they as a person? What are the common threads across all the media categories they enjoy? Deduce their likely age group/demographic (e.g. late teens, mid-20s, 30s) and temperament based on their choices and how they talk about them.
-2. Connect the dots: Look at the themes, emotional cores, and style of the specific works they love. Find the unifying threads (e.g. drawn to existential questions, complex romantic dynamics, slow-paced character growth, high stakes).
+2. Connect the dots & cross-media style patterns (CRITICAL):
+   - Look at the themes, emotional cores, and styles of the specific works they love across all categories.
+   - Find cross-media and cultural/geographic correlations: for example, if they like Anime (e.g., Steins;Gate, Monogatari) and also mention Visual Novels (e.g., Tsukihime, Katawa Shoujo), explicitly deduce and record their strong preference for Japanese media aesthetics, character tropes, sub-genres like nakige/utsuge, and visual novel/light novel storytelling styles.
+   - Trace the psychological relationships between these likes (e.g., how their love of a painter protagonist or a tragic romance in one format maps onto their overall preference for stories about the beauty and cruelty of life).
 3. Synthesize a clean, 2-paragraph core identity. 
-   - First paragraph: Describe who they are, their general temperament, likely age/demographic context, and the psychological needs their media satisfies.
+   - First paragraph: Describe who they are, their general temperament, likely age/demographic context, and the psychological needs their media satisfies. Explicitly mention any strong cultural or stylistic inclinations (such as a deep alignment with Japanese anime/VN aesthetics and narrative structures).
    - Second paragraph: Describe the specific unifying themes, motifs, and narrative styles they seek across different formats. Make it beautiful, cohesive prose (no bullet points or lists).
 4. Clean and consolidate the category-specific profiles, outputting them in "category_profiles_overwrite". 
    CRITICAL: Remove all redundancies, word soup, and exact duplicates. Cleanly rewrite each category's list to compress and merge similar-meaning points (e.g., if there are multiple entries like "Loves Steins;Gate" and "Loves Steins;Gate for romance", consolidate them into a single clean statement like "Loves Steins;Gate for its romance and psychological depth").

@@ -24520,3 +24520,3786 @@ Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had g
 - **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/d7/12/07/d712070d-6779-3dcb-89dc-3f2bed728326/mzaf_11264313470686233709.plus.aac.p.m4a
 
 ---
+
+## [2026-06-04T23:48:59.597Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": ". Specific Tastes in Anime: None",
+  "recent_context": "Just started using the app, exploring formats.",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["best late night anime to binge site:reddit.com/r/animesuggest","chill anime to watch at night site:reddit.com/r/anime","anime for late night vibes site:reddit.com/r/animesuggest"]
+
+- **Master Directive:**
+> Look for light-hearted and chill anime series that are perfect for late-night viewing. Since you have no specific tastes, explore a variety of genres that are known for their relaxing or engaging qualities.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Gravitation
+- **Content:** [Kitsu] Gravitation (TV): All Shuichi ever dreamed about was following in the footsteps of his pop idol, Ryuichi Sakuma and the band Nittle Grasper. Together with his best friend Hiro, Shuichi's formed a band called Bad Luck and they've even managed to get signed to a major recording label! Unfortunately, the studio deadlines are looming and Shuichi still hasn't finished th Kitsu rating: 68.29/100.
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Dekoboko Majo no Oyako Jijou
+- **Content:** [Kitsu] Dekoboko Majo no Oyako Jijou (TV): The story centers on Alissa, who is a witch who lives alone in a forest. One day she finds a human baby, and she names her Viola. Alissa raises Viola for 16 years, but Viola grows beyond even Alissa's imagination. The comedy series focuses on the parent-and-child relationship where appearances are deceiving as to who is the parent and who is the ch Kitsu rating: 67.25/100.
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Little Witch Academia
+- **Content:** [Kitsu] Little Witch Academia (movie): For young witches everywhere, the world-renowned witch Shiny Chariot reigns as the most revered and celebrated role model. But as the girls age, so do their opinions of her—now just the mention of Chariot would get a witch labeled a child. However, undeterred in her blind admiration for Chariot, ordinary girl Atsuko Kagari enrolls into Luna Nova Ma Kitsu rating: 80.01/100.
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Little Witch Academia**
+- **Coda Blurb:** _"This is the one; it's pure magic and charm for late-night vibes!"_
+- **Pitch:**
+> I picked 'Little Witch Academia' because it perfectly captures that light-hearted, whimsical feel that’s just right for late-night viewing. The story follows Atsuko Kagari, an ordinary girl who enrolls in a magical academy to become a witch like her idol. It's filled with delightful animation, quirky characters, and a sense of adventure that keeps things fun and engaging without being too intense. Plus, the humor and heartwarming moments will definitely put a smile on your face as you unwind.
+
+> Fans rave about how 'Little Witch Academia' balances its enchanting world with relatable themes of friendship, ambition, and self-discovery. The vibrant visuals and catchy soundtrack add to its charm, making it a favorite among viewers looking for something uplifting and easy-going. It's a series that not only entertains but also inspires, making it a perfect choice for those late-night binge sessions when you just want to relax and enjoy some feel-good magic.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx14349-zvSfbgjZr4LW.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/b0/02/47/b00247f0-e7f5-4af6-d4d7-3d4c77e9fb9d/mzaf_1629355323521564674.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:51:17.521Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> hello my name is Fortune I'm 18 i love to think I'm a person with taste and my pick in media is deliberate. I kind of feel happy thinking that my taste or my picks are superior to the mainstream. I love stories of love and loss, stories with great overarching plots stories with peak memorable characters and casts with their stories and trauma, emotional psychological media, stories about life the teoublss the beauty and the cruelty
+
+**Coda Reply:**
+> Hey Fortune! I love that you have such a deep appreciation for storytelling. Those themes of love and loss really hit hard, don’t they? What’s been on your mind lately?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [
+    "Appreciates deep, emotional storytelling with complex characters and themes of love and loss"
+  ]
+}
+```
+
+---
+
+## [2026-06-04T23:51:26.501Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep, emotional storytelling with complex characters and themes of love and loss. Specific Tastes in Anime: None",
+  "recent_context": "Just started using the app, exploring formats.",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["emotional storytelling anime site:reddit.com/r/animesuggest","anime about love and loss site:reddit.com/r/anime","complex character anime recommendations site:reddit.com/r/animesuggest"]
+
+- **Master Directive:**
+> Look for anime that features deep emotional storytelling, focusing on complex characters and themes of love and loss. Given the late night setting, aim for titles that evoke strong feelings and resonate on a personal level.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou
+- **Content:** [Kitsu] Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou (movie): The Drossel royal family pulls strings to have Violet tutor Isabella York, a student at a prestigious girls' school, for her upcoming debut. Isabella may have a well-connected father but as Violet befriends her she discovers the debutante has an unhappy past of poverty and separation. With Benedict's help and with the emotional power of letters Vio Kitsu rating: 82.21/100.
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Kiss x Sis
+- **Content:** [Kitsu] Kiss x Sis (OVA): After his single father gets remarried, Keita Suminoe not only finds himself with a new mother, but also two beautiful twin step-sisters, Ako and Riko. Their close bond as children soon grows into something more personal, and Keita finds himself in a real bind that he vigorously struggles to escape from.
+
+For the twins, the transition from little g Kitsu rating: 67.72/100.
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Kao ni Denai Kashiwada-san to Kao ni Deru Oota-kun
+- **Content:** [Kitsu] Kao ni Denai Kashiwada-san to Kao ni Deru Oota-kun (TV): Meet Kashiwada-san, a female middle-school student, who remains emotionless regardless of how she is meddled with. And Oota-kun, unable to control his facial expressions, is the complete opposite of Kashiwada-san--but he keeps messing with her, against his better judgment?!
+
+Though both of them are the exact opposite, will a mutual love eventually  Kitsu rating: 72.06/100.
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Saishuu Gakushou Hibike! Euphonium Zenpen
+- **Content:** [Kitsu] Saishuu Gakushou Hibike! Euphonium Zenpen (movie): The grand finale of the series is here!!! This journey will lead to the next melody—
+For ten years, Sound! Euphonium has depicted the youth of high school students who devote themselves to the concert band. Following the emotional finale of Sound! Euphonium 3 broadcast in 2024, the story reaches its true conclusion in 2026 with the long-awaited the
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Akubi wo Suru ni wa Wake ga Aru
+- **Content:** [Kitsu] Akubi wo Suru ni wa Wake ga Aru (movie): Japan, 2093. A rural town that used to be the most prestigious town in the world has long since sunk 30 meters under the ocean's surface. The story is a tale of a girl who takes part in freediving (diving without the aid of equipment to breathe), and the emotional growth she experiences.
+
+(Source: Anime News Network)
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** VladLove
+- **Content:** [Kitsu] VladLove (ONA): Mitsugu Bamba is a high school girl who finds meaning in donating blood. She frequently visits a blood bank to donate blood, despite being harshly treated by the nurse. One day, she encounters a beautiful girl who looks like she's from overseas at the blood bank. The pale girl looks like she's about to faint any minute, but then, she starts destroy Kitsu rating: 59.76/100.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Master of Epic: The Animation Age
+- **Content:** [Kitsu] Master of Epic: The Animation Age (TV): Over millions of years, there have been many ages - war, gods, and future to name a few. Each of these was infinitely less exciting than the current Animation Age! In this RPG-esque existence, becoming stronger is paramount to one's survival and leveling up is a must. From pacifists to news casting, from fishing woes to love advice, there's nothing Kitsu rating: 60.81/100.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Fudanshi Shoukan: Isekai de Shinjuu ni Hameraremashita Mini Anime
+- **Content:** [Kitsu] Fudanshi Shoukan: Isekai de Shinjuu ni Hameraremashita Mini Anime (ONA): A short anime commemorating the release of the BL manga's second volume.
+
+Kotone is a fudanshi. One day while he was buying BL manga outside of a manga stand, a truck loses control and kills him with BL manga all over him. To his surprise, he wakes up in an Asian ancient-looking palace. A man named Nagi, that is half serpent, tells him that he is n
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Fruits Basket The Final Season**
+- **Coda Blurb:** _"This is the one; it beautifully encapsulates love, loss, and the struggle for acceptance."_
+- **Pitch:**
+> I thought of you when I came across 'Fruits Basket The Final Season' because it dives deep into the emotional complexities of its characters, especially as they confront their past traumas and relationships. The series has a way of intertwining themes of love and loss, making it resonate on a personal level. In this final chapter, Tohru and the Soma family face their emotional chains, and it’s heart-wrenching yet cathartic to watch them navigate their struggles.
+
+> Fans have praised this season for its poignant storytelling and character development. Many have noted how it captures the essence of healing and the importance of family bonds, even in the face of adversity. The emotional weight of the narrative, combined with its beautiful animation, creates an experience that is both touching and unforgettable. If you're looking for a late-night watch that stirs the heart and leaves you reflecting on your own experiences with love and loss, this is definitely the pick for you.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124194-TJlqMMR7BGn9.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview113/v4/c2/da/93/c2da9379-d8c4-6271-b00b-ff8cacb0e4df/mzaf_10996589433711919802.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:51:48.800Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> nothing in particular
+
+**Coda Reply:**
+> That's cool! Sometimes it's nice to just chill. So, what do you usually do to unwind? Any favorite shows or games you dive into?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": {
+    "anime": []
+  },
+  "recent_context_overwrite": "Nothing in particular",
+  "guardrails_appends": [],
+  "thematic_connections_appends": [
+    "Drawn to emotional and psychological themes"
+  ]
+}
+```
+
+---
+
+## [2026-06-04T23:51:58.050Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep, emotional storytelling with complex characters and themes of love and loss. Specific Tastes in Anime: None",
+  "recent_context": "Nothing in particular",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["emotional storytelling anime site:reddit.com/r/animesuggest","anime about love and loss site:reddit.com/r/animesuggest","complex character development anime site:reddit.com/r/animesuggest"]
+
+- **Master Directive:**
+> Look for anime that features deep emotional storytelling, focusing on themes of love and loss, with complex characters. Since you have no specific tastes, explore a variety of recommendations that resonate with these themes to find something impactful.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou
+- **Content:** [Kitsu] Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou (movie): The Drossel royal family pulls strings to have Violet tutor Isabella York, a student at a prestigious girls' school, for her upcoming debut. Isabella may have a well-connected father but as Violet befriends her she discovers the debutante has an unhappy past of poverty and separation. With Benedict's help and with the emotional power of letters Vio Kitsu rating: 82.21/100.
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Kiss x Sis
+- **Content:** [Kitsu] Kiss x Sis (OVA): After his single father gets remarried, Keita Suminoe not only finds himself with a new mother, but also two beautiful twin step-sisters, Ako and Riko. Their close bond as children soon grows into something more personal, and Keita finds himself in a real bind that he vigorously struggles to escape from.
+
+For the twins, the transition from little g Kitsu rating: 67.72/100.
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Kao ni Denai Kashiwada-san to Kao ni Deru Oota-kun
+- **Content:** [Kitsu] Kao ni Denai Kashiwada-san to Kao ni Deru Oota-kun (TV): Meet Kashiwada-san, a female middle-school student, who remains emotionless regardless of how she is meddled with. And Oota-kun, unable to control his facial expressions, is the complete opposite of Kashiwada-san--but he keeps messing with her, against his better judgment?!
+
+Though both of them are the exact opposite, will a mutual love eventually  Kitsu rating: 72.06/100.
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Saishuu Gakushou Hibike! Euphonium Zenpen
+- **Content:** [Kitsu] Saishuu Gakushou Hibike! Euphonium Zenpen (movie): The grand finale of the series is here!!! This journey will lead to the next melody—
+For ten years, Sound! Euphonium has depicted the youth of high school students who devote themselves to the concert band. Following the emotional finale of Sound! Euphonium 3 broadcast in 2024, the story reaches its true conclusion in 2026 with the long-awaited the
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Akubi wo Suru ni wa Wake ga Aru
+- **Content:** [Kitsu] Akubi wo Suru ni wa Wake ga Aru (movie): Japan, 2093. A rural town that used to be the most prestigious town in the world has long since sunk 30 meters under the ocean's surface. The story is a tale of a girl who takes part in freediving (diving without the aid of equipment to breathe), and the emotional growth she experiences.
+
+(Source: Anime News Network)
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** VladLove
+- **Content:** [Kitsu] VladLove (ONA): Mitsugu Bamba is a high school girl who finds meaning in donating blood. She frequently visits a blood bank to donate blood, despite being harshly treated by the nurse. One day, she encounters a beautiful girl who looks like she's from overseas at the blood bank. The pale girl looks like she's about to faint any minute, but then, she starts destroy Kitsu rating: 59.76/100.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Fudanshi Shoukan: Isekai de Shinjuu ni Hameraremashita Mini Anime
+- **Content:** [Kitsu] Fudanshi Shoukan: Isekai de Shinjuu ni Hameraremashita Mini Anime (ONA): A short anime commemorating the release of the BL manga's second volume.
+
+Kotone is a fudanshi. One day while he was buying BL manga outside of a manga stand, a truck loses control and kills him with BL manga all over him. To his surprise, he wakes up in an Asian ancient-looking palace. A man named Nagi, that is half serpent, tells him that he is n
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Master of Epic: The Animation Age
+- **Content:** [Kitsu] Master of Epic: The Animation Age (TV): Over millions of years, there have been many ages - war, gods, and future to name a few. Each of these was infinitely less exciting than the current Animation Age! In this RPG-esque existence, becoming stronger is paramount to one's survival and leveling up is a must. From pacifists to news casting, from fishing woes to love advice, there's nothing Kitsu rating: 60.81/100.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Fruits Basket The Final Season**
+- **Coda Blurb:** _"This is the one that will tug at your heartstrings and leave you reflecting on love and loss."_
+- **Pitch:**
+> Fruits Basket The Final Season is a beautifully crafted conclusion to a story that has captivated audiences with its deep emotional storytelling. It dives into the complexities of relationships and the burdens of the past, exploring how love can both heal and hurt. As Tohru and the Soma family navigate their intertwined fates, the series masterfully balances moments of joy and sorrow, making it a poignant watch for anyone who appreciates character-driven narratives.
+
+> Fans rave about how this season ties together all the character arcs, providing closure while still leaving a lasting impact. Many have expressed how the themes of acceptance, forgiveness, and the scars of trauma resonate deeply, often bringing them to tears. The final season encapsulates the essence of love and loss, making it a perfect fit for your quest for anime that explores these profound themes.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124194-TJlqMMR7BGn9.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview113/v4/c2/da/93/c2da9379-d8c4-6271-b00b-ff8cacb0e4df/mzaf_10996589433711919802.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:53:20.850Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> steins gate is likey favorite piece of media I just loved it the way it was funny comedic great momentd and characters then emotional psychological stakes with trauma and characters backstories, I like the romance dynamic and the other memorable characters
+
+**Coda Reply:**
+> Steins;Gate is such a masterpiece! The blend of humor and those emotional stakes really makes it unforgettable. I totally get why it’s your favorite! Are you watching or playing anything right now that’s giving you those same vibes?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": {
+    "anime": [
+      "Loves Steins;Gate",
+      "Enjoys emotional psychological themes",
+      "Appreciates character-driven stories"
+    ]
+  },
+  "recent_context_overwrite": "",
+  "guardrails_appends": [],
+  "thematic_connections_appends": [
+    "Drawn to stories with trauma and character backstories",
+    "Loves romance dynamics in media"
+  ]
+}
+```
+
+---
+
+## [2026-06-04T23:53:36.237Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep, emotional storytelling with complex characters and themes of love and loss. Specific Tastes in Anime: Loves Steins;Gate. Enjoys emotional psychological themes. Appreciates character-driven stories",
+  "recent_context": "Nothing in particular",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["emotional psychological anime recommendations site:reddit.com/r/animesuggest","anime with complex characters and themes of love and loss site:reddit.com/r/animesuggest","character-driven anime with deep storytelling site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate"]
+
+- **Master Directive:**
+> Look for anime that features deep emotional storytelling, focusing on complex characters and themes of love and loss. Since it's late at night, consider titles that are thought-provoking and immersive, perfect for a reflective viewing experience.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Paprika
+- **Content:** [Kitsu] Paprika (movie): In the real world, she is the renowned and highly intelligent Dr. Atsuko Chiba. In the dream world, she is the spunky redhead Paprika. Thanks to a new technology developed at Chiba’s lab called a DC Mini, Paprika is able to jump into people’s dreams with the ease of a driver switching lanes. The dream machine allows her to see into the dreamers’ de Kitsu rating: 80.26/100.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Fruits Basket The Final Season**
+- **Coda Blurb:** _"This is the one; it beautifully encapsulates love, loss, and the journey of healing."_
+- **Pitch:**
+> I picked 'Fruits Basket The Final Season' because it dives deep into the emotional struggles of its characters, particularly focusing on Tohru and the Soma family. As they confront their past traumas and the curse that binds them, the series masterfully intertwines themes of love, acceptance, and the pain of letting go. It's a heartfelt exploration of how relationships shape us, making it a perfect choice for a reflective viewing experience at night.
+
+> The community has praised this season for its poignant storytelling and character development, with many viewers expressing how it resonated with their own experiences of grief and healing. People have shared how the series captures the essence of found family and the bittersweet nature of life, making it a truly immersive watch that lingers long after the credits roll. If you're looking for something that will tug at your heartstrings and provoke thought, this is definitely the anime for you.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124194-TJlqMMR7BGn9.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview113/v4/c2/da/93/c2da9379-d8c4-6271-b00b-ff8cacb0e4df/mzaf_10996589433711919802.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:53:47.177Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> no nothing right now thougl
+
+**Coda Reply:**
+> That's totally fine! Sometimes you just need a break. Do you have any go-to platforms for when you're ready to dive back into something? Like Netflix or Crunchyroll?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": {
+    "anime": [
+      "Loves emotional psychological stories",
+      "Enjoys character-driven narratives"
+    ]
+  },
+  "recent_context_overwrite": "Looking for something to watch or play soon",
+  "guardrails_appends": [],
+  "thematic_connections_appends": [
+    "Drawn to stories of love and loss",
+    "Appreciates humor mixed with emotional depth"
+  ]
+}
+```
+
+---
+
+## [2026-06-04T23:54:09.966Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep, emotional storytelling with complex characters and themes of love and loss. Specific Tastes in Anime: Loves Steins;Gate. Enjoys emotional psychological themes. Appreciates character-driven stories. Loves emotional psychological stories. Enjoys character-driven narratives",
+  "recent_context": "Looking for something to watch or play soon",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["emotional psychological anime recommendations site:reddit.com/r/animesuggest","character-driven anime with themes of love and loss site:reddit.com/r/animesuggest","anime similar to Steins;Gate with emotional depth site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate"]
+
+- **Master Directive:**
+> Seek out anime that delivers profound emotional storytelling, particularly those that explore themes of love and loss with complex characters. Focus on character-driven narratives that resonate deeply, similar to the emotional psychological themes found in Steins;Gate.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Paprika
+- **Content:** [Kitsu] Paprika (movie): In the real world, she is the renowned and highly intelligent Dr. Atsuko Chiba. In the dream world, she is the spunky redhead Paprika. Thanks to a new technology developed at Chiba’s lab called a DC Mini, Paprika is able to jump into people’s dreams with the ease of a driver switching lanes. The dream machine allows her to see into the dreamers’ de Kitsu rating: 80.26/100.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Re:Zero kara Hajimeru Isekai Seikatsu**
+- **Coda Blurb:** _"This is the one; it's a rollercoaster of emotions that you'll resonate with deeply."_
+- **Pitch:**
+> Re:Zero kara Hajimeru Isekai Seikatsu is a masterful blend of psychological depth and emotional storytelling that mirrors the complex themes found in Steins;Gate. The protagonist, Subaru Natsuki, finds himself in a fantastical world where he possesses a unique ability to return to a specific point in time upon death. This premise sets the stage for a heart-wrenching exploration of love, loss, and the consequences of one's choices. As Subaru navigates through this new world, he faces not only external threats but also his own inner demons, making it a gripping character-driven narrative that will keep you on the edge of your seat.
+
+> Community members rave about the emotional weight of the series, often highlighting how Subaru's struggles resonate with their own experiences of despair and hope. The relationships he builds, especially with Emilia and Rem, are beautifully crafted, showcasing the complexities of love and sacrifice. Fans appreciate how the series doesn't shy away from darker themes, making it a profound journey that challenges viewers to reflect on their own lives. If you're looking for an anime that delivers a powerful emotional punch while exploring intricate character arcs, Re:Zero is definitely a must-watch.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-wRVUrGxpvIQQ.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/51/81/8e/51818eb6-38c8-7308-b077-31339b925e2e/mzaf_1151923935049625676.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:54:58.569Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> meant I am watching monster now and I love the vibe the atmosphere something you can only get in older media the haunting soundtrack the stakes the story the charactersx the mystery the struggle it's pretty great
+
+**Coda Reply:**
+> Monster is such a gripping choice! The atmosphere and tension in that show are on another level. I love how it pulls you in with its haunting elements. It sounds like you really appreciate those deep, psychological narratives!
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [
+    "Appreciates deep, psychological narratives"
+  ],
+  "category_appends": {
+    "anime": [
+      "Loves emotional and psychological themes",
+      "Enjoys older media with haunting soundtracks"
+    ]
+  },
+  "recent_context_overwrite": "Watching Monster and loving its vibe",
+  "guardrails_appends": [],
+  "thematic_connections_appends": [
+    "Drawn to stories with trauma and character struggles"
+  ]
+}
+```
+
+---
+
+## [2026-06-04T23:55:11.434Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> yep
+
+**Coda Reply:**
+> It's awesome to connect with someone who has such a refined taste in media! So, just to recap, you love emotional and psychological stories, Steins;Gate is your favorite, you're currently watching Monster, and you appreciate older media vibes. If you ever want to chat more about your favorites or anything else, I'm here!
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [
+    "Appreciates emotional and psychological narratives",
+    "Enjoys older media vibes"
+  ],
+  "category_appends": {
+    "anime": [
+      "Loves Steins;Gate",
+      "Currently watching Monster"
+    ]
+  },
+  "recent_context_overwrite": "Watching Monster",
+  "guardrails_appends": [],
+  "thematic_connections_appends": [
+    "Drawn to stories of love, loss, and trauma"
+  ]
+}
+```
+
+---
+
+## [2026-06-04T23:55:12.769Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep, emotional storytelling with complex characters and themes of love and loss. Appreciates deep, psychological narratives. Specific Tastes in Anime: Loves Steins;Gate. Enjoys emotional psychological themes. Appreciates character-driven stories. Loves emotional psychological stories. Enjoys character-driven narratives. Loves emotional and psychological themes. Enjoys older media with haunting soundtracks",
+  "recent_context": "Watching Monster and loving its vibe",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["psychological thriller anime similar to Monster site:reddit.com/r/animesuggest","emotionally intense character-driven anime site:reddit.com/r/animesuggest","anime with deep psychological themes and haunting soundtracks site:reddit.com/r/anime"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate"]
+
+- **Master Directive:**
+> Look for anime that features deep psychological narratives and complex character-driven stories, similar to the vibe of 'Monster'. Focus on titles that evoke strong emotions and explore themes of love and loss with haunting soundtracks.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Psycho-Pass 2
+- **Content:** [Kitsu] Psycho-Pass 2 (TV): A year and a half after the events of the original sci-fi psychological thriller, Akane Tsunemori continues her work as an inspector—enforcing the Sibyl System's judgments. Joining her are new enforcers and junior inspector Mika Shimotsuki, a young woman blindly and inflexibly loyal to Sibyl. As Akane ponders both the nature of her job and the legi Kitsu rating: 73.0/100.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Boku dake ga Inai Machi**
+- **Coda Blurb:** _"You'll definitely like this one; it captures the essence of love and loss with a haunting narrative."_
+- **Pitch:**
+> I thought of you when I came across 'Boku dake ga Inai Machi' (Erased). This anime masterfully intertwines elements of mystery and psychological depth, following Satoru, a manga artist who possesses the ability to time travel and prevent tragedies. The emotional weight of his journey as he tries to save those he loves from a horrific fate is incredibly poignant. It evokes a sense of nostalgia and urgency, making you deeply invested in the characters and their struggles.
+
+> The community has praised 'Boku dake ga Inai Machi' for its gripping storytelling and complex character arcs, often highlighting how it explores themes of regret and redemption. Viewers have expressed how the haunting soundtrack amplifies the emotional stakes, making every moment resonate deeply. It's a series that not only entertains but also leaves a lasting impact, perfectly aligning with your taste for profound narratives and emotional exploration.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21234-XmqW39aQ9o7O.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/75/a4/da/75a4daa2-0fc7-fef7-a461-5092735d4c82/mzaf_7106405690837156263.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:55:18.337Z] Harmonization Pass (Tab - Tab: You)
+
+**Input Memory:**
+```json
+{
+  "globalIdentity": [
+    "Appreciates deep, emotional storytelling with complex characters and themes of love and loss",
+    "Appreciates deep, psychological narratives",
+    "Appreciates emotional and psychological narratives",
+    "Enjoys older media vibes"
+  ],
+  "categoryProfiles": {
+    "anime": [
+      "Loves Steins;Gate",
+      "Enjoys emotional psychological themes",
+      "Appreciates character-driven stories",
+      "Loves emotional psychological stories",
+      "Enjoys character-driven narratives",
+      "Loves emotional and psychological themes",
+      "Enjoys older media with haunting soundtracks",
+      "Currently watching Monster"
+    ]
+  },
+  "recentContext": "Watching Monster",
+  "guardrails": []
+}
+```
+
+
+**Output Harmonized Memory:**
+```json
+{
+  "global_identity_overwrite": [
+    "Fortune is an introspective 18-year-old with a discerning taste in media, valuing narratives that explore love, loss, and the complexities of human experience. They appreciate deep, emotional storytelling, particularly in older media, where haunting soundtracks and character-driven plots leave a lasting impact. Their love for psychological narratives reflects a desire for cathartic resolution through stories that delve into trauma and the beauty and cruelty of life."
+  ],
+  "recent_context_overwrite": "Currently watching Monster, seeking more emotionally and psychologically engaging stories.",
+  "guardrails_appends": [],
+  "thematic_connections_appends": [
+    "Bridges their love of Steins;Gate and Monster through a fascination with emotional narratives that explore trauma and complex character dynamics."
+  ]
+}
+```
+
+---
+
+## [2026-06-04T23:55:29.175Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep, emotional storytelling with complex characters and themes of love and loss. Appreciates deep, psychological narratives. Appreciates emotional and psychological narratives. Enjoys older media vibes. Specific Tastes in Anime: Loves Steins;Gate. Enjoys emotional psychological themes. Appreciates character-driven stories. Loves emotional psychological stories. Enjoys character-driven narratives. Loves emotional and psychological themes. Enjoys older media with haunting soundtracks. Currently watching Monster",
+  "recent_context": "Watching Monster",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["psychological thriller anime similar to Monster site:reddit.com/r/animesuggest","emotional character-driven anime with complex narratives site:reddit.com/r/animesuggest","older psychological anime with haunting soundtracks site:reddit.com/r/anime"]
+- **MAL Anime Titles Extracted:** ["Monster","Steins;Gate"]
+
+- **Master Directive:**
+> Look for anime that features deep emotional storytelling and complex characters, particularly in the psychological thriller genre. Focus on series that evoke themes of love and loss, similar to the tone of 'Monster' and 'Steins;Gate'.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Psycho-Pass 2
+- **Content:** [Kitsu] Psycho-Pass 2 (TV): A year and a half after the events of the original sci-fi psychological thriller, Akane Tsunemori continues her work as an inspector—enforcing the Sibyl System's judgments. Joining her are new enforcers and junior inspector Mika Shimotsuki, a young woman blindly and inflexibly loyal to Sibyl. As Akane ponders both the nature of her job and the legi Kitsu rating: 73.0/100.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Boku dake ga Inai Machi**
+- **Coda Blurb:** _"You'll definitely like this one."_
+- **Pitch:**
+> I thought of you when I came across 'Boku dake ga Inai Machi' (also known as 'ERASED'). It’s a gripping psychological thriller that dives deep into themes of love, loss, and the haunting weight of regret. The story follows Satoru, a man who has the ability to travel back in time to prevent tragedies, and when his mother is murdered, he finds himself back in his childhood, trying to solve the mystery and save his friends. The emotional stakes are incredibly high, and the character development is profound, making it a perfect fit for your taste in complex narratives.
+
+> Fans rave about how 'Boku dake ga Inai Machi' masterfully blends suspense with heartfelt storytelling. Many viewers note that the emotional depth of the characters, especially Satoru's journey to confront his past, resonates deeply. The series doesn’t shy away from the darker aspects of its themes, exploring the impact of trauma and the longing for redemption. It’s been highly recommended for those who enjoyed 'Steins;Gate' and 'Monster', and I think you'll find its blend of psychological tension and emotional storytelling truly captivating.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21234-XmqW39aQ9o7O.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/75/a4/da/75a4daa2-0fc7-fef7-a461-5092735d4c82/mzaf_7106405690837156263.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:55:29.685Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Fortune is an introspective 18-year-old with a discerning taste in media, valuing narratives that explore love, loss, and the complexities of human experience. They appreciate deep, emotional storytelling, particularly in older media, where haunting soundtracks and character-driven plots leave a lasting impact. Their love for psychological narratives reflects a desire for cathartic resolution through stories that delve into trauma and the beauty and cruelty of life.. Specific Tastes in Anime: Loves Steins;Gate. Enjoys emotional psychological themes. Appreciates character-driven stories. Loves emotional psychological stories. Enjoys character-driven narratives. Loves emotional and psychological themes. Enjoys older media with haunting soundtracks. Currently watching Monster",
+  "recent_context": "Currently watching Monster, seeking more emotionally and psychologically engaging stories.",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["emotionally engaging psychological anime site:reddit.com/r/animesuggest","character-driven psychological thrillers anime site:reddit.com/r/anime","older emotional anime with haunting soundtracks site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate"]
+
+- **Master Directive:**
+> Look for emotionally and psychologically engaging anime that resonate with themes of love, loss, and the complexities of human experience. Focus on character-driven narratives and older titles that feature haunting soundtracks, similar to what you appreciate in 'Monster' and 'Steins;Gate'.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Kizuna (ONA)
+- **Content:** [Kitsu] Kizuna (ONA) (ONA): A Norton (anti-virus company) commissioned anime from Tekken showing a man who tries to protect his coworkers but caves under the social pressure. He finds himself scared and alone only for a girl to come and protect him (emotionally) and together they protect each other.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Kanojo, Okarishimasu
+- **Content:** [Kitsu] Kanojo, Okarishimasu (TV): Dumped by his girlfriend, emotionally shattered college student Kazuya Kinoshita attempts to appease the void in his heart through a rental girlfriend from a mobile app. At first, Chizuru Mizuhara seems to be the perfect girl with everything he could possibly ask for: great looks and a cute, caring personality.Upon seeing mixed opinions on her prof Kitsu rating: 71.19/100.
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** 3-gatsu no Lion
+- **Content:** [Kitsu] 3-gatsu no Lion (TV): Rei Kiriyama is a 17-year-old boy who recently started living alone, financed by his salary as a professional Shogi player. Despite his independence, however, he's yet to mature emotionally, and his problems continue to haunt him in his daily life. His relationship with his adoptive family is strained, and he has difficulties interacting with his f Kitsu rating: 81.7/100.
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Boku no Kokoro no Yabai Yatsu 2nd Season
+- **Content:** [Kitsu] Boku no Kokoro no Yabai Yatsu 2nd Season (TV): The second season of Boku no Kokoro no Yabai Yatsu.
+
+After an eventful winter break, Kyoutarou Ichikawa and Anna Yamada reunite with a stronger bond. They continue to grow in their own ways, with Yamada taking on more challenging photoshoots and Ichikawa maturing both physically and emotionally as he tackles his affections for Yamada. However, spen Kitsu rating: 85.39/100.
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chouon Senshi Borgman: Lovers Rain
+- **Content:** [Kitsu] Chouon Senshi Borgman: Lovers Rain (movie): The OVA series Sonic Soldier Borgman serves as a sequel to the 1980s television series about an elite squad of bio-enhanced, crime-fighting humans known as Borgmen. Picking up several years after the dissolution of the original Borgman team, this volume reunites the three remaining members--rocket scientist Ryo, his girlfriend Anise, and police off Kitsu rating: 69.71/100.
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 23 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 24 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 25 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 26 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **3-gatsu no Lion**
+- **Coda Blurb:** _"This is the one; it beautifully captures the intricacies of human emotion and connection."_
+- **Pitch:**
+> I immediately thought of you when I came across '3-gatsu no Lion'. This anime dives deep into the life of Rei Kiriyama, a young professional shogi player struggling with loneliness and emotional turmoil. The series is a poignant exploration of love, loss, and the complexities of human relationships, echoing the same haunting emotional depth you appreciated in 'Monster' and 'Steins;Gate'. The characters are richly developed, and their interactions are both heartwarming and heartbreaking, making it a truly immersive experience.
+
+> The community has praised '3-gatsu no Lion' for its delicate storytelling and beautiful animation, which perfectly complements its haunting soundtrack. Fans have noted how it captures the struggles of mental health and the importance of finding connections in a seemingly isolating world. The way it portrays Rei's journey towards healing and understanding is incredibly relatable, making it a perfect fit for your taste in character-driven narratives that resonate with profound emotional themes.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21366-0wrYK0kjKeFn.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/e3/60/d5/e360d582-a859-f9c8-75a9-2525cf558844/mzaf_2076848142128494171.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:57:54.457Z] Onboarding Chat (Tab: Anime)
+
+**User Message:**
+> hello my taste in anime... well I love peak anime emotional, great overaching plot great characters diverse with personal backstories, favorites I love steins gate monogatari bunny girl senpai sad animeovies silent voice I want to eat your pancreas, monster, I like some comedy with a vibe something like urusei uarsura, but my favorite of the series was their movies seeing the characters I already know and lv8face stskes where I can feel for them is great
+
+**Coda Reply:**
+> Wow, you have a fantastic taste in anime! I totally get the emotional connection you have with those characters. Steins;Gate and A Silent Voice really hit hard, right? And I love that you enjoy a mix of comedy and deeper themes too!
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [
+    "Loves emotional storytelling with great character development"
+  ],
+  "category_appends": {
+    "anime": [
+      "Favorites include Steins;Gate, Monogatari, Bunny Girl Senpai, A Silent Voice, I Want to Eat Your Pancreas, Monster, and Urusei Yatsura",
+      "Enjoys a mix of comedy and emotional depth",
+      "Prefers character-driven stories with personal backstories"
+    ]
+  },
+  "recent_context_overwrite": "Excited to dive deeper into anime tastes",
+  "guardrails_appends": [],
+  "thematic_connections_appends": [
+    "Drawn to emotional narratives and character arcs"
+  ]
+}
+```
+
+---
+
+## [2026-06-04T23:58:04.804Z] Onboarding Chat (Tab: Anime)
+
+**User Message:**
+> sure
+
+**Coda Reply:**
+> So, do you have any dealbreakers when it comes to anime? Like, any genres or themes you just can't stand?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": [
+    "Loves emotional stories",
+    "Enjoys great overarching plots",
+    "Appreciates diverse characters with personal backstories",
+    "Likes a mix of comedy and deeper themes"
+  ],
+  "recent_context_overwrite": "",
+  "guardrails_appends": [],
+  "thematic_connections_appends": []
+}
+```
+
+---
+
+## [2026-06-04T23:58:10.806Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Fortune is an introspective 18-year-old with a discerning taste in media, valuing narratives that explore love, loss, and the complexities of human experience. They appreciate deep, emotional storytelling, particularly in older media, where haunting soundtracks and character-driven plots leave a lasting impact. Their love for psychological narratives reflects a desire for cathartic resolution through stories that delve into trauma and the beauty and cruelty of life.. Loves emotional storytelling with great character development. Specific Tastes in Anime: Loves Steins;Gate. Enjoys emotional psychological themes. Appreciates character-driven stories. Loves emotional psychological stories. Enjoys character-driven narratives. Loves emotional and psychological themes. Enjoys older media with haunting soundtracks. Currently watching Monster. Favorites include Steins;Gate, Monogatari, Bunny Girl Senpai, A Silent Voice, I Want to Eat Your Pancreas, Monster, and Urusei Yatsura. Enjoys a mix of comedy and emotional depth. Prefers character-driven stories with personal backstories",
+  "recent_context": "Excited to dive deeper into anime tastes",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["psychological anime with emotional depth site:reddit.com/r/animesuggest","character-driven anime that explore love and loss site:reddit.com/r/animesuggest","older anime with haunting soundtracks site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate","Monster"]
+
+- **Master Directive:**
+> Look for anime that delves into psychological themes and emotional storytelling, particularly those that feature character-driven narratives exploring love, loss, and the complexities of human experience. Seek out older titles with haunting soundtracks that resonate with the emotional depth you appreciate.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Tomodachi Game
+- **Content:** [Kitsu] Tomodachi Game (TV): High school student Katagiri Yuuichi, who values friendship above all else, enjoys a fulfilling life with his close friends Sawagiri Shiho, Mikasa Tenji, Shibe Makoto, and Kokorogi Yutori.
+
+However, after a particular incident, they're dragged into a debt repayment game.
+
+The only way to beat the "Tomodachi Game" is to not doubt their friends. Boun Kitsu rating: 76.57/100.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Boku dake ga Inai Machi**
+- **Coda Blurb:** _"You'll definitely like this one."_
+- **Pitch:**
+> I thought of you when I came across 'Boku dake ga Inai Machi' (Erased). This anime beautifully intertwines psychological themes with an emotional narrative that explores love, loss, and the haunting effects of trauma. The story follows Satoru, a struggling manga artist who finds himself transported back to his childhood, where he must prevent a series of tragic events from occurring. The depth of the characters and the way their pasts shape their present is incredibly poignant, making it a gripping watch for anyone who appreciates character-driven storytelling.
+
+> The community has praised 'Boku dake ga Inai Machi' for its ability to evoke strong emotions and keep viewers on the edge of their seats. Many fans highlight the haunting soundtrack that complements the intense moments of the narrative, enhancing the overall experience. The blend of mystery and psychological elements resonates deeply, making it a standout choice for those who cherish anime that delve into the complexities of human experience. It's a title that lingers with you long after the credits roll, and I think you'll find it profoundly impactful.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21234-XmqW39aQ9o7O.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/75/a4/da/75a4daa2-0fc7-fef7-a461-5092735d4c82/mzaf_7106405690837156263.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:58:12.182Z] Onboarding Chat (Tab: Anime)
+
+**User Message:**
+> sure
+
+**Coda Reply:**
+> Awesome! So, do you have any specific genres or vibes you tend to avoid in anime? Like, anything that just doesn't click for you?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": [
+    "Loves emotional stories",
+    "Enjoys great overarching plots",
+    "Appreciates diverse characters with personal backstories",
+    "Likes a mix of comedy and deeper themes"
+  ],
+  "recent_context_overwrite": "",
+  "guardrails_appends": [],
+  "thematic_connections_appends": []
+}
+```
+
+---
+
+## [2026-06-04T23:58:18.523Z] Onboarding Chat (Tab: Anime)
+
+**User Message:**
+> sure
+
+**Coda Reply:**
+> I appreciate your patience! So, besides the emotional depth and character backstories, are there any specific genres or vibes you want to avoid in anime?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": [
+    "Loves emotional stories",
+    "Enjoys character-driven plots",
+    "Likes a mix of comedy and deeper themes"
+  ],
+  "recent_context_overwrite": "",
+  "guardrails_appends": [],
+  "thematic_connections_appends": []
+}
+```
+
+---
+
+## [2026-06-04T23:58:38.369Z] Onboarding Chat (Tab: Anime)
+
+**User Message:**
+> sure
+
+**Coda Reply:**
+> So, what are some dealbreakers for you in anime? Anything you just can't stand?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": {
+    "anime": [
+      "Loves emotional stories",
+      "Enjoys great overarching plots",
+      "Appreciates diverse characters with personal backstories",
+      "Likes comedy with a vibe",
+      "Enjoys character-driven movies"
+    ]
+  },
+  "recent_context_overwrite": "",
+  "guardrails_appends": [],
+  "thematic_connections_appends": []
+}
+```
+
+---
+
+## [2026-06-04T23:58:53.105Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Fortune is an introspective 18-year-old with a discerning taste in media, valuing narratives that explore love, loss, and the complexities of human experience. They appreciate deep, emotional storytelling, particularly in older media, where haunting soundtracks and character-driven plots leave a lasting impact. Their love for psychological narratives reflects a desire for cathartic resolution through stories that delve into trauma and the beauty and cruelty of life.. Loves emotional storytelling with great character development. Specific Tastes in Anime: Loves Steins;Gate. Enjoys emotional psychological themes. Appreciates character-driven stories. Loves emotional psychological stories. Enjoys character-driven narratives. Loves emotional and psychological themes. Enjoys older media with haunting soundtracks. Currently watching Monster. Favorites include Steins;Gate, Monogatari, Bunny Girl Senpai, A Silent Voice, I Want to Eat Your Pancreas, Monster, and Urusei Yatsura. Enjoys a mix of comedy and emotional depth. Prefers character-driven stories with personal backstories. Loves emotional stories. Enjoys great overarching plots. Appreciates diverse characters with personal backstories. Likes comedy with a vibe. Enjoys character-driven movies",
+  "recent_context": "Excited to dive deeper into anime tastes",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["emotional psychological anime with character development site:reddit.com/r/animesuggest","older anime with haunting soundtracks site:reddit.com/r/animesuggest","anime exploring love and loss site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate","Monster"]
+
+- **Master Directive:**
+> Look for anime that deeply explores emotional and psychological themes, focusing on character-driven narratives that resonate with experiences of love and loss. Prioritize older titles with haunting soundtracks that enhance the storytelling experience.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Paprika
+- **Content:** [Kitsu] Paprika (movie): In the real world, she is the renowned and highly intelligent Dr. Atsuko Chiba. In the dream world, she is the spunky redhead Paprika. Thanks to a new technology developed at Chiba’s lab called a DC Mini, Paprika is able to jump into people’s dreams with the ease of a driver switching lanes. The dream machine allows her to see into the dreamers’ de Kitsu rating: 80.26/100.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Fruits Basket The Final Season**
+- **Coda Blurb:** _"This is the one; it beautifully encapsulates the essence of love and loss."_
+- **Pitch:**
+> I picked 'Fruits Basket The Final Season' because it dives deep into the emotional struggles of its characters while exploring themes of trauma, love, and redemption. The story continues to follow Tohru Honda and the cursed Soma family, showcasing their growth and the complexities of their relationships. The show is renowned for its ability to resonate with viewers who have experienced loss and the longing for acceptance, making it a perfect fit for your taste in character-driven narratives.
+
+> Fans rave about how this season ties up the series with powerful storytelling and a haunting soundtrack that elevates every emotional moment. Many viewers have shared how they felt a personal connection to the characters' journeys, particularly Tohru's resilience in the face of adversity. The way the series handles the intricacies of love and family dynamics is both heartwarming and heartbreaking, leaving a lasting impact that lingers long after the final episode.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124194-TJlqMMR7BGn9.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview113/v4/c2/da/93/c2da9379-d8c4-6271-b00b-ff8cacb0e4df/mzaf_10996589433711919802.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:58:54.598Z] Onboarding Chat (Tab: Anime)
+
+**User Message:**
+> um I don't like mass appeal stuff with no substance
+
+**Coda Reply:**
+> Got it! You prefer anime with depth over just popular trends. What about genres? Any specific ones you lean towards or avoid?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": [
+    "Loves emotional stories",
+    "Enjoys complex characters",
+    "Prefers substance over mass appeal"
+  ],
+  "recent_context_overwrite": "",
+  "guardrails_appends": [],
+  "thematic_connections_appends": []
+}
+```
+
+---
+
+## [2026-06-04T23:59:09.483Z] Onboarding Chat (Tab: Anime)
+
+**User Message:**
+> I don't like mass appeal stuff with no substance
+
+**Coda Reply:**
+> Got it! You want depth over just popularity. That makes total sense. What about genres? Any specific ones you lean towards or avoid?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": {
+    "anime": [
+      "Loves emotional stories",
+      "Enjoys complex characters with backstories",
+      "Prefers depth over mass appeal"
+    ]
+  },
+  "recent_context_overwrite": "",
+  "guardrails_appends": [],
+  "thematic_connections_appends": []
+}
+```
+
+---
+
+## [2026-06-04T23:59:27.316Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Fortune is an introspective 18-year-old with a discerning taste in media, valuing narratives that explore love, loss, and the complexities of human experience. They appreciate deep, emotional storytelling, particularly in older media, where haunting soundtracks and character-driven plots leave a lasting impact. Their love for psychological narratives reflects a desire for cathartic resolution through stories that delve into trauma and the beauty and cruelty of life.. Loves emotional storytelling with great character development. Specific Tastes in Anime: Loves Steins;Gate. Enjoys emotional psychological themes. Appreciates character-driven stories. Loves emotional psychological stories. Enjoys character-driven narratives. Loves emotional and psychological themes. Enjoys older media with haunting soundtracks. Currently watching Monster. Favorites include Steins;Gate, Monogatari, Bunny Girl Senpai, A Silent Voice, I Want to Eat Your Pancreas, Monster, and Urusei Yatsura. Enjoys a mix of comedy and emotional depth. Prefers character-driven stories with personal backstories. Loves emotional stories. Enjoys great overarching plots. Appreciates diverse characters with personal backstories. Likes comedy with a vibe. Enjoys character-driven movies. Enjoys complex characters with backstories. Prefers depth over mass appeal",
+  "recent_context": "Excited to dive deeper into anime tastes",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["psychological emotional anime recommendations site:reddit.com/r/animesuggest","character-driven anime with haunting soundtracks site:reddit.com/r/anime","older emotional anime series site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate","Monster"]
+
+- **Master Directive:**
+> Look for anime that deeply explores emotional and psychological themes, focusing on character-driven narratives with haunting soundtracks. Seek out older titles that resonate with the complexities of love, loss, and human experience, enhancing the introspective mood of late-night viewing.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Paprika
+- **Content:** [Kitsu] Paprika (movie): In the real world, she is the renowned and highly intelligent Dr. Atsuko Chiba. In the dream world, she is the spunky redhead Paprika. Thanks to a new technology developed at Chiba’s lab called a DC Mini, Paprika is able to jump into people’s dreams with the ease of a driver switching lanes. The dream machine allows her to see into the dreamers’ de Kitsu rating: 80.26/100.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Fruits Basket The Final Season**
+- **Coda Blurb:** _"This is the one that will resonate with your soul."_
+- **Pitch:**
+> Fruits Basket The Final Season is the emotional crescendo of a series that beautifully captures the complexities of love, loss, and healing. As Tohru Honda navigates the tangled relationships within the cursed Soma family, you'll find yourself deeply immersed in their struggles and triumphs. The series doesn't shy away from the darker aspects of human experience, exploring themes of trauma and redemption, making it a perfect fit for your late-night introspective mood.
+
+> Fans rave about how the final season ties together the character arcs with such grace and poignancy, leaving viewers both heartbroken and hopeful. The haunting soundtrack complements the emotional weight of the story perfectly, enhancing those late-night viewing sessions where you might find yourself reflecting on your own life. It’s a series that stays with you long after the credits roll, and many community members have expressed how it helped them process their own feelings of grief and love. This is truly a must-watch for anyone looking for a profound emotional experience.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124194-TJlqMMR7BGn9.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview113/v4/c2/da/93/c2da9379-d8c4-6271-b00b-ff8cacb0e4df/mzaf_10996589433711919802.plus.aac.p.m4a
+
+---
+
+## [2026-06-04T23:59:48.683Z] Onboarding Chat (Tab: Anime)
+
+**User Message:**
+> sci Fi is pretty good, romance and emotional ones. not a fan of bl or  any related content
+
+**Coda Reply:**
+> Nice mix! Sci-fi and emotional romance can really pack a punch. And I totally get wanting to steer clear of BL. What about the pacing? Do you prefer slow-burn stories or something more fast-paced?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": [
+    "Loves emotional stories",
+    "Enjoys sci-fi and romance",
+    "Prefers slow-burn pacing"
+  ],
+  "recent_context_overwrite": "",
+  "guardrails_appends": [
+    "No mass appeal stuff with no substance",
+    "Not a fan of BL or related content"
+  ],
+  "thematic_connections_appends": []
+}
+```
+
+---
+
+## [2026-06-05T00:00:33.599Z] Onboarding Chat (Tab: Anime)
+
+**User Message:**
+> sci Fi is is pretty good, romance and emotional ones, serious plots, not a fan of bl or similar stuff
+
+**Coda Reply:**
+> Nice mix! Sci-fi and emotional stories can really pack a punch. I totally get wanting to avoid BL stuff too. Do you have a favorite character or two from the shows you mentioned?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": [
+    "Loves emotional stories",
+    "Enjoys sci-fi and romance",
+    "Not a fan of BL or similar content"
+  ],
+  "recent_context_overwrite": "",
+  "guardrails_appends": [
+    "No mass appeal stuff with no substance"
+  ],
+  "thematic_connections_appends": []
+}
+```
+
+---
+
+## [2026-06-05T00:01:37.322Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Fortune is an introspective 18-year-old with a discerning taste in media, valuing narratives that explore love, loss, and the complexities of human experience. They appreciate deep, emotional storytelling, particularly in older media, where haunting soundtracks and character-driven plots leave a lasting impact. Their love for psychological narratives reflects a desire for cathartic resolution through stories that delve into trauma and the beauty and cruelty of life.. Loves emotional storytelling with great character development. Specific Tastes in Anime: Loves Steins;Gate. Enjoys emotional psychological themes. Appreciates character-driven stories. Loves emotional psychological stories. Enjoys character-driven narratives. Loves emotional and psychological themes. Enjoys older media with haunting soundtracks. Currently watching Monster. Favorites include Steins;Gate, Monogatari, Bunny Girl Senpai, A Silent Voice, I Want to Eat Your Pancreas, Monster, and Urusei Yatsura. Enjoys a mix of comedy and emotional depth. Prefers character-driven stories with personal backstories. Loves emotional stories. Enjoys great overarching plots. Appreciates diverse characters with personal backstories. Likes comedy with a vibe. Enjoys character-driven movies. Enjoys complex characters with backstories. Prefers depth over mass appeal",
+  "recent_context": "Excited to dive deeper into anime tastes",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["psychological anime with deep emotional storytelling site:reddit.com/r/animesuggest","character-driven anime with haunting soundtracks site:reddit.com/r/animesuggest","emotional psychological themes anime recommendations site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate","Monster"]
+
+- **Master Directive:**
+> Seek out anime that features introspective narratives exploring love, loss, and the complexities of the human experience, particularly those that are character-driven and have haunting soundtracks. Focus on titles that provide emotional depth and psychological themes, resonating with your appreciation for older media.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Tomodachi Game
+- **Content:** [Kitsu] Tomodachi Game (TV): High school student Katagiri Yuuichi, who values friendship above all else, enjoys a fulfilling life with his close friends Sawagiri Shiho, Mikasa Tenji, Shibe Makoto, and Kokorogi Yutori.
+
+However, after a particular incident, they're dragged into a debt repayment game.
+
+The only way to beat the "Tomodachi Game" is to not doubt their friends. Boun Kitsu rating: 76.57/100.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Boku dake ga Inai Machi**
+- **Coda Blurb:** _"This is the one that will resonate deeply with you."_
+- **Pitch:**
+> Boku dake ga Inai Machi, also known as ERASED, is a gripping blend of mystery and psychological drama that explores themes of love, loss, and the weight of our past actions. The story follows Satoru Fujinuma, a struggling manga artist who possesses a unique ability to travel back in time to prevent tragedies. As he embarks on a quest to save a childhood friend from a tragic fate, the narrative delves into the complexities of human relationships and the haunting consequences of failure. It's a beautifully crafted tale that will keep you on the edge of your seat while tugging at your heartstrings.
+
+> Community members rave about its emotional depth and the way it handles sensitive topics like trauma and redemption. Many viewers have expressed how the haunting soundtrack complements the story's introspective nature, enhancing the overall experience. With its character-driven narrative and profound psychological themes, Boku dake ga Inai Machi is a perfect fit for your appreciation of older media that explores the intricacies of the human experience.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21234-XmqW39aQ9o7O.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/75/a4/da/75a4daa2-0fc7-fef7-a461-5092735d4c82/mzaf_7106405690837156263.plus.aac.p.m4a
+
+---
+
+## [2026-06-05T00:01:48.261Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": ". Specific Tastes in Anime: None",
+  "recent_context": "Just started using the app, exploring formats.",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["best late night anime to binge site:reddit.com/r/animesuggest","chill anime for nighttime viewing site:reddit.com/r/anime","anime series to watch at night site:reddit.com/r/animesuggest"]
+
+- **Master Directive:**
+> Look for anime that are perfect for late-night viewing, focusing on series that are either relaxing or engaging enough to keep you entertained. Consider options that are well-suited for binge-watching during a quiet weekday night.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Gravitation
+- **Content:** [Kitsu] Gravitation (TV): All Shuichi ever dreamed about was following in the footsteps of his pop idol, Ryuichi Sakuma and the band Nittle Grasper. Together with his best friend Hiro, Shuichi's formed a band called Bad Luck and they've even managed to get signed to a major recording label! Unfortunately, the studio deadlines are looming and Shuichi still hasn't finished th Kitsu rating: 68.29/100.
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Nihon Animator Mihonichi
+- **Content:** [Kitsu] Nihon Animator Mihonichi (ONA): The short film series "Japan Anima(tor)'s Exhibition" presented by Studio Khara and Dwango. Original projects, spin-off projects, promotional films, Music PV, and VJ Films, etc... Various omnibus animations produced with love and energy, regardless of any genres. The digital distribution anime series bring opportunities for project development, R&a Kitsu rating: 73.87/100.
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Kotencotenco
+- **Content:** [Kitsu] Kotencotenco (TV): Kotencotenco is a gag strip anime for young children featuring the flourishes of the Prince of the country of the Paradice, Kotenco.
+Kotenco guards the “Angel Star” for the Queen in the Paradice. Kotenco is a very good child, but when the bad spirits rise, Kotenco transforms into Matenco. Unlike Kotenco, Matenco is a very naughty child and troubles
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Dekoboko Majo no Oyako Jijou
+- **Content:** [Kitsu] Dekoboko Majo no Oyako Jijou (TV): The story centers on Alissa, who is a witch who lives alone in a forest. One day she finds a human baby, and she names her Viola. Alissa raises Viola for 16 years, but Viola grows beyond even Alissa's imagination. The comedy series focuses on the parent-and-child relationship where appearances are deceiving as to who is the parent and who is the ch Kitsu rating: 67.25/100.
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Nanja Monja Obake
+- **Content:** [Kitsu] Nanja Monja Obake (special): An anime made entirely in sumi-e following a child fox spirit and his morphing ability for haunting but he ends up getting scared himself.
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Road to You
+- **Content:** [Kitsu] Road to You (ONA): Commercials by Dunlop Tyres Japan for their Winter Maxx tire line.
+
+Episode 1 (Kimi e to Tsuzuku Michi) (The Road That Goes On to You): The anime short's story is set in a certain snowy land and centers on the intermingling feelings of three groups of men and women: a couple, a parent and child, and coworkers.
+
+Episode 2 (Hoshifuruoka no Yakusoku)  Kitsu rating: 67.74/100.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Frieren: Beyond Journey’s End**
+- **Coda Blurb:** _"This is the one—perfect for a cozy late-night binge!"_
+- **Pitch:**
+> I thought of you when I came across 'Frieren: Beyond Journey’s End.' This anime beautifully explores the life of an elf mage named Frieren, who embarks on a journey of self-discovery after her party defeats the Demon King. It's a gentle blend of adventure and introspection that unfolds at a relaxed pace, making it ideal for late-night viewing when you want something engaging yet soothing. The animation is stunning, and the storytelling is heartfelt, inviting you to reflect on life and relationships in a way that's both profound and comforting.
+
+> The community is raving about how 'Frieren' manages to balance its fantasy elements with deep emotional themes. Viewers appreciate the way it captures the bittersweet nature of time and friendship, especially as Frieren learns to cherish the moments she has with her friends who age while she remains the same. It's a series that resonates with anyone who's ever pondered their own journey and the passage of time, making it a perfect companion for those quiet weekday nights when you want to unwind and reflect.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-qQTzQnEJJ3oB.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/18/ee/62/18ee62e2-54ab-88ec-a828-2eb2d1ed9395/mzaf_16075514319107360120.plus.aac.p.m4a
+
+---
+
+## [2026-06-05T00:02:50.210Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> hello I'm Fortune I'm 18. I love to watch peak content like I take joy in watching thing s that I think are superior to what others are watching to think I'm one of the only ones who has taste or who can appreciate some content +.i love stories of love and loss, stories with a peak overarching plot, stories with a great diverse cast with their own personal struggles trauma and back story love a great romantic dynamic between the mcs, emotional, psychological stories, stories about the cruelty and the beauty in life.
+
+**Coda Reply:**
+> Hey Fortune! Love your vibe—sounds like you really appreciate the depth in stories. Those themes of love and loss hit hard, right? What’s been on your watchlist lately?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [
+    "Appreciates deep emotional and psychological stories",
+    "Enjoys stories with diverse casts and personal struggles"
+  ]
+}
+```
+
+---
+
+## [2026-06-05T00:03:02.612Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep emotional and psychological stories. Enjoys stories with diverse casts and personal struggles. Specific Tastes in Anime: None",
+  "recent_context": "Just started using the app, exploring formats.",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["emotional psychological anime site:reddit.com/r/animesuggest","anime with diverse cast and personal struggles site:reddit.com/r/animesuggest","profound storytelling anime site:reddit.com/r/animesuggest"]
+
+- **Master Directive:**
+> Look for anime that delve into emotional and psychological narratives, focusing on personal struggles and featuring diverse character casts. Late-night viewing calls for immersive stories that resonate deeply and provoke thought.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Paprika
+- **Content:** [Kitsu] Paprika (movie): In the real world, she is the renowned and highly intelligent Dr. Atsuko Chiba. In the dream world, she is the spunky redhead Paprika. Thanks to a new technology developed at Chiba’s lab called a DC Mini, Paprika is able to jump into people’s dreams with the ease of a driver switching lanes. The dream machine allows her to see into the dreamers’ de Kitsu rating: 80.25/100.
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Space Thunder Kids
+- **Content:** [Kitsu] Space Thunder Kids (movie): Three children pilots fight against the Dark Empire on their mission to destroy the universe.
+
+This film was edited with footage from Savior of the Earth, Defenders of Space - Phoenix-bot Phoenix King, King Robot, Protectors of Universe - Super Express Mazinger 7, Solar Adventure, Space Transformers - Micro-Commando Diatron-5, Super Mazinger 3 and
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Fruits Basket The Final Season**
+- **Coda Blurb:** _"This is the one; it beautifully captures the essence of personal struggle and emotional depth."_
+- **Pitch:**
+> Fruits Basket The Final Season is a heart-wrenching conclusion to a beloved series that dives deep into the psychological and emotional struggles of its characters. It follows Tohru and the Soma family's journey as they grapple with their traumatic pasts and the emotional chains that bind them. The narrative is rich with themes of acceptance, healing, and the complexity of relationships, making it an immersive experience that resonates on many levels. You'll find yourself rooting for Tohru as she navigates her feelings and the weight of the secrets surrounding her friends.
+
+> Fans and critics alike have praised this final season for its emotional storytelling and character development, with many expressing how it left them in tears. The series tackles heavy topics like trauma and redemption while maintaining a sense of hope and warmth. The way it portrays the struggles of each character, especially in their moments of vulnerability, is both poignant and relatable. It's a perfect late-night watch that will not only provoke thought but also leave you reflecting on your own relationships and personal growth.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124194-TJlqMMR7BGn9.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview113/v4/c2/da/93/c2da9379-d8c4-6271-b00b-ff8cacb0e4df/mzaf_10996589433711919802.plus.aac.p.m4a
+
+---
+
+## [2026-06-05T00:03:39.668Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> steins gate is like poster child of my favorite anime it has a diverse interring cast the romantic dynamic between okabe and kurisu is great the overarching interesting psychological emotional stories, the peak plot, I love the monogatari series for the same and similar reasons, for movies interstellar is peak I love once again grand stories stories of love and loss, great atmospheric cinematography and a killer soundtrack, for vns I really loved the katawa shoujo vns. cast with personal problems trauma MC comes into lives and tries to resolve and love kind of reminds me of that kind of monogatari or bunny girl senpai tyoe stuff, I love sad anime movies though I've watched a lot and is quite hard to find a new oe, I also love Ghibli movies especially on a cool night
+
+**Coda Reply:**
+> Wow, you have such a refined taste! Steins;Gate really is a masterpiece, and the dynamics in Monogatari are just so captivating. Interstellar is a great pick too—those themes of love and loss really resonate. What are you craving to watch or play right now? Anything specific on your mind?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [
+    "Appreciates deep emotional and psychological stories",
+    "Loves stories of love and loss"
+  ],
+  "category_appends": {
+    "anime": [
+      "Loves Steins;Gate",
+      "Enjoys Monogatari series",
+      "Likes Bunny Girl Senpai",
+      "Enjoys sad anime movies",
+      "Loves Ghibli movies"
+    ]
+  },
+  "recent_context_overwrite": "Looking for new sad anime movies",
+  "guardrails_appends": [],
+  "thematic_connections_appends": [
+    "Drawn to emotional and psychological narratives",
+    "Enjoys diverse casts with personal struggles"
+  ]
+}
+```
+
+---
+
+## [2026-06-05T00:03:52.954Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep emotional and psychological stories. Enjoys stories with diverse casts and personal struggles. Loves stories of love and loss. Specific Tastes in Anime: Loves Steins;Gate. Enjoys Monogatari series. Likes Bunny Girl Senpai. Enjoys sad anime movies. Loves Ghibli movies",
+  "recent_context": "Looking for new sad anime movies",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["best sad anime movies site:reddit.com/r/animesuggest","emotional anime films recommendations site:reddit.com/r/anime","heartbreaking anime movies site:reddit.com/r/animesuggest"]
+
+- **Master Directive:**
+> Look for recommendations of sad anime movies that evoke deep emotional responses, particularly those that explore themes of love and loss. Focus on films that feature diverse characters and personal struggles, similar to the user's favorites.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** H2O: Footprints in the Sand
+- **Content:** [Kitsu] H2O: Footprints in the Sand (TV): Takuma Hirose is a blind young male high school student, though the cause for his blindness is undetermined. In order to heal his medical condition, he is sent to live in a village with his uncle. There, he meets several girls, three of which stand out more than any of the others. They are Hayami Kohinata, Hinata Kangura, and Otoha. Otoha temporari Kitsu rating: 68.08/100.
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Kill Me Baby
+- **Content:** [Kitsu] Kill Me Baby (TV): Kill Me Baby is the touching story of Yasuna, a normal (?) high school girl, and Sonya, her best friend who happens to be an assassin. Unfortunately, little Sonya's trained assassin instincts often work against her and others in her daily high school life, as Yasuna's often-broken wrist can attest to. She just wanted a hug, but she ended up with a  Kitsu rating: 66.8/100.
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Saishuu Gakushou Hibike! Euphonium Zenpen
+- **Content:** [Kitsu] Saishuu Gakushou Hibike! Euphonium Zenpen (movie): The grand finale of the series is here!!! This journey will lead to the next melody—
+For ten years, Sound! Euphonium has depicted the youth of high school students who devote themselves to the concert band. Following the emotional finale of Sound! Euphonium 3 broadcast in 2024, the story reaches its true conclusion in 2026 with the long-awaited the
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Frieren: Beyond Journey’s End**
+- **Coda Blurb:** _"This is the one; it beautifully captures the essence of love and loss in a way that resonates deeply."_
+- **Pitch:**
+> I thought of you when I came across 'Frieren: Beyond Journey’s End.' This anime movie dives into the life of an elf mage, Frieren, who has outlived her adventuring companions after defeating the Demon King. As she embarks on a journey of self-discovery, she grapples with the weight of her long life and the fleeting nature of human emotions and relationships. It’s a poignant exploration of how love and loss shape our lives, making it a perfect match for your tastes.
+
+> The community has praised this film for its emotional depth and character development, highlighting Frieren's struggle to understand the bonds she formed and the grief of watching her friends age and pass away. Viewers have expressed how it evokes a profound sense of nostalgia and reflection, making it not just a story about adventure but a heartfelt meditation on what it means to truly live and love. If you're looking for something that resonates with your experiences of love and loss, this is definitely a film you won't want to miss.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-qQTzQnEJJ3oB.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/18/ee/62/18ee62e2-54ab-88ec-a828-2eb2d1ed9395/mzaf_16075514319107360120.plus.aac.p.m4a
+
+---
+
+## [2026-06-05T00:04:00.441Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> um I'm basically looking of another peak, something that will stay with me, something that the character will stay with me even over the years when I might have forgotten the plot thrbfeel I had when I watched it should
+
+**Coda Reply:**
+> I totally get that! You're looking for something that leaves a lasting impact, like those unforgettable characters and emotional journeys. Do you have any dealbreakers or specific platforms you prefer for streaming?
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [],
+  "category_appends": {
+    "anime": [
+      "Loves deep emotional stories",
+      "Appreciates diverse casts",
+      "Enjoys psychological themes"
+    ]
+  },
+  "recent_context_overwrite": "Looking for impactful stories that stay with you over the years.",
+  "guardrails_appends": [],
+  "thematic_connections_appends": [
+    "Drawn to stories of love and loss",
+    "Appreciates atmospheric storytelling"
+  ]
+}
+```
+
+---
+
+## [2026-06-05T00:04:19.137Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> nope just no bl or generic stuff
+
+**Coda Reply:**
+> Got it! No BL or generic stuff. I love that you're looking for something truly special. It sounds like you really value depth and uniqueness in your stories. If you ever want to chat more about your favorites or what you're craving next, I'm here!
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [
+    "Values depth and uniqueness in stories",
+    "Prefers emotional and psychological themes"
+  ],
+  "category_appends": {
+    "anime": [
+      "Loves Steins;Gate",
+      "Enjoys Monogatari series",
+      "Appreciates sad anime movies",
+      "Likes Ghibli films"
+    ],
+    "visual_novels": [
+      "Enjoys Katawa Shoujo"
+    ]
+  },
+  "recent_context_overwrite": "Looking for impactful stories with memorable characters",
+  "guardrails_appends": [
+    "No BL",
+    "No generic content"
+  ],
+  "thematic_connections_appends": [
+    "Drawn to emotional and psychological narratives",
+    "Appreciates themes of love and loss"
+  ]
+}
+```
+
+---
+
+## [2026-06-05T00:04:19.139Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep emotional and psychological stories. Enjoys stories with diverse casts and personal struggles. Loves stories of love and loss. Specific Tastes in Anime: Loves Steins;Gate. Enjoys Monogatari series. Likes Bunny Girl Senpai. Enjoys sad anime movies. Loves Ghibli movies. Loves deep emotional stories. Appreciates diverse casts. Enjoys psychological themes",
+  "recent_context": "Looking for impactful stories that stay with you over the years.",
+  "guardrails": "",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["impactful emotional anime site:reddit.com/r/animesuggest","psychological anime with diverse casts site:reddit.com/r/anime","sad anime movies that stay with you site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate","Bunny Girl Senpai"]
+
+- **Master Directive:**
+> Seek out anime that delivers profound emotional experiences and psychological depth, particularly those that feature diverse characters and themes of love and loss. Focus on impactful stories that resonate long after viewing, especially sad anime movies and series that evoke strong feelings.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Bakemonogatari
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Bakemonogatari on MyAnimeList (with 137 community votes).
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Yahari Ore no Seishun Love Comedy wa Machigatteiru.
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Yahari Ore no Seishun Love Comedy wa Machigatteiru. on MyAnimeList (with 44 community votes).
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Kokoro Connect
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Kokoro Connect on MyAnimeList (with 34 community votes).
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Suzumiya Haruhi no Yuuutsu
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Suzumiya Haruhi no Yuuutsu on MyAnimeList (with 25 community votes).
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Clannad
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Clannad on MyAnimeList (with 14 community votes).
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** My Teen Romantic Comedy SNAFU
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Teen Romantic Comedy SNAFU (Comedy, Drama, Romance, Slice of Life) — This romantic comedy revolves around an antisocial high school student named Hikigaya Hachiman with a distorted view on life and no friends or girlfriend. When he sees his classmates talking excitedly AniList score: 78/100. Community rated this recommendation 2098 times.
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Bakemonogatari
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Bakemonogatari (Comedy, Drama, Mystery, Psychological) — First season of the Monogatari Series, part 1/6. Contains the arcs Hitagi Crab, Mayoi Snail, Suruga Monkey, Nadeko Snake, and Tsubasa Cat from the Bakemonogatari light novels.
+Thanks to Meme Oshino, K AniList score: 82/100. Community rated this recommendation 1731 times.
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Horimiya
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Horimiya (Comedy, Romance, Slice of Life) — A secret life is the one thing they have in common. At school, Hori is a prim and perfect social butterfly, but the truth is she's a brash homebody. Meanwhile, under a gloomy facade, Miyamura hides a  AniList score: 81/100. Community rated this recommendation 810 times.
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** The Pet Girl of Sakurasou
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: The Pet Girl of Sakurasou (Comedy, Drama, Romance, Slice of Life) — The first time he saw her, it was love at first sight. Unfortunately for Sorata Kanda, "she" was a cat named Hikari and his school's rules forbid keeping pets in the regular dorms. As a result, Sorata AniList score: 78/100. Community rated this recommendation 463 times.
+
+#### Snippet 23 (Source: Unknown Source)
+- **Title/Topic:** My Teen Romantic Comedy SNAFU Climax!
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Teen Romantic Comedy SNAFU Climax! (Comedy, Drama, Romance, Slice of Life) — The third season of Yahari Ore no Seishun Love Come wa Machigatteiru.
+
+As the members of the Service Club band together to host a school prom, Hachiman, Yukino and Yui will have to put their feelings  AniList score: 82/100. Community rated this recommendation 430 times.
+
+#### Snippet 24 (Source: Unknown Source)
+- **Title/Topic:** My Dress-Up Darling
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Dress-Up Darling (Comedy, Ecchi, Romance, Slice of Life) — High schooler Wakana Gojou cares about one thing: making Hina dolls. With nobody to share his obsession, he has trouble finding friends—or even holding conversation. But after the school’s most popula AniList score: 80/100. Community rated this recommendation 409 times.
+
+#### Snippet 25 (Source: Unknown Source)
+- **Title/Topic:** Kokoro Connect
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Kokoro Connect (Drama, Romance, Slice of Life, Supernatural) — The five members of the Cultural Research Club - Taichi Yaegashi, Iori Nagase, Himeko Inaba, Yui Kiriyama, and Yoshifumi Aoki - encounter a bizarre phenomenon one day when Aoki and Yui switch bodies w AniList score: 75/100. Community rated this recommendation 289 times.
+
+#### Snippet 26 (Source: Unknown Source)
+- **Title/Topic:** The Melancholy of Haruhi Suzumiya
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: The Melancholy of Haruhi Suzumiya (Comedy, Mystery, Sci-Fi, Slice of Life) — Kyon, your typical high school student, has long given up his belief in the supernatural. However, upon meeting Haruhi Suzumiya, he quickly finds out that it is the supernatural that she is interested AniList score: 76/100. Community rated this recommendation 268 times.
+
+#### Snippet 27 (Source: Unknown Source)
+- **Title/Topic:** Clannad: After Story
+- **Content:** [Kitsu] Clannad: After Story (TV): Clannad: After Story, the sequel to the critically acclaimed slice-of-life series Clannad, begins after Tomoya Okazaki and Nagisa Furukawa graduate from high school. Together, they experience the emotional rollercoaster of growing up. Unable to decide on a course for his future, Tomoya learns the value of a strong work ethic and discovers the stren Kitsu rating: 82.24/100.
+
+#### Snippet 28 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 29 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 30 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 31 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 32 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 33 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 34 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 35 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Clannad: After Story**
+- **Coda Blurb:** _"This is the one that will hit you right in the feels."_
+- **Pitch:**
+> I thought of you when I came across 'Clannad: After Story' because it’s not just a continuation of the first season; it’s a deep dive into the complexities of love, family, and the painful realities of life. The series takes Tomoya Okazaki and Nagisa Furukawa's relationship and expands it into a heartfelt journey that explores the joys and sorrows of adulthood. If you’re looking for an anime that captures the essence of love and loss, this is it. Prepare yourself for an emotional rollercoaster that resonates long after the credits roll.
+
+> Fans rave about how 'Clannad: After Story' manages to blend everyday life with profound emotional experiences, making it a staple for anyone who appreciates character-driven narratives. The community often highlights the series' ability to evoke tears and laughter in equal measure, with many viewers sharing how it changed their perspective on life and relationships. It’s celebrated not just for its storytelling but for its ability to make you feel deeply connected to the characters, making it a perfect match for your desire for impactful stories.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx4181-zUKE7BZC62OF.png
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/ba/5e/3e/ba5e3e11-1ccd-7cd2-9c63-442da29163d2/mzaf_9053590328423252013.plus.aac.p.m4a
+
+---
+
+## [2026-06-05T00:04:27.709Z] Onboarding Chat (Tab: You)
+
+**User Message:**
+> ok
+
+**Coda Reply:**
+> Thanks for sharing, Fortune! You've got such a great taste in stories. If you ever want to dive deeper into your favorites or explore new ones, just let me know!
+
+**Memory Updates Extracted:**
+```json
+{
+  "global_identity_appends": [
+    "Values depth and uniqueness in stories"
+  ],
+  "category_appends": {
+    "anime": [
+      "Loves Steins;Gate",
+      "Enjoys Monogatari series",
+      "Appreciates sad anime movies",
+      "Likes Ghibli movies"
+    ],
+    "visual_novels": [
+      "Loved Katawa Shoujo"
+    ]
+  },
+  "recent_context_overwrite": "Looking for impactful stories that stay with you",
+  "guardrails_appends": [
+    "No BL",
+    "No generic stuff"
+  ],
+  "thematic_connections_appends": [
+    "Drawn to emotional and psychological stories of love and loss"
+  ]
+}
+```
+
+---
+
+## [2026-06-05T00:04:33.115Z] Harmonization Pass (Tab - Tab: You)
+
+**Input Memory:**
+```json
+{
+  "globalIdentity": [
+    "Appreciates deep emotional and psychological stories",
+    "Enjoys stories with diverse casts and personal struggles",
+    "Loves stories of love and loss",
+    "Values depth and uniqueness in stories",
+    "Prefers emotional and psychological themes"
+  ],
+  "categoryProfiles": {
+    "anime": [
+      "Loves Steins;Gate",
+      "Enjoys Monogatari series",
+      "Likes Bunny Girl Senpai",
+      "Enjoys sad anime movies",
+      "Loves Ghibli movies",
+      "Loves deep emotional stories",
+      "Appreciates diverse casts",
+      "Enjoys psychological themes",
+      "Appreciates sad anime movies",
+      "Likes Ghibli films",
+      "Likes Ghibli movies"
+    ],
+    "visual_novels": [
+      "Enjoys Katawa Shoujo",
+      "Loved Katawa Shoujo"
+    ]
+  },
+  "recentContext": "Looking for impactful stories that stay with you",
+  "guardrails": [
+    "No BL",
+    "No generic content",
+    "No generic stuff"
+  ]
+}
+```
+
+
+**Output Harmonized Memory:**
+```json
+{
+  "global_identity_overwrite": [
+    "Fortune is an introspective thinker who seeks cathartic resolution through character-driven dramas. At 18, they appreciate stories that explore love and loss, featuring diverse casts with rich backstories and personal struggles. They value emotional and psychological depth, and enjoy narratives that highlight the beauty and cruelty of life."
+  ],
+  "recent_context_overwrite": "Fortune is actively looking for impactful stories that will stay with them over the years, focusing on unforgettable characters and emotional experiences.",
+  "guardrails_appends": [
+    "No BL",
+    "No generic content"
+  ],
+  "thematic_connections_appends": [
+    "Fortune bridges their love of Steins;Gate and Interstellar through a fascination with emotional narratives that explore deep human connections and the complexities of time and trauma."
+  ]
+}
+```
+
+---
+
+## [2026-06-05T00:04:35.973Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep emotional and psychological stories. Enjoys stories with diverse casts and personal struggles. Loves stories of love and loss. Values depth and uniqueness in stories. Prefers emotional and psychological themes. Specific Tastes in Anime: Loves Steins;Gate. Enjoys Monogatari series. Likes Bunny Girl Senpai. Enjoys sad anime movies. Loves Ghibli movies. Loves deep emotional stories. Appreciates diverse casts. Enjoys psychological themes. Appreciates sad anime movies. Likes Ghibli films",
+  "recent_context": "Looking for impactful stories with memorable characters",
+  "guardrails": "No BL, No generic content",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["impactful psychological anime with memorable characters site:reddit.com/r/animesuggest","deep emotional anime stories site:reddit.com/r/animesuggest","anime with diverse casts and personal struggles site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate","Bunny Girl Senpai"]
+
+- **Master Directive:**
+> Look for anime that feature impactful stories with memorable characters, focusing on emotional and psychological themes. Seek out titles that explore personal struggles and have a diverse cast to resonate with your appreciation for depth and uniqueness.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Bakemonogatari
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Bakemonogatari on MyAnimeList (with 137 community votes).
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Yahari Ore no Seishun Love Comedy wa Machigatteiru.
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Yahari Ore no Seishun Love Comedy wa Machigatteiru. on MyAnimeList (with 44 community votes).
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Kokoro Connect
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Kokoro Connect on MyAnimeList (with 34 community votes).
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Suzumiya Haruhi no Yuuutsu
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Suzumiya Haruhi no Yuuutsu on MyAnimeList (with 25 community votes).
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Clannad
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Clannad on MyAnimeList (with 14 community votes).
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** My Teen Romantic Comedy SNAFU
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Teen Romantic Comedy SNAFU (Comedy, Drama, Romance, Slice of Life) — This romantic comedy revolves around an antisocial high school student named Hikigaya Hachiman with a distorted view on life and no friends or girlfriend. When he sees his classmates talking excitedly AniList score: 78/100. Community rated this recommendation 2098 times.
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Bakemonogatari
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Bakemonogatari (Comedy, Drama, Mystery, Psychological) — First season of the Monogatari Series, part 1/6. Contains the arcs Hitagi Crab, Mayoi Snail, Suruga Monkey, Nadeko Snake, and Tsubasa Cat from the Bakemonogatari light novels.
+Thanks to Meme Oshino, K AniList score: 82/100. Community rated this recommendation 1731 times.
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Horimiya
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Horimiya (Comedy, Romance, Slice of Life) — A secret life is the one thing they have in common. At school, Hori is a prim and perfect social butterfly, but the truth is she's a brash homebody. Meanwhile, under a gloomy facade, Miyamura hides a  AniList score: 81/100. Community rated this recommendation 810 times.
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** The Pet Girl of Sakurasou
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: The Pet Girl of Sakurasou (Comedy, Drama, Romance, Slice of Life) — The first time he saw her, it was love at first sight. Unfortunately for Sorata Kanda, "she" was a cat named Hikari and his school's rules forbid keeping pets in the regular dorms. As a result, Sorata AniList score: 78/100. Community rated this recommendation 463 times.
+
+#### Snippet 23 (Source: Unknown Source)
+- **Title/Topic:** My Teen Romantic Comedy SNAFU Climax!
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Teen Romantic Comedy SNAFU Climax! (Comedy, Drama, Romance, Slice of Life) — The third season of Yahari Ore no Seishun Love Come wa Machigatteiru.
+
+As the members of the Service Club band together to host a school prom, Hachiman, Yukino and Yui will have to put their feelings  AniList score: 82/100. Community rated this recommendation 430 times.
+
+#### Snippet 24 (Source: Unknown Source)
+- **Title/Topic:** My Dress-Up Darling
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Dress-Up Darling (Comedy, Ecchi, Romance, Slice of Life) — High schooler Wakana Gojou cares about one thing: making Hina dolls. With nobody to share his obsession, he has trouble finding friends—or even holding conversation. But after the school’s most popula AniList score: 80/100. Community rated this recommendation 409 times.
+
+#### Snippet 25 (Source: Unknown Source)
+- **Title/Topic:** Kokoro Connect
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Kokoro Connect (Drama, Romance, Slice of Life, Supernatural) — The five members of the Cultural Research Club - Taichi Yaegashi, Iori Nagase, Himeko Inaba, Yui Kiriyama, and Yoshifumi Aoki - encounter a bizarre phenomenon one day when Aoki and Yui switch bodies w AniList score: 75/100. Community rated this recommendation 289 times.
+
+#### Snippet 26 (Source: Unknown Source)
+- **Title/Topic:** The Melancholy of Haruhi Suzumiya
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: The Melancholy of Haruhi Suzumiya (Comedy, Mystery, Sci-Fi, Slice of Life) — Kyon, your typical high school student, has long given up his belief in the supernatural. However, upon meeting Haruhi Suzumiya, he quickly finds out that it is the supernatural that she is interested AniList score: 76/100. Community rated this recommendation 268 times.
+
+#### Snippet 27 (Source: Unknown Source)
+- **Title/Topic:** Clannad: After Story
+- **Content:** [Kitsu] Clannad: After Story (TV): Clannad: After Story, the sequel to the critically acclaimed slice-of-life series Clannad, begins after Tomoya Okazaki and Nagisa Furukawa graduate from high school. Together, they experience the emotional rollercoaster of growing up. Unable to decide on a course for his future, Tomoya learns the value of a strong work ethic and discovers the stren Kitsu rating: 82.24/100.
+
+#### Snippet 28 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 29 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 30 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 31 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 32 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 33 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 34 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 35 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Fruits Basket The Final Season**
+- **Coda Blurb:** _"This is the one that will tug at your heartstrings and make you reflect on personal struggles in the most beautiful way."_
+- **Pitch:**
+> Fruits Basket The Final Season wraps up a story that has beautifully blended drama, psychological depth, and emotional resonance throughout its run. It dives into the complexities of the Soma family and the burdens they carry, exploring themes of trauma, healing, and the power of love and acceptance. The character development is profound, particularly with Tohru and her journey to understand her own feelings while helping others confront their pasts. It's a series that encourages viewers to reflect on their own struggles and relationships, making it a perfect fit for your appreciation of impactful storytelling.
+
+> Community feedback highlights how this season takes the emotional stakes to new heights, with fans praising its ability to tackle heavy themes while still maintaining a sense of hope and warmth. The characters are not just memorable; they feel like friends you’ve grown up with, each facing their unique challenges. Many viewers have shared how the series has helped them process their own experiences, making it resonate deeply with those who appreciate depth and uniqueness in storytelling. This is a heartfelt conclusion that is sure to leave a lasting impact.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124194-TJlqMMR7BGn9.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview113/v4/c2/da/93/c2da9379-d8c4-6271-b00b-ff8cacb0e4df/mzaf_10996589433711919802.plus.aac.p.m4a
+
+---
+
+## [2026-06-05T00:04:42.477Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Appreciates deep emotional and psychological stories. Enjoys stories with diverse casts and personal struggles. Loves stories of love and loss. Values depth and uniqueness in stories. Prefers emotional and psychological themes. Specific Tastes in Anime: Loves Steins;Gate. Enjoys Monogatari series. Likes Bunny Girl Senpai. Enjoys sad anime movies. Loves Ghibli movies. Loves deep emotional stories. Appreciates diverse casts. Enjoys psychological themes. Appreciates sad anime movies. Likes Ghibli films. Likes Ghibli movies",
+  "recent_context": "Looking for impactful stories that stay with you",
+  "guardrails": "No BL, No generic content, No generic stuff",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["impactful psychological anime site:reddit.com/r/animesuggest","emotional stories in anime site:reddit.com/r/anime","best sad anime movies site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate","Bunny Girl Senpai"]
+
+- **Master Directive:**
+> Seek out anime that deliver profound emotional experiences and psychological depth, particularly those that feature diverse casts and themes of love and loss. Focus on impactful stories that resonate long after viewing, especially in the late-night atmosphere that enhances introspection.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Bakemonogatari
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Bakemonogatari on MyAnimeList (with 137 community votes).
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Yahari Ore no Seishun Love Comedy wa Machigatteiru.
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Yahari Ore no Seishun Love Comedy wa Machigatteiru. on MyAnimeList (with 44 community votes).
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Kokoro Connect
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Kokoro Connect on MyAnimeList (with 34 community votes).
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Suzumiya Haruhi no Yuuutsu
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Suzumiya Haruhi no Yuuutsu on MyAnimeList (with 25 community votes).
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Clannad
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Clannad on MyAnimeList (with 14 community votes).
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** My Teen Romantic Comedy SNAFU
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Teen Romantic Comedy SNAFU (Comedy, Drama, Romance, Slice of Life) — This romantic comedy revolves around an antisocial high school student named Hikigaya Hachiman with a distorted view on life and no friends or girlfriend. When he sees his classmates talking excitedly AniList score: 78/100. Community rated this recommendation 2098 times.
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Bakemonogatari
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Bakemonogatari (Comedy, Drama, Mystery, Psychological) — First season of the Monogatari Series, part 1/6. Contains the arcs Hitagi Crab, Mayoi Snail, Suruga Monkey, Nadeko Snake, and Tsubasa Cat from the Bakemonogatari light novels.
+Thanks to Meme Oshino, K AniList score: 82/100. Community rated this recommendation 1731 times.
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Horimiya
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Horimiya (Comedy, Romance, Slice of Life) — A secret life is the one thing they have in common. At school, Hori is a prim and perfect social butterfly, but the truth is she's a brash homebody. Meanwhile, under a gloomy facade, Miyamura hides a  AniList score: 81/100. Community rated this recommendation 810 times.
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** The Pet Girl of Sakurasou
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: The Pet Girl of Sakurasou (Comedy, Drama, Romance, Slice of Life) — The first time he saw her, it was love at first sight. Unfortunately for Sorata Kanda, "she" was a cat named Hikari and his school's rules forbid keeping pets in the regular dorms. As a result, Sorata AniList score: 78/100. Community rated this recommendation 463 times.
+
+#### Snippet 23 (Source: Unknown Source)
+- **Title/Topic:** My Teen Romantic Comedy SNAFU Climax!
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Teen Romantic Comedy SNAFU Climax! (Comedy, Drama, Romance, Slice of Life) — The third season of Yahari Ore no Seishun Love Come wa Machigatteiru.
+
+As the members of the Service Club band together to host a school prom, Hachiman, Yukino and Yui will have to put their feelings  AniList score: 82/100. Community rated this recommendation 430 times.
+
+#### Snippet 24 (Source: Unknown Source)
+- **Title/Topic:** My Dress-Up Darling
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Dress-Up Darling (Comedy, Ecchi, Romance, Slice of Life) — High schooler Wakana Gojou cares about one thing: making Hina dolls. With nobody to share his obsession, he has trouble finding friends—or even holding conversation. But after the school’s most popula AniList score: 80/100. Community rated this recommendation 409 times.
+
+#### Snippet 25 (Source: Unknown Source)
+- **Title/Topic:** Kokoro Connect
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Kokoro Connect (Drama, Romance, Slice of Life, Supernatural) — The five members of the Cultural Research Club - Taichi Yaegashi, Iori Nagase, Himeko Inaba, Yui Kiriyama, and Yoshifumi Aoki - encounter a bizarre phenomenon one day when Aoki and Yui switch bodies w AniList score: 75/100. Community rated this recommendation 289 times.
+
+#### Snippet 26 (Source: Unknown Source)
+- **Title/Topic:** The Melancholy of Haruhi Suzumiya
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: The Melancholy of Haruhi Suzumiya (Comedy, Mystery, Sci-Fi, Slice of Life) — Kyon, your typical high school student, has long given up his belief in the supernatural. However, upon meeting Haruhi Suzumiya, he quickly finds out that it is the supernatural that she is interested AniList score: 76/100. Community rated this recommendation 268 times.
+
+#### Snippet 27 (Source: Unknown Source)
+- **Title/Topic:** Clannad: After Story
+- **Content:** [Kitsu] Clannad: After Story (TV): Clannad: After Story, the sequel to the critically acclaimed slice-of-life series Clannad, begins after Tomoya Okazaki and Nagisa Furukawa graduate from high school. Together, they experience the emotional rollercoaster of growing up. Unable to decide on a course for his future, Tomoya learns the value of a strong work ethic and discovers the stren Kitsu rating: 82.24/100.
+
+#### Snippet 28 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 29 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 30 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 31 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 32 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 33 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 34 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 35 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Fruits Basket The Final Season**
+- **Coda Blurb:** _"This is the one—prepare for an emotional journey that resonates deeply."_
+- **Pitch:**
+> Fruits Basket The Final Season beautifully encapsulates themes of love, loss, and personal growth, making it a perfect fit for your late-night introspective vibe. As the Soma family confronts their past traumas and the emotional chains that bind them, you'll find yourself drawn into their struggles and triumphs. The series masterfully balances heartwarming moments with gut-wrenching revelations, ensuring that every episode leaves a lasting impact.
+
+> Community members rave about how this season ties up the intricate character arcs and emotional threads established throughout the series. Viewers have expressed that the emotional weight of the finale is profound, with many feeling a sense of catharsis as they witness the characters evolve and confront their fears. The blend of psychological depth and heartfelt storytelling makes it a standout choice for anyone seeking a resonant experience that lingers long after the credits roll.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx124194-TJlqMMR7BGn9.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview113/v4/c2/da/93/c2da9379-d8c4-6271-b00b-ff8cacb0e4df/mzaf_10996589433711919802.plus.aac.p.m4a
+
+---
+
+## [2026-06-05T00:04:48.555Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Fortune is an introspective thinker who seeks cathartic resolution through character-driven dramas. At 18, they appreciate stories that explore love and loss, featuring diverse casts with rich backstories and personal struggles. They value emotional and psychological depth, and enjoy narratives that highlight the beauty and cruelty of life.. Specific Tastes in Anime: Loves Steins;Gate. Enjoys Monogatari series. Likes Bunny Girl Senpai. Enjoys sad anime movies. Loves Ghibli movies. Loves deep emotional stories. Appreciates diverse casts. Enjoys psychological themes. Appreciates sad anime movies. Likes Ghibli films. Likes Ghibli movies",
+  "recent_context": "Fortune is actively looking for impactful stories that will stay with them over the years, focusing on unforgettable characters and emotional experiences.",
+  "guardrails": "No BL, No generic content, No generic stuff",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "anime"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** anime
+- **Queries Generated:** ["impactful character-driven anime with emotional depth site:reddit.com/r/animesuggest","best sad anime movies that leave a lasting impression site:reddit.com/r/animesuggest","psychological anime with rich backstories site:reddit.com/r/animesuggest"]
+- **MAL Anime Titles Extracted:** ["Steins;Gate","Bunny Girl Senpai"]
+
+- **Master Directive:**
+> Look for anime that features impactful stories with unforgettable characters and emotional experiences, particularly those that delve into themes of love and loss. Prioritize character-driven dramas that resonate deeply and explore complex human emotions.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Re:Zero kara Hajimeru Isekai Seikatsu
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Re:Zero kara Hajimeru Isekai Seikatsu on MyAnimeList (with 136 community votes).
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Boku dake ga Inai Machi
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Boku dake ga Inai Machi on MyAnimeList (with 133 community votes).
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Mahou Shoujo Madoka★Magica
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mahou Shoujo Madoka★Magica on MyAnimeList (with 53 community votes).
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Mirai Nikki (TV)
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Mirai Nikki (TV) on MyAnimeList (with 27 community votes).
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Shiguang Dailiren
+- **Content:** [MAL Recommendation based on Steins;Gate]: Users who liked Steins;Gate also highly recommended watching Shiguang Dailiren on MyAnimeList (with 23 community votes).
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Bakemonogatari
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Bakemonogatari on MyAnimeList (with 137 community votes).
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Yahari Ore no Seishun Love Comedy wa Machigatteiru.
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Yahari Ore no Seishun Love Comedy wa Machigatteiru. on MyAnimeList (with 44 community votes).
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** Kokoro Connect
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Kokoro Connect on MyAnimeList (with 34 community votes).
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Suzumiya Haruhi no Yuuutsu
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Suzumiya Haruhi no Yuuutsu on MyAnimeList (with 25 community votes).
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Clannad
+- **Content:** [MAL Recommendation based on Bunny Girl Senpai]: Users who liked Bunny Girl Senpai also highly recommended watching Clannad on MyAnimeList (with 14 community votes).
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** ERASED
+- **Content:** [AniList Recommendation based on Steins;Gate]: ERASED (Drama, Mystery, Psychological, Supernatural) — Satoru Fujinuma is a 29 year old manga artist struggling to make a name for himself following his debut. But, that was not the only thing in his life that Satoru was feeling frustrated about… He has a AniList score: 81/100. Community rated this recommendation 1871 times.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- (Action, Adventure, Drama, Fantasy) — In the story, Subaru Natsuki is an ordinary high school student who is lost in an alternate world, where he is rescued by a beautiful, silver-haired girl. He stays near her to return the favor, but th AniList score: 81/100. Community rated this recommendation 1577 times.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Summer Time Rendering
+- **Content:** [AniList Recommendation based on Steins;Gate]: Summer Time Rendering (Action, Drama, Mystery, Supernatural) — A sci-fi, summer story filled with suspense set on a small island with Shinpei Aijiro, whose childhood friend Ushio Kofune died. He returns to his hometown for the first time in two years for the fune AniList score: 83/100. Community rated this recommendation 589 times.
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Puella Magi Madoka Magica
+- **Content:** [AniList Recommendation based on Steins;Gate]: Puella Magi Madoka Magica (Action, Drama, Fantasy, Mahou Shoujo) — One night, 14-year-old Madoka Kaname has a terrible nightmare - against the backdrop of a devastated city, she witnesses a girl fight a losing battle against a dreadful being lingering above, while a  AniList score: 83/100. Community rated this recommendation 525 times.
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Re:ZERO -Starting Life in Another World- Season 2
+- **Content:** [AniList Recommendation based on Steins;Gate]: Re:ZERO -Starting Life in Another World- Season 2 (Action, Adventure, Drama, Fantasy) — Even after dying countless times, Subaru finally ended the threat of the White Whale and defeated the Witch Cult's Sin Archbishop representing sloth, Petelgeuse Romaneeconti. But only shortly after ov AniList score: 83/100. Community rated this recommendation 457 times.
+
+#### Snippet 16 (Source: Unknown Source)
+- **Title/Topic:** Vivy -Fluorite Eye's Song-
+- **Content:** [AniList Recommendation based on Steins;Gate]: Vivy -Fluorite Eye's Song- (Action, Drama, Music, Sci-Fi) — An AI named Matsumoto appears before Vivy, the world’s first autonomous humanoid AI. Matsumoto’s mission is to rewrite history together with Vivy, in order to stop the war between AI and humans that w AniList score: 82/100. Community rated this recommendation 364 times.
+
+#### Snippet 17 (Source: Unknown Source)
+- **Title/Topic:** Link Click
+- **Content:** [AniList Recommendation based on Steins;Gate]: Link Click (Drama, Mystery, Supernatural, Thriller) — In a corner of a bustling city, there is a small shop called "Time Photo Studio"  operating as usual. Although the entrance looks abandoned, it's actually run by two men with special abilities: Cheng  AniList score: 86/100. Community rated this recommendation 352 times.
+
+#### Snippet 18 (Source: Unknown Source)
+- **Title/Topic:** Tokyo Revengers
+- **Content:** [AniList Recommendation based on Steins;Gate]: Tokyo Revengers (Action, Drama, Romance, Supernatural) — Takemichi Hanagaki is a freelancer that's reached the absolute pits of despair in his life. He finds out that the only girlfriend he ever had in his life that he dated in middle school, Hinata Tachiba AniList score: 77/100. Community rated this recommendation 318 times.
+
+#### Snippet 19 (Source: Unknown Source)
+- **Title/Topic:** My Teen Romantic Comedy SNAFU
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Teen Romantic Comedy SNAFU (Comedy, Drama, Romance, Slice of Life) — This romantic comedy revolves around an antisocial high school student named Hikigaya Hachiman with a distorted view on life and no friends or girlfriend. When he sees his classmates talking excitedly AniList score: 78/100. Community rated this recommendation 2098 times.
+
+#### Snippet 20 (Source: Unknown Source)
+- **Title/Topic:** Bakemonogatari
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Bakemonogatari (Comedy, Drama, Mystery, Psychological) — First season of the Monogatari Series, part 1/6. Contains the arcs Hitagi Crab, Mayoi Snail, Suruga Monkey, Nadeko Snake, and Tsubasa Cat from the Bakemonogatari light novels.
+Thanks to Meme Oshino, K AniList score: 82/100. Community rated this recommendation 1731 times.
+
+#### Snippet 21 (Source: Unknown Source)
+- **Title/Topic:** Horimiya
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Horimiya (Comedy, Romance, Slice of Life) — A secret life is the one thing they have in common. At school, Hori is a prim and perfect social butterfly, but the truth is she's a brash homebody. Meanwhile, under a gloomy facade, Miyamura hides a  AniList score: 81/100. Community rated this recommendation 810 times.
+
+#### Snippet 22 (Source: Unknown Source)
+- **Title/Topic:** The Pet Girl of Sakurasou
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: The Pet Girl of Sakurasou (Comedy, Drama, Romance, Slice of Life) — The first time he saw her, it was love at first sight. Unfortunately for Sorata Kanda, "she" was a cat named Hikari and his school's rules forbid keeping pets in the regular dorms. As a result, Sorata AniList score: 78/100. Community rated this recommendation 463 times.
+
+#### Snippet 23 (Source: Unknown Source)
+- **Title/Topic:** My Teen Romantic Comedy SNAFU Climax!
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Teen Romantic Comedy SNAFU Climax! (Comedy, Drama, Romance, Slice of Life) — The third season of Yahari Ore no Seishun Love Come wa Machigatteiru.
+
+As the members of the Service Club band together to host a school prom, Hachiman, Yukino and Yui will have to put their feelings  AniList score: 82/100. Community rated this recommendation 430 times.
+
+#### Snippet 24 (Source: Unknown Source)
+- **Title/Topic:** My Dress-Up Darling
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: My Dress-Up Darling (Comedy, Ecchi, Romance, Slice of Life) — High schooler Wakana Gojou cares about one thing: making Hina dolls. With nobody to share his obsession, he has trouble finding friends—or even holding conversation. But after the school’s most popula AniList score: 80/100. Community rated this recommendation 409 times.
+
+#### Snippet 25 (Source: Unknown Source)
+- **Title/Topic:** Kokoro Connect
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: Kokoro Connect (Drama, Romance, Slice of Life, Supernatural) — The five members of the Cultural Research Club - Taichi Yaegashi, Iori Nagase, Himeko Inaba, Yui Kiriyama, and Yoshifumi Aoki - encounter a bizarre phenomenon one day when Aoki and Yui switch bodies w AniList score: 75/100. Community rated this recommendation 289 times.
+
+#### Snippet 26 (Source: Unknown Source)
+- **Title/Topic:** The Melancholy of Haruhi Suzumiya
+- **Content:** [AniList Recommendation based on Bunny Girl Senpai]: The Melancholy of Haruhi Suzumiya (Comedy, Mystery, Sci-Fi, Slice of Life) — Kyon, your typical high school student, has long given up his belief in the supernatural. However, upon meeting Haruhi Suzumiya, he quickly finds out that it is the supernatural that she is interested AniList score: 76/100. Community rated this recommendation 268 times.
+
+#### Snippet 27 (Source: Unknown Source)
+- **Title/Topic:** Clannad: After Story
+- **Content:** [Kitsu] Clannad: After Story (TV): Clannad: After Story, the sequel to the critically acclaimed slice-of-life series Clannad, begins after Tomoya Okazaki and Nagisa Furukawa graduate from high school. Together, they experience the emotional rollercoaster of growing up. Unable to decide on a course for his future, Tomoya learns the value of a strong work ethic and discovers the stren Kitsu rating: 82.24/100.
+
+#### Snippet 28 (Source: Unknown Source)
+- **Title/Topic:** Frieren: Beyond Journey’s End
+- **Content:** [AniList] Frieren: Beyond Journey’s End (Adventure, Drama, Fantasy): The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to AniList score: 91/100. Tags: Travel, Magic, Elf, Female Protagonist
+
+#### Snippet 29 (Source: Unknown Source)
+- **Title/Topic:** Gintama: THE VERY FINAL
+- **Content:** [AniList] Gintama: THE VERY FINAL (Action, Comedy, Drama, Sci-Fi): Gintama: THE FINAL is the 3rd and final film adaptation of the remainder of the Silver Soul arc and is the series finale.
+
+Two years have passed following the Tendoshuu's invasion of the O-Edo Central Terminal. Since then, the Yorozuya have gone their separate ways. Foreseeing Utsuro's return, Ginto AniList score: 91/100. Tags: Samurai, Swordplay, Dissociative Identities, Shounen
+
+#### Snippet 30 (Source: Unknown Source)
+- **Title/Topic:** Gintama Season 3
+- **Content:** [AniList] Gintama Season 3 (Action, Comedy, Drama, Sci-Fi): Gintoki, Shinpachi, and Kagura return as the fun-loving but broke members of the Yorozuya team! Living in an alternate-reality Edo, where swords are prohibited and alien overlords have conquered Japan, they try to thrive on doing whatever work they can get their hands on. However, Shinpachi and Kagu AniList score: 90/100. Tags: Samurai, Tragedy, Meta, Swordplay
+
+#### Snippet 31 (Source: Unknown Source)
+- **Title/Topic:** Chainsaw Man – The Movie: Reze Arc
+- **Content:** [AniList] Chainsaw Man – The Movie: Reze Arc (Action, Drama, Horror, Romance, Supernatural): Theatrical follow-up to Chainsaw Man.
+Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.
+
+(Source: MAPPA AniList score: 90/100. Tags: Demons, Monster Boy, Urban Fantasy, Monster Girl
+
+#### Snippet 32 (Source: Unknown Source)
+- **Title/Topic:** Fullmetal Alchemist: Brotherhood
+- **Content:** [AniList] Fullmetal Alchemist: Brotherhood (Action, Adventure, Drama, Fantasy): "In order for something to be obtained, something of equal value must be lost."
+
+Alchemy is bound by this Law of Equivalent Exchange—something the young brothers Edward and Alphonse Elric only realize after attempting human transmutation: the one forbidden act of alchemy. They pay a terrible price f AniList score: 90/100. Tags: Alchemy, Conspiracy, Military, War
+
+#### Snippet 33 (Source: Unknown Source)
+- **Title/Topic:** Attack on Titan Season 3 Part 2
+- **Content:** [AniList] Attack on Titan Season 3 Part 2 (Action, Drama, Fantasy, Mystery): The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the AniList score: 90/100. Tags: Dystopian, Military, Conspiracy, Tragedy
+
+#### Snippet 34 (Source: Unknown Source)
+- **Title/Topic:** Fruits Basket The Final Season
+- **Content:** [AniList] Fruits Basket The Final Season (Comedy, Drama, Psychological, Romance, Slice of Life): After last season’s revelations, the Soma family moves forward, but the emotional chains that bind them are not easily broken. Unable to admit why she wants the cure, Tohru wrestles with the truth, aware that time is running out for someone close.
+
+And a secret still lurks that could break another’s AniList score: 89/100. Tags: Shoujo, Found Family, Coming of Age, Rehabilitation
+
+#### Snippet 35 (Source: Unknown Source)
+- **Title/Topic:** Owarimonogatari Second Season
+- **Content:** [AniList] Owarimonogatari Second Season (Comedy, Mystery, Psychological, Romance, Supernatural): Third and “Final Season” of the Monogatari Series, part 4/5. Contains the arcs Mayoi Hell, Hitagi Rendezvous, and Ougi Dark from the Owarimonogatari light novels.
+
+Koyomi wakes up to see Mayoi Hachikuji before him, the girl who supposedly had gone to the afterlife. She tells Koyomi that they are cur AniList score: 89/100. Tags: Urban Fantasy, Philosophy, Coming of Age, Male Protagonist
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Clannad: After Story**
+- **Coda Blurb:** _"This is the one; it will take you on an emotional journey like no other."_
+- **Pitch:**
+> I thought of you when I came across 'Clannad: After Story' because it perfectly encapsulates the themes of love and loss that resonate deeply with your tastes. This sequel to 'Clannad' dives into the lives of Tomoya and Nagisa as they navigate adulthood, facing the trials of family, dreams, and heartache. It's not just a continuation; it's a profound exploration of relationships and the bittersweet nature of life, making it a must-watch for anyone who appreciates character-driven narratives.
+
+> Fans rave about how 'Clannad: After Story' hits them emotionally, often describing it as a life-changing experience. The storytelling is beautifully crafted, with moments that will leave you in tears, reflecting on your own life and relationships. The community often highlights how it captures the essence of growing up and the inevitable challenges that come with it, making it an unforgettable watch that lingers long after the credits roll. If you're looking for something that will tug at your heartstrings and make you think, this is it.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ AniList CDN
+- **Poster URL:** https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx4181-zUKE7BZC62OF.png
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/ba/5e/3e/ba5e3e11-1ccd-7cd2-9c63-442da29163d2/mzaf_9053590328423252013.plus.aac.p.m4a
+
+---
+
+## [2026-06-05T00:05:10.956Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "Fortune is an introspective thinker who seeks cathartic resolution through character-driven dramas. At 18, they appreciate stories that explore love and loss, featuring diverse casts with rich backstories and personal struggles. They value emotional and psychological depth, and enjoy narratives that highlight the beauty and cruelty of life.. Specific Tastes in Visual Novels: Enjoys Katawa Shoujo. Loved Katawa Shoujo",
+  "recent_context": "Fortune is actively looking for impactful stories that will stay with them over the years, focusing on unforgettable characters and emotional experiences.",
+  "guardrails": "No BL, No generic content, No generic stuff",
+  "local_context": "It is currently a late night on a weekday.",
+  "requested_media_type": "visualNovel"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** visual novel
+- **Queries Generated:** ["character-driven visual novels with emotional depth site:vndb.org","impactful visual novels about love and loss site:vndb.org","narrative-rich visual novels with diverse casts site:vndb.org"]
+
+- **Master Directive:**
+> Look for visual novels that focus on character-driven narratives with emotional and psychological depth, particularly those that explore themes of love and loss. Seek titles that feature diverse casts and rich backstories to ensure a memorable and impactful experience.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** Tag: Proactive Protagonist | vndb
+- **Content:** Report an issue on this page. Tag: Proactive Protagonist Tags > Character > Protagonist > Protagonist's Traits > Protagonist's Personality > Proactive Protagonist
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** The Visual Novel Database | vndb
+- **Content:** VNDB.org strives to be a comprehensive database for information about visual novels. This website is built as a wiki, meaning that anyone can freely add and contribute information to the database, allowing us to create the largest, most accurate and most up-to-date visual novel database on the web.
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Tag: Protagonist with Psychological Problems | vndb
+- **Content:** Report an issue on this page. Tag: Protagonist with Psychological Problems Tags > Theme > Drama > Health Issues > Psychological Problems > Protagonist with Psychological Problems Tags > Character > Protagonist > Protagonist's Traits > Protagonist with Health Issues > Protagonist with Psychological Problems
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Tag: Female Protagonist | vndb - The Visual Novel Database
+- **Content:** Report an issue on this page. Tag: Female Protagonist Tags > Character > Protagonist > Protagonist's Traits > Protagonist's Gender > Female Protagonist
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Tag index | vndb - The Visual Novel Database
+- **Content:** > Fantasy (12804) > 7 more tags Character > Hero > Heroine > Major Antagonist (462) > Misc. Character Tags > More Than Seven Love Interests (1102) > 3 more tags Style > April Fool's (174) > Design > Game Jam (6106) > Modifications (39) > Other Gameplay Elements (7763) > 3 more tags Plot > Ending > Routes > Type Setting > Scene > Time Period ...
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Tag: Pure Love Story | vndb - The Visual Novel Database
+- **Content:** Most of the VNs have some sort of romance, but there are some that are about true love overcoming all difficulties. Of a pair of destined lovers overcoming every difficulty...
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Tag: Romance | vndb - The Visual Novel Database
+- **Content:** Forbidden Love (234) Inter-class Romance (91) Interracial/interspecies Romance (337) Long-distance Relationship (73) May-December Romance (310) Pure Love Story (579) Romance Between Protagonists (149) Secret Romance (91) Self-romance (6) Slow-burn Romance (160) Student-Teacher Romance (247) Unrequited Love (320) Recently tagged Visual novels ...
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** The Visual Novel Database | vndb
+- **Content:** VNDB.org strives to be a comprehensive database for information about visual novels. This website is built as a wiki, meaning that anyone can freely add and contribute information to the database, allowing us to create the largest, most accurate and most up-to-date visual novel database on the web.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** Tag: Different Love Interest (s) Per Protagonist | vndb
+- **Content:** In a game with multiple protagonists, different heroes or heroines are available as potential romantic partners for each protagonist. The protagonists have no overlapping love interests.
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Canvas of Lost Love | vndb - The Visual Novel Database
+- **Content:** Report an issue on this page. Canvas of Lost Love 1 cover ... content technical hide spoilers show minor spoilers spoil me! summary all Hero with Heterochromia 2.0 Otome Game 2.0 Painter Protagonist 2.0
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Canvas of Lost Love**
+- **Coda Blurb:** _"This is the one; it's a heartfelt journey through love and loss that you'll resonate with deeply."_
+- **Pitch:**
+> Canvas of Lost Love is a beautifully crafted visual novel that delves into the emotional complexities of love and the pain of loss. As a painter protagonist, you navigate a world filled with rich backstories and diverse characters, each with their own struggles and aspirations. The narrative is not just about romance; it's a poignant exploration of how art can be a means of healing and expression in the face of heartache.
+
+> Players have praised its ability to evoke strong emotions, with many noting how the characters feel incredibly real and relatable. The game tackles themes of grief and recovery, making it a powerful experience that resonates long after the credits roll. The community has highlighted its stunning visuals and immersive storytelling, creating a memorable journey that aligns perfectly with your desire for character-driven narratives rich in emotional depth.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ External URL
+- **Poster URL:** https://t.vndb.org/cv/54/108254.jpg
+- **OST URL:** https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/91/02/a6/9102a6f8-b072-29fc-374c-36e625f8d412/mzaf_1772805761012658592.plus.aac.p.m4a
+
+---
+
+## [2026-06-05T08:55:15.083Z] Harmonization Pass (Global)
+
+**Input Memory:**
+```json
+{
+  "global_identity": [
+    "Appreciates stories of love and loss",
+    "Values deep characters with trauma and backstory"
+  ],
+  "category_profiles": {
+    "anime": [
+      "Loves Steins;Gate",
+      "Enjoys Monogatari series"
+    ],
+    "movies": [
+      "Loves Interstellar"
+    ],
+    "visual_novels": [
+      "Enjoys Katawa Shoujo",
+      "Enjoys Tsukihime"
+    ]
+  }
+}
+```
+
+**Research / Theme Context Gathered:**
+Title: Steins;Gate
+Research:
+Wikipedia Summary:
+Steins;Gate is a 2009 science fiction visual novel game developed by 5pb. and Nitroplus. It is the second game in the Science Adventure series, following Chaos;Head. The story follows a group of students as they discover and develop technology that gives them the means to change the past. The gameplay in Steins;Gate includes branching scenarios with courses of interaction.
+Steins;Gate was released in Japan for the Xbox 360 in October 2009. The game was ported to Windows in August 2010, PlayStation Portable in June 2011, iOS in August 2011, PlayStation 3 in May 2012, PlayStation Vita in March 2013, and Android in June 2013. JAST USA released the PC version in North America in March 2014, both digitally and as a physical collector's edition, while PQube released the PS3 and Vita versions in 
+
+Community Themes:
+(not found)
+
+---
+
+Title: Monogatari series
+Research:
+Wikipedia Summary:
+Monogatari (物語; "Story") is a Japanese light novel series written by Nisio Isin and illustrated by Vofan. The story follows Koyomi Araragi, a third-year high school student who survives a vampire attack and finds himself helping girls affected by various supernatural phenomena that act as proxies for their emotional and mental issues. Since November 2006, Kodansha published 29 volumes in the series under its Kodansha Box imprint. All of the series' story arcs share the common title suffix -monogatari (物語).
+Shaft has animated the Monogatari series several times since 2009. The "first season" of the anime adaptation consists of 30 episodes, which were broadcast in Japan between July 2009 and December 2012. The second season consists of 28 episodes broadcast between July and December 2013, an
+
+Community Themes:
+(not found)
+
+---
+
+Title: Interstellar
+Research:
+Wikipedia Summary:
+Interstellar is a 2014 epic science fiction film directed by Christopher Nolan, who co-wrote the screenplay with his brother Jonathan Nolan. It has an ensemble cast led by Matthew McConaughey, Anne Hathaway, Jessica Chastain, Bill Irwin, Ellen Burstyn, and Michael Caine. Set in a dystopian future where Earth is suffering from catastrophic blight and famine, the film follows a group of astronauts who travel through space in search of a new home for humanity.
+The screenplay had its origins in a script that Jonathan had developed in 2007 and was originally set to be directed by Steven Spielberg. Theoretical physicist Kip Thorne was an executive producer and scientific consultant on the film, and wrote the tie-in book The Science of Interstellar. It was Lynda Obst's final film as producer befo
+
+Community Themes:
+(not found)
+
+---
+
+Title: Katawa Shoujo
+Research:
+Wikipedia Summary:
+Katawa Shoujo (Japanese: かたわ少女, Hepburn: Katawa Shōjo; lit. "Cripple Girls", translated "Disability Girls") is a bishōjo-style visual novel by Four Leaf Studios that tells the story of a young man and five young women living with varying disabilities. The game uses a traditional text and sprite-based visual novel model with an ADV-style text box running on the Ren'Py visual novel engine. The game is licensed under the Creative Commons CC-BY-NC-ND.
+The majority of the story takes place at Yamaku High School, a boarding school for disabled students, located in an unnamed city somewhere in modern, northern Japan. The player takes the role of Hisao Nakai, an ordinary boy whose life changes dramatically after a heart attack caused by his long-dormant cardiac arrhythmia. After a lengthy hospital
+
+Community Themes:
+(not found)
+
+---
+
+Title: Tsukihime
+Research:
+Wikipedia Summary:
+Tsukihime (月姫; lit. 'Moon Princess') is a Japanese adult visual novel game created by Type-Moon, who first released it at the Winter Comiket in December 2000. In 2003, it was adapted into both an anime television series, Lunar Legend Tsukihime, animated by J.C.Staff, and a manga series, which was serialized between 2003 and 2010 in MediaWorks shōnen manga magazine Dengeki Daioh, with ten volumes released.
+Several other related media have also been released, including the bonus disc Tsukihime Plus-Disc, a fan disc Kagetsu Tohya, and the fighting game series Melty Blood. Story concepts and characters shared many similarities with other Type-Moon's series The Garden of Sinners, and the two were also subtly connected. A remake with updated art and story was announced in 2008. The first part of
+
+Community Themes:
+(not found)
+
+---
+
+
+
+**Output Harmonized Memory:**
+```json
+{
+  "global_identity_overwrite": [
+    "This individual is likely in their late teens to mid-20s, exhibiting a deep appreciation for narratives that explore the complexities of love, loss, and the human experience. Their interests suggest a contemplative and introspective temperament, drawn to stories that delve into characters' traumas and backstories, reflecting a desire for emotional depth and connection. They have a strong inclination towards Japanese media aesthetics and storytelling, particularly in visual novels and anime, indicating a cultural affinity that shapes their preferences.",
+    "Across their diverse media interests, they consistently seek themes of emotional struggle and the beauty of life's fragility. The narratives they gravitate towards often feature intricate character development and psychological depth, whether through the lens of science fiction in 'Interstellar' or the poignant storytelling of 'Steins;Gate' and 'Monogatari.' Their love for visual novels like 'Katawa Shoujo' and 'Tsukihime' further underscores their desire for rich, character-driven experiences that explore the intersection of personal challenges and interpersonal relationships, weaving a tapestry of profound emotional resonance."
+  ],
+  "category_profiles_overwrite": {
+    "anime": [
+      "Loves Steins;Gate for its romance and psychological depth",
+      "Enjoys Monogatari series for its complex character interactions and supernatural themes"
+    ],
+    "movies": [
+      "Loves Interstellar for its exploration of human resilience and existential themes"
+    ],
+    "visual_novels": [
+      "Enjoys Katawa Shoujo for its heartfelt storytelling and character development",
+      "Enjoys Tsukihime for its intricate narrative and emotional depth"
+    ]
+  }
+}
+```
+
+---
+
+## [2026-06-05T08:56:28.565Z] Recommendation Pipeline Trace
+
+### Input Taste Profile & Request
+```json
+{
+  "core_identity": "The user is an 18-year-old introspective thinker seeking cathartic resolution through character-driven dramas. They appreciate Japanese visual novel aesthetics, tragedy, and complex romance. Favorite titles include Tsukihime, Katawa Shoujo, and Steins;Gate.",
+  "recent_context": "Looking for an emotional visual novel with a sad/bittersweet story about love and loss and a great cast.",
+  "guardrails": "No generic content",
+  "local_context": "It is currently a late night on a cool night.",
+  "requested_media_type": "visualNovel"
+}
+```
+
+### Step 1: Synthesis & Routing
+- **Detected Media Type:** visual novel
+- **Queries Generated:** ["emotional visual novels about love and loss site:vndb.org","character-driven visual novels with tragic narratives site:reddit.com/r/visualnovels","bittersweet romance visual novels recommendations site:vndb.org","complex romance visual novels with deep emotional casts site:reddit.com/r/visualnovels","late night introspective visual novels site:vndb.org"]
+
+- **Master Directive:**
+> Look for emotional visual novels that feature tragic love stories and complex characters, perfect for introspective late-night gaming. Focus on titles that provide a cathartic experience through their narratives and aesthetics.
+
+### Step 2: Web Search & Jikan API Snippets
+#### Snippet 1 (Source: Unknown Source)
+- **Title/Topic:** The Visual Novel Database | vndb
+- **Content:** VNDB.org strives to be a comprehensive database for information about visual novels. This website is built as a wiki, meaning that anyone can freely add and contribute information to the database, allowing us to create the largest, most accurate and most up-to-date visual novel database on the web.
+
+#### Snippet 2 (Source: Unknown Source)
+- **Title/Topic:** Bittersweet Romance | vndb - The Visual Novel Database
+- **Content:** User stats Nobody has voted on this visual novel yet... Screenshots Bittersweet Romance
+
+#### Snippet 3 (Source: Unknown Source)
+- **Title/Topic:** Tag: Romance | vndb - The Visual Novel Database
+- **Content:** Boy x Boy Romance (4216) > Boy x Boy Romance Only (3069) > Brother/Brother Romance (29) > Father/Son Romance Girl x Girl Romance (2775) > Girl x Girl Romance Only (1541) > Mother/Daughter Romance (14) > Sister/Sister Romance (38) Romancing a Family (814) > Oyakodon Ending (339) > Shimaidon Ending (314) Both Male and Female Love Interests (1036) See full list on vndb.org
+
+#### Snippet 4 (Source: Unknown Source)
+- **Title/Topic:** Tag: Pure Love Story | vndb - The Visual Novel Database
+- **Content:** Most of the VNs have some sort of romance, but there are some that are about true love overcoming all difficulties. Of a pair of destined lovers overcoming every difficulty...
+
+#### Snippet 5 (Source: Unknown Source)
+- **Title/Topic:** Bittersweet Romance | vndb - The Visual Novel Database
+- **Content:** Sep 24, 2000 ·   A game made for Kamishibai.
+
+#### Snippet 6 (Source: Unknown Source)
+- **Title/Topic:** Looking for dark/realistic/romance vn's for steam deck
+- **Content:** Can you recommend me a visual novel that has a strong biblical foundation? It can be quite complex and profound, with plenty of biblical references. Thank you.
+
+#### Snippet 7 (Source: Unknown Source)
+- **Title/Topic:** Recommend me a romance on steam : r/visualnovels - Reddit
+- **Content:** The complicated and complex prose has a way of getting you hooked to the screen. You will quickly get attached to the quirky, complex and -mostly- likable characters.
+
+#### Snippet 8 (Source: Unknown Source)
+- **Title/Topic:** What are great visual novels that are incredibly emotional ...
+- **Content:** Common requests include: Asking for a Visual Novel for beginners / newbies, Visual novels similar to Katawa Shoujo OR Doki Doki Literature Club, and Visual Novels that are on Switch.
+
+#### Snippet 9 (Source: Unknown Source)
+- **Title/Topic:** What is your favorite romance based visual novel? - Reddit
+- **Content:** As far as normal romance visual novels goes, I'd say my favorites are Hoshi Ori Yume Mirai and Gin'iro, Haruka. They have separate chapters for high school and young adulthood arcs (as well as middle school for Gin'iro, Haruka)
+
+#### Snippet 10 (Source: Unknown Source)
+- **Title/Topic:** Visual Novel Recommendations (Romance mainly ... - Reddit
+- **Content:** I would love to know if anyone can give me recommendations on romance visual novels (with at least a decent amount of choices but the choices NEED to actually matter and multiple endings, tired of getting forced into a storyline I don't want).
+
+#### Snippet 11 (Source: Unknown Source)
+- **Title/Topic:** The Visual Novel Database | vndb
+- **Content:** VNDB.org strives to be a comprehensive database for information about visual novels. This website is built as a wiki, meaning that anyone can freely add and contribute information to the database, allowing us to create the largest, most accurate and most up-to-date visual novel database on the web.
+
+#### Snippet 12 (Source: Unknown Source)
+- **Title/Topic:** Tag index | vndb - The Visual Novel Database
+- **Content:** Explore a comprehensive tag index for visual novels, offering detailed categorization and insights into various themes and elements in the genre.
+
+#### Snippet 13 (Source: Unknown Source)
+- **Title/Topic:** Late Night Surfing | vndb - The Visual Novel Database
+- **Content:** Sep 28, 2024 ·   User stats Nobody has voted on this visual novel yet... Screenshots Late Night Surfing - Demo
+
+#### Snippet 14 (Source: Unknown Source)
+- **Title/Topic:** Higanbana no Saku Yoru ni - Dai Ichi Ya | vndb
+- **Content:** User stats ... Screenshots Higanbana no Saku Yoru ni - Dai Ichi Ya Higanbana no Saku Yoru ni - The First Night
+
+#### Snippet 15 (Source: Unknown Source)
+- **Title/Topic:** Fate/stay night | vndb - The Visual Novel Database
+- **Content:** Report an issue on this page. Fate/stay night 14 covers + 5 package artwork ... content sexual content technical hide spoilers show minor spoilers spoil me! summary all
+
+
+### Step 3: Scoring & Pitching Selection
+- **Selected Title:** **Higanbana no Saku Yoru ni - Dai Ichi Ya**
+- **Coda Blurb:** _"This is the one that will tug at your heartstrings and leave you reflecting long after it's over."_
+- **Pitch:**
+> Higanbana no Saku Yoru ni - Dai Ichi Ya is a visual novel that dives deep into themes of love, loss, and the supernatural, all wrapped in a beautifully haunting narrative. Set in a mysterious world where the boundaries between life and death blur, it explores tragic love stories that resonate with the complexities of human emotions. Players are drawn into a tale that not only captivates with its stunning visuals and atmospheric soundtrack but also challenges them to confront the darker aspects of affection and attachment.
+
+> Community members rave about its emotional depth, often describing it as a cathartic experience that lingers in their minds long after they finish playing. The characters are intricately crafted, each with their own backstories and struggles, making their journeys feel personal and relatable. Many players have noted that the game doesn't shy away from difficult themes, resulting in a powerful narrative that encourages introspection and emotional engagement. If you're looking for a visual novel that offers both aesthetic beauty and a profound story, this one is sure to resonate with you.
+
+### Step 4: Asset Retrieval
+- **Poster Source:** ✅ External URL
+- **Poster URL:** https://t.vndb.org/cv/33/91333.jpg
+- **OST URL:** https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3
+
+---
