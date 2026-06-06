@@ -9,8 +9,8 @@ import 'package:coda/src/features/onboarding/presentation/taste_profile_screen.d
 import 'package:coda/src/features/session/presentation/current_session_screen.dart';
 import 'package:coda/src/features/shell/presentation/coda_shell.dart';
 import 'package:flutter/material.dart';
-// import 'package:coda/src/core/providers/shared_preferences_provider.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coda/src/core/providers/shared_preferences_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -19,18 +19,17 @@ final codaRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/onboarding',
   redirect: (context, state) {
-    // try {
-    //   final container = ProviderScope.containerOf(context);
-    //   final prefs = container.read(sharedPreferencesProvider);
-    //   final savedChips = prefs.getStringList('coda_onboarding_chips') ?? [];
-    //   
-    //   // Temporarily disabled auto-skip onboarding to allow previewing
-    //   // if (savedChips.isNotEmpty && state.matchedLocation == '/onboarding') {
-    //   //   return '/home';
-    //   // }
-    // } catch (e) {
-    //   debugPrint('GoRouter redirect error: $e');
-    // }
+    try {
+      final container = ProviderScope.containerOf(context);
+      final prefs = container.read(sharedPreferencesProvider);
+      final hasMemory = prefs.getString('living_memory_v1') != null;
+      // Skip onboarding if we already have a seeded profile
+      if (hasMemory && state.matchedLocation == '/onboarding') {
+        return '/home';
+      }
+    } catch (e) {
+      debugPrint('GoRouter redirect error: $e');
+    }
     return null;
   },
   routes: [

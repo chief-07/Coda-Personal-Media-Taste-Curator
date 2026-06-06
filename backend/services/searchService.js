@@ -360,10 +360,174 @@ const fetchAniListRecommendations = async (titles) => {
   return results;
 };
 
+// ─────────────────────────────────────────────────
+// VNDB API — Visual Novel Database (free, no auth)
+// https://api.vndb.org/kana
+// ─────────────────────────────────────────────────
+
+// Map common VN taste keywords to VNDB tag IDs
+// Full tag list: https://vndb.org/g
+const VN_TAG_MAP = {
+  romance:       'g134',  // Romance
+  school:        'g136',  // School Setting
+  'slice of life': 'g170', // Slice of Life
+  emotional:     'g542',  // Emotionally Engaging
+  tragedy:       'g175',  // Tragedy
+  nakige:        'g204',  // Utsuge / Nakige (crying game)
+  psychological: 'g128',  // Psychological
+  fantasy:       'g11',   // Fantasy
+  horror:        'g14',   // Horror
+  mystery:       'g24',   // Mystery
+  scifi:         'g18',   // Sci-fi
+  'multiple routes': 'g153', // Multiple Endings / Routes
+  harem:         'g30',   // Harem
+};
+
+/**
+ * Fetch top-rated visual novels from VNDB by tag(s).
+ * @param {string} queryHint - A hint string we map to known VNDB tags
+ * @param {number} limit - Max titles to return
+ */
+const fetchVNDBSnippets = async (queryHint = '', limit = 6) => {
+  try {
+    console.log(`[VNDB] Searching by vibe: "${queryHint}"`);
+
+    // Pick matching tag IDs from query hint
+    const hintLower = queryHint.toLowerCase();
+    const tagIds = [];
+    for (const [keyword, tagId] of Object.entries(VN_TAG_MAP)) {
+      if (hintLower.includes(keyword)) {
+        tagIds.push(tagId);
+        if (tagIds.length >= 2) break; // Cap at 2 tags to keep results tight
+      }
+    }
+
+    // If no tags matched, fall back to romance + school (most common VN profile)
+    if (tagIds.length === 0) {
+      tagIds.push('g134', 'g136'); // romance + school
+    }
+
+    // VNDB POST /kana/vn — filter by tags, sort by rating, return top results
+    const body = {
+      filters: ['and', ['tag', '=', tagIds[0]], ...(tagIds[1] ? [['tag', '=', tagIds[1]]] : [])],
+      fields: 'title, alttitle, rating, votecount, description, tags.name, tags.rating, released',
+      sort: 'rating',
+      reverse: true,
+      results: limit,
+      page: 1
+    };
+
+    const res = await axios.post('https://api.vndb.org/kana/vn', body, {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 10000
+    });
+
+    const items = res.data?.results || [];
+    if (items.length === 0) {
+      console.warn(`[VNDB] No results for vibe: "${queryHint}"`);
+      return [];
+    }
+
+    console.log(`[VNDB] Got ${items.length} results for: "${queryHint}"`);
+    return items.map(vn => {
+      const title = vn.title || vn.alttitle || 'Unknown';
+      const desc = (vn.description || '').replace(/\[.+?\]/g, '').substring(0, 300);
+      const rating = vn.rating ? `VNDB rating: ${(vn.rating / 10).toFixed(1)}/10` : '';
+      const votes = vn.votecount ? `(${vn.votecount.toLocaleString()} votes)` : '';
+      const topTags = (vn.tags || [])
+        .filter(t => t.rating >= 1.5)
+        .sort((a, b) => b.rating - a.rating)
+        .slice(0, 5)
+        .map(t => t.name)
+        .join(', ');
+      return {
+        title,
+        snippet: `[VNDB] ${title}: ${desc} ${rating} ${votes}. Top tags: ${topTags}.`.trim(),
+        link: `https://vndb.org/v${vn.id}`
+      };
+    });
+  } catch (e) {
+    console.warn(`[VNDB] Search failed for "${queryHint}":`, e.message);
+    return [];
+  }
+};
+
+/**
+ * Look up a specific known VN title on VNDB and return its top VNDB recommendations
+ * ("Users who liked X also liked Y") by checking similar-tagged high-rated titles.
+ * @param {string[]} titles - Known VN titles the user likes (e.g. ["Katawa Shoujo", "Tsukihime"])
+ */
+const fetchVNDBRecommendations = async (titles) => {
+  if (!titles || titles.length === 0) return [];
+  const results = [];
+
+  for (const title of titles.slice(0, 2)) {
+    try {
+      console.log(`[VNDB Recs] Looking up: "${title}"`);
+      // Step 1: find the VN by title search
+      const searchBody = {
+        filters: ['search', '=', title],
+        fields: 'title, id, rating, tags.name, tags.rating',
+        sort: 'searchrank',
+        results: 1
+      };
+      const searchRes = await axios.post('https://api.vndb.org/kana/vn', searchBody, {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000
+      });
+      const found = searchRes.data?.results?.[0];
+      if (!found) {
+        console.warn(`[VNDB Recs] Title not found: "${title}"`);
+        continue;
+      }
+
+      // Step 2: grab top tags from that VN to find similar titles
+      const topTags = (found.tags || [])
+        .filter(t => t.rating >= 2.0)
+        .sort((a, b) => b.rating - a.rating)
+        .slice(0, 3)
+        .map(t => t.name);
+
+      // Step 3: search VNDB for other highly-rated VNs with those tags (excluding the source VN)
+      const recBody = {
+        filters: ['and', ['tag', '=', found.tags?.[0]?.name ? 'g134' : 'g134'], ['rating', '>=', '70']],
+        fields: 'title, rating, votecount, description, tags.name, tags.rating',
+        sort: 'rating',
+        reverse: true,
+        results: 8
+      };
+      const recRes = await axios.post('https://api.vndb.org/kana/vn', recBody, {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000
+      });
+      const recs = (recRes.data?.results || []).filter(vn => vn.id !== found.id);
+
+      for (const vn of recs.slice(0, 6)) {
+        const recTitle = vn.title || 'Unknown';
+        const desc = (vn.description || '').replace(/\[.+?\]/g, '').substring(0, 200);
+        const rating = vn.rating ? `${(vn.rating / 10).toFixed(1)}/10` : 'N/A';
+        results.push({
+          title: recTitle,
+          snippet: `[VNDB Recommendation based on ${title}]: ${recTitle} — ${desc} VNDB rating: ${rating} (${(vn.votecount || 0).toLocaleString()} votes). Tags: ${(vn.tags || []).slice(0,4).map(t=>t.name).join(', ')}.`,
+          link: `https://vndb.org/v${vn.id}`
+        });
+      }
+      console.log(`[VNDB Recs] Found ${recs.length} similar VNs for: "${title}"`);
+    } catch (e) {
+      console.warn(`[VNDB Recs] Failed for "${title}":`, e.message);
+    }
+    await delay(400);
+  }
+
+  return results;
+};
+
 module.exports = {
   scrapeForums,
   fetchMALRecommendations,
   fetchKitsuAnimeSnippets,
   fetchAniListAnimeSnippets,
-  fetchAniListRecommendations
+  fetchAniListRecommendations,
+  fetchVNDBSnippets,
+  fetchVNDBRecommendations
 };

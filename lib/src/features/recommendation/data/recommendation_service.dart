@@ -148,8 +148,44 @@ class RecommendationService {
         throw Exception('Failed to fetch recommendation: \${response.statusCode}');
       }
     } catch (e) {
-      print("Recommendation network error: \$e");
+      print("Recommendation network error: $e");
       throw Exception('Could not connect to recommendation engine.');
+    }
+  }
+
+  /// Sends feedback for a rejected recommendation to refine the profile
+  Future<MemoryUpdates?> refineTaste({
+    required LivingMemory memory,
+    required String title,
+    required String mediaType,
+    required String reason,
+  }) async {
+    final payload = {
+      'current_memory': memory.toJson(),
+      'recommendation_title': title,
+      'media_type': mediaType,
+      'feedback_reason': reason,
+    };
+
+    final targetUrl = kIsWeb 
+        ? '${Uri.base.origin}/api/recommend/feedback' 
+        : _baseUrl.replaceAll('/recommend', '/recommend/feedback');
+
+    try {
+      final response = await http.post(
+        Uri.parse(targetUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        return MemoryUpdates.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to refine taste: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Feedback network error: $e");
+      return null;
     }
   }
 }

@@ -3,50 +3,65 @@ const { researchMediaThemes } = require('./onboardingAgent');
 const loggerService = require('./loggerService');
 
 
-const callOpenAI = (messages, responseFormat = null) => {
-  return new Promise((resolve, reject) => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) return reject(new Error("Missing OPENAI_API_KEY"));
+const callOpenAI = async (messages, responseFormat = null, retries = 2) => {
+  const executeCall = () => {
+    return new Promise((resolve, reject) => {
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (!apiKey) return reject(new Error("Missing OPENAI_API_KEY"));
 
-    const payload = {
-      model: 'gpt-4o-mini',
-      messages: messages,
-      temperature: 0.4, // increased from 0.2 to 0.4 for diverse recommendations
-    };
-    
-    if (responseFormat) {
-      payload.response_format = responseFormat;
-    }
-
-    const bodyData = JSON.stringify(payload);
-
-    const req = https.request({
-      hostname: 'api.openai.com',
-      path: '/v1/chat/completions',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Length': Buffer.byteLength(bodyData)
+      const payload = {
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.4, // increased from 0.2 to 0.4 for diverse recommendations
+      };
+      
+      if (responseFormat) {
+        payload.response_format = responseFormat;
       }
-    }, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        if (res.statusCode >= 400) return reject(new Error(`OpenAI Error: ${data}`));
-        try {
-          const json = JSON.parse(data);
-          resolve(json.choices[0].message.content);
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
 
-    req.on('error', reject);
-    req.write(bodyData);
-    req.end();
-  });
+      const bodyData = JSON.stringify(payload);
+
+      const req = https.request({
+        hostname: 'api.openai.com',
+        path: '/v1/chat/completions',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Length': Buffer.byteLength(bodyData)
+        }
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          if (res.statusCode >= 400) return reject(new Error(`OpenAI Error: ${data}`));
+          try {
+            const json = JSON.parse(data);
+            resolve(json.choices[0].message.content);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+
+      req.on('error', reject);
+      req.write(bodyData);
+      req.end();
+    });
+  };
+
+  for (let attempt = 1; attempt <= retries + 1; attempt++) {
+    try {
+      return await executeCall();
+    } catch (e) {
+      const isNetworkError = e.code === 'ENOTFOUND' || e.code === 'ETIMEDOUT' || e.code === 'ECONNRESET' || e.code === 'EPIPE' || (e.message && e.message.includes('timeout'));
+      if (attempt > retries || !isNetworkError) {
+        throw e;
+      }
+      console.warn(`[OpenAI Call] Attempt ${attempt} failed with ${e.code || e.message}. Retrying in 1s...`);
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
 };
 
 const normalizeMediaType = (type) => {
@@ -75,6 +90,7 @@ Your job is to:
 2. Determine the "media_type" (which MUST be EXACTLY "${requestedMediaType}").
 3. Generate an array of exactly 5 distinct, highly targeted web search queries to find human-vetted recommendations.
 4. If the media_type is "anime", extract up to 2 specific favorite anime titles that they love from their profile in "mal_anime_titles" ONLY if they directly align with the user's current request/craving in "recent_context". If no specific favorite anime titles in their profile are relevant to the current request, set "mal_anime_titles" to an empty array [].
+5. If the media_type is "visual novel", extract up to 2 specific favorite visual novel titles that they love from their profile in "vn_titles" (e.g. "Katawa Shoujo", "Tsukihime", "Clannad"). These will be used to seed a VNDB recommendation graph. If no specific VN titles are mentioned, set "vn_titles" to an empty array [].
 
 **SEARCH QUERY CRITERIA:**
 - You MUST generate exactly 5 search queries.
@@ -85,6 +101,16 @@ Your job is to:
   4. Thematic/Genre Isolation (e.g. searching for specific narrative themes like love and loss, existential sci-fi, time travel, or tragedy).
   5. Vibe/Atmosphere & Local Context (matching their current mood, time of day/weather, or specific atmospheric preferences like "cool night Ghibli vibe" or "late night slow-burn").
 - All queries must be site-constrained (e.g. site:vndb.org, site:reddit.com/r/visualnovels, site:reddit.com/r/MovieSuggestions, etc.) depending on the media type.
+
+**VISUAL NOVEL SEARCH QUERY RULES (CRITICAL):**
+- When media_type is "visual novel", do NOT target VNDB tag index pages (e.g. "site:vndb.org slice of life" returns tag pages, not titles).
+- Instead, target Reddit recommendation threads that name actual VN titles:
+  - Use queries like: "visual novels similar to Katawa Shoujo site:reddit.com/r/visualnovels"
+  - Use queries like: "emotional romance visual novels with multiple routes site:reddit.com/r/visualnovels"
+  - Use queries like: "best nakige visual novels site:reddit.com/r/visualnovels"
+  - Use queries like: "visual novels like Tsukihime dark romance site:reddit.com/r/visualnovels"
+  - Lean into specific VN community terms: nakige, utsuge, charage, moege, eroge, nukige — use whichever apply to this user's profile.
+- One query may target vndb.org but ONLY if it names a specific title search, NOT a tag page (e.g. "Clannad site:vndb.org" is fine, "site:vndb.org romance" is NOT).
 
 **CRITICAL MEDIA FORMAT ALIGNMENT:**
 - The requested media format is strictly: "${requestedMediaType}".
@@ -105,7 +131,7 @@ Your job is to:
 - **RECENT CONTEXT IS THE ACTIVE SEARCH TARGET:** If the user's "recent_context" has a craving matching the requested media type, it must guide the search.
 - **DYNAMIC SEARCH ROTATION:** Search queries must target the specific vibe/themes requested. Avoid using generic search queries or the same queries every time.
 - **SITE-SPECIFIC CONSTRAINTS ARE MANDATORY:** All generated search queries MUST use site-specific constraints:
-  - For "visual novel": use site constraints like \`site:vndb.org\` or \`site:reddit.com/r/visualnovels\`.
+  - For "visual novel": use \`site:reddit.com/r/visualnovels\` (Reddit threads that NAME actual titles) — see Visual Novel rules above.
   - For "anime": use \`site:reddit.com/r/animesuggest\` or \`site:reddit.com/r/anime\`.
   - For "movie": use \`site:reddit.com/r/MovieSuggestions\` or \`site:letterboxd.com\`.
   - For "book": use \`site:reddit.com/r/suggestmeabook\` or \`site:goodreads.com\`.
@@ -117,7 +143,8 @@ Respond ONLY with a JSON object:
   "media_type": "${requestedMediaType}",
   "search_queries": ["query1", "query2", "query3", "query4", "query5"],
   "master_directive": "A 2-sentence summary of exactly what to look for and why.",
-  "mal_anime_titles": ["title1", "title2"]
+  "mal_anime_titles": ["title1", "title2"],
+  "vn_titles": ["title1", "title2"]
 }
 `;
 
@@ -141,7 +168,7 @@ Here are raw snippets scraped from the web:
 ${JSON.stringify(scrapedSnippets)}
 
 Your job:
-1. Instantly disqualify any candidate that violates the guardrails.
+1. Instantly disqualify any candidate that violates the guardrails. Specifically, if a guardrail indicates a work has already been watched, played, or seen (e.g. "Already watched: Erased" or "Avoid: Erased"), you MUST NOT recommend that work.
 2. From the remaining candidates, pick the #1 absolute best match for the user's current vibe.
 3. Write a short, highly personalized "coda_blurb" (1 sentence) that acts as a hero text (e.g. "This is the one", "You'll definitely like this one", "I thought of you when...").
 4. Write a longer, highly personalized "pitch_paragraphs" array (2-3 paragraphs) explaining why you picked it, referencing what real people said about it online. Talk like a normal friend.
@@ -345,9 +372,52 @@ Respond ONLY with a JSON object in this format:
   return parsedResponse;
 };
 
+const refineTasteFromFeedback = async (currentMemory, title, mediaType, reason) => {
+  const systemPrompt = `
+You are the Coda Taste Refiner.
+The user was recommended a work, but they swiped left ("NOT FOR ME") and gave a specific feedback reason.
+Your job is to analyze their current 'Living Memory' and this rejection feedback, then produce a JSON object containing updates to their memory to ensure future recommendations do not repeat the same mismatch.
+
+REJECTED WORK: "${title}" (${mediaType})
+FEEDBACK REASON: "${reason}"
+
+CURRENT LIVING MEMORY:
+${JSON.stringify(currentMemory)}
+
+RULES:
+1. Identify if the feedback represents a persistent preference/guardrail, a temporary vibe constraint, or a structural taste shift.
+2. Based on this, generate a "guardrails_appends" array (for hard dealbreakers, platforms, or styles to avoid, e.g., "Avoid mainstream recommendations", "No horror", "No gore"). Keep it concise and negative.
+3. Generate a "recent_context_overwrite" string if the feedback represents a current preference, mood constraint, or context change (e.g. "Seeking visual novels, but avoiding mainstream titles like ${title}").
+4. If applicable, add specific preferences to "category_appends" under the media type key (valid keys are: "anime", "movies", "tv_shows", "visual_novels", "books", "games", "manga", "youtube", "music") or "global_identity_appends" if it's a broad personality or structural preference.
+5. Do NOT include duplicates of existing guardrails or preferences.
+6. Make sure to return ONLY the updates. Do not overwrite the entire memory, just output appends and recent context overwrite.
+
+Respond ONLY with a JSON object:
+{
+  "global_identity_appends": ["Any new broad identity traits if applicable"],
+  "category_appends": {
+    "media_type_key": ["Any new media type specific preferences if applicable"]
+  },
+  "recent_context_overwrite": "Any new current craving or active search direction if applicable",
+  "guardrails_appends": ["Any new negative dealbreakers or constraints if applicable"]
+}
+`;
+
+  try {
+    const response = await callOpenAI([
+      { role: 'system', content: systemPrompt }
+    ], { type: "json_object" });
+    return JSON.parse(response);
+  } catch (e) {
+    console.error("Taste refinement LLM call failed:", e);
+    return {};
+  }
+};
+
 module.exports = {
   synthesizeAndRoute,
   scoreAndPitch,
   harmonizeMemory,
-  harmonizeAllMemory
+  harmonizeAllMemory,
+  refineTasteFromFeedback
 };

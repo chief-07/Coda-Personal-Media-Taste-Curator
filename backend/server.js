@@ -1,3 +1,9 @@
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+process.env.UV_THREADPOOL_SIZE = 128;
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');

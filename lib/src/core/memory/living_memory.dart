@@ -176,6 +176,12 @@ class LivingMemoryNotifier extends Notifier<LivingMemory> {
     state = repo.getMemory(); // refresh state to trigger UI rebuilds if needed
   }
 
+  Future<void> seedMemory(LivingMemory memory) async {
+    final repo = ref.read(livingMemoryRepositoryProvider);
+    await repo.saveMemory(memory);
+    state = memory;
+  }
+
   Future<void> clearMemory() async {
     final repo = ref.read(livingMemoryRepositoryProvider);
     await repo.saveMemory(LivingMemory.empty());

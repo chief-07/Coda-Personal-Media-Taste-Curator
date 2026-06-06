@@ -11,53 +11,68 @@ const WIKI_HEADERS = {
 };
 
 // Helper to call OpenAI with tools
-const callOpenAI = (messages, tools) => {
-  return new Promise((resolve, reject) => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) return reject(new Error("Missing OPENAI_API_KEY"));
+const callOpenAI = async (messages, tools, retries = 2) => {
+  const executeCall = () => {
+    return new Promise((resolve, reject) => {
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (!apiKey) return reject(new Error("Missing OPENAI_API_KEY"));
 
-    const payload = {
-      model: 'gpt-4o-mini',
-      messages: messages,
-      temperature: 0.0,
-    };
-    
-    if (tools && tools.length > 0) {
-      payload.tools = tools;
-      payload.tool_choice = "auto";
-    } else {
-      payload.response_format = { type: 'json_object' };
-    }
-
-    const bodyData = JSON.stringify(payload);
-
-    const req = https.request({
-      hostname: 'api.openai.com',
-      path: '/v1/chat/completions',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Length': Buffer.byteLength(bodyData)
+      const payload = {
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.0,
+      };
+      
+      if (tools && tools.length > 0) {
+        payload.tools = tools;
+        payload.tool_choice = "auto";
+      } else {
+        payload.response_format = { type: 'json_object' };
       }
-    }, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        if (res.statusCode >= 400) return reject(new Error(`OpenAI Error: ${data}`));
-        try {
-          const json = JSON.parse(data);
-          resolve(json.choices[0].message);
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
 
-    req.on('error', reject);
-    req.write(bodyData);
-    req.end();
-  });
+      const bodyData = JSON.stringify(payload);
+
+      const req = https.request({
+        hostname: 'api.openai.com',
+        path: '/v1/chat/completions',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Length': Buffer.byteLength(bodyData)
+        }
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          if (res.statusCode >= 400) return reject(new Error(`OpenAI Error: ${data}`));
+          try {
+            const json = JSON.parse(data);
+            resolve(json.choices[0].message);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+
+      req.on('error', reject);
+      req.write(bodyData);
+      req.end();
+    });
+  };
+
+  for (let attempt = 1; attempt <= retries + 1; attempt++) {
+    try {
+      return await executeCall();
+    } catch (e) {
+      const isNetworkError = e.code === 'ENOTFOUND' || e.code === 'ETIMEDOUT' || e.code === 'ECONNRESET' || e.code === 'EPIPE' || (e.message && e.message.includes('timeout'));
+      if (attempt > retries || !isNetworkError) {
+        throw e;
+      }
+      console.warn(`[OpenAI Chat] Attempt ${attempt} failed with ${e.code || e.message}. Retrying in 1s...`);
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
 };
 
 const themeResearchCache = new Map();

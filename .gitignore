@@ -50,4 +50,7 @@ node_modules/
 # Environment files
 assets/.env
 
+# Coda agent brain and log dumps
+brain/
+backend/logs/*.txt
 

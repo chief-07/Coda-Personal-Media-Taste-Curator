@@ -45,11 +45,14 @@ router.post('/', async (req, res) => {
 
     // ── Step 1: Synthesis & Routing ─────────────────────────────────────────
     console.log('[Recommend] → Step 1: Synthesizing context and routing...');
-    const { media_type, search_queries, master_directive, mal_anime_titles } = await llmService.synthesizeAndRoute(payload);
+    const { media_type, search_queries, master_directive, mal_anime_titles, vn_titles } = await llmService.synthesizeAndRoute(payload);
     console.log(`[Recommend]   Media type: ${media_type}`);
     console.log(`[Recommend]   Queries: ${JSON.stringify(search_queries)}`);
     if (mal_anime_titles?.length > 0) {
       console.log(`[Recommend]   MAL anchor titles: ${JSON.stringify(mal_anime_titles)}`);
+    }
+    if (vn_titles?.length > 0) {
+      console.log(`[Recommend]   VNDB anchor titles: ${JSON.stringify(vn_titles)}`);
     }
 
     // ── Step 2: Data Gathering ───────────────────────────────────────────────
@@ -100,6 +103,39 @@ router.post('/', async (req, res) => {
         }
       }
 
+    } else if (media_type === 'visual novel') {
+      // ── Visual Novel pipeline: VNDB structured data + web search ─────────
+
+      // 2a. VNDB Recommendations — based on known liked VN titles from profile
+      //     vn_titles was extracted by the LLM router in Step 1
+      const resolvedVnTitles = (vn_titles && Array.isArray(vn_titles)) ? vn_titles : [];
+
+      if (resolvedVnTitles.length > 0) {
+        console.log('[Recommend]   2a. Fetching VNDB recommendations based on liked titles...');
+        const vndbRecs = await searchService.fetchVNDBRecommendations(resolvedVnTitles);
+        scrapedSnippets = scrapedSnippets.concat(vndbRecs);
+        console.log(`[Recommend]   VNDB Recs: ${vndbRecs.length} snippets`);
+      }
+
+
+      // 2b. VNDB Tag Search — discover top-rated VNs matching profile vibe
+      console.log('[Recommend]   2b. Fetching VNDB tag-based discovery...');
+      for (const query of search_queries.slice(0, 3)) {
+        const vndbSnippets = await searchService.fetchVNDBSnippets(query, 6);
+        scrapedSnippets = scrapedSnippets.concat(vndbSnippets);
+        console.log(`[Recommend]   VNDB "${query}": ${vndbSnippets.length} snippets`);
+        if (scrapedSnippets.length >= 15) break;
+      }
+
+      // 2c. Web search — Reddit/community threads as a supplement
+      console.log('[Recommend]   2c. Web search for community VN opinions...');
+      for (const query of search_queries) {
+        const webSnippets = await searchService.scrapeForums(query);
+        scrapedSnippets = scrapedSnippets.concat(webSnippets);
+        console.log(`[Recommend]   Web "${query}": ${webSnippets.length} snippets`);
+        if (scrapedSnippets.length >= 25) break;
+      }
+
     } else {
       // All other media types — web search only
       console.log('[Recommend]   Web search for non-anime media type...');
@@ -129,6 +165,7 @@ router.post('/', async (req, res) => {
       mediaType: media_type,
       queries: search_queries,
       malAnimeTitles: mal_anime_titles || [],
+      vnTitles: vn_titles || [],
       scrapedSnippets,
       masterDirective: master_directive,
       selection: { title, coda_blurb, pitch_paragraphs },
@@ -155,6 +192,30 @@ router.post('/', async (req, res) => {
   } catch (error) {
     console.error('[Recommend Route Error]:', error);
     res.status(500).json({ error: 'Recommendation pipeline failed', details: error.message });
+  }
+});
+
+router.post('/feedback', async (req, res) => {
+  try {
+    const { current_memory, recommendation_title, media_type, feedback_reason } = req.body;
+    console.log('\n[Feedback] ═══════════════════════════════════════════════════');
+    console.log(`[Feedback] Received rejection for "${recommendation_title}" (${media_type})`);
+    console.log(`[Feedback] Reason: "${feedback_reason}"`);
+
+    const updates = await llmService.refineTasteFromFeedback(
+      current_memory,
+      recommendation_title,
+      media_type,
+      feedback_reason
+    );
+
+    console.log('[Feedback] Generated updates:', JSON.stringify(updates));
+    console.log('[Feedback] ✅ Refinement complete.\n');
+
+    res.json(updates);
+  } catch (error) {
+    console.error('[Feedback Route Error]:', error);
+    res.status(500).json({ error: 'Feedback refinement failed', details: error.message });
   }
 });
 
