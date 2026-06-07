@@ -176,7 +176,9 @@ Your job:
    - Is in the list of rejected "not for me" works (you must NOT recommend any title in "${JSON.stringify(notForMe)}").
    - Note: Disqualify the work under any alternative titles, aliases, or localized names.
 2. From the remaining candidates, pick the #1 absolute best match for the user's current vibe.
-3. Write a very short, friendly, and casual "coda_blurb" (maximum 8-12 words) talking directly to the user like a close friend giving a recommendation (e.g., "This one will absolutely break you.", "Since you liked Tsukihime, you'll love this.", "Perfect for when you want to cry.", "Trust me, this has your name on it."). Keep it extremely casual and conversational, avoiding cold descriptions or generic placeholder phrases.
+3. Write a very short, friendly, and casual "coda_blurb" (maximum 8-12 words) talking directly to the user like a close friend recommending a work they love.
+   - It MUST be highly specific to the content, theme, or feeling of this particular pick (e.g. for time travel: "Prepare to have your mind completely bent.", or for school drama: "It's got all the high-school drama you wanted.").
+   - Make it spontaneous and lively, avoiding generic templates or cold descriptions (do NOT use "This is the one" or "This will make you cry"). Connect it to what makes this specific work special.
 
 CRITICAL RULE: The "title" MUST be the exact name of the specific individual work (e.g., "Never Let Me Go", "Inception", "Katawa Shoujo"). 
 - NEVER use compilation titles, article titles, listicle titles, or forum thread titles as the title. 
@@ -216,7 +218,9 @@ Your job:
    - Is in the list of rejected "not for me" works (you must NOT recommend any title in "${JSON.stringify(notForMe)}").
    - Note: Disqualify the work under any alternative titles, aliases, or localized names.
 2. From the remaining candidates, pick the top ${count} distinct, best matches for the user's current vibe.
-3. For each pick, write a very short, friendly, and casual "coda_blurb" (maximum 8-12 words) talking directly to the user like a close friend giving a recommendation (e.g., "This one will absolutely break you.", "Since you liked Tsukihime, you'll love this.", "Perfect for when you want to cry.", "Trust me, this has your name on it."). Keep it extremely casual and conversational, avoiding cold descriptions or generic placeholder phrases.
+3. For each pick, write a very short, friendly, and casual "coda_blurb" (maximum 8-12 words) talking directly to the user like a close friend recommending a work they love.
+   - It MUST be highly specific to the content, theme, or feeling of this particular pick (e.g. for time travel: "Prepare to have your mind completely bent.", or for school drama: "It's got all the high-school drama you wanted.").
+   - Make it spontaneous and lively, avoiding generic templates or cold descriptions (do NOT use "This is the one" or "This will make you cry"). Connect it to what makes this specific work special.
 
 CRITICAL RULE: The "title" MUST be the exact name of the specific individual work (e.g., "Never Let Me Go", "Inception", "Katawa Shoujo"). 
 - NEVER use compilation titles, article titles, listicle titles, or forum thread titles as the title. 
