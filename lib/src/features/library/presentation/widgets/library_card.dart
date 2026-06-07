@@ -1,18 +1,23 @@
+import 'dart:ui' as dart_ui;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:coda/src/features/library/presentation/widgets/library_tab_bar.dart';
+import 'package:go_router/go_router.dart';
 
-class LibraryCard extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coda/src/core/memory/living_memory.dart';
+
+class LibraryCard extends ConsumerStatefulWidget {
   const LibraryCard({super.key, required this.tab});
 
   final LibraryTab tab;
 
   @override
-  State<LibraryCard> createState() => _LibraryCardState();
+  ConsumerState<LibraryCard> createState() => _LibraryCardState();
 }
 
-class _LibraryCardState extends State<LibraryCard> {
+class _LibraryCardState extends ConsumerState<LibraryCard> {
   final _maskScrollController = ScrollController();
   final _topScrollController = ScrollController();
 
@@ -117,7 +122,7 @@ class _LibraryCardState extends State<LibraryCard> {
   }
 }
 
-class _CardLayout extends StatelessWidget {
+class _CardLayout extends ConsumerWidget {
   const _CardLayout({
     required this.isKnockoutLayer,
     required this.scrollController,
@@ -141,7 +146,8 @@ class _CardLayout extends StatelessWidget {
   final ValueChanged<bool>? onReduceAnimationsChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final memory = ref.watch(livingMemoryProvider);
     return SingleChildScrollView(
       controller: scrollController,
       physics: isKnockoutLayer
@@ -195,7 +201,10 @@ class _CardLayout extends StatelessWidget {
             const SizedBox(height: 35),
             _buildSettingsRow('Memories'),
             const SizedBox(height: 35),
-            _buildSettingsRow('Account'),
+            _buildSettingsRow(
+              'Reset Account',
+              onTap: () => _showResetProfileDialog(context, ref),
+            ),
             const SizedBox(height: 35),
             _buildSettingsRow(
               'Reduce animations',
@@ -219,9 +228,118 @@ class _CardLayout extends StatelessWidget {
 
           if (currentTab == LibraryTab.seen) ...[
             const SizedBox(height: 35),
-            _buildSeenRow('The Matrix'),
-            const SizedBox(height: 24),
-            _buildSeenRow('Inception'),
+            if (memory.seen.isEmpty && memory.notForMe.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: isKnockoutLayer
+                    ? Text(
+                        'No seen or rejected items.',
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      )
+                    : Opacity(
+                        opacity: 0,
+                        child: Text(
+                          'No seen or rejected items.',
+                          style: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+              )
+            else ...[
+              if (memory.seen.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  child: isKnockoutLayer
+                      ? Text(
+                          'SEEN / WATCHED',
+                          style: GoogleFonts.inter(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        )
+                      : Opacity(
+                          opacity: 0,
+                          child: Text(
+                            'SEEN / WATCHED',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ),
+                ),
+                ...memory.seen.map((title) => _buildSeenRow(
+                      title,
+                      onDelete: () async {
+                        final newSeen = List<String>.from(memory.seen)..remove(title);
+                        final newGuardrails = List<String>.from(memory.guardrails)
+                          ..remove('Already watched: $title');
+                        final updates = LivingMemory(
+                          globalIdentity: memory.globalIdentity,
+                          categoryProfiles: memory.categoryProfiles,
+                          recentContext: memory.recentContext,
+                          guardrails: newGuardrails,
+                          seen: newSeen,
+                          notForMe: memory.notForMe,
+                        );
+                        await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
+                      },
+                    )),
+              ],
+              if (memory.notForMe.isNotEmpty) ...[
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  child: isKnockoutLayer
+                      ? Text(
+                          'REJECTED (NOT FOR ME)',
+                          style: GoogleFonts.inter(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        )
+                      : Opacity(
+                          opacity: 0,
+                          child: Text(
+                            'REJECTED (NOT FOR ME)',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ),
+                ),
+                ...memory.notForMe.map((title) => _buildSeenRow(
+                      title,
+                      onDelete: () async {
+                        final newNotForMe = List<String>.from(memory.notForMe)..remove(title);
+                        final newGuardrails = List<String>.from(memory.guardrails)
+                          ..remove('Avoid: $title (rejected)');
+                        final updates = LivingMemory(
+                          globalIdentity: memory.globalIdentity,
+                          categoryProfiles: memory.categoryProfiles,
+                          recentContext: memory.recentContext,
+                          guardrails: newGuardrails,
+                          seen: memory.seen,
+                          notForMe: newNotForMe,
+                        );
+                        await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
+                      },
+                    )),
+              ],
+            ],
             const SizedBox(height: 64),
           ],
         ],
@@ -302,30 +420,45 @@ class _CardLayout extends StatelessWidget {
     );
   }
 
-  Widget _buildSeenRow(String title) {
+  Widget _buildSeenRow(String title, {VoidCallback? onDelete}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: isKnockoutLayer
-          ? Text(
-              title,
-              style: GoogleFonts.inter(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                color: Colors.black, // 100% knockout
-                letterSpacing: 0.5,
-              ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: isKnockoutLayer
+                ? Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black, // 100% knockout
+                      letterSpacing: 0.5,
+                    ),
+                  )
+                : Opacity(
+                    opacity: 0,
+                    child: Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+          ),
+          if (!isKnockoutLayer)
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, color: Colors.white70),
+              onPressed: onDelete,
+              splashRadius: 20,
             )
-          : Opacity(
-              opacity: 0,
-              child: Text(
-                title,
-                style: GoogleFonts.inter(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ),
+          else
+            const SizedBox(width: 48, height: 48),
+        ],
+      ),
     );
   }
 
@@ -445,13 +578,106 @@ class _CardLayout extends StatelessWidget {
     );
   }
 
+  void _showResetProfileDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
+      builder: (dialogCtx) => BackdropFilter(
+        filter: dart_ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF16181C).withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Reset Account?',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'This will permanently wipe your profile, recommendations, seen list, and not interested list.\n\nThis cannot be undone.',
+                  style: GoogleFonts.inter(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogCtx).pop(),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.inter(
+                          color: Colors.white54,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF3B5C),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      onPressed: () async {
+                        Navigator.of(dialogCtx).pop();
+                        await ref.read(livingMemoryProvider.notifier).clearMemory();
+                        if (context.mounted) {
+                          context.go('/onboarding');
+                        }
+                      },
+                      child: Text(
+                        'Reset Everything',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSettingsRow(
     String label, {
     bool hasToggle = false,
     bool toggleValue = false,
     ValueChanged<bool>? onToggle,
+    VoidCallback? onTap,
   }) {
-    return Padding(
+    final rowContent = Padding(
       padding: const EdgeInsets.only(left: 24, right: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -490,6 +716,16 @@ class _CardLayout extends StatelessWidget {
             const SizedBox(width: 58, height: 32),
         ],
       ),
+    );
+
+    if (hasToggle || isKnockoutLayer || onTap == null) {
+      return rowContent;
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: rowContent,
     );
   }
 }

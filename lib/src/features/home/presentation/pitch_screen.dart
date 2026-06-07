@@ -1,6 +1,7 @@
 import 'dart:ui' as dart_ui;
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
+import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -125,7 +126,11 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    final rec = widget.recommendation;
+    final activeRecState = ref.watch(homeRecommendationProvider);
+    final activeRec = activeRecState.value;
+    final rec = (activeRec != null && (activeRec.id == widget.recommendation.id || activeRec.title == widget.recommendation.title))
+        ? activeRec
+        : widget.recommendation;
 
     return PopScope<Object?>(
       canPop: !_chatFocusNode.hasFocus,
@@ -151,7 +156,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
                 left: 0,
                 width: screenWidth,
                 height: screenHeight,
-                child: rec.posterUrl != null && !rec.posterUrl!.startsWith('holder:')
+                child: rec.posterUrl != null && rec.posterUrl!.isNotEmpty && !rec.posterUrl!.startsWith('holder:')
                     ? Transform.scale(
                         scale: 1.2,
                         child: ImageFiltered(
@@ -160,11 +165,10 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
                             sigmaY: 80,
                             tileMode: dart_ui.TileMode.mirror,
                           ),
-                          child: Image(
-                            image: rec.posterUrl!.startsWith('assets/')
-                                ? AssetImage(rec.posterUrl!) as ImageProvider
-                                : NetworkImage(rec.posterUrl!),
+                          child: FallbackImage(
+                            url: rec.posterUrl,
                             fit: BoxFit.cover,
+                            errorWidget: const SizedBox.shrink(),
                           ),
                         ),
                       )
@@ -340,18 +344,24 @@ class _PitchLayout extends StatelessWidget {
           const SizedBox(height: 28),
 
           // ── Body Paragraphs ──────────────────────────────────────
-          ...recommendation.pitch.map(
-            (paragraph) => Padding(
+          if (recommendation.pitch.isEmpty)
+            Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-              child: isKnockoutLayer
-                  ? _buildBodyText(paragraph, Colors.black)
-                  : Opacity(
-                      opacity:
-                          0, // No longer needed, background is brightened globally
-                      child: _buildBodyText(paragraph, Colors.white),
-                    ),
+              child: _buildWritingIndicator(context),
+            )
+          else
+            ...recommendation.pitch.map(
+              (paragraph) => Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                child: isKnockoutLayer
+                    ? _buildBodyText(paragraph, Colors.black)
+                    : Opacity(
+                        opacity:
+                            0, // No longer needed, background is brightened globally
+                        child: _buildBodyText(paragraph, Colors.white),
+                      ),
+              ),
             ),
-          ),
           // ── User Chat Messages ───────────────────────────────────
             for (final message in messages)
               Padding(
@@ -388,6 +398,55 @@ class _PitchLayout extends StatelessWidget {
         fontSize: 18,
         fontWeight: FontWeight.w700, // Bold
         height: 1.5,
+      ),
+    );
+  }
+
+  Widget _buildWritingIndicator(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: isKnockoutLayer ? Colors.transparent : Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isKnockoutLayer ? Colors.transparent : Colors.white.withValues(alpha: 0.1),
+          width: 1.5,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: isKnockoutLayer
+              ? dart_ui.ImageFilter.blur(sigmaX: 0, sigmaY: 0)
+              : dart_ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: isKnockoutLayer
+                      ? const SizedBox.shrink()
+                      : const CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: isKnockoutLayer
+                      ? _buildBodyText('Writing your personalized pitch...', Colors.black)
+                      : Opacity(
+                          opacity: 0,
+                          child: _buildBodyText('Writing your personalized pitch...', Colors.white),
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

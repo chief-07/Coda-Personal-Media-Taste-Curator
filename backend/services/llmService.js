@@ -158,27 +158,28 @@ Respond ONLY with a JSON object:
   return JSON.parse(responseJson);
 };
 
-const scoreAndPitch = async (directive, scrapedSnippets, guardrails) => {
+const scoreAndSelect = async (directive, scrapedSnippets, guardrails, seen = [], notForMe = []) => {
   const systemPrompt = `
 You are Coda, an expert curator.
 You have the Master Directive for this user: "${directive}"
 And their strict guardrails: "${JSON.stringify(guardrails)}"
+And the works they have ALREADY watched, played, or seen (do NOT recommend these): "${JSON.stringify(seen)}"
+And the works they have explicitly rejected as "not for me" (do NOT recommend these): "${JSON.stringify(notForMe)}"
 
 Here are raw snippets scraped from the web:
 ${JSON.stringify(scrapedSnippets)}
 
 Your job:
-1. Instantly disqualify any candidate that violates the guardrails. Specifically, if a guardrail indicates a work has already been watched, played, or seen (e.g. "Already watched: Erased" or "Avoid: Erased"), you MUST NOT recommend that work.
+1. Instantly disqualify any candidate that:
+   - Violates the guardrails.
+   - Is in the list of already watched/played/seen works (e.g. you must NOT recommend any title in "${JSON.stringify(seen)}").
+   - Is in the list of rejected "not for me" works (you must NOT recommend any title in "${JSON.stringify(notForMe)}").
+   - Note: Disqualify the work under any alternative titles, aliases, or localized names.
 2. From the remaining candidates, pick the #1 absolute best match for the user's current vibe.
-3. Write a short, highly personalized "coda_blurb" (1 sentence) that acts as a hero text (e.g. "This is the one", "You'll definitely like this one", "I thought of you when...").
-4. Write a longer, highly personalized "pitch_paragraphs" array (2-3 paragraphs) explaining why you picked it, referencing what real people said about it online. Talk like a normal friend.
-
-**UNRESTRICTED MATURE CONTENT:**
-- Do not censor, filter, or avoid mature content (e.g. eroge, adult visual novels, gore, 18+ themes) if it matches the user's directive/tastes.
-- Openly pitch and describe mature elements of the picked media (e.g. adult romance dynamics, psychological horror/gore) without hesitation or self-censorship, as a mature companion would.
+3. Write a very short, friendly, and casual "coda_blurb" (maximum 8-12 words) talking directly to the user like a close friend giving a recommendation (e.g., "This one will absolutely break you.", "Since you liked Tsukihime, you'll love this.", "Perfect for when you want to cry.", "Trust me, this has your name on it."). Keep it extremely casual and conversational, avoiding cold descriptions or generic placeholder phrases.
 
 CRITICAL RULE: The "title" MUST be the exact name of the specific individual work (e.g., "Never Let Me Go", "Inception", "Katawa Shoujo"). 
-- NEVER use compilation titles, article titles, listicle titles (e.g., "10 Deep Character Studies...", "Top 5 Sci-fi Movies", "Best anime to watch"), or forum thread titles as the title. 
+- NEVER use compilation titles, article titles, listicle titles, or forum thread titles as the title. 
 - If a snippet represents a listicle or discussion thread, you MUST look INSIDE the text content of that snippet, identify the specific individual works recommended/discussed within it, and pick ONE of those specific works as your recommendation.
 - Disqualify any title containing list numbers (e.g., "10...", "5..."), compilation words (e.g., "List", "Top", "Best", "Recommendations", "Similar", "Thread", "Movies like"), or punctuation like colons used for subtitles of lists.
 - Discard any candidates that do not represent a specific single piece of media.
@@ -186,7 +187,90 @@ CRITICAL RULE: The "title" MUST be the exact name of the specific individual wor
 Respond ONLY with a JSON object:
 {
   "title": "Exact Title of the Pick",
-  "coda_blurb": "Your punchy hero text here.",
+  "coda_blurb": "Your punchy hero text here."
+}
+`;
+
+  const response = await callOpenAI([
+    { role: 'system', content: systemPrompt }
+  ], { type: "json_object" });
+
+  return JSON.parse(response);
+};
+
+const scoreAndSelectMultiple = async (directive, scrapedSnippets, guardrails, seen = [], notForMe = [], count = 3) => {
+  const systemPrompt = `
+You are Coda, an expert curator.
+You have the Master Directive for this user: "${directive}"
+And their strict guardrails: "${JSON.stringify(guardrails)}"
+And the works they have ALREADY watched, played, or seen (do NOT recommend these): "${JSON.stringify(seen)}"
+And the works they have explicitly rejected as "not for me" (do NOT recommend these): "${JSON.stringify(notForMe)}"
+
+Here are raw snippets scraped from the web:
+${JSON.stringify(scrapedSnippets)}
+
+Your job:
+1. Instantly disqualify any candidate that:
+   - Violates the guardrails.
+   - Is in the list of already watched/played/seen works (e.g. you must NOT recommend any title in "${JSON.stringify(seen)}").
+   - Is in the list of rejected "not for me" works (you must NOT recommend any title in "${JSON.stringify(notForMe)}").
+   - Note: Disqualify the work under any alternative titles, aliases, or localized names.
+2. From the remaining candidates, pick the top ${count} distinct, best matches for the user's current vibe.
+3. For each pick, write a very short, friendly, and casual "coda_blurb" (maximum 8-12 words) talking directly to the user like a close friend giving a recommendation (e.g., "This one will absolutely break you.", "Since you liked Tsukihime, you'll love this.", "Perfect for when you want to cry.", "Trust me, this has your name on it."). Keep it extremely casual and conversational, avoiding cold descriptions or generic placeholder phrases.
+
+CRITICAL RULE: The "title" MUST be the exact name of the specific individual work (e.g., "Never Let Me Go", "Inception", "Katawa Shoujo"). 
+- NEVER use compilation titles, article titles, listicle titles, or forum thread titles as the title. 
+- Disqualify any title containing list numbers (e.g., "10...", "5..."), compilation words (e.g., "List", "Top", "Best", "Recommendations", "Similar", "Thread", "Movies like"), or punctuation like colons used for subtitles of lists.
+- Discard any candidates that do not represent a specific single piece of media.
+
+Respond ONLY with a JSON object:
+{
+  "picks": [
+    {
+      "title": "Exact Title of Pick 1",
+      "coda_blurb": "Your punchy hero text here."
+    },
+    {
+      "title": "Exact Title of Pick 2",
+      "coda_blurb": "Your punchy hero text here."
+    },
+    {
+      "title": "Exact Title of Pick 3",
+      "coda_blurb": "Your punchy hero text here."
+    }
+  ]
+}
+`;
+
+  const response = await callOpenAI([
+    { role: 'system', content: systemPrompt }
+  ], { type: "json_object" });
+
+  return JSON.parse(response);
+};
+
+const generatePitch = async (directive, title, scrapedSnippets, guardrails) => {
+  const systemPrompt = `
+You are Coda, an expert curator.
+The user's profile and craving directive is: "${directive}"
+You have selected the following title for them: "${title}"
+And their strict guardrails: "${JSON.stringify(guardrails)}"
+
+Here are snippets from the web about this title:
+${JSON.stringify(scrapedSnippets)}
+
+Your job:
+Write a longer, highly personalized "pitch_paragraphs" array (2-3 paragraphs) explaining why you picked "${title}" for them.
+- Reference community thoughts from the snippets (what real people said about it online).
+- Explain how it connects to their temperament, interests, or active craving.
+- Talk like a normal friend.
+
+**UNRESTRICTED MATURE CONTENT:**
+- Do not censor, filter, or avoid mature content (e.g. eroge, adult visual novels, gore, 18+ themes) if it matches the user's directive/tastes.
+- Openly pitch and describe mature elements of the picked media (e.g. adult romance dynamics, psychological horror/gore) without hesitation or self-censorship, as a mature companion would.
+
+Respond ONLY with a JSON object:
+{
   "pitch_paragraphs": [
     "First paragraph explaining the pick like a friend.",
     "Second paragraph referencing community thoughts or why it fits perfectly."
@@ -416,7 +500,9 @@ Respond ONLY with a JSON object:
 
 module.exports = {
   synthesizeAndRoute,
-  scoreAndPitch,
+  scoreAndSelect,
+  scoreAndSelectMultiple,
+  generatePitch,
   harmonizeMemory,
   harmonizeAllMemory,
   refineTasteFromFeedback

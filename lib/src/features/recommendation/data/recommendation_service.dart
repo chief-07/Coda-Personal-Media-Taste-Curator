@@ -24,12 +24,17 @@ class RecommendationResult {
   });
 
   factory RecommendationResult.fromJson(Map<String, dynamic> json) {
+    String rawPoster = json['poster_url'] ?? '';
+    if (rawPoster.startsWith('/')) {
+      final baseHost = kIsWeb ? Uri.base.origin : 'http://localhost:8080';
+      rawPoster = '$baseHost$rawPoster';
+    }
     return RecommendationResult(
       title: json['title'] ?? 'Unknown',
       mediaType: json['media_type'] ?? 'unknown',
       codaBlurb: json['coda_blurb'] ?? '',
       pitchParagraphs: List<String>.from(json['pitch_paragraphs'] ?? []),
-      posterUrl: json['poster_url'] ?? '',
+      posterUrl: rawPoster,
       ostUrl: json['ost_url'] ?? '',
     );
   }
@@ -68,17 +73,26 @@ class RecommendationResult {
 class RecommendationService {
   static const String _baseUrl = 'http://localhost:8080/api/recommend';
 
-  /// Fetches a recommendation using the user's Living Memory and current environmental context
-  Future<RecommendationResult> fetchRecommendation(LivingMemory memory, coda_domain.MediaType selectedMediaType) async {
+  /// Fetches recommendations using the user's Living Memory and current environmental context
+  Future<List<RecommendationResult>> fetchRecommendations(
+    LivingMemory memory, 
+    coda_domain.MediaType selectedMediaType, {
+    List<String> additionalExclusions = const [],
+  }) async {
     final now = DateTime.now();
     final hour = now.hour;
     
     // Simple heuristic for time of day
     String timeOfDay = 'evening';
-    if (hour >= 5 && hour < 12) timeOfDay = 'morning';
-    else if (hour >= 12 && hour < 17) timeOfDay = 'afternoon';
-    else if (hour >= 17 && hour < 21) timeOfDay = 'evening';
-    else timeOfDay = 'late night';
+    if (hour >= 5 && hour < 12) {
+      timeOfDay = 'morning';
+    } else if (hour >= 12 && hour < 17) {
+      timeOfDay = 'afternoon';
+    } else if (hour >= 17 && hour < 21) {
+      timeOfDay = 'evening';
+    } else {
+      timeOfDay = 'late night';
+    }
 
     // In a full app, we could add weather or season here.
     final localContext = 'It is currently a $timeOfDay on a ${now.weekday == 6 || now.weekday == 7 ? 'weekend' : 'weekday'}.';
@@ -125,12 +139,20 @@ class RecommendationService {
     
     final guardrails = memory.guardrails.join(', ');
 
+    // Build seen list including exclusions
+    final finalSeen = List<String>.from(memory.seen);
+    for (final title in additionalExclusions) {
+      if (!finalSeen.contains(title)) finalSeen.add(title);
+    }
+
     final payload = {
       'core_identity': fullCoreIdentity,
       'recent_context': memory.recentContext,
       'guardrails': guardrails,
       'local_context': localContext,
       'requested_media_type': selectedMediaType.name, // The user explicitly tapped this tab
+      'seen': finalSeen,
+      'not_for_me': memory.notForMe,
     };
 
     final targetUrl = kIsWeb ? '${Uri.base.origin}/api/recommend' : _baseUrl;
@@ -143,9 +165,15 @@ class RecommendationService {
       );
 
       if (response.statusCode == 200) {
-        return RecommendationResult.fromJson(jsonDecode(response.body));
+        final Map<String, dynamic> jsonMap = jsonDecode(response.body);
+        final recommendationsList = jsonMap['recommendations'] as List?;
+        if (recommendationsList != null) {
+          return recommendationsList.map((item) => RecommendationResult.fromJson(item)).toList();
+        }
+        // Fallback for backward compatibility
+        return [RecommendationResult.fromJson(jsonMap)];
       } else {
-        throw Exception('Failed to fetch recommendation: \${response.statusCode}');
+        throw Exception('Failed to fetch recommendations: ${response.statusCode}');
       }
     } catch (e) {
       print("Recommendation network error: $e");
@@ -186,6 +214,64 @@ class RecommendationService {
     } catch (e) {
       print("Feedback network error: $e");
       return null;
+    }
+  }
+
+  /// Fetches the lazy pitch paragraphs for a recommendation
+  Future<List<String>> fetchPitch({
+    required LivingMemory memory,
+    required String title,
+    required String mediaType,
+  }) async {
+    final coreIdentity = memory.globalIdentity.join('. ');
+    String cleanKey;
+    switch (mediaType) {
+      case 'anime': cleanKey = 'anime'; break;
+      case 'movie': cleanKey = 'movies'; break;
+      case 'tv': cleanKey = 'tv_shows'; break;
+      case 'visualNovel': cleanKey = 'visual_novels'; break;
+      case 'manga': cleanKey = 'manga'; break;
+      case 'book': cleanKey = 'books'; break;
+      case 'game': cleanKey = 'games'; break;
+      case 'youtube': cleanKey = 'youtube'; break;
+      case 'music': cleanKey = 'music'; break;
+      default: cleanKey = mediaType;
+    }
+    final specificTastes = memory.categoryProfiles[cleanKey] ?? [];
+    final specificTastesStr = specificTastes.isEmpty ? 'None' : specificTastes.join('. ');
+    final fullCoreIdentity = '$coreIdentity. Specific Tastes in $mediaType: $specificTastesStr';
+    final guardrails = memory.guardrails.join(', ');
+
+    final payload = {
+      'core_identity': fullCoreIdentity,
+      'recent_context': memory.recentContext,
+      'guardrails': guardrails,
+      'title': title,
+      'requested_media_type': mediaType,
+      'seen': memory.seen,
+      'not_for_me': memory.notForMe,
+    };
+
+    final targetUrl = kIsWeb 
+        ? '${Uri.base.origin}/api/recommend/pitch' 
+        : _baseUrl.replaceAll('/recommend', '/pitch');
+
+    try {
+      final response = await http.post(
+        Uri.parse(targetUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return List<String>.from(data['pitch_paragraphs'] ?? []);
+      } else {
+        throw Exception('Failed to fetch pitch: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Pitch fetch network error: $e");
+      return [];
     }
   }
 }

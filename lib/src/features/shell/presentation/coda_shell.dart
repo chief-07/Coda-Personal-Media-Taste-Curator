@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
+import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +44,7 @@ class CodaShell extends ConsumerWidget {
               ),
             ),
           ),
-          if (rec != null && rec.posterUrl != null && !rec.posterUrl!.startsWith('holder:'))
+          if (rec != null && rec.posterUrl != null && rec.posterUrl!.isNotEmpty && !rec.posterUrl!.startsWith('holder:'))
             Positioned.fill(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 600),
@@ -56,22 +57,12 @@ class CodaShell extends ConsumerWidget {
                       sigmaY: 80,
                       tileMode: TileMode.mirror,
                     ),
-                    child: Image(
-                      image: rec.posterUrl!.startsWith('assets/')
-                          ? AssetImage(rec.posterUrl!)
-                          : NetworkImage(rec.posterUrl!) as ImageProvider,
+                    child: FallbackImage(
+                      url: rec.posterUrl,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
-                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                        if (wasSynchronouslyLoaded) return child;
-                        return AnimatedOpacity(
-                          opacity: frame == null ? 0.0 : 1.0,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeOut,
-                          child: child,
-                        );
-                      },
+                      errorWidget: const SizedBox.shrink(),
                     ),
                   ),
                 ),

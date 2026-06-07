@@ -9,12 +9,16 @@ class LivingMemory {
   final Map<String, List<String>> categoryProfiles;
   final String recentContext;
   final List<String> guardrails;
+  final List<String> seen;
+  final List<String> notForMe;
 
   LivingMemory({
     required this.globalIdentity,
     required this.categoryProfiles,
     required this.recentContext,
     required this.guardrails,
+    required this.seen,
+    required this.notForMe,
   });
 
   factory LivingMemory.empty() {
@@ -23,6 +27,8 @@ class LivingMemory {
       categoryProfiles: {},
       recentContext: '',
       guardrails: [],
+      seen: [],
+      notForMe: [],
     );
   }
 
@@ -31,6 +37,8 @@ class LivingMemory {
         'categoryProfiles': categoryProfiles,
         'recentContext': recentContext,
         'guardrails': guardrails,
+        'seen': seen,
+        'notForMe': notForMe,
       };
 
   factory LivingMemory.fromJson(Map<String, dynamic> json) {
@@ -42,6 +50,8 @@ class LivingMemory {
           {},
       recentContext: json['recentContext'] as String? ?? '',
       guardrails: List<String>.from(json['guardrails'] ?? []),
+      seen: List<String>.from(json['seen'] ?? []),
+      notForMe: List<String>.from(json['notForMe'] ?? json['not_for_me'] ?? []),
     );
   }
 }
@@ -53,6 +63,8 @@ class MemoryUpdates {
   final List<String> guardrailsAppends;
   final List<String>? globalIdentityOverwrite;
   final Map<String, List<String>>? categoryProfilesOverwrite;
+  final List<String> seenAppends;
+  final List<String> notForMeAppends;
 
   MemoryUpdates({
     this.globalIdentityAppends = const [],
@@ -61,6 +73,8 @@ class MemoryUpdates {
     this.guardrailsAppends = const [],
     this.globalIdentityOverwrite,
     this.categoryProfilesOverwrite,
+    this.seenAppends = const [],
+    this.notForMeAppends = const [],
   });
 
   factory MemoryUpdates.fromJson(Map<String, dynamic> json) {
@@ -77,6 +91,8 @@ class MemoryUpdates {
       categoryProfilesOverwrite: (json['category_profiles_overwrite'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry(k, List<String>.from(e)),
           ),
+      seenAppends: List<String>.from(json['seen_appends'] ?? json['seen'] ?? []),
+      notForMeAppends: List<String>.from(json['not_for_me_appends'] ?? json['not_for_me'] ?? []),
     );
   }
 }
@@ -149,11 +165,25 @@ class LivingMemoryRepository {
       if (!newGuardrails.contains(u)) newGuardrails.add(u);
     }
 
+    // 5. Append Seen Items
+    final newSeen = List<String>.from(current.seen);
+    for (var u in updates.seenAppends) {
+      if (!newSeen.contains(u)) newSeen.add(u);
+    }
+
+    // 6. Append Not For Me Items
+    final newNotForMe = List<String>.from(current.notForMe);
+    for (var u in updates.notForMeAppends) {
+      if (!newNotForMe.contains(u)) newNotForMe.add(u);
+    }
+
     final newMemory = LivingMemory(
       globalIdentity: newGlobal,
       categoryProfiles: newCategory,
       recentContext: newRecent,
       guardrails: newGuardrails,
+      seen: newSeen,
+      notForMe: newNotForMe,
     );
 
     await saveMemory(newMemory);
@@ -187,7 +217,15 @@ class LivingMemoryNotifier extends Notifier<LivingMemory> {
     await repo.saveMemory(LivingMemory.empty());
     state = LivingMemory.empty();
     final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.remove('living_memory_v1'); // Remove key so GoRouter redirect works
     await prefs.remove('coda_onboarding_chips');
+    await prefs.remove('coda_selected_media_type');
+    final types = ['anime', 'movie', 'tv', 'visualNovel', 'manga', 'book', 'game', 'youtube', 'music'];
+    for (final type in types) {
+      await prefs.remove('coda_active_pick_$type');
+      await prefs.remove('coda_buffer_pick_$type');
+      await prefs.remove('coda_recommendation_queue_$type');
+    }
   }
 }
 

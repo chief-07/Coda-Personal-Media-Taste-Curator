@@ -40,17 +40,16 @@ class OnboardingController extends Notifier<OnboardingState> {
 
   @override
   OnboardingState build() {
-    // Temporarily disabled loading saved chips on start to allow previewing
-    // final prefs = ref.watch(sharedPreferencesProvider);
-    // final savedChips = prefs.getStringList('coda_onboarding_chips');
-    // if (savedChips != null && savedChips.isNotEmpty) {
-    //   return OnboardingState(
-    //     messages: [
-    //       ChatMessage(chips: savedChips, isUser: false),
-    //     ],
-    //     isLoading: false,
-    //   );
-    // }
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final savedChips = prefs.getStringList('coda_onboarding_chips');
+    if (savedChips != null && savedChips.isNotEmpty) {
+      return OnboardingState(
+        messages: [
+          ChatMessage(chips: savedChips, isUser: false),
+        ],
+        isLoading: false,
+      );
+    }
     return OnboardingState(
       messages: [],
       isLoading: false,

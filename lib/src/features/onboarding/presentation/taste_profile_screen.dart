@@ -515,8 +515,6 @@ class _CardLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final String heroText;
     final List<String> paragraphs;
-    final String systemReply1;
-    final String systemReply2;
 
     final String tabName = tab.toLowerCase();
 
@@ -530,8 +528,6 @@ class _CardLayout extends StatelessWidget {
         "Just tell me whatever comes to mind.",
         "The more I get to know you, the better I'll get at finding things you'll genuinely connect with.",
       ];
-      systemReply1 = "I think I've got a good sense of who you are now.";
-      systemReply2 = "I can start finding your first pick, or you can tell me a bit more about the specific things you like to improve what I recommend.";
     } else {
       heroText = 'Tell me about your\ntaste in $tab';
       paragraphs = [
@@ -540,10 +536,6 @@ class _CardLayout extends StatelessWidget {
         "The characters you connected with. The stories that stayed with you.",
         "Tell me what keeps you coming back.",
       ];
-      systemReply1 = "I think I've got a good sense of your taste in $tab now.";
-      systemReply2 = isLastTab
-          ? "We've covered everything! I'm ready to find your first pick."
-          : "I can start finding your first pick, or you can tell me a bit more about the specific things you like to improve what I recommend.";
     }
 
     return SingleChildScrollView(

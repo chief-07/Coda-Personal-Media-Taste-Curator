@@ -1,4 +1,5 @@
 import 'package:coda/src/features/home/domain/recommendation.dart';
+import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -305,17 +306,14 @@ class _CardLayout extends StatelessWidget {
       width: double
           .infinity, // Forces poster to span all available horizontal space up to margins
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-      child: recommendation.posterUrl != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image(
-                image: recommendation.posterUrl!.startsWith('assets/')
-                    ? AssetImage(recommendation.posterUrl!) as ImageProvider
-                    : NetworkImage(recommendation.posterUrl!),
-                fit: BoxFit.cover,
-              ),
-            )
-          : Container(color: Colors.grey.shade900),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: FallbackImage(
+          url: recommendation.posterUrl,
+          fit: BoxFit.cover,
+          errorWidget: Container(color: Colors.grey.shade900),
+        ),
+      ),
     );
   }
 

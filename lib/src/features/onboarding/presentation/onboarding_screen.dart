@@ -2,6 +2,7 @@ import 'dart:ui' as dart_ui;
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
+import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +10,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
+import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 
 const _askRecommendation = Recommendation(
   id: 'ask-coda',
@@ -46,8 +48,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(livingMemoryProvider.notifier).clearMemory();
-      ref.read(onboardingControllerProvider.notifier).reset();
+      final hasMemory = ref.read(sharedPreferencesProvider).getString('living_memory_v1') != null;
+      if (!hasMemory) {
+        ref.read(livingMemoryProvider.notifier).clearMemory();
+        ref.read(onboardingControllerProvider.notifier).reset();
+      }
     });
     _topScrollController.addListener(() {
       if (_maskScrollController.hasClients &&
@@ -171,7 +176,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Positioned.fill(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 600),
-                child: activeRec != null && activeRec.posterUrl != null
+                child: activeRec != null && activeRec.posterUrl != null && activeRec.posterUrl!.isNotEmpty
                     ? Transform.scale(
                         scale: 1.2,
                         child: ImageFiltered(
@@ -181,11 +186,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             sigmaY: 80,
                             tileMode: TileMode.mirror,
                           ),
-                          child: Image(
-                            image: activeRec.posterUrl!.startsWith('assets/')
-                                ? AssetImage(activeRec.posterUrl!)
-                                : NetworkImage(activeRec.posterUrl!) as ImageProvider,
+                          child: FallbackImage(
+                            url: activeRec.posterUrl,
                             fit: BoxFit.cover,
+                            errorWidget: const SizedBox.shrink(),
                           ),
                         ),
                       )

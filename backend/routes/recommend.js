@@ -1,23 +1,98 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
 const llmService = require('../services/llmService');
 const searchService = require('../services/searchService');
 const mediaService = require('../services/mediaService');
 const loggerService = require('../services/loggerService');
 
+// Create image cache directory
+const IMAGE_CACHE_DIR = path.join(__dirname, '../cache/images');
+if (!fs.existsSync(IMAGE_CACHE_DIR)) {
+  fs.mkdirSync(IMAGE_CACHE_DIR, { recursive: true });
+}
+
+// Search Cache setup
+const SEARCH_CACHE_FILE = path.join(__dirname, '../cache/search_cache.json');
+let searchCache = {};
+if (fs.existsSync(SEARCH_CACHE_FILE)) {
+  try {
+    searchCache = JSON.parse(fs.readFileSync(SEARCH_CACHE_FILE, 'utf8'));
+  } catch (_) {}
+}
+
+const saveSearchCache = () => {
+  try {
+    const cacheDir = path.dirname(SEARCH_CACHE_FILE);
+    if (!fs.existsSync(cacheDir)) {
+      fs.mkdirSync(cacheDir, { recursive: true });
+    }
+    fs.writeFileSync(SEARCH_CACHE_FILE, JSON.stringify(searchCache, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[Search Cache Save Error]:', e.message);
+  }
+};
+
+const getCachedSnippetData = async (key, fetchFn) => {
+  const now = Date.now();
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  if (searchCache[key] && (now - searchCache[key].timestamp < ONE_DAY)) {
+    console.log(`[Search Cache Hit] serving cached data for: "${key}"`);
+    return searchCache[key].results;
+  }
+  
+  const results = await fetchFn();
+  searchCache[key] = {
+    timestamp: now,
+    results: results
+  };
+  saveSearchCache();
+  return results;
+};
+
+// Cached wrapper helpers
+const cachedScrapeForums = (query) => getCachedSnippetData(`forum:${query}`, () => searchService.scrapeForums(query));
+const cachedFetchMAL = (titles) => getCachedSnippetData(`mal:${titles.join(',')}`, () => searchService.fetchMALRecommendations(titles));
+const cachedFetchAniListRecs = (titles) => getCachedSnippetData(`anilist_rec:${titles.join(',')}`, () => searchService.fetchAniListRecommendations(titles));
+const cachedFetchKitsu = (query) => getCachedSnippetData(`kitsu:${query}`, () => searchService.fetchKitsuAnimeSnippets(query));
+const cachedFetchAniListSearch = (query) => getCachedSnippetData(`anilist_search:${query}`, () => searchService.fetchAniListAnimeSnippets(query));
+const cachedFetchVNDBRecs = (titles) => getCachedSnippetData(`vndb_rec:${titles.join(',')}`, () => searchService.fetchVNDBRecommendations(titles));
+const cachedFetchVNDBSnippets = (query, limit) => getCachedSnippetData(`vndb_search:${query}:${limit}`, () => searchService.fetchVNDBSnippets(query, limit));
 
 router.get('/proxy-image', async (req, res) => {
+  const { url } = req.query;
   try {
-    const { url } = req.query;
     if (!url) {
       return res.status(400).send('Missing url parameter');
+    }
+    
+    // Hash the URL to get a safe filename
+    const hash = crypto.createHash('md5').update(url).digest('hex');
+    const cachedFilePath = path.join(IMAGE_CACHE_DIR, hash);
+    const metaPath = cachedFilePath + '.json';
+    
+    if (fs.existsSync(cachedFilePath)) {
+      let contentType = 'image/jpeg';
+      if (fs.existsSync(metaPath)) {
+        try {
+          const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+          contentType = meta.contentType || contentType;
+        } catch (_) {}
+      }
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year cache
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      fs.createReadStream(cachedFilePath).pipe(res);
+      return;
     }
     
     const response = await axios({
       method: 'get',
       url: url,
-      responseType: 'stream',
+      responseType: 'arraybuffer',
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'image/*'
@@ -25,17 +100,49 @@ router.get('/proxy-image', async (req, res) => {
       timeout: 10000
     });
     
-    res.setHeader('Content-Type', response.headers['content-type'] || 'image/jpeg');
-    res.setHeader('Cache-Control', 'public, max-age=86400');
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    const contentType = response.headers['content-type'] || 'image/jpeg';
+    const buffer = Buffer.from(response.data);
     
-    response.data.pipe(res);
+    // Save to disk asynchronously
+    fs.writeFile(cachedFilePath, buffer, () => {});
+    fs.writeFile(metaPath, JSON.stringify({ contentType, url }), () => {});
+    
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.end(buffer);
   } catch (error) {
-    console.error('[Proxy Image Error]:', error.message);
+    console.error('[Proxy Image Error] for URL:', url, ':', error.message);
     res.status(500).send('Failed to proxy image');
   }
 });
+const normalizeTitle = (title) => {
+  if (!title) return '';
+  return title.toLowerCase().replace(/[^a-z0-9]/g, '');
+};
 
+const isExcluded = (candidateTitle, excludedTitles) => {
+  if (!candidateTitle) return false;
+  const normalizedCandidate = normalizeTitle(candidateTitle);
+  if (!normalizedCandidate) return false;
+
+  for (const title of excludedTitles) {
+    if (!title) continue;
+    const normalizedExcluded = normalizeTitle(title);
+    if (!normalizedExcluded) continue;
+
+    // Direct match
+    if (normalizedCandidate === normalizedExcluded) return true;
+
+    // Substring match for reasonably long titles (to avoid short word collisions)
+    if (normalizedExcluded.length >= 3) {
+      if (normalizedCandidate.includes(normalizedExcluded) || normalizedExcluded.includes(normalizedCandidate)) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
 
 router.post('/', async (req, res) => {
   try {
@@ -55,143 +162,184 @@ router.post('/', async (req, res) => {
       console.log(`[Recommend]   VNDB anchor titles: ${JSON.stringify(vn_titles)}`);
     }
 
-    // ── Step 2: Data Gathering ───────────────────────────────────────────────
+    // ── Step 2: Data Gathering (Parallelized & Cached) ───────────────────────
     console.log('[Recommend] → Step 2: Gathering data from APIs and web search...');
     let scrapedSnippets = [];
 
     if (media_type === 'anime') {
-      // 2a. MAL/Jikan — community recommendation votes for anchor titles
+      const promises = [];
       if (mal_anime_titles?.length > 0) {
-        console.log('[Recommend]   2a. Fetching MAL community recommendations...');
-        const malSnippets = await searchService.fetchMALRecommendations(mal_anime_titles);
-        scrapedSnippets = scrapedSnippets.concat(malSnippets);
-        console.log(`[Recommend]   MAL: ${malSnippets.length} snippets`);
-
-        // 2b. AniList — recommendation graph for same anchor titles
-        console.log('[Recommend]   2b. Fetching AniList recommendation graph...');
-        const aniListRecs = await searchService.fetchAniListRecommendations(mal_anime_titles);
-        scrapedSnippets = scrapedSnippets.concat(aniListRecs);
-        console.log(`[Recommend]   AniList Recs: ${aniListRecs.length} snippets`);
+        promises.push(cachedFetchMAL(mal_anime_titles));
+        promises.push(cachedFetchAniListRecs(mal_anime_titles));
       }
-
-      // 2c. Kitsu — structured title search with ratings + synopsis
-      console.log('[Recommend]   2c. Searching Kitsu...');
       for (const query of search_queries.slice(0, 3)) {
-        const kitsuSnippets = await searchService.fetchKitsuAnimeSnippets(query);
-        scrapedSnippets = scrapedSnippets.concat(kitsuSnippets);
-        console.log(`[Recommend]   Kitsu "${query}": ${kitsuSnippets.length} snippets`);
-        if (scrapedSnippets.length >= 16) break;
+        promises.push(cachedFetchKitsu(query));
+        promises.push(cachedFetchAniListSearch(query));
       }
-
-      // 2d. AniList search — score, genres, tags, similar titles
-      console.log('[Recommend]   2d. Searching AniList...');
       for (const query of search_queries.slice(0, 3)) {
-        const aniListSnippets = await searchService.fetchAniListAnimeSnippets(query);
-        scrapedSnippets = scrapedSnippets.concat(aniListSnippets);
-        console.log(`[Recommend]   AniList Search "${query}": ${aniListSnippets.length} snippets`);
-        if (scrapedSnippets.length >= 20) break;
+        promises.push(cachedScrapeForums(query));
       }
-
-      // 2e. Web search (DDG → Yahoo → Bing) — for broader discovery
-      if (scrapedSnippets.length < 15) {
-        console.log('[Recommend]   2e. Web search for broader discovery...');
-        for (const query of search_queries) {
-          const webSnippets = await searchService.scrapeForums(query);
-          scrapedSnippets = scrapedSnippets.concat(webSnippets);
-          console.log(`[Recommend]   Web "${query}": ${webSnippets.length} snippets`);
-          if (scrapedSnippets.length >= 20) break;
-        }
+      
+      const results = await Promise.all(promises);
+      for (const res of results) {
+        if (res) scrapedSnippets = scrapedSnippets.concat(res);
       }
 
     } else if (media_type === 'visual novel') {
-      // ── Visual Novel pipeline: VNDB structured data + web search ─────────
-
-      // 2a. VNDB Recommendations — based on known liked VN titles from profile
-      //     vn_titles was extracted by the LLM router in Step 1
+      const promises = [];
       const resolvedVnTitles = (vn_titles && Array.isArray(vn_titles)) ? vn_titles : [];
-
       if (resolvedVnTitles.length > 0) {
-        console.log('[Recommend]   2a. Fetching VNDB recommendations based on liked titles...');
-        const vndbRecs = await searchService.fetchVNDBRecommendations(resolvedVnTitles);
-        scrapedSnippets = scrapedSnippets.concat(vndbRecs);
-        console.log(`[Recommend]   VNDB Recs: ${vndbRecs.length} snippets`);
+        promises.push(cachedFetchVNDBRecs(resolvedVnTitles));
       }
-
-
-      // 2b. VNDB Tag Search — discover top-rated VNs matching profile vibe
-      console.log('[Recommend]   2b. Fetching VNDB tag-based discovery...');
       for (const query of search_queries.slice(0, 3)) {
-        const vndbSnippets = await searchService.fetchVNDBSnippets(query, 6);
-        scrapedSnippets = scrapedSnippets.concat(vndbSnippets);
-        console.log(`[Recommend]   VNDB "${query}": ${vndbSnippets.length} snippets`);
-        if (scrapedSnippets.length >= 15) break;
+        promises.push(cachedFetchVNDBSnippets(query, 6));
+        promises.push(cachedScrapeForums(query));
       }
-
-      // 2c. Web search — Reddit/community threads as a supplement
-      console.log('[Recommend]   2c. Web search for community VN opinions...');
-      for (const query of search_queries) {
-        const webSnippets = await searchService.scrapeForums(query);
-        scrapedSnippets = scrapedSnippets.concat(webSnippets);
-        console.log(`[Recommend]   Web "${query}": ${webSnippets.length} snippets`);
-        if (scrapedSnippets.length >= 25) break;
+      
+      const results = await Promise.all(promises);
+      for (const res of results) {
+        if (res) scrapedSnippets = scrapedSnippets.concat(res);
       }
 
     } else {
-      // All other media types — web search only
-      console.log('[Recommend]   Web search for non-anime media type...');
-      for (const query of search_queries) {
-        const webSnippets = await searchService.scrapeForums(query);
-        scrapedSnippets = scrapedSnippets.concat(webSnippets);
-        console.log(`[Recommend]   Web "${query}": ${webSnippets.length} snippets`);
-        if (scrapedSnippets.length >= 20) break;
+      const promises = search_queries.slice(0, 4).map(query => cachedScrapeForums(query));
+      const results = await Promise.all(promises);
+      for (const res of results) {
+        if (res) scrapedSnippets = scrapedSnippets.concat(res);
       }
     }
 
     console.log(`[Recommend]   Total snippets: ${scrapedSnippets.length}`);
 
-    // ── Step 3: Scoring & Pitching ───────────────────────────────────────────
-    console.log('[Recommend] → Step 3: Scoring candidates and generating pitch...');
-    const { title, coda_blurb, pitch_paragraphs } = await llmService.scoreAndPitch(master_directive, scrapedSnippets, payload.guardrails);
-    console.log(`[Recommend]   Selected: "${title}"`);
+    // Extract seen and not-for-me lists
+    const seenList = Array.isArray(payload.seen) ? payload.seen : [];
+    const notForMeList = Array.isArray(payload.not_for_me) ? payload.not_for_me : [];
 
-    // ── Step 4: Asset Retrieval ──────────────────────────────────────────────
-    console.log('[Recommend] → Step 4: Fetching poster and OST...');
-    const { poster_url, ost_url } = await mediaService.fetchAssets(title, media_type);
-    console.log(`[Recommend]   Poster: ${poster_url}`);
-
-    // ── Trace Log ────────────────────────────────────────────────────────────
-    loggerService.logRecommendation({
-      payload,
-      mediaType: media_type,
-      queries: search_queries,
-      malAnimeTitles: mal_anime_titles || [],
-      vnTitles: vn_titles || [],
-      scrapedSnippets,
-      masterDirective: master_directive,
-      selection: { title, coda_blurb, pitch_paragraphs },
-      posterUrl: poster_url,
-      ostUrl: ost_url
+    // Filter scrapedSnippets early
+    const filteredSnippets = scrapedSnippets.filter(snippet => {
+      const excluded = isExcluded(snippet.title, seenList) || isExcluded(snippet.title, notForMeList);
+      if (excluded) {
+        console.log(`[Recommend] Programmatically filtering out snippet matching seen/not-for-me: "${snippet.title}"`);
+      }
+      return !excluded;
     });
+
+    console.log(`[Recommend] Snippets after exclusion filtering: ${filteredSnippets.length}`);
+
+    // ── Step 3: Scoring & Selection (Single Pick) ─────────────────────────
+    console.log('[Recommend] → Step 3: Scoring candidates and selecting top pick...');
+    let finalPicks = [];
+    try {
+      const single = await llmService.scoreAndSelect(
+        master_directive,
+        filteredSnippets,
+        payload.guardrails,
+        seenList,
+        notForMeList
+      );
+      if (single && single.title) {
+        finalPicks = [single];
+      }
+    } catch (err) {
+      console.error('[Recommend] scoreAndSelect failed:', err.message);
+    }
+    
+    console.log(`[Recommend]   Selected picks: ${JSON.stringify(finalPicks.map(p => p.title))}`);
+
+    // ── Step 4: Asset Retrieval (Parallelized) ───────────────────────────────
+    console.log('[Recommend] → Step 4: Fetching posters and OSTs in parallel...');
+    const resolvedPicks = await Promise.all(finalPicks.map(async (pick) => {
+      try {
+        const { poster_url, ost_url } = await mediaService.fetchAssets(pick.title, media_type);
+        let finalPosterUrl = poster_url;
+        if (poster_url && poster_url.startsWith('http') && !poster_url.includes('localhost') && !poster_url.includes('127.0.0.1')) {
+          finalPosterUrl = `/api/recommend/proxy-image?url=${encodeURIComponent(poster_url)}`;
+        }
+        return {
+          title: pick.title,
+          media_type: media_type,
+          coda_blurb: pick.coda_blurb,
+          pitch_paragraphs: [],
+          poster_url: finalPosterUrl,
+          ost_url
+        };
+      } catch (err) {
+        console.error(`Asset fetch failed for "${pick.title}":`, err.message);
+        return {
+          title: pick.title,
+          media_type: media_type,
+          coda_blurb: pick.coda_blurb,
+          pitch_paragraphs: [],
+          poster_url: '',
+          ost_url: ''
+        };
+      }
+    }));
+
+    // ── Trace Log (using first pick for logging compatibility) ────────────────
+    if (resolvedPicks.length > 0) {
+      loggerService.logRecommendation({
+        payload,
+        mediaType: media_type,
+        queries: search_queries,
+        malAnimeTitles: mal_anime_titles || [],
+        vnTitles: vn_titles || [],
+        scrapedSnippets,
+        masterDirective: master_directive,
+        selection: { 
+          title: resolvedPicks[0].title, 
+          coda_blurb: resolvedPicks[0].coda_blurb, 
+          pitch_paragraphs: [] 
+        },
+        posterUrl: resolvedPicks[0].poster_url,
+        ostUrl: resolvedPicks[0].ost_url
+      });
+    }
 
     console.log('[Recommend] ✅ Pipeline complete.\n');
 
-    let finalPosterUrl = poster_url;
-    if (poster_url && poster_url.startsWith('http') && !poster_url.includes('localhost') && !poster_url.includes('127.0.0.1')) {
-      finalPosterUrl = `/api/recommend/proxy-image?url=${encodeURIComponent(poster_url)}`;
-    }
-
     res.json({
-      title,
-      media_type,
-      coda_blurb,
-      pitch_paragraphs,
-      poster_url: finalPosterUrl,
-      ost_url
+      title: resolvedPicks[0]?.title || '',
+      media_type: media_type,
+      coda_blurb: resolvedPicks[0]?.coda_blurb || '',
+      pitch_paragraphs: [],
+      poster_url: resolvedPicks[0]?.poster_url || '',
+      ost_url: resolvedPicks[0]?.ost_url || '',
+      recommendations: resolvedPicks
     });
 
   } catch (error) {
     console.error('[Recommend Route Error]:', error);
     res.status(500).json({ error: 'Recommendation pipeline failed', details: error.message });
+  }
+});
+router.post('/pitch', async (req, res) => {
+  try {
+    const { core_identity, recent_context, guardrails, title, requested_media_type } = req.body;
+    console.log('\n[Pitch] ═══════════════════════════════════════════════════');
+    console.log(`[Pitch] Generating lazy pitch for: "${title}" (${requested_media_type})`);
+
+    const directive = `User core identity: ${core_identity}. Current craving/recent context: ${recent_context}.`;
+    
+    // Quick search for title discussions to build human pitch context
+    const query = `"${title}" ${requested_media_type} review site:reddit.com`;
+    console.log(`[Pitch] Scraping human discussions for query: "${query}"`);
+    const scrapedSnippets = await searchService.scrapeForums(query);
+
+    const { pitch_paragraphs } = await llmService.generatePitch(
+      directive,
+      title,
+      scrapedSnippets,
+      guardrails
+    );
+
+    console.log(`[Pitch] Successfully generated ${pitch_paragraphs.length} paragraphs.`);
+    console.log('[Pitch] ✅ Generation complete.\n');
+
+    res.json({ pitch_paragraphs });
+  } catch (error) {
+    console.error('[Pitch Route Error]:', error);
+    res.status(500).json({ error: 'Pitch generation failed', details: error.message });
   }
 });
 

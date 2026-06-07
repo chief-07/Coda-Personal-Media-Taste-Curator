@@ -52,4 +52,41 @@ class Recommendation {
 
   /// Conversational pitch paragraphs shown on the pitch screen.
   final List<String> pitch;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'mediaType': mediaType.name,
+        'codaBlurb': codaBlurb,
+        'codaNote': codaNote,
+        'description': description,
+        'genres': genres,
+        'tags': tags,
+        'fitSignals': fitSignals,
+        'posterGradient': posterGradient.map((c) => c.toARGB32()).toList(),
+        'posterUrl': posterUrl,
+        'releaseYear': releaseYear,
+        'pitch': pitch,
+      };
+
+  factory Recommendation.fromJson(Map<String, dynamic> json) {
+    return Recommendation(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      mediaType: MediaType.values.firstWhere((e) => e.name == json['mediaType']),
+      codaBlurb: json['codaBlurb'] as String,
+      codaNote: json['codaNote'] as String,
+      description: json['description'] as String,
+      genres: List<String>.from(json['genres'] ?? []),
+      tags: List<String>.from(json['tags'] ?? []),
+      fitSignals: List<String>.from(json['fitSignals'] ?? []),
+      posterGradient: (json['posterGradient'] as List<dynamic>?)
+              ?.map((val) => Color(val as int))
+              .toList() ??
+          const [Color(0xFF2B5876), Color(0xFF4E4376)],
+      posterUrl: json['posterUrl'] as String?,
+      releaseYear: json['releaseYear'] as String? ?? '',
+      pitch: List<String>.from(json['pitch'] ?? []),
+    );
+  }
 }

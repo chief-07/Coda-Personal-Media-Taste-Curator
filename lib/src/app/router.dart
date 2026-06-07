@@ -1,5 +1,4 @@
 import 'package:coda/src/features/ask/presentation/ask_coda_screen.dart';
-import 'package:coda/src/features/home/data/mock_recommendations.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/home/presentation/home_screen.dart';
 import 'package:coda/src/features/home/presentation/pitch_screen.dart';
@@ -23,8 +22,13 @@ final codaRouter = GoRouter(
       final container = ProviderScope.containerOf(context);
       final prefs = container.read(sharedPreferencesProvider);
       final hasMemory = prefs.getString('living_memory_v1') != null;
-      // Skip onboarding if we already have a seeded profile
-      if (hasMemory && state.matchedLocation == '/onboarding') {
+      final isGoingToOnboarding = state.matchedLocation == '/onboarding' || state.matchedLocation == '/taste-profile';
+      // If we don't have a profile and we're not on onboarding/taste-profile, send to onboarding
+      if (!hasMemory && !isGoingToOnboarding) {
+        return '/onboarding';
+      }
+      // If we have a profile and we're on onboarding/taste-profile, send to home
+      if (hasMemory && isGoingToOnboarding) {
         return '/home';
       }
     } catch (e) {

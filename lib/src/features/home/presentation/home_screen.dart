@@ -83,6 +83,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     try {
       final updates = MemoryUpdates(
         guardrailsAppends: ['Already watched: ${rec.title}'],
+        seenAppends: [rec.title],
       );
       await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
     } catch (e) {
@@ -90,6 +91,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
 
     ref.read(homeRecommendationProvider.notifier).reload();
+  }
+
+  Future<void> _runBackgroundRefinement(Recommendation rec, String reason) async {
+    try {
+      final memory = ref.read(livingMemoryProvider);
+      final service = ref.read(recommendationServiceProvider);
+      
+      final updates = await service.refineTaste(
+        memory: memory,
+        title: rec.title,
+        mediaType: rec.mediaType.name,
+        reason: reason,
+      );
+
+      if (updates != null) {
+        final finalUpdates = MemoryUpdates(
+          globalIdentityAppends: updates.globalIdentityAppends,
+          categoryAppends: updates.categoryAppends,
+          recentContextOverwrite: updates.recentContextOverwrite,
+          guardrailsAppends: [
+            ...updates.guardrailsAppends,
+            'Avoid: ${rec.title} (rejected)',
+          ],
+          seenAppends: updates.seenAppends,
+          notForMeAppends: [
+            ...updates.notForMeAppends,
+            rec.title,
+          ],
+        );
+
+        await ref.read(livingMemoryProvider.notifier).applyUpdates(finalUpdates);
+        debugPrint('Successfully completed background taste refinement for "${rec.title}"');
+      }
+    } catch (e) {
+      debugPrint('Background taste refinement failed: $e');
+    }
   }
 
   void _showFeedbackSheet(Recommendation rec) {
@@ -102,10 +139,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         onFeedbackSubmitted: (reason) async {
           Navigator.of(ctx).pop();
           
+          final localUpdates = MemoryUpdates(
+            guardrailsAppends: ['Avoid: ${rec.title} (rejected)'],
+            notForMeAppends: [rec.title],
+          );
+          
+          try {
+            await ref.read(livingMemoryProvider.notifier).applyUpdates(localUpdates);
+          } catch (e) {
+            debugPrint('Error applying local feedback updates: $e');
+          }
+
+          ref.read(homeRecommendationProvider.notifier).reload();
+
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Refining your profile for "${rec.title}"...'),
+                content: const Text('Getting a better pick...'),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
@@ -115,38 +165,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             );
           }
 
-          try {
-            final memory = ref.read(livingMemoryProvider);
-            final service = ref.read(recommendationServiceProvider);
-            
-            final updates = await service.refineTaste(
-              memory: memory,
-              title: rec.title,
-              mediaType: rec.mediaType.name,
-              reason: reason,
-            );
-
-            if (updates != null) {
-              await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
-            }
-          } catch (e) {
-            debugPrint('Error applying feedback updates: $e');
-          }
-
-          ref.read(homeRecommendationProvider.notifier).reload();
-          
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text("Profile refined — getting a better pick..."),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                backgroundColor: Colors.white.withValues(alpha: 0.12),
-                duration: const Duration(seconds: 2),
-              ),
-            );
-          }
+          // Trigger remote LLM refinement in the background without blocking the UI
+          _runBackgroundRefinement(rec, reason);
         },
         onSkip: () {
           Navigator.of(ctx).pop();
@@ -482,7 +502,7 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
         child: Container(
-          padding: EdgeInsets.fromLTRB(24, 12, 24, 24 + bottomPad),
+          padding: EdgeInsets.fromLTRB(24, 12, 24, 80 + bottomPad),
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.07),
             borderRadius:

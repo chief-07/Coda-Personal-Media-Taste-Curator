@@ -28,7 +28,8 @@ const scrapeDDG = async (query) => {
   try {
     const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
     const response = await axios.get(url, {
-      headers: { 'User-Agent': getRandomUserAgent() }
+      headers: { 'User-Agent': getRandomUserAgent() },
+      timeout: 3000
     });
     const $ = cheerio.load(response.data);
     const results = [];
@@ -52,11 +53,12 @@ const scrapeYahoo = async (query) => {
   try {
     const url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`;
     const response = await axios.get(url, {
-      headers: { 'User-Agent': getRandomUserAgent() }
+      headers: { 'User-Agent': getRandomUserAgent() },
+      timeout: 3000
     });
     const $ = cheerio.load(response.data);
     const results = [];
-    $('.algo').each((i, el) => {
+    $('.compText').each((i, el) => {
       if (i >= 5) return false;
       const title = $(el).find('h3').text().trim();
       const snippet = $(el).find('.compText').text().trim() || $(el).find('.lh-16').text().trim() || $(el).find('.fc-drakgray').text().trim();
@@ -76,7 +78,8 @@ const scrapeBing = async (query) => {
   try {
     const url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
     const response = await axios.get(url, {
-      headers: { 'User-Agent': getRandomUserAgent() }
+      headers: { 'User-Agent': getRandomUserAgent() },
+      timeout: 3000
     });
     const $ = cheerio.load(response.data);
     const results = [];
@@ -106,8 +109,15 @@ const scrapeForums = async (query) => {
   // Add randomized delay to prevent instant blocks
   await delay(Math.floor(Math.random() * 300) + 200);
 
-  console.log(`[SearchService] Scraping DDG for: "${cleanedQuery}"`);
-  let results = await scrapeDDG(cleanedQuery);
+  console.log(`[SearchService] Scraping Bing for: "${cleanedQuery}"`);
+  let results = await scrapeBing(cleanedQuery);
+  if (results && results.length > 0) {
+    return results;
+  }
+
+  console.log(`[SearchService] Bing returned 0 results. Trying DDG fallback...`);
+  await delay(Math.floor(Math.random() * 300) + 200);
+  results = await scrapeDDG(cleanedQuery);
   if (results && results.length > 0) {
     return results;
   }
@@ -115,13 +125,6 @@ const scrapeForums = async (query) => {
   console.log(`[SearchService] DDG returned 0 results. Trying Yahoo fallback...`);
   await delay(Math.floor(Math.random() * 300) + 200);
   results = await scrapeYahoo(cleanedQuery);
-  if (results && results.length > 0) {
-    return results;
-  }
-
-  console.log(`[SearchService] Yahoo returned 0 results. Trying Bing fallback...`);
-  await delay(Math.floor(Math.random() * 300) + 200);
-  results = await scrapeBing(cleanedQuery);
   return results || [];
 };
 

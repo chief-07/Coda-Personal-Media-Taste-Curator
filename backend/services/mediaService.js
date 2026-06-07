@@ -17,7 +17,7 @@ const getWikipediaImage = async (title, mediaType) => {
     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(title + ' ' + mediaType)}&format=json`;
     const searchRes = await axios.get(searchUrl, {
       headers: WIKI_HEADERS,
-      timeout: 8000
+      timeout: 3000
     });
     const results = searchRes.data?.query?.search;
     if (!results || results.length === 0) {
@@ -33,7 +33,7 @@ const getWikipediaImage = async (title, mediaType) => {
       const imgUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages&pithumbsize=1000&format=json`;
       const imgRes = await axios.get(imgUrl, {
         headers: WIKI_HEADERS,
-        timeout: 8000
+        timeout: 3000
       });
       const pages = imgRes.data?.query?.pages;
       if (pages) {
@@ -55,7 +55,7 @@ const getWikipediaImage = async (title, mediaType) => {
       const parseUrl = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(pageTitle)}&prop=text&format=json`;
       const parseRes = await axios.get(parseUrl, {
         headers: WIKI_HEADERS,
-        timeout: 8000
+        timeout: 3000
       });
       const html = parseRes.data?.parse?.text?.['*'];
       if (html) {
@@ -126,7 +126,7 @@ const fetchAnilistAnimePoster = async (title) => {
       variables: { search: title }
     }, {
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      timeout: 8000
+      timeout: 3000
     });
     const media = response.data?.data?.Media;
     if (media?.coverImage) {
@@ -148,7 +148,7 @@ const fetchKitsuAnimePoster = async (title) => {
     const url = `https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(title)}&page[limit]=1&fields[anime]=canonicalTitle,posterImage`;
     const res = await axios.get(url, {
       headers: { 'Accept': 'application/vnd.api+json' },
-      timeout: 8000
+      timeout: 3000
     });
     const item = res.data?.data?.[0];
     const poster = item?.attributes?.posterImage;
@@ -181,7 +181,7 @@ const resolveImdbId = async (title, mediaType) => {
     try {
       const type = (mediaType === 'tv' || mediaType === 'show') ? 'series' : 'movie';
       const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&type=${type}&apikey=${omdbKey}`;
-      const res = await axios.get(url, { timeout: 8000 });
+      const res = await axios.get(url, { timeout: 3000 });
       if (res.data?.imdbID && res.data.Response === 'True') {
         console.log(`[OMDb] Resolved "${title}" → ${res.data.imdbID}`);
         return res.data.imdbID;
@@ -197,11 +197,11 @@ const resolveImdbId = async (title, mediaType) => {
     try {
       const searchType = (mediaType === 'tv' || mediaType === 'show') ? 'tv' : 'movie';
       const searchUrl = `https://api.themoviedb.org/3/search/${searchType}?api_key=${tmdbKey}&query=${encodeURIComponent(title)}`;
-      const searchRes = await axios.get(searchUrl, { timeout: 8000 });
+      const searchRes = await axios.get(searchUrl, { timeout: 3000 });
       const firstResult = searchRes.data?.results?.[0];
       if (firstResult?.id) {
         const extUrl = `https://api.themoviedb.org/3/${searchType}/${firstResult.id}/external_ids?api_key=${tmdbKey}`;
-        const extRes = await axios.get(extUrl, { timeout: 8000 });
+        const extRes = await axios.get(extUrl, { timeout: 3000 });
         const imdbId = extRes.data?.imdb_id;
         if (imdbId) {
           console.log(`[TMDb] Resolved "${title}" → ${imdbId}`);
@@ -256,7 +256,7 @@ const fetchMoviePosterDB = async (title, mediaType) => {
         'sec-fetch-site': 'same-origin',
         'Connection': 'keep-alive'
       },
-      timeout: 12000,
+      timeout: 4000,
       maxRedirects: 5
     });
 
@@ -296,7 +296,7 @@ const fetchTMDbPoster = async (title, mediaType) => {
   if (!tmdbKey) return null;
   try {
     const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbKey}&query=${encodeURIComponent(title)}`;
-    const res = await axios.get(searchUrl, { timeout: 8000 });
+    const res = await axios.get(searchUrl, { timeout: 3000 });
     if (res.data.results && res.data.results.length > 0) {
       const match = res.data.results.find(r => r.poster_path);
       if (match) {
@@ -316,7 +316,7 @@ const fetchOMDbPoster = async (title, mediaType) => {
   try {
     const type = (mediaType === 'tv' || mediaType === 'show') ? 'series' : 'movie';
     const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&type=${type}&apikey=${omdbKey}`;
-    const res = await axios.get(url, { timeout: 8000 });
+    const res = await axios.get(url, { timeout: 3000 });
     if (res.data?.Poster && res.data.Poster !== 'N/A' && res.data.Response === 'True') {
       const originalUrl = res.data.Poster;
       // Upgrade to original high-res by removing the ._V1_... suffix
@@ -344,7 +344,7 @@ const fetchVNDBPoster = async (title) => {
       fields: "title, alttitle, image.url"
     }, {
       headers: { 'Content-Type': 'application/json' },
-      timeout: 8000
+      timeout: 3000
     });
     
     const results = res.data?.results;
@@ -397,7 +397,7 @@ const fetchMangaDexPoster = async (title) => {
     const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(title)}&limit=1&includes[]=cover_art`;
     const res = await axios.get(searchUrl, {
       headers: { 'User-Agent': 'CodaApp/2.0 (contact@mycodaapp.net)' },
-      timeout: 8000
+      timeout: 3000
     });
 
     const manga = res.data?.data?.[0];
@@ -413,7 +413,7 @@ const fetchMangaDexPoster = async (title) => {
       // Fetch cover art separately
       const coverRes = await axios.get(`https://api.mangadex.org/cover?manga[]=${mangaId}&limit=1`, {
         headers: { 'User-Agent': 'CodaApp/2.0' },
-        timeout: 8000
+        timeout: 3000
       });
       const coverFile = coverRes.data?.data?.[0]?.attributes?.fileName;
       if (coverFile) {
@@ -441,7 +441,7 @@ const fetchOpenLibraryPoster = async (title) => {
     console.log(`[Open Library] Searching for: "${title}"`);
     const res = await axios.get(`https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&limit=1`, {
       headers: { 'User-Agent': 'CodaMediaFinder/2.0 (contact@mycodaapp.net)' },
-      timeout: 8000
+      timeout: 3000
     });
     const book = res.data?.docs?.[0];
     if (book?.cover_i) {
@@ -466,7 +466,7 @@ const fetchPenguinRandomHousePoster = async (title) => {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html'
       },
-      timeout: 10000
+      timeout: 4000
     });
     const $ = cheerio.load(res.data);
     
@@ -495,7 +495,7 @@ const fetchPenguinRandomHousePoster = async (title) => {
 
 const fetchGoogleBooksPoster = async (title) => {
   try {
-    const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}`, { timeout: 8000 });
+    const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}`, { timeout: 3000 });
     if (res.data.items && res.data.items.length > 0) {
       const links = res.data.items[0].volumeInfo?.imageLinks;
       if (links) {
@@ -524,15 +524,19 @@ const fetchPoster = async (title, mediaType) => {
 
     // ── 1. ANIME ──────────────────────────────────────────
     if (type === 'anime') {
-      // AniList (extraLarge quality covers)
-      const anilist = await fetchAnilistAnimePoster(cleanedTitle);
-      if (anilist) return anilist;
-      // Kitsu (good quality poster images)
-      const kitsu = await fetchKitsuAnimePoster(cleanedTitle);
-      if (kitsu) return kitsu;
+      // Fetch AniList and Kitsu in parallel
+      try {
+        const [anilist, kitsu] = await Promise.all([
+          fetchAnilistAnimePoster(cleanedTitle).catch(() => null),
+          fetchKitsuAnimePoster(cleanedTitle).catch(() => null)
+        ]);
+        if (anilist) return anilist;
+        if (kitsu) return kitsu;
+      } catch (e) {}
+      
       // Jikan/MAL fallback
       try {
-        const res = await axios.get(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(cleanedTitle)}&limit=1`, { timeout: 8000 });
+        const res = await axios.get(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(cleanedTitle)}&limit=1`, { timeout: 3000 });
         if (res.data.data?.length > 0) {
           const img = res.data.data[0].images?.jpg?.large_image_url;
           if (img) { console.log(`[Jikan Poster] ✅ "${cleanedTitle}"`); return img; }
@@ -555,7 +559,7 @@ const fetchPoster = async (title, mediaType) => {
       if (vndb) return vndb;
 
       try {
-        const res = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanedTitle)}&l=english&cc=US`, { timeout: 8000 });
+        const res = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanedTitle)}&l=english&cc=US`, { timeout: 3000 });
         if (res.data.items?.length > 0) {
           const img = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${res.data.items[0].id}/library_600x900.jpg`;
           console.log(`[Steam Poster] ✅ "${cleanedTitle}"`);
@@ -566,7 +570,7 @@ const fetchPoster = async (title, mediaType) => {
 
     if (type === 'game') {
       try {
-        const res = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanedTitle)}&l=english&cc=US`, { timeout: 8000 });
+        const res = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanedTitle)}&l=english&cc=US`, { timeout: 3000 });
         if (res.data.items?.length > 0) {
           const img = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${res.data.items[0].id}/library_600x900.jpg`;
           console.log(`[Steam Poster] ✅ "${cleanedTitle}"`);
@@ -579,24 +583,25 @@ const fetchPoster = async (title, mediaType) => {
     }
 
     // ── 4. MOVIE / TV ─────────────────────────────────────
-    // MPDB is first — highest quality, real movie posters
     if (type === 'movie' || type === 'tv' || type === 'show') {
-      // 4a. MoviePosterDB (requires IMDB ID via OMDb/TMDb)
+      // TMDb and OMDb are extremely fast and reliable APIs
+      try {
+        const [tmdb, omdb] = await Promise.all([
+          fetchTMDbPoster(cleanedTitle, type).catch(() => null),
+          fetchOMDbPoster(cleanedTitle, type).catch(() => null)
+        ]);
+        if (tmdb) return tmdb;
+        if (omdb) return omdb;
+      } catch (e) {}
+
+      // Fallback to MoviePosterDB (requires IMDB ID via OMDb/TMDb)
       const mpdb = await fetchMoviePosterDB(cleanedTitle, type);
       if (mpdb) return mpdb;
-
-      // 4b. TMDb poster
-      const tmdb = await fetchTMDbPoster(cleanedTitle, type);
-      if (tmdb) return tmdb;
-
-      // 4c. OMDb poster (high-res Amazon/IMDb CDN)
-      const omdb = await fetchOMDbPoster(cleanedTitle, type);
-      if (omdb) return omdb;
 
       // 4d. iTunes
       try {
         const itunesMedia = (type === 'tv' || type === 'show') ? 'tvShow' : 'movie';
-        const res = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(cleanedTitle)}&media=${itunesMedia}&country=US&limit=1`, { timeout: 8000 });
+        const res = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(cleanedTitle)}&media=${itunesMedia}&country=US&limit=1`, { timeout: 3000 });
         if (res.data.results?.length > 0) {
           const img = res.data.results[0].artworkUrl100?.replace('100x100bb', '600x900bb');
           if (img) { console.log(`[iTunes Poster] ✅ "${cleanedTitle}"`); return img; }
@@ -610,15 +615,19 @@ const fetchPoster = async (title, mediaType) => {
 
     // ── 5. BOOKS ──────────────────────────────────────────
     if (type === 'book') {
-      // Open Library
-      const ol = await fetchOpenLibraryPoster(cleanedTitle);
-      if (ol) return ol;
+      // Open Library and Google Books in parallel
+      try {
+        const [ol, gb] = await Promise.all([
+          fetchOpenLibraryPoster(cleanedTitle).catch(() => null),
+          fetchGoogleBooksPoster(cleanedTitle).catch(() => null)
+        ]);
+        if (ol) return ol;
+        if (gb) return gb;
+      } catch (e) {}
+      
       // Penguin Random House
       const prh = await fetchPenguinRandomHousePoster(cleanedTitle);
       if (prh) return prh;
-      // Google Books
-      const gb = await fetchGoogleBooksPoster(cleanedTitle);
-      if (gb) return gb;
     }
 
     // ── 6. GLOBAL WIKIPEDIA FALLBACK ──────────────────────
@@ -645,33 +654,26 @@ const fetchPoster = async (title, mediaType) => {
 const fetchOST = async (title) => {
   try {
     console.log(`[OST] Fetching soundtrack for: "${title}"`);
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(title + ' soundtrack')}&media=music&entity=song&limit=5`;
-    const res = await axios.get(url, { timeout: 8000 });
-    const results = res.data?.results || [];
-    if (results.length > 0) {
-      const match = results.find(r => r.previewUrl);
-      if (match) {
-        console.log(`[OST] ✅ Found soundtrack preview for "${title}": "${match.trackName}" by ${match.artistName} - ${match.previewUrl}`);
-        return match.previewUrl;
-      }
-    }
-  } catch (e) {
-    console.warn(`[OST] iTunes soundtrack query failed for "${title}":`, e.message);
-  }
+    const [resSoundtrack, resTheme] = await Promise.all([
+      axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(title + ' soundtrack')}&media=music&entity=song&limit=5`, { timeout: 3000 }).catch(() => null),
+      axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(title + ' theme')}&media=music&entity=song&limit=5`, { timeout: 3000 }).catch(() => null)
+    ]);
 
-  try {
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(title + ' theme')}&media=music&entity=song&limit=5`;
-    const res = await axios.get(url, { timeout: 8000 });
-    const results = res.data?.results || [];
-    if (results.length > 0) {
-      const match = results.find(r => r.previewUrl);
-      if (match) {
-        console.log(`[OST] ✅ Found theme preview for "${title}": "${match.trackName}" by ${match.artistName} - ${match.previewUrl}`);
-        return match.previewUrl;
-      }
+    const resultsSoundtrack = resSoundtrack?.data?.results || [];
+    const matchSoundtrack = resultsSoundtrack.find(r => r.previewUrl);
+    if (matchSoundtrack) {
+      console.log(`[OST] ✅ Found soundtrack preview for "${title}": "${matchSoundtrack.trackName}" by ${matchSoundtrack.artistName} - ${matchSoundtrack.previewUrl}`);
+      return matchSoundtrack.previewUrl;
+    }
+
+    const resultsTheme = resTheme?.data?.results || [];
+    const matchTheme = resultsTheme.find(r => r.previewUrl);
+    if (matchTheme) {
+      console.log(`[OST] ✅ Found theme preview for "${title}": "${matchTheme.trackName}" by ${matchTheme.artistName} - ${matchTheme.previewUrl}`);
+      return matchTheme.previewUrl;
     }
   } catch (e) {
-    console.warn(`[OST] iTunes theme query failed for "${title}":`, e.message);
+    console.warn(`[OST] iTunes queries failed for "${title}":`, e.message);
   }
 
   console.warn(`[OST] ❌ No soundtrack found for "${title}". Returning static placeholder.`);
