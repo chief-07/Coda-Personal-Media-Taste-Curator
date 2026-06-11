@@ -2,6 +2,7 @@ import 'package:coda/src/features/onboarding/application/onboarding_controller.d
 import 'package:coda/src/features/onboarding/data/coda_ai_service.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 
 class TasteProfileTabState {
   final List<ChatMessage> messages;
@@ -107,6 +108,7 @@ class TasteProfileController extends Notifier<TasteProfileState> {
 
       if (response.memoryUpdates != null) {
         await ref.read(livingMemoryProvider.notifier).applyUpdates(response.memoryUpdates!);
+        ref.read(homeRecommendationProvider.notifier).reload();
       }
 
       if (response.status == 'success' && response.message != null) {
@@ -190,6 +192,7 @@ class TasteProfileController extends Notifier<TasteProfileState> {
     if (updates != null) {
       // Apply the harmonized updates directly (overwriting/cleaning the memory)
       await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
+      ref.read(homeRecommendationProvider.notifier).reload();
     }
 
     final nextTabState = getTabState(tab);
@@ -204,6 +207,7 @@ class TasteProfileController extends Notifier<TasteProfileState> {
     final updates = await _aiService.harmonizeAllMemory(currentMemory);
     if (updates != null) {
       await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
+      ref.read(homeRecommendationProvider.notifier).reload();
     }
   }
 }

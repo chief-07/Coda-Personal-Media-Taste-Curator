@@ -54,3 +54,11 @@ assets/.env
 brain/
 backend/logs/*.txt
 
+# Coda cache, temporary, and scratch files
+backend/cache/
+backend/scratch/
+scratch/
+*.log
+android/build/
+
+

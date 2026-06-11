@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:coda/src/core/memory/living_memory.dart';
@@ -6,6 +7,7 @@ import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/home/presentation/widgets/media_type_tab_bar.dart';
 import 'package:coda/src/features/home/presentation/widgets/recommendation_card.dart';
+import 'package:coda/src/features/recommendation/application/audio_player_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,23 +24,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
   double _dragOffset = 0;
   bool _isAnimatingOut = false;
+  bool _isDeepSwipeAnimating = false;
   static const double _swipeThreshold = 110;
 
-  // Swipe direction overlay opacity
-  double get _leftOverlayOpacity =>
-      (_dragOffset < 0 ? (-_dragOffset / _swipeThreshold).clamp(0.0, 1.0) : 0.0);
-  double get _rightOverlayOpacity =>
-      (_dragOffset > 0 ? (_dragOffset / _swipeThreshold).clamp(0.0, 1.0) : 0.0);
+  int _calculateSwipeLevel(double offset) {
+    final absOffset = offset.abs();
+    if (absOffset >= 160) return 2;
+    if (absOffset >= 80) return 1;
+    return 0;
+  }
 
   void _onTypeSelected(MediaType type) {
     ref.read(selectedMediaTypeProvider.notifier).select(type);
     setState(() => _dragOffset = 0);
   }
 
-  // LEFT SWIPE — "This doesn't fit"
+  // LEFT SWIPE (DEEP) — "Not for me" + open reasons sheet
   Future<void> _onSwipeLeft(Recommendation rec) async {
     HapticFeedback.mediumImpact();
-    // Animate card off screen left
     setState(() {
       _isAnimatingOut = true;
       _dragOffset = -500;
@@ -48,15 +51,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     setState(() {
       _dragOffset = 0;
       _isAnimatingOut = false;
+      _isDeepSwipeAnimating = false;
     });
-    // Show "why not?" feedback sheet
     _showFeedbackSheet(rec);
   }
 
-  // RIGHT SWIPE — "Already watched/played this"
+  // LEFT SWIPE (MODERATE) — "Not for me" quick silent skip
+  Future<void> _onSwipeLeftQuick(Recommendation rec) async {
+    HapticFeedback.lightImpact();
+    setState(() {
+      _isAnimatingOut = true;
+      _dragOffset = -500;
+    });
+    await Future.delayed(const Duration(milliseconds: 280));
+    if (!mounted) return;
+    setState(() {
+      _dragOffset = 0;
+      _isAnimatingOut = false;
+      _isDeepSwipeAnimating = false;
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Got it — skipping "${rec.title}"'),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          backgroundColor: Colors.white.withValues(alpha: 0.12),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+
+    try {
+      final updates = MemoryUpdates(
+        guardrailsAppends: ['Avoid: ${rec.title} (rejected)'],
+        notForMeAppends: [rec.title],
+      );
+      await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
+    } catch (e) {
+      debugPrint('Error updating rejected list: $e');
+    }
+
+    ref.read(homeRecommendationProvider.notifier).reload();
+  }
+
+  // RIGHT SWIPE (MODERATE) — "Already watched/played this" quick seen skip
   Future<void> _onSwipeRight(Recommendation rec) async {
     HapticFeedback.lightImpact();
-    // Animate card off screen right
     setState(() {
       _isAnimatingOut = true;
       _dragOffset = 500;
@@ -66,12 +108,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     setState(() {
       _dragOffset = 0;
       _isAnimatingOut = false;
+      _isDeepSwipeAnimating = false;
     });
-    // Show "already watched" toast and fetch next
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Got it — skipping "${rec.title}"'),
+          content: Text('Got it — marked "${rec.title}" as seen'),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           backgroundColor: Colors.white.withValues(alpha: 0.12),
@@ -88,6 +131,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
     } catch (e) {
       debugPrint('Error updating seen list: $e');
+    }
+
+    ref.read(homeRecommendationProvider.notifier).reload();
+  }
+
+  // RIGHT SWIPE (DEEP) — "Loved it" + positive taste reinforcement
+  Future<void> _onSwipeRightLoved(Recommendation rec) async {
+    HapticFeedback.heavyImpact();
+    setState(() {
+      _isAnimatingOut = true;
+      _dragOffset = 500;
+    });
+    await Future.delayed(const Duration(milliseconds: 280));
+    if (!mounted) return;
+    setState(() {
+      _dragOffset = 0;
+      _isAnimatingOut = false;
+      _isDeepSwipeAnimating = false;
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Loved "${rec.title}"! Coda reinforced your tastes ❤️'),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          backgroundColor: Colors.white.withValues(alpha: 0.15),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+
+    try {
+      final updates = MemoryUpdates(
+        globalIdentityAppends: ['Highly values: ${rec.title} (loved work)'],
+        categoryAppends: {
+          rec.mediaType.name: ['Loved: ${rec.title} (excellent match)'],
+        },
+        seenAppends: [rec.title],
+      );
+      await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
+    } catch (e) {
+      debugPrint('Error updating loved taste memory: $e');
     }
 
     ref.read(homeRecommendationProvider.notifier).reload();
@@ -192,46 +278,100 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                MediaTypeTabBar(
-                  types: activeTypes,
-                  selected: selectedType,
-                  onSelected: _onTypeSelected,
+                Row(
+                  children: [
+                    Expanded(
+                      child: MediaTypeTabBar(
+                        types: activeTypes,
+                        selected: selectedType,
+                        onSelected: _onTypeSelected,
+                      ),
+                    ),
+                    const _MusicTogglePill(),
+                    const SizedBox(width: 16),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Expanded(
                   child: rec.when(
-                    data: (data) => data != null
-                        ? _SwipeableCard(
-                            recommendation: data,
-                            dragOffset: _dragOffset,
-                            isAnimatingOut: _isAnimatingOut,
-                            leftOverlayOpacity: _leftOverlayOpacity,
-                            rightOverlayOpacity: _rightOverlayOpacity,
-                            swipeThreshold: _swipeThreshold,
-                            onDragUpdate: (dx) {
-                              if (!_isAnimatingOut) {
-                                setState(() => _dragOffset += dx);
-                              }
-                            },
-                            onDragEnd: () {
-                              if (_isAnimatingOut) return;
-                              if (_dragOffset < -_swipeThreshold) {
-                                _onSwipeLeft(data);
-                              } else if (_dragOffset > _swipeThreshold) {
-                                _onSwipeRight(data);
-                              } else {
-                                setState(() => _dragOffset = 0);
-                              }
-                            },
-                          )
-                        : Center(
-                            child: Text(
-                              'No recommendation for ${selectedType.label} yet.',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.4),
-                              ),
+                    data: (data) {
+                      if (data == null) {
+                        return Center(
+                          child: Text(
+                            'No recommendation for ${selectedType.label} yet.',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.4),
                             ),
                           ),
+                        );
+                      }
+
+                      if (data.mediaType != selectedType) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const CircularProgressIndicator(
+                                  color: Colors.white54),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Coda is thinking...',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.5),
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return _SwipeableCard(
+                        recommendation: data,
+                        dragOffset: _dragOffset,
+                        isAnimatingOut: _isAnimatingOut,
+                        isDeepSwipeAnimating: _isDeepSwipeAnimating,
+                        swipeThreshold: _swipeThreshold,
+                        onDragUpdate: (dx) {
+                          if (!_isAnimatingOut) {
+                            final oldOffset = _dragOffset;
+                            final newOffset = _dragOffset + dx;
+                            final oldLevel = _calculateSwipeLevel(oldOffset);
+                            final newLevel = _calculateSwipeLevel(newOffset);
+                            
+                            if (oldLevel != newLevel && newLevel > 0) {
+                              if (newLevel == 1) {
+                                HapticFeedback.selectionClick();
+                              } else if (newLevel == 2) {
+                                HapticFeedback.mediumImpact();
+                              }
+                            }
+                            setState(() => _dragOffset = newOffset);
+                          }
+                        },
+                        onDragEnd: () {
+                          if (_isAnimatingOut) return;
+                          if (_dragOffset <= -160) {
+                            setState(() => _isDeepSwipeAnimating = true);
+                            _onSwipeLeft(data); // Deep Left: open feedback reasons sheet
+                          } else if (_dragOffset <= -80) {
+                            setState(() => _isDeepSwipeAnimating = false);
+                            _onSwipeLeftQuick(data); // Moderate Left: quick silent skip
+                          } else if (_dragOffset >= 160) {
+                            setState(() => _isDeepSwipeAnimating = true);
+                            _onSwipeRightLoved(data); // Deep Right: Loved it!
+                          } else if (_dragOffset >= 80) {
+                            setState(() => _isDeepSwipeAnimating = false);
+                            _onSwipeRight(data); // Moderate Right: Seen it quick skip
+                          } else {
+                            setState(() {
+                              _dragOffset = 0;
+                              _isDeepSwipeAnimating = false;
+                            });
+                          }
+                        },
+                      );
+                    },
                     loading: () => Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -277,8 +417,7 @@ class _SwipeableCard extends StatelessWidget {
     required this.recommendation,
     required this.dragOffset,
     required this.isAnimatingOut,
-    required this.leftOverlayOpacity,
-    required this.rightOverlayOpacity,
+    required this.isDeepSwipeAnimating,
     required this.swipeThreshold,
     required this.onDragUpdate,
     required this.onDragEnd,
@@ -287,145 +426,212 @@ class _SwipeableCard extends StatelessWidget {
   final Recommendation recommendation;
   final double dragOffset;
   final bool isAnimatingOut;
-  final double leftOverlayOpacity;
-  final double rightOverlayOpacity;
+  final bool isDeepSwipeAnimating;
   final double swipeThreshold;
   final void Function(double dx) onDragUpdate;
   final VoidCallback onDragEnd;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) => onDragUpdate(details.delta.dx),
-      onHorizontalDragEnd: (_) => onDragEnd(),
-      child: AnimatedContainer(
-        duration: (isAnimatingOut || dragOffset == 0)
-            ? const Duration(milliseconds: 300)
-            : Duration.zero,
-        curve: isAnimatingOut ? Curves.easeIn : Curves.easeOut,
-        transform: Matrix4.translationValues(dragOffset * 0.85, 0, 0)
-          ..rotateZ(dragOffset * 0.0004),
-        child: Stack(
+    final double gapWidth = dragOffset.abs() * 0.85;
+    final isRightSwipe = dragOffset > 0;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final parentWidth = constraints.maxWidth;
+
+        return Stack(
+          clipBehavior: Clip.none,
           children: [
-            RecommendationCard(recommendation: recommendation),
-
-            // ── Left swipe hint: "Not for me" ───────────────────────────
-            if (leftOverlayOpacity > 0)
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(64)),
-                    child: AnimatedOpacity(
-                      opacity: leftOverlayOpacity,
-                      duration: Duration.zero,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerRight,
-                            end: Alignment.centerLeft,
-                            colors: [
-                              Colors.transparent,
-                              const Color(0xFFFF3B5C).withValues(alpha: 0.35),
-                            ],
-                          ),
-                        ),
-                        child: Align(
-                          alignment: const Alignment(-0.7, -0.2),
-                          child: _SwipeLabel(
-                            label: 'NOT FOR ME',
-                            icon: Icons.close_rounded,
-                            color: const Color(0xFFFF3B5C),
-                            opacity: leftOverlayOpacity,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+            // ── The Moving Card (Rendered first, underneath) ──
+            GestureDetector(
+              onHorizontalDragUpdate: (details) => onDragUpdate(details.delta.dx),
+              onHorizontalDragEnd: (_) => onDragEnd(),
+              child: AnimatedContainer(
+                duration: (isAnimatingOut || dragOffset == 0)
+                    ? const Duration(milliseconds: 300)
+                    : Duration.zero,
+                curve: isAnimatingOut ? Curves.easeIn : Curves.easeOut,
+                transform: Matrix4.translationValues(dragOffset * 0.85, 0, 0)
+                  ..rotateZ(dragOffset * 0.0004),
+                child: RecommendationCard(recommendation: recommendation),
               ),
+            ),
 
-            // ── Right swipe hint: "Seen it" ──────────────────────────────
-            if (rightOverlayOpacity > 0)
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(64)),
-                    child: AnimatedOpacity(
-                      opacity: rightOverlayOpacity,
-                      duration: Duration.zero,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Colors.transparent,
-                              const Color(0xFF34C759).withValues(alpha: 0.35),
-                            ],
-                          ),
-                        ),
-                        child: Align(
-                          alignment: const Alignment(0.7, -0.2),
-                          child: _SwipeLabel(
-                            label: 'SEEN IT',
-                            icon: Icons.check_rounded,
-                            color: const Color(0xFF34C759),
-                            opacity: rightOverlayOpacity,
-                          ),
-                        ),
-                      ),
-                    ),
+            // ── Action Pills Anchored Directly Beside the Card (Rendered second, on top) ──
+            if (gapWidth > 15 && !isAnimatingOut)
+              Positioned(
+                left: isRightSwipe ? null : parentWidth + (dragOffset * 0.85) + 12,
+                right: isRightSwipe ? parentWidth - (dragOffset * 0.85) + 12 : null,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: _BackgroundActionPills(
+                    dragOffset: dragOffset,
+                    swipeThreshold: swipeThreshold,
+                    isAnimatingOut: isAnimatingOut,
+                    isDeepActive: isDeepSwipeAnimating,
                   ),
                 ),
               ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-class _SwipeLabel extends StatelessWidget {
-  const _SwipeLabel({
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.opacity,
+class _BackgroundActionPills extends StatelessWidget {
+  const _BackgroundActionPills({
+    required this.dragOffset,
+    required this.swipeThreshold,
+    required this.isAnimatingOut,
+    required this.isDeepActive,
   });
 
-  final String label;
-  final IconData icon;
-  final Color color;
-  final double opacity;
+  final double dragOffset;
+  final double swipeThreshold;
+  final bool isAnimatingOut;
+  final bool isDeepActive;
 
   @override
   Widget build(BuildContext context) {
-    return Transform.scale(
-      scale: 0.7 + (opacity * 0.3),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.6), width: 2),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                color: color,
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.5,
-              ),
+    final isRightSwipe = dragOffset > 0;
+    final isLeftSwipe = dragOffset < 0;
+    
+    final double offset = dragOffset.abs();
+
+    if (offset < 15) return const SizedBox.shrink();
+
+    // ── RIGHT SWIPE MATH (Seen + Loved It) ──
+    double seenWidth = 0.0;
+    double seenOpacity = 0.0;
+    bool isSeenActive = false;
+
+    double lovedWidth = 0.0;
+    double lovedOpacity = 0.0;
+    bool isLovedActive = false;
+
+    if (isRightSwipe) {
+      isSeenActive = offset >= 80;
+      isLovedActive = offset >= 160;
+
+      if (offset < 80) {
+        seenWidth = (offset / 80.0 * 40.0).clamp(0.0, 40.0);
+        seenOpacity = (offset / 80.0 * 0.25).clamp(0.0, 0.25);
+        lovedWidth = 0.0;
+        lovedOpacity = 0.0;
+      } else {
+        seenWidth = 40.0;
+        seenOpacity = 1.0 - ((offset - 80) / 80.0 * 0.75).clamp(0.0, 0.75);
+        lovedWidth = ((offset - 80) / 80.0 * 40.0).clamp(0.0, 40.0);
+        lovedOpacity = isLovedActive ? 1.0 : ((offset - 80) / 80.0 * 0.25).clamp(0.0, 0.25);
+      }
+    }
+
+    // ── LEFT SWIPE MATH (Wrong Pick + Why?) ──
+    double notForMeWidth = 0.0;
+    double notForMeOpacity = 0.0;
+    bool isNotForMeActive = false;
+
+    double whyWidth = 0.0;
+    double whyOpacity = 0.0;
+    bool isWhyActive = false;
+
+    if (isLeftSwipe) {
+      isNotForMeActive = offset >= 80;
+      isWhyActive = offset >= 160;
+
+      if (offset < 80) {
+        notForMeWidth = (offset / 80.0 * 40.0).clamp(0.0, 40.0);
+        notForMeOpacity = (offset / 80.0 * 0.25).clamp(0.0, 0.25);
+        whyWidth = 0.0;
+        whyOpacity = 0.0;
+      } else {
+        notForMeWidth = 40.0;
+        notForMeOpacity = 1.0 - ((offset - 80) / 80.0 * 0.75).clamp(0.0, 0.75);
+        whyWidth = ((offset - 80) / 80.0 * 40.0).clamp(0.0, 40.0);
+        whyOpacity = isWhyActive ? 1.0 : ((offset - 80) / 80.0 * 0.25).clamp(0.0, 0.25);
+      }
+    }
+
+    final showLovedGap = isRightSwipe && offset >= 80 && lovedWidth > 0;
+    final showWhyGap = isLeftSwipe && offset >= 80 && whyWidth > 0;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (isRightSwipe) ...[
+          if (lovedWidth > 0) ...[
+            _buildPill(
+              width: lovedWidth,
+              opacity: lovedOpacity,
+              isActive: isLovedActive,
+              icon: Icons.favorite_rounded,
+            ),
+            if (showLovedGap) const SizedBox(width: 8),
+          ],
+          _buildPill(
+            width: seenWidth,
+            opacity: seenOpacity,
+            isActive: isSeenActive,
+            icon: Icons.check_rounded,
+          ),
+        ],
+        if (isLeftSwipe) ...[
+          _buildPill(
+            width: notForMeWidth,
+            opacity: notForMeOpacity,
+            isActive: isNotForMeActive,
+            icon: Icons.close_rounded,
+          ),
+          if (showWhyGap) const SizedBox(width: 8),
+          if (whyWidth > 0) ...[
+            _buildPill(
+              width: whyWidth,
+              opacity: whyOpacity,
+              isActive: isWhyActive,
+              icon: Icons.help_outline_rounded,
             ),
           ],
+        ],
+      ],
+    );
+  }
+
+  Widget _buildPill({
+    required double width,
+    required double opacity,
+    required bool isActive,
+    required IconData icon,
+  }) {
+    if (width <= 0) return const SizedBox.shrink();
+
+    return AnimatedContainer(
+      duration: Duration.zero,
+      width: width,
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: isActive ? 0.6 : 0.4),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: isActive ? 0.4 : 0.12),
+          width: isActive ? 1.5 : 1.0,
+        ),
+        boxShadow: isActive
+            ? [
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                )
+              ]
+            : null,
+      ),
+      child: Center(
+        child: Opacity(
+          opacity: opacity,
+          child: Icon(icon, color: Colors.white, size: 18),
         ),
       ),
     );
@@ -648,25 +854,22 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    flex: 2,
                     child: GestureDetector(
-                      onTap: _selectedReason != null ? _submit : null,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
+                      onTap: _submit,
+                      child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: _selectedReason != null
-                              ? Colors.white
-                              : Colors.white.withValues(alpha: 0.12),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.25),
+                          ),
                         ),
                         child: Center(
                           child: Text(
-                            'Get a better pick →',
+                            'Submit',
                             style: GoogleFonts.inter(
-                              color: _selectedReason != null
-                                  ? Colors.black
-                                  : Colors.white30,
+                              color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                             ),
@@ -680,6 +883,130 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Music Toggle Pill & Playing Indicator
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _MusicTogglePill extends ConsumerWidget {
+  const _MusicTogglePill();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final audioState = ref.watch(audioPlayerControllerProvider);
+    final isMuted = audioState.isMuted;
+    final hasTrack = audioState.currentUrl != null && audioState.currentUrl!.isNotEmpty;
+    final isPlaying = hasTrack && !isMuted;
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        ref.read(audioPlayerControllerProvider.notifier).toggleMute();
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: isPlaying
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : Colors.white.withValues(alpha: 0.04),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: isPlaying
+                    ? Colors.white.withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.08),
+                width: 1,
+              ),
+              boxShadow: isPlaying
+                  ? [
+                      BoxShadow(
+                        color: Colors.white.withValues(alpha: 0.08),
+                        blurRadius: 12,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isPlaying ? Icons.music_note_rounded : Icons.music_off_rounded,
+                  color: isPlaying ? Colors.white : Colors.white.withValues(alpha: 0.35),
+                  size: 18,
+                ),
+                if (isPlaying) ...[
+                  const SizedBox(width: 6),
+                  const _PlayingIndicator(),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlayingIndicator extends StatefulWidget {
+  const _PlayingIndicator();
+
+  @override
+  State<_PlayingIndicator> createState() => _PlayingIndicatorState();
+}
+
+class _PlayingIndicatorState extends State<_PlayingIndicator>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 12,
+      width: 14,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: List.generate(3, (index) {
+          return AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              final t = _controller.value;
+              final phase = index * (3.14159 / 3);
+              final scale = 0.3 + 0.7 * (math.sin(t * 2 * 3.14159 + phase).abs());
+              return Container(
+                width: 2.5,
+                height: 12 * scale,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(1),
+                ),
+              );
+            },
+          );
+        }),
       ),
     );
   }

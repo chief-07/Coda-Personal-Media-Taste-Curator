@@ -4,9 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:coda/src/features/library/presentation/widgets/library_tab_bar.dart';
 import 'package:go_router/go_router.dart';
+import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
+import 'package:coda/src/features/library/presentation/library_screen.dart';
 
 class LibraryCard extends ConsumerStatefulWidget {
   const LibraryCard({super.key, required this.tab});
@@ -21,9 +23,28 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
   final _maskScrollController = ScrollController();
   final _topScrollController = ScrollController();
 
+  // Map to store linked horizontal scroll controllers for each item title
+  final Map<String, (ScrollController, ScrollController)> _horizontalControllers = {};
+
   bool _themeEnabled = true;
   bool _audioEnabled = true;
   bool _reduceAnimationsEnabled = false;
+
+  (ScrollController, ScrollController) _getHorizontalControllers(String title) {
+    if (!_horizontalControllers.containsKey(title)) {
+      final maskScroll = ScrollController();
+      final topScroll = ScrollController();
+
+      // Synchronize horizontal scrolling: scrolling top scrolls mask
+      topScroll.addListener(() {
+        if (maskScroll.hasClients && topScroll.offset != maskScroll.offset) {
+          maskScroll.jumpTo(topScroll.offset);
+        }
+      });
+      _horizontalControllers[title] = (maskScroll, topScroll);
+    }
+    return _horizontalControllers[title]!;
+  }
 
   @override
   void initState() {
@@ -41,6 +62,11 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
   void dispose() {
     _maskScrollController.dispose();
     _topScrollController.dispose();
+    for (final pair in _horizontalControllers.values) {
+      pair.$1.dispose();
+      pair.$2.dispose();
+    }
+    _horizontalControllers.clear();
     super.dispose();
   }
 
@@ -92,8 +118,24 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
                             audioValue: _audioEnabled,
                             reduceAnimationsValue: _reduceAnimationsEnabled,
                             currentTab: widget.tab,
+                            horizontalControllerProvider: (title, isMask) => isMask
+                                ? _getHorizontalControllers(title).$1
+                                : _getHorizontalControllers(title).$2,
                           ),
                         ),
+                        if (widget.tab == LibraryTab.lists)
+                          Positioned(
+                            bottom: 75.0,
+                            right: 24.0,
+                            child: Container(
+                              width: 56,
+                              height: 56,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black, // Punches a solid cutout circle
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -108,11 +150,38 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
                     audioValue: _audioEnabled,
                     reduceAnimationsValue: _reduceAnimationsEnabled,
                     currentTab: widget.tab,
+                    horizontalControllerProvider: (title, isMask) => isMask
+                        ? _getHorizontalControllers(title).$1
+                        : _getHorizontalControllers(title).$2,
                     onThemeChanged: (val) => setState(() => _themeEnabled = val),
                     onAudioChanged: (val) => setState(() => _audioEnabled = val),
                     onReduceAnimationsChanged: (val) => setState(() => _reduceAnimationsEnabled = val),
                   ),
                 ),
+                if (widget.tab == LibraryTab.lists)
+                  Positioned(
+                    bottom: 75.0,
+                    right: 24.0,
+                    child: GestureDetector(
+                      onTap: () => showAddMediaDialog(context),
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                        ),
+                        child: Center(
+                          child: Icon(
+                            PhosphorIconsBold.plus,
+                            color: Colors.black.withValues(alpha: 0.7), // Plus icon black with 70% opacity
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           );
@@ -130,6 +199,7 @@ class _CardLayout extends ConsumerWidget {
     required this.audioValue,
     required this.reduceAnimationsValue,
     required this.currentTab,
+    required this.horizontalControllerProvider,
     this.onThemeChanged,
     this.onAudioChanged,
     this.onReduceAnimationsChanged,
@@ -141,6 +211,7 @@ class _CardLayout extends ConsumerWidget {
   final bool audioValue;
   final bool reduceAnimationsValue;
   final LibraryTab currentTab;
+  final ScrollController Function(String title, bool isMask) horizontalControllerProvider;
   final ValueChanged<bool>? onThemeChanged;
   final ValueChanged<bool>? onAudioChanged;
   final ValueChanged<bool>? onReduceAnimationsChanged;
@@ -177,19 +248,56 @@ class _CardLayout extends ConsumerWidget {
           ),
           
           if (currentTab == LibraryTab.lists) ...[
-            const SizedBox(height: 35),
-            _buildListItemRow(
-              'Serial Experiment Lain',
-              ['13 eps', 'Sci-fi', 'Psychological'],
-              'assets/lain.jpg',
-            ),
-            const SizedBox(height: 35),
-            _buildListItemRow(
-              'Interstellar',
-              ['Movie', 'Sci-fi', 'Psychological'],
-              'assets/interstellar.jpg',
-            ),
-            const SizedBox(height: 64),
+            if (memory.watchlist.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 48, left: 24, right: 24),
+                child: Center(
+                  child: isKnockoutLayer
+                      ? Text(
+                          'Your watchlist is empty.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        )
+                      : Opacity(
+                          opacity: 0,
+                          child: Text(
+                            'Your watchlist is empty.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                ),
+              )
+            else ...[
+              const SizedBox(height: 16),
+              ...memory.watchlist.map((item) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 35),
+                    _buildListItemRow(
+                      item.title,
+                      [item.mediaType, ...item.tags],
+                      item.posterUrl,
+                      horizontalControllerProvider(item.title, isKnockoutLayer),
+                      onDelete: () async {
+                        await ref.read(livingMemoryProvider.notifier).applyUpdates(
+                          MemoryUpdates(watchlistRemoves: [item.title]),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              }),
+              const SizedBox(height: 64),
+            ],
           ],
 
           if (currentTab == LibraryTab.settings) ...[
@@ -290,6 +398,7 @@ class _CardLayout extends ConsumerWidget {
                           guardrails: newGuardrails,
                           seen: newSeen,
                           notForMe: memory.notForMe,
+                          watchlist: memory.watchlist,
                         );
                         await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
                       },
@@ -334,6 +443,7 @@ class _CardLayout extends ConsumerWidget {
                           guardrails: newGuardrails,
                           seen: memory.seen,
                           notForMe: newNotForMe,
+                          watchlist: memory.watchlist,
                         );
                         await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
                       },
@@ -462,11 +572,17 @@ class _CardLayout extends ConsumerWidget {
     );
   }
 
-  Widget _buildListItemRow(String title, List<String> tags, String imageAsset) {
+  Widget _buildListItemRow(
+    String title,
+    List<String> tags,
+    String imageAsset,
+    ScrollController horizontalScroll, {
+    VoidCallback? onDelete,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Thumbnail
           isKnockoutLayer
@@ -481,14 +597,13 @@ class _CardLayout extends ConsumerWidget {
                     ),
                   ),
                 )
-              : Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade800,
-                    borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(
-                      image: AssetImage(imageAsset),
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    width: 72,
+                    height: 72,
+                    child: FallbackImage(
+                      url: imageAsset,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -498,10 +613,13 @@ class _CardLayout extends ConsumerWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 isKnockoutLayer
                     ? Text(
                         title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
@@ -513,6 +631,8 @@ class _CardLayout extends ConsumerWidget {
                         opacity: 0,
                         child: Text(
                           title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.inter(
                             fontSize: 20,
                             fontWeight: FontWeight.w900,
@@ -522,6 +642,7 @@ class _CardLayout extends ConsumerWidget {
                       ),
                 const SizedBox(height: 12),
                 SingleChildScrollView(
+                  controller: horizontalScroll,
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: tags.map((tag) => Padding(
@@ -533,6 +654,19 @@ class _CardLayout extends ConsumerWidget {
               ],
             ),
           ),
+          const SizedBox(width: 4),
+          if (onDelete != null) ...[
+            if (!isKnockoutLayer)
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.delete_outline_rounded, color: Colors.white70, size: 22),
+                onPressed: onDelete,
+                splashRadius: 20,
+              )
+            else
+              const SizedBox(width: 24, height: 24),
+          ],
         ],
       ),
     );

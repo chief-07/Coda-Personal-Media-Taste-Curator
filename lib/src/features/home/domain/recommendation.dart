@@ -15,6 +15,7 @@ class Recommendation {
     required this.posterGradient,
     required this.releaseYear,
     this.posterUrl,
+    this.ostUrl,
     this.pitch = const [],
   });
 
@@ -47,6 +48,9 @@ class Recommendation {
   /// Optional network URL for the poster image.
   final String? posterUrl;
 
+  /// Optional network URL for the soundtrack audio preview stream.
+  final String? ostUrl;
+
   /// Release year to show beside the title.
   final String releaseYear;
 
@@ -65,6 +69,7 @@ class Recommendation {
         'fitSignals': fitSignals,
         'posterGradient': posterGradient.map((c) => c.toARGB32()).toList(),
         'posterUrl': posterUrl,
+        'ostUrl': ostUrl,
         'releaseYear': releaseYear,
         'pitch': pitch,
       };
@@ -85,6 +90,7 @@ class Recommendation {
               .toList() ??
           const [Color(0xFF2B5876), Color(0xFF4E4376)],
       posterUrl: json['posterUrl'] as String?,
+      ostUrl: json['ostUrl'] as String?,
       releaseYear: json['releaseYear'] as String? ?? '',
       pitch: List<String>.from(json['pitch'] ?? []),
     );

@@ -2,11 +2,20 @@ import 'dart:ui' as dart_ui;
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
+import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
+import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+class _PitchChatMessage {
+  final String text;
+  final bool isUser;
+
+  _PitchChatMessage({required this.text, required this.isUser});
+}
 
 class PitchScreen extends ConsumerStatefulWidget {
   const PitchScreen({required this.recommendation, super.key});
@@ -23,7 +32,8 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
   final _chatController = TextEditingController();
   final _chatFocusNode = FocusNode();
   late final AnimationController _animationController;
-  final List<String> _messages = [];
+  final List<_PitchChatMessage> _messages = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -68,23 +78,64 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
     super.dispose();
   }
 
-  void _sendMessage() {
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_topScrollController.hasClients) {
+        _topScrollController.animateTo(
+          _topScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  Future<void> _sendMessage() async {
     final text = _chatController.text.trim();
-    if (text.isNotEmpty) {
-      setState(() {
-        _messages.add(text);
-      });
-      _chatController.clear();
-      _chatFocusNode.unfocus();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_topScrollController.hasClients) {
-          _topScrollController.animateTo(
-            _topScrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
+    if (text.isEmpty || _isLoading) return;
+
+    setState(() {
+      _messages.add(_PitchChatMessage(text: text, isUser: true));
+      _isLoading = true;
+    });
+    _chatController.clear();
+    _chatFocusNode.unfocus();
+    _scrollToBottom();
+
+    final chatHistory = _messages.sublist(0, _messages.length - 1).map((m) => {
+      'isUser': m.isUser,
+      'text': m.text,
+    }).toList();
+
+    try {
+      final response = await RecommendationService().discussRecommendation(
+        memory: ref.read(livingMemoryProvider),
+        title: widget.recommendation.title,
+        mediaType: widget.recommendation.mediaType.name,
+        codaBlurb: widget.recommendation.codaBlurb,
+        pitchParagraphs: widget.recommendation.pitch,
+        chatHistory: chatHistory,
+        userMessage: text,
+      );
+
+      if (mounted) {
+        setState(() {
+          _messages.add(_PitchChatMessage(text: response, isUser: false));
+          _isLoading = false;
+        });
+        _scrollToBottom();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _messages.add(_PitchChatMessage(
+            text: "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
+            isUser: false,
+          ));
+          _isLoading = false;
+        });
+        _scrollToBottom();
+      }
     }
   }
 
@@ -209,6 +260,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
                               isKnockoutLayer: true,
                               scrollController: _maskScrollController,
                               messages: _messages,
+                              isLoading: _isLoading,
                             ),
                           ),
                         ),
@@ -243,6 +295,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
                           isKnockoutLayer: false,
                           scrollController: _topScrollController,
                           messages: _messages,
+                          isLoading: _isLoading,
                         ),
                       ),
                     ),
@@ -288,12 +341,14 @@ class _PitchLayout extends StatelessWidget {
     required this.isKnockoutLayer,
     required this.scrollController,
     required this.messages,
+    required this.isLoading,
   });
 
   final Recommendation recommendation;
   final bool isKnockoutLayer;
   final ScrollController scrollController;
-  final List<String> messages;
+  final List<_PitchChatMessage> messages;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -362,15 +417,30 @@ class _PitchLayout extends StatelessWidget {
                       ),
               ),
             ),
-          // ── User Chat Messages ───────────────────────────────────
-            for (final message in messages)
+          // ── Messages List ────────────────────────────────────────
+          for (var i = 0; i < messages.length; i++) ...[
+            if (messages[i].isUser)
               Padding(
                 padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: _buildChatBubble(message),
+                  child: _buildChatBubble(messages[i].text),
                 ),
-              ),
+              )
+            else
+              _buildCodaMessage(messages[i].text),
+          ],
+
+          if (isLoading)
+            Padding(
+              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+              child: isKnockoutLayer
+                  ? _buildBodyText('Coda is thinking...', Colors.black)
+                  : Opacity(
+                      opacity: 0,
+                      child: _buildBodyText('Coda is thinking...', Colors.white),
+                    ),
+            ),
           ],
         ),
       ),
@@ -448,6 +518,18 @@ class _PitchLayout extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCodaMessage(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+      child: isKnockoutLayer
+          ? _buildBodyText(text, Colors.black)
+          : Opacity(
+              opacity: 0, // background is brightened globally
+              child: _buildBodyText(text, Colors.white),
+            ),
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/features/onboarding/data/coda_ai_service.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 
 class ChatMessage {
   final String? text;
@@ -93,6 +94,7 @@ class OnboardingController extends Notifier<OnboardingState> {
 
       if (response.memoryUpdates != null) {
         await ref.read(livingMemoryProvider.notifier).applyUpdates(response.memoryUpdates!);
+        ref.read(homeRecommendationProvider.notifier).reload();
       }
 
       if (response.message != null) {

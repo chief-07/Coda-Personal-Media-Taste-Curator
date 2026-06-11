@@ -4,6 +4,56 @@ import '../providers/shared_preferences_provider.dart';
 
 // --- Data Models ---
 
+class WatchlistItem {
+  final String title;
+  final String mediaType;
+  final List<String> tags;
+  final String posterUrl;
+  final String ostUrl;
+  final String description;
+  final String codaBlurb;
+  final DateTime addedAt;
+
+  WatchlistItem({
+    required this.title,
+    required this.mediaType,
+    required this.tags,
+    required this.posterUrl,
+    required this.ostUrl,
+    required this.description,
+    required this.codaBlurb,
+    required this.addedAt,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'mediaType': mediaType,
+        'tags': tags,
+        'posterUrl': posterUrl,
+        'ostUrl': ostUrl,
+        'description': description,
+        'codaBlurb': codaBlurb,
+        'addedAt': addedAt.toIso8601String(),
+      };
+
+  factory WatchlistItem.fromJson(Map<String, dynamic> json) {
+    return WatchlistItem(
+      title: json['title'] as String? ?? '',
+      mediaType: json['mediaType'] as String? ?? json['media_type'] as String? ?? '',
+      tags: List<String>.from(json['tags'] ?? []),
+      posterUrl: json['posterUrl'] as String? ?? json['poster_url'] as String? ?? '',
+      ostUrl: json['ostUrl'] as String? ?? json['ost_url'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      codaBlurb: json['codaBlurb'] as String? ?? json['coda_blurb'] as String? ?? '',
+      addedAt: json['addedAt'] != null
+          ? DateTime.parse(json['addedAt'] as String)
+          : json['added_at'] != null
+              ? DateTime.parse(json['added_at'] as String)
+              : DateTime.now(),
+    );
+  }
+}
+
 class LivingMemory {
   final List<String> globalIdentity;
   final Map<String, List<String>> categoryProfiles;
@@ -11,6 +61,7 @@ class LivingMemory {
   final List<String> guardrails;
   final List<String> seen;
   final List<String> notForMe;
+  final List<WatchlistItem> watchlist;
 
   LivingMemory({
     required this.globalIdentity,
@@ -19,6 +70,7 @@ class LivingMemory {
     required this.guardrails,
     required this.seen,
     required this.notForMe,
+    required this.watchlist,
   });
 
   factory LivingMemory.empty() {
@@ -29,6 +81,7 @@ class LivingMemory {
       guardrails: [],
       seen: [],
       notForMe: [],
+      watchlist: [],
     );
   }
 
@@ -39,6 +92,7 @@ class LivingMemory {
         'guardrails': guardrails,
         'seen': seen,
         'notForMe': notForMe,
+        'watchlist': watchlist.map((e) => e.toJson()).toList(),
       };
 
   factory LivingMemory.fromJson(Map<String, dynamic> json) {
@@ -52,6 +106,10 @@ class LivingMemory {
       guardrails: List<String>.from(json['guardrails'] ?? []),
       seen: List<String>.from(json['seen'] ?? []),
       notForMe: List<String>.from(json['notForMe'] ?? json['not_for_me'] ?? []),
+      watchlist: (json['watchlist'] as List<dynamic>?)
+              ?.map((e) => WatchlistItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 }
@@ -65,6 +123,8 @@ class MemoryUpdates {
   final Map<String, List<String>>? categoryProfilesOverwrite;
   final List<String> seenAppends;
   final List<String> notForMeAppends;
+  final List<WatchlistItem> watchlistAppends;
+  final List<String> watchlistRemoves;
 
   MemoryUpdates({
     this.globalIdentityAppends = const [],
@@ -75,6 +135,8 @@ class MemoryUpdates {
     this.categoryProfilesOverwrite,
     this.seenAppends = const [],
     this.notForMeAppends = const [],
+    this.watchlistAppends = const [],
+    this.watchlistRemoves = const [],
   });
 
   factory MemoryUpdates.fromJson(Map<String, dynamic> json) {
@@ -93,6 +155,11 @@ class MemoryUpdates {
           ),
       seenAppends: List<String>.from(json['seen_appends'] ?? json['seen'] ?? []),
       notForMeAppends: List<String>.from(json['not_for_me_appends'] ?? json['not_for_me'] ?? []),
+      watchlistAppends: (json['watchlist_appends'] as List<dynamic>?)
+              ?.map((e) => WatchlistItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      watchlistRemoves: List<String>.from(json['watchlist_removes'] ?? []),
     );
   }
 }
@@ -177,6 +244,17 @@ class LivingMemoryRepository {
       if (!newNotForMe.contains(u)) newNotForMe.add(u);
     }
 
+    // 7. Watchlist Items
+    final newWatchlist = List<WatchlistItem>.from(current.watchlist);
+    for (var removeTitle in updates.watchlistRemoves) {
+      newWatchlist.removeWhere((item) => item.title.toLowerCase() == removeTitle.toLowerCase());
+    }
+    for (var item in updates.watchlistAppends) {
+      if (!newWatchlist.any((existing) => existing.title.toLowerCase() == item.title.toLowerCase())) {
+        newWatchlist.insert(0, item);
+      }
+    }
+
     final newMemory = LivingMemory(
       globalIdentity: newGlobal,
       categoryProfiles: newCategory,
@@ -184,6 +262,7 @@ class LivingMemoryRepository {
       guardrails: newGuardrails,
       seen: newSeen,
       notForMe: newNotForMe,
+      watchlist: newWatchlist,
     );
 
     await saveMemory(newMemory);
@@ -220,6 +299,7 @@ class LivingMemoryNotifier extends Notifier<LivingMemory> {
     await prefs.remove('living_memory_v1'); // Remove key so GoRouter redirect works
     await prefs.remove('coda_onboarding_chips');
     await prefs.remove('coda_selected_media_type');
+    await prefs.remove('coda_onboarding_completed');
     final types = ['anime', 'movie', 'tv', 'visualNovel', 'manga', 'book', 'game', 'youtube', 'music'];
     for (final type in types) {
       await prefs.remove('coda_active_pick_$type');

@@ -1,6 +1,5 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const https = require('https');
 
 const BROWSER_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const WIKI_HEADERS = {
@@ -12,64 +11,51 @@ const WIKI_HEADERS = {
 
 // Helper to call OpenAI with tools
 const callOpenAI = async (messages, tools, retries = 2) => {
-  const executeCall = () => {
-    return new Promise((resolve, reject) => {
-      const apiKey = process.env.OPENAI_API_KEY;
-      if (!apiKey) return reject(new Error("Missing OPENAI_API_KEY"));
+  const executeCall = async () => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
 
-      const payload = {
-        model: 'gpt-4o-mini',
-        messages: messages,
-        temperature: 0.0,
-      };
-      
-      if (tools && tools.length > 0) {
-        payload.tools = tools;
-        payload.tool_choice = "auto";
-      } else {
-        payload.response_format = { type: 'json_object' };
-      }
+    const payload = {
+      model: 'gpt-4o-mini',
+      messages: messages,
+      temperature: 0.0,
+    };
+    
+    if (tools && tools.length > 0) {
+      payload.tools = tools;
+      payload.tool_choice = "auto";
+    } else {
+      payload.response_format = { type: 'json_object' };
+    }
 
-      const bodyData = JSON.stringify(payload);
-
-      const req = https.request({
-        hostname: 'api.openai.com',
-        path: '/v1/chat/completions',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Length': Buffer.byteLength(bodyData)
-        }
-      }, (res) => {
-        let data = '';
-        res.on('data', chunk => data += chunk);
-        res.on('end', () => {
-          if (res.statusCode >= 400) return reject(new Error(`OpenAI Error: ${data}`));
-          try {
-            const json = JSON.parse(data);
-            resolve(json.choices[0].message);
-          } catch (e) {
-            reject(e);
-          }
-        });
-      });
-
-      req.on('error', reject);
-      req.write(bodyData);
-      req.end();
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      timeout: 60000
     });
+
+    return response.data.choices[0].message;
   };
 
   for (let attempt = 1; attempt <= retries + 1; attempt++) {
     try {
       return await executeCall();
     } catch (e) {
-      const isNetworkError = e.code === 'ENOTFOUND' || e.code === 'ETIMEDOUT' || e.code === 'ECONNRESET' || e.code === 'EPIPE' || (e.message && e.message.includes('timeout'));
+      const errorCode = e.code || (e.response && e.response.status) || 'unknown';
+      const isNetworkError = 
+        e.code === 'ENOTFOUND' || 
+        e.code === 'ETIMEDOUT' || 
+        e.code === 'ECONNRESET' || 
+        e.code === 'EPIPE' || 
+        e.message?.includes('timeout') || 
+        (e.response && e.response.status >= 500);
+
       if (attempt > retries || !isNetworkError) {
         throw e;
       }
-      console.warn(`[OpenAI Chat] Attempt ${attempt} failed with ${e.code || e.message}. Retrying in 1s...`);
+      console.warn(`[OpenAI Chat] Attempt ${attempt} failed with error ${errorCode}. Retrying in 1s...`);
       await new Promise(r => setTimeout(r, 1000));
     }
   }
@@ -117,7 +103,7 @@ const researchMediaThemes = async (query) => {
     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`;
     const searchRes = await axios.get(searchUrl, {
       headers: WIKI_HEADERS,
-      timeout: 8000
+      timeout: 30000
     });
     const searchResults = searchRes.data?.query?.search;
 
@@ -129,7 +115,7 @@ const researchMediaThemes = async (query) => {
       const extractUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(pageTitle)}&redirects=1&format=json`;
       const extractRes = await axios.get(extractUrl, {
         headers: WIKI_HEADERS,
-        timeout: 8000
+        timeout: 30000
       });
       const pages = extractRes.data?.query?.pages;
       if (pages) {
@@ -154,7 +140,7 @@ const researchMediaThemes = async (query) => {
     const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(communityQuery)}`;
     const ddgRes = await axios.get(ddgUrl, {
       headers: { 'User-Agent': BROWSER_USER_AGENT },
-      timeout: 15000
+      timeout: 30000
     });
     const $ = cheerio.load(ddgRes.data);
     const snippets = [];
@@ -174,7 +160,7 @@ const researchMediaThemes = async (query) => {
       const bingUrl = `https://www.bing.com/search?q=${encodeURIComponent(communityQuery)}`;
       const bingRes = await axios.get(bingUrl, {
         headers: { 'User-Agent': BROWSER_USER_AGENT },
-        timeout: 15000
+        timeout: 30000
       });
       const $ = cheerio.load(bingRes.data);
       const snippets = [];

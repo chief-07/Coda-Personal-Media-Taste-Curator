@@ -41,6 +41,9 @@ dependencies:
   flutter_dotenv: ^6.0.1
   http: ^1.6.0
   shared_preferences: ^2.5.5
+  audioplayers: ^6.7.1
+  image_picker: ^1.1.2
+  receive_sharing_intent: ^1.7.0
 
 dev_dependencies:
   flutter_test:

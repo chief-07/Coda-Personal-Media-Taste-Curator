@@ -24,9 +24,12 @@ app.use(express.json());
 const chatRoute = require('./routes/chat');
 const recommendRoute = require('./routes/recommend');
 const onboardingRoute = require('./routes/onboarding');
+const detectRoute = require('./routes/detect');
 app.use('/api/openai', chatRoute);
 app.use('/api/recommend', recommendRoute);
 app.use('/api/onboarding', onboardingRoute);
+app.use('/api/detect', detectRoute);
+app.use('/share', detectRoute); // Mount PWA share target at root /share
 
 // Serve static Flutter web files
 const webBuildPath = path.join(projectRoot, 'build', 'web');

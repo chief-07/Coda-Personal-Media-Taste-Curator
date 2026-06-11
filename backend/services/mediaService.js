@@ -1,5 +1,34 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs');
+const path = require('path');
+const llmService = require('./llmService');
+const searchService = require('./searchService');
+
+const ASSET_CACHE_FILE = path.join(__dirname, '../cache/asset_cache.json');
+let assetCache = {};
+if (fs.existsSync(ASSET_CACHE_FILE)) {
+  try {
+    assetCache = JSON.parse(fs.readFileSync(ASSET_CACHE_FILE, 'utf8'));
+  } catch (_) {}
+}
+
+const saveAssetCache = () => {
+  try {
+    const cacheDir = path.dirname(ASSET_CACHE_FILE);
+    if (!fs.existsSync(cacheDir)) {
+      fs.mkdirSync(cacheDir, { recursive: true });
+    }
+    fs.writeFileSync(ASSET_CACHE_FILE, JSON.stringify(assetCache, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[Asset Cache Save Error]:', e.message);
+  }
+};
+
+const cacheNormalize = (title) => {
+  if (!title) return '';
+  return title.toLowerCase().replace(/[^a-z0-9]/g, '');
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // WIKIPEDIA IMAGE SCRAPER — used as global fallback
@@ -17,7 +46,7 @@ const getWikipediaImage = async (title, mediaType) => {
     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(title + ' ' + mediaType)}&format=json`;
     const searchRes = await axios.get(searchUrl, {
       headers: WIKI_HEADERS,
-      timeout: 3000
+      timeout: 15000
     });
     const results = searchRes.data?.query?.search;
     if (!results || results.length === 0) {
@@ -33,7 +62,7 @@ const getWikipediaImage = async (title, mediaType) => {
       const imgUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages&pithumbsize=1000&format=json`;
       const imgRes = await axios.get(imgUrl, {
         headers: WIKI_HEADERS,
-        timeout: 3000
+        timeout: 15000
       });
       const pages = imgRes.data?.query?.pages;
       if (pages) {
@@ -55,7 +84,7 @@ const getWikipediaImage = async (title, mediaType) => {
       const parseUrl = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(pageTitle)}&prop=text&format=json`;
       const parseRes = await axios.get(parseUrl, {
         headers: WIKI_HEADERS,
-        timeout: 3000
+        timeout: 15000
       });
       const html = parseRes.data?.parse?.text?.['*'];
       if (html) {
@@ -126,7 +155,7 @@ const fetchAnilistAnimePoster = async (title) => {
       variables: { search: title }
     }, {
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      timeout: 3000
+      timeout: 15000
     });
     const media = response.data?.data?.Media;
     if (media?.coverImage) {
@@ -148,7 +177,7 @@ const fetchKitsuAnimePoster = async (title) => {
     const url = `https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(title)}&page[limit]=1&fields[anime]=canonicalTitle,posterImage`;
     const res = await axios.get(url, {
       headers: { 'Accept': 'application/vnd.api+json' },
-      timeout: 3000
+      timeout: 15000
     });
     const item = res.data?.data?.[0];
     const poster = item?.attributes?.posterImage;
@@ -181,7 +210,7 @@ const resolveImdbId = async (title, mediaType) => {
     try {
       const type = (mediaType === 'tv' || mediaType === 'show') ? 'series' : 'movie';
       const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&type=${type}&apikey=${omdbKey}`;
-      const res = await axios.get(url, { timeout: 3000 });
+      const res = await axios.get(url, { timeout: 15000 });
       if (res.data?.imdbID && res.data.Response === 'True') {
         console.log(`[OMDb] Resolved "${title}" → ${res.data.imdbID}`);
         return res.data.imdbID;
@@ -197,11 +226,11 @@ const resolveImdbId = async (title, mediaType) => {
     try {
       const searchType = (mediaType === 'tv' || mediaType === 'show') ? 'tv' : 'movie';
       const searchUrl = `https://api.themoviedb.org/3/search/${searchType}?api_key=${tmdbKey}&query=${encodeURIComponent(title)}`;
-      const searchRes = await axios.get(searchUrl, { timeout: 3000 });
+      const searchRes = await axios.get(searchUrl, { timeout: 15000 });
       const firstResult = searchRes.data?.results?.[0];
       if (firstResult?.id) {
         const extUrl = `https://api.themoviedb.org/3/${searchType}/${firstResult.id}/external_ids?api_key=${tmdbKey}`;
-        const extRes = await axios.get(extUrl, { timeout: 3000 });
+        const extRes = await axios.get(extUrl, { timeout: 15000 });
         const imdbId = extRes.data?.imdb_id;
         if (imdbId) {
           console.log(`[TMDb] Resolved "${title}" → ${imdbId}`);
@@ -256,7 +285,7 @@ const fetchMoviePosterDB = async (title, mediaType) => {
         'sec-fetch-site': 'same-origin',
         'Connection': 'keep-alive'
       },
-      timeout: 4000,
+      timeout: 15000,
       maxRedirects: 5
     });
 
@@ -296,7 +325,7 @@ const fetchTMDbPoster = async (title, mediaType) => {
   if (!tmdbKey) return null;
   try {
     const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbKey}&query=${encodeURIComponent(title)}`;
-    const res = await axios.get(searchUrl, { timeout: 3000 });
+    const res = await axios.get(searchUrl, { timeout: 15000 });
     if (res.data.results && res.data.results.length > 0) {
       const match = res.data.results.find(r => r.poster_path);
       if (match) {
@@ -316,7 +345,7 @@ const fetchOMDbPoster = async (title, mediaType) => {
   try {
     const type = (mediaType === 'tv' || mediaType === 'show') ? 'series' : 'movie';
     const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&type=${type}&apikey=${omdbKey}`;
-    const res = await axios.get(url, { timeout: 3000 });
+    const res = await axios.get(url, { timeout: 15000 });
     if (res.data?.Poster && res.data.Poster !== 'N/A' && res.data.Response === 'True') {
       const originalUrl = res.data.Poster;
       // Upgrade to original high-res by removing the ._V1_... suffix
@@ -343,8 +372,11 @@ const fetchVNDBPoster = async (title) => {
       filters: ["search", "=", cleanedTitle],
       fields: "title, alttitle, image.url"
     }, {
-      headers: { 'Content-Type': 'application/json' },
-      timeout: 3000
+      headers: { 
+        'Content-Type': 'application/json',
+        'User-Agent': 'CodaRecommendations/1.0'
+      },
+      timeout: 15000
     });
     
     const results = res.data?.results;
@@ -397,7 +429,7 @@ const fetchMangaDexPoster = async (title) => {
     const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(title)}&limit=1&includes[]=cover_art`;
     const res = await axios.get(searchUrl, {
       headers: { 'User-Agent': 'CodaApp/2.0 (contact@mycodaapp.net)' },
-      timeout: 3000
+      timeout: 15000
     });
 
     const manga = res.data?.data?.[0];
@@ -413,7 +445,7 @@ const fetchMangaDexPoster = async (title) => {
       // Fetch cover art separately
       const coverRes = await axios.get(`https://api.mangadex.org/cover?manga[]=${mangaId}&limit=1`, {
         headers: { 'User-Agent': 'CodaApp/2.0' },
-        timeout: 3000
+        timeout: 15000
       });
       const coverFile = coverRes.data?.data?.[0]?.attributes?.fileName;
       if (coverFile) {
@@ -441,7 +473,7 @@ const fetchOpenLibraryPoster = async (title) => {
     console.log(`[Open Library] Searching for: "${title}"`);
     const res = await axios.get(`https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&limit=1`, {
       headers: { 'User-Agent': 'CodaMediaFinder/2.0 (contact@mycodaapp.net)' },
-      timeout: 3000
+      timeout: 15000
     });
     const book = res.data?.docs?.[0];
     if (book?.cover_i) {
@@ -466,7 +498,7 @@ const fetchPenguinRandomHousePoster = async (title) => {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html'
       },
-      timeout: 4000
+      timeout: 15000
     });
     const $ = cheerio.load(res.data);
     
@@ -495,7 +527,7 @@ const fetchPenguinRandomHousePoster = async (title) => {
 
 const fetchGoogleBooksPoster = async (title) => {
   try {
-    const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}`, { timeout: 3000 });
+    const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}`, { timeout: 15000 });
     if (res.data.items && res.data.items.length > 0) {
       const links = res.data.items[0].volumeInfo?.imageLinks;
       if (links) {
@@ -536,7 +568,7 @@ const fetchPoster = async (title, mediaType) => {
       
       // Jikan/MAL fallback
       try {
-        const res = await axios.get(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(cleanedTitle)}&limit=1`, { timeout: 3000 });
+        const res = await axios.get(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(cleanedTitle)}&limit=1`, { timeout: 15000 });
         if (res.data.data?.length > 0) {
           const img = res.data.data[0].images?.jpg?.large_image_url;
           if (img) { console.log(`[Jikan Poster] ✅ "${cleanedTitle}"`); return img; }
@@ -559,7 +591,7 @@ const fetchPoster = async (title, mediaType) => {
       if (vndb) return vndb;
 
       try {
-        const res = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanedTitle)}&l=english&cc=US`, { timeout: 3000 });
+        const res = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanedTitle)}&l=english&cc=US`, { timeout: 15000 });
         if (res.data.items?.length > 0) {
           const img = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${res.data.items[0].id}/library_600x900.jpg`;
           console.log(`[Steam Poster] ✅ "${cleanedTitle}"`);
@@ -570,7 +602,7 @@ const fetchPoster = async (title, mediaType) => {
 
     if (type === 'game') {
       try {
-        const res = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanedTitle)}&l=english&cc=US`, { timeout: 3000 });
+        const res = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanedTitle)}&l=english&cc=US`, { timeout: 15000 });
         if (res.data.items?.length > 0) {
           const img = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${res.data.items[0].id}/library_600x900.jpg`;
           console.log(`[Steam Poster] ✅ "${cleanedTitle}"`);
@@ -601,7 +633,7 @@ const fetchPoster = async (title, mediaType) => {
       // 4d. iTunes
       try {
         const itunesMedia = (type === 'tv' || type === 'show') ? 'tvShow' : 'movie';
-        const res = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(cleanedTitle)}&media=${itunesMedia}&country=US&limit=1`, { timeout: 3000 });
+        const res = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(cleanedTitle)}&media=${itunesMedia}&country=US&limit=1`, { timeout: 15000 });
         if (res.data.results?.length > 0) {
           const img = res.data.results[0].artworkUrl100?.replace('100x100bb', '600x900bb');
           if (img) { console.log(`[iTunes Poster] ✅ "${cleanedTitle}"`); return img; }
@@ -648,42 +680,132 @@ const fetchPoster = async (title, mediaType) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// OST — iTunes API (free, no auth)
+// OST — LLM + iTunes + Deezer (free, no auth)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const fetchOST = async (title) => {
+const resolveIconicTrack = async (title, mediaType, snippets = []) => {
+  const snippetsContext = snippets.length > 0
+    ? `\nHere are some web search results and community comments about the soundtrack of this work:\n${JSON.stringify(snippets)}\nUse this context to identify the actual name and artist/composer of the main theme, opening theme, or most popular signature song.`
+    : "";
+
+  const prompt = `You are a music supervisor. For the given media title and category, identify the single most iconic, popular, or emotionally resonant song/theme song associated with it in popular culture (e.g. played in iconic scenes, opening themes, or main menus).
+${snippetsContext}
+
+Examples:
+- "Rick and Morty" (tv): {"song_title": "For the Damaged Coda", "artist": "Blonde Redhead"}
+- "Cyberpunk: Edgerunners" (anime): {"song_title": "I Really Want to Stay at Your House", "artist": "Rosa Walton"}
+- "Interstellar" (movie): {"song_title": "Cornfield Chase", "artist": "Hans Zimmer"}
+- "Steins;Gate" (anime): {"song_title": "Gate of Steiner", "artist": "Takeshi Abo"}
+- "Clannad: After Story" (anime): {"song_title": "Dango Daikazoku", "artist": "Chata"}
+- "Norwegian Wood" (book): {"song_title": "Norwegian Wood (This Bird Has Flown)", "artist": "The Beatles"}
+- "The Book Thief" (book): {"song_title": null, "artist": null} (No universally recognized iconic soundtrack song)
+- "Sayonara Eri" (manga): {"song_title": null, "artist": null}
+
+If there is no highly popular, iconic, or officially recognized song/theme associated with the work, or if you are not 100% sure of the exact signature track name and its correct artist/composer, you MUST return null for both fields. Do not guess, do not hallucinate, and do not pair a track with a wrong artist (for example, do not match 'Reflectia' with 'Aqua Timez'). Be conservative, especially for books, games, and manga—only return a track if it's famous and deeply associated.
+
+Media Title: "${title}"
+Media Category: "${mediaType}"
+
+Respond with ONLY a JSON object:
+{
+  "song_title": "Song Title or null",
+  "artist": "Artist/Composer Name or null"
+}`;
+
   try {
-    console.log(`[OST] Fetching soundtrack for: "${title}"`);
-    const [resSoundtrack, resTheme] = await Promise.all([
-      axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(title + ' soundtrack')}&media=music&entity=song&limit=5`, { timeout: 3000 }).catch(() => null),
-      axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(title + ' theme')}&media=music&entity=song&limit=5`, { timeout: 3000 }).catch(() => null)
-    ]);
+    const responseJson = await llmService.callOpenAI([
+      { role: 'user', content: prompt }
+    ], { type: 'json_object' });
+    return JSON.parse(responseJson);
+  } catch (e) {
+    console.error(`[OST LLM Resolve] Failed for "${title}":`, e.message);
+    return null;
+  }
+};
 
-    const resultsSoundtrack = resSoundtrack?.data?.results || [];
-    const matchSoundtrack = resultsSoundtrack.find(r => r.previewUrl);
-    if (matchSoundtrack) {
-      console.log(`[OST] ✅ Found soundtrack preview for "${title}": "${matchSoundtrack.trackName}" by ${matchSoundtrack.artistName} - ${matchSoundtrack.previewUrl}`);
-      return matchSoundtrack.previewUrl;
-    }
-
-    const resultsTheme = resTheme?.data?.results || [];
-    const matchTheme = resultsTheme.find(r => r.previewUrl);
-    if (matchTheme) {
-      console.log(`[OST] ✅ Found theme preview for "${title}": "${matchTheme.trackName}" by ${matchTheme.artistName} - ${matchTheme.previewUrl}`);
-      return matchTheme.previewUrl;
+const fetchDeezerPreview = async (songTitle, artistName) => {
+  try {
+    const query = artistName ? `${artistName} - ${songTitle}` : songTitle;
+    console.log(`[Deezer OST] Searching for: "${query}"`);
+    const url = `https://api.deezer.com/search?q=${encodeURIComponent(query)}`;
+    const response = await axios.get(url, { timeout: 15000 });
+    const tracks = response.data?.data || [];
+    const match = tracks.find(t => t.preview);
+    if (match) {
+      console.log(`[Deezer OST] ✅ Found track preview: "${match.title}" by ${match.artist?.name} - ${match.preview}`);
+      return match.preview;
     }
   } catch (e) {
-    console.warn(`[OST] iTunes queries failed for "${title}":`, e.message);
+    console.warn('[Deezer OST] Search failed:', e.message);
+  }
+  return null;
+};
+
+const fetchOST = async (title, mediaType) => {
+  const cleanMedia = (mediaType || '').toLowerCase().trim();
+  console.log(`[OST] Fetching soundtrack for: "${title}" (type: ${cleanMedia})`);
+
+  try {
+    // Search the web for theme song info first to prevent LLM hallucinations
+    let snippets = [];
+    try {
+      const query = `"${title}" ${cleanMedia} theme song main theme soundtrack artist`;
+      console.log(`[OST] Scraping web for soundtrack info: "${query}"`);
+      snippets = await searchService.scrapeForums(query);
+    } catch (err) {
+      console.warn(`[OST] Web scrape for theme song failed:`, err.message);
+    }
+
+    // 1. Resolve iconic track via LLM using scraped snippets
+    const resolved = await resolveIconicTrack(title, cleanMedia, snippets);
+    if (resolved && resolved.song_title && resolved.artist) {
+      const { song_title, artist } = resolved;
+      console.log(`[OST] LLM resolved iconic track: "${song_title}" by ${artist}`);
+
+      // 2. Search iTunes for the exact song + artist
+      const itunesQuery = `${song_title} ${artist}`;
+      const itunesRes = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(itunesQuery)}&media=music&entity=song&limit=5`, { timeout: 15000 }).catch(() => null);
+      const itunesTracks = itunesRes?.data?.results || [];
+      const itunesMatch = itunesTracks.find(r => r.previewUrl);
+      if (itunesMatch) {
+        console.log(`[OST] ✅ Found iTunes track: "${itunesMatch.trackName}" by ${itunesMatch.artistName} - ${itunesMatch.previewUrl}`);
+        return itunesMatch.previewUrl;
+      }
+
+      // 3. Search Deezer for the exact song + artist
+      const deezerMatch = await fetchDeezerPreview(song_title, artist);
+      if (deezerMatch) {
+        return deezerMatch;
+      }
+    } else {
+      console.log(`[OST] LLM determined no iconic track exists or returned null for "${title}"`);
+    }
+
+
+
+  } catch (e) {
+    console.warn(`[OST] Failed to resolve soundtrack for "${title}":`, e.message);
   }
 
-  console.warn(`[OST] ❌ No soundtrack found for "${title}". Returning static placeholder.`);
-  return 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+  console.warn(`[OST] ❌ No soundtrack found for "${title}". Returning empty string (silent).`);
+  return '';
 };
 
 const fetchAssets = async (title, mediaType) => {
+  const normMediaType = (mediaType || '').toLowerCase().trim();
+  const key = `${cacheNormalize(title)}:${normMediaType}`;
+  if (assetCache[key]) {
+    console.log(`[Asset Cache Hit] serving cached assets for: "${title}" (${mediaType})`);
+    return assetCache[key];
+  }
+
   const poster_url = await fetchPoster(title, mediaType);
-  const ost_url = await fetchOST(title);
-  return { poster_url, ost_url };
+  const ost_url = await fetchOST(title, mediaType);
+  const assets = { poster_url, ost_url };
+
+  assetCache[key] = assets;
+  saveAssetCache();
+  return assets;
 };
 
 module.exports = {

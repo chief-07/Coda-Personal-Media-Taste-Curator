@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart' as coda_domain;
 import 'package:coda/src/features/home/domain/media_type.dart' as coda_domain;
+import 'package:coda/src/core/providers/api_config.dart';
 
 class RecommendationResult {
   final String title;
@@ -26,7 +27,7 @@ class RecommendationResult {
   factory RecommendationResult.fromJson(Map<String, dynamic> json) {
     String rawPoster = json['poster_url'] ?? '';
     if (rawPoster.startsWith('/')) {
-      final baseHost = kIsWeb ? Uri.base.origin : 'http://localhost:8080';
+      final baseHost = getApiBaseUrl();
       rawPoster = '$baseHost$rawPoster';
     }
     return RecommendationResult(
@@ -57,6 +58,7 @@ class RecommendationResult {
       codaBlurb: codaBlurb,
       pitch: pitchParagraphs,
       posterUrl: posterUrl.isNotEmpty ? posterUrl : null,
+      ostUrl: ostUrl.isNotEmpty ? ostUrl : null,
       
       // The Engine doesn't return these yet, so provide defaults
       codaNote: "I picked this based on everything we've talked about.",
@@ -71,7 +73,7 @@ class RecommendationResult {
 }
 
 class RecommendationService {
-  static const String _baseUrl = 'http://localhost:8080/api/recommend';
+  static String get _baseUrl => '${getApiBaseUrl()}/api/recommend';
 
   /// Fetches recommendations using the user's Living Memory and current environmental context
   Future<List<RecommendationResult>> fetchRecommendations(
@@ -153,9 +155,10 @@ class RecommendationService {
       'requested_media_type': selectedMediaType.name, // The user explicitly tapped this tab
       'seen': finalSeen,
       'not_for_me': memory.notForMe,
+      'watchlist': memory.watchlist.map((e) => e.toJson()).toList(),
     };
 
-    final targetUrl = kIsWeb ? '${Uri.base.origin}/api/recommend' : _baseUrl;
+    final targetUrl = _baseUrl;
 
     try {
       final response = await http.post(
@@ -195,9 +198,7 @@ class RecommendationService {
       'feedback_reason': reason,
     };
 
-    final targetUrl = kIsWeb 
-        ? '${Uri.base.origin}/api/recommend/feedback' 
-        : _baseUrl.replaceAll('/recommend', '/recommend/feedback');
+    final targetUrl = '${getApiBaseUrl()}/api/recommend/feedback';
 
     try {
       final response = await http.post(
@@ -252,9 +253,7 @@ class RecommendationService {
       'not_for_me': memory.notForMe,
     };
 
-    final targetUrl = kIsWeb 
-        ? '${Uri.base.origin}/api/recommend/pitch' 
-        : _baseUrl.replaceAll('/recommend', '/pitch');
+    final targetUrl = '${getApiBaseUrl()}/api/recommend/pitch';
 
     try {
       final response = await http.post(
@@ -272,6 +271,84 @@ class RecommendationService {
     } catch (e) {
       print("Pitch fetch network error: $e");
       return [];
+    }
+  }
+
+  /// Sends a message in the Ask Coda conversational flow.
+  /// Returns { status: "chatting"|"success", message: String, recommendation: Map? }
+  Future<Map<String, dynamic>> sendAskChatMessage({
+    required LivingMemory memory,
+    required List<Map<String, dynamic>> chatHistory,
+    required String userMessage,
+  }) async {
+    final payload = {
+      'current_memory': memory.toJson(),
+      'chat_history': chatHistory,
+      'user_message': userMessage,
+    };
+
+    final targetUrl = '${getApiBaseUrl()}/api/recommend/ask';
+
+    try {
+      final response = await http.post(
+        Uri.parse(targetUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Ask Coda failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Ask Coda network error: $e");
+      return {
+        'status': 'chatting',
+        'message': "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
+        'recommendation': null,
+      };
+    }
+  }
+
+  /// Discusses a recommendation with Coda
+  Future<String> discussRecommendation({
+    required LivingMemory memory,
+    required String title,
+    required String mediaType,
+    required String codaBlurb,
+    required List<String> pitchParagraphs,
+    required List<Map<String, dynamic>> chatHistory,
+    required String userMessage,
+  }) async {
+    final payload = {
+      'current_memory': memory.toJson(),
+      'title': title,
+      'media_type': mediaType,
+      'coda_blurb': codaBlurb,
+      'pitch_paragraphs': pitchParagraphs,
+      'chat_history': chatHistory,
+      'user_message': userMessage,
+    };
+
+    final targetUrl = '${getApiBaseUrl()}/api/recommend/chat';
+
+    try {
+      final response = await http.post(
+        Uri.parse(targetUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['message'] ?? "I'm not sure how to respond to that.";
+      } else {
+        throw Exception('Failed to get chat response: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Chat network error: $e");
+      return "Hmm, I'm having trouble connecting right now. Let's try again in a bit.";
     }
   }
 }

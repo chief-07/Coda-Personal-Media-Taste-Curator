@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
+import 'package:coda/src/core/providers/api_config.dart';
 
 class GroqResponse {
   final String status;
@@ -81,14 +82,8 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
     List<String> currentChips,
     List<ChatMessage> chatHistory,
   ) async {
-    final apiKey = dotenv.env['OPENAI_API_KEY'];
-    if (!kIsWeb && (apiKey == null || apiKey.isEmpty)) {
-      throw Exception('OPENAI_API_KEY is not set in .env file');
-    }
-
     final headers = {
       'Content-Type': 'application/json',
-      if (!kIsWeb) 'Authorization': 'Bearer $apiKey',
     };
 
     final messagesPayload = <Map<String, String>>[
@@ -118,7 +113,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
       'response_format': {'type': 'json_object'},
     });
 
-    final targetUrl = kIsWeb ? '${Uri.base.origin}/api/openai' : _baseUrl;
+    final targetUrl = '${getApiBaseUrl()}/api/openai';
 
     try {
       final response = await http.post(Uri.parse(targetUrl), headers: headers, body: body);
@@ -164,7 +159,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
       'selectedCategories': selectedCategories,
     });
 
-    final targetUrl = kIsWeb ? '${Uri.base.origin}/api/onboarding/profile' : 'http://localhost:8080/api/onboarding/profile';
+    final targetUrl = '${getApiBaseUrl()}/api/onboarding/profile';
 
     try {
       final response = await http.post(Uri.parse(targetUrl), headers: headers, body: body);
@@ -203,7 +198,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
       'tabName': tabName,
     });
 
-    final targetUrl = kIsWeb ? '${Uri.base.origin}/api/onboarding/harmonize' : 'http://localhost:8080/api/onboarding/harmonize';
+    final targetUrl = '${getApiBaseUrl()}/api/onboarding/harmonize';
 
     try {
       final response = await http.post(Uri.parse(targetUrl), headers: headers, body: body);
@@ -230,7 +225,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
       'currentMemory': currentMemory.toJson(),
     });
 
-    final targetUrl = kIsWeb ? '${Uri.base.origin}/api/onboarding/harmonize_all' : 'http://localhost:8080/api/onboarding/harmonize_all';
+    final targetUrl = '${getApiBaseUrl()}/api/onboarding/harmonize_all';
 
     try {
       final response = await http.post(Uri.parse(targetUrl), headers: headers, body: body);

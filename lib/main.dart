@@ -7,7 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: 'assets/.env');
+  try {
+    await dotenv.load(fileName: 'assets/.env');
+  } catch (e) {
+    debugPrint('Warning: Could not load assets/.env: $e');
+  }
   final prefs = await SharedPreferences.getInstance();
 
   runApp(

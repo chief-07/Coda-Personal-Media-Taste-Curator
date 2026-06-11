@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:coda/src/core/providers/api_config.dart';
 
 class FallbackImage extends StatefulWidget {
   final String? url;
@@ -46,10 +47,16 @@ class _FallbackImageState extends State<FallbackImage> {
     }
 
     String currentUrl = widget.url!;
+    
+    // Resolve relative proxy paths first
+    if (currentUrl.startsWith('/')) {
+      currentUrl = '${getApiBaseUrl()}$currentUrl';
+    }
+
     if (_useFallback) {
       if (widget.url!.contains('/api/recommend/proxy-image?url=')) {
         try {
-          final uri = Uri.parse(widget.url!);
+          final uri = Uri.parse(widget.url!.startsWith('/') ? '${getApiBaseUrl()}${widget.url!}' : widget.url!);
           final original = uri.queryParameters['url'];
           if (original != null && original.isNotEmpty) {
             currentUrl = original;

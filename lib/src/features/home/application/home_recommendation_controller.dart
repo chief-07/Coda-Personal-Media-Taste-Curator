@@ -6,6 +6,7 @@ import 'package:coda/src/features/onboarding/application/onboarding_controller.d
 import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
+import 'package:coda/src/core/providers/api_config.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -77,9 +78,10 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
       return;
     }
     try {
-      final ImageProvider provider = posterUrl.startsWith('assets/')
-          ? AssetImage(posterUrl)
-          : NetworkImage(posterUrl);
+      final resolvedUrl = posterUrl.startsWith('/') ? '${getApiBaseUrl()}$posterUrl' : posterUrl;
+      final ImageProvider provider = resolvedUrl.startsWith('assets/')
+          ? AssetImage(resolvedUrl)
+          : NetworkImage(resolvedUrl);
       provider.resolve(const ImageConfiguration()).addListener(
         ImageStreamListener(
           (_, _) {
@@ -103,9 +105,10 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     ImageStream? stream;
     ImageStreamListener? listener;
     try {
-      final ImageProvider provider = url.startsWith('assets/')
-          ? AssetImage(url)
-          : NetworkImage(url);
+      final resolvedUrl = url.startsWith('/') ? '${getApiBaseUrl()}$url' : url;
+      final ImageProvider provider = resolvedUrl.startsWith('assets/')
+          ? AssetImage(resolvedUrl)
+          : NetworkImage(resolvedUrl);
       
       stream = provider.resolve(const ImageConfiguration());
       listener = ImageStreamListener(
@@ -504,6 +507,24 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
       } else {
         state = const AsyncValue.data(null);
       }
+    }
+  }
+
+  Future<void> setActivePick(Recommendation recommendation) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final type = recommendation.mediaType;
+    final key = 'coda_active_pick_${type.name}';
+    _activePicks[type] = recommendation;
+    await prefs.setString(key, jsonEncode(recommendation.toJson()));
+    
+    // Clear buffer pick to force a new buffer pre-warm
+    final bufferKey = 'coda_buffer_pick_${type.name}';
+    await prefs.remove(bufferKey);
+    
+    final selectedType = ref.read(selectedMediaTypeProvider);
+    if (selectedType == type) {
+      state = AsyncValue.data(recommendation);
+      _startBackgroundTasksForActiveTab(ref.read(livingMemoryProvider), type, ref.read(activeMediaTypesProvider));
     }
   }
 }

@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
+import 'package:coda/src/core/providers/shared_preferences_provider.dart';
+import 'package:coda/src/core/providers/api_config.dart';
 
 class TasteProfileTabNotifier extends Notifier<String> {
   @override
@@ -77,7 +79,11 @@ class TasteProfileScreen extends ConsumerWidget {
                     child: Image(
                       image: activeRec.posterUrl!.startsWith('assets/')
                           ? AssetImage(activeRec.posterUrl!)
-                          : NetworkImage(activeRec.posterUrl!) as ImageProvider,
+                          : NetworkImage(
+                              activeRec.posterUrl!.startsWith('/')
+                                  ? '${getApiBaseUrl()}${activeRec.posterUrl!}'
+                                  : activeRec.posterUrl!,
+                            ) as ImageProvider,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
@@ -405,12 +411,13 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                                 }
                               },
                               onLater: () async {
-                                await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
-                                if (isLastTab) {
-                                  await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
-                                }
-                                if (context.mounted) context.go('/home');
-                              },
+                                 await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
+                                 await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
+                                 if (isLastTab) {
+                                   await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
+                                 }
+                                 if (context.mounted) context.go('/home');
+                               },
                               isLastTab: isLastTab,
                             ),
                           ),
@@ -453,12 +460,13 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                             }
                           },
                           onLater: () async {
-                                await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
-                                if (isLastTab) {
-                                  await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
-                                }
-                                if (context.mounted) context.go('/home');
-                              },
+                                 await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
+                                 await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
+                                 if (isLastTab) {
+                                   await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
+                                 }
+                                 if (context.mounted) context.go('/home');
+                               },
                           isLastTab: isLastTab,
                         ),
                       ),
