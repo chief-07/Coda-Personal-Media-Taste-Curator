@@ -3,11 +3,13 @@ import 'package:coda/src/features/ask/presentation/ask_coda_screen.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/home/presentation/home_screen.dart';
 import 'package:coda/src/features/home/presentation/pitch_screen.dart';
+import 'package:coda/src/features/home/presentation/media_detail_screen.dart';
 import 'package:coda/src/features/library/presentation/library_screen.dart';
 import 'package:coda/src/features/library/presentation/share_receive_screen.dart';
 import 'package:coda/src/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:coda/src/features/onboarding/presentation/taste_profile_screen.dart';
 import 'package:coda/src/features/session/presentation/current_session_screen.dart';
+import 'package:coda/src/features/session/presentation/session_completion_chat_screen.dart';
 import 'package:coda/src/features/shell/presentation/coda_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
@@ -95,6 +97,20 @@ final codaRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/session',
       builder: (context, state) => const CurrentSessionScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/session-chat',
+      builder: (context, state) => const SessionCompletionChatScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/detail/:id',
+      builder: (context, state) {
+        final recommendation = state.extra as Recommendation?;
+        if (recommendation == null) return const HomeScreen();
+        return MediaDetailScreen(recommendation: recommendation);
+      },
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,

@@ -349,7 +349,7 @@ class _PitchLayout extends StatelessWidget {
     final isKeyboardOpen = keyboardHeight > 0;
     final safeBottom = MediaQuery.of(context).padding.bottom;
     final bottomPadding = isKeyboardOpen
-        ? keyboardHeight + 83.0
+        ? 83.0
         : safeBottom + 150.0;
 
     return SingleChildScrollView(
@@ -583,7 +583,7 @@ class _PromptBar extends StatelessWidget {
     final safeBottom = MediaQuery.of(context).padding.bottom;
 
     final bottomPadding = isKeyboardOpen
-        ? keyboardHeight + 16.0
+        ? 16.0
         : safeBottom + 83.0;
 
     return Padding(

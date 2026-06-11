@@ -276,12 +276,14 @@ class _CardLayout extends ConsumerWidget {
                 ),
               )
             else ...[
-              const SizedBox(height: 16),
-              ...memory.watchlist.map((item) {
+              const SizedBox(height: 12),
+              ...memory.watchlist.asMap().entries.map((entry) {
+                final idx = entry.key;
+                final item = entry.value;
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(height: 35),
+                    if (idx > 0) const SizedBox(height: 28) else const SizedBox(height: 8),
                     _buildListItemRow(
                       item.title,
                       [item.mediaType, ...item.tags],
@@ -580,7 +582,7 @@ class _CardLayout extends ConsumerWidget {
     VoidCallback? onDelete,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.only(left: 24, right: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

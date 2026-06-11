@@ -171,7 +171,12 @@ class _CardLayout extends StatelessWidget {
                       opacity: 0, // Hidden in knockout layer
                       child: _buildPoster(),
                     )
-                  : _buildPoster(),
+                  : GestureDetector(
+                      onTap: () {
+                        context.push('/detail/${recommendation.id}', extra: recommendation);
+                      },
+                      child: _buildPoster(),
+                    ),
             ),
           ),
 
