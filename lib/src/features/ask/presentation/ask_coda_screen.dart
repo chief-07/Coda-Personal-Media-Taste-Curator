@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show File;
+import 'dart:math' as math;
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/api_config.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
@@ -27,18 +28,40 @@ import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart'
 // ═══════════════════════════════════════════════════════════════════════
 // Message model
 // ═══════════════════════════════════════════════════════════════════════
-class _AskChatMessage {
+class AskChatMessage {
   final String text;
   final bool isUser;
   /// If non-null, this Coda message came with a completed recommendation
   final Recommendation? recommendation;
 
-  _AskChatMessage({
+  AskChatMessage({
     required this.text,
     required this.isUser,
     this.recommendation,
   });
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// Session Persistence Provider
+// ═══════════════════════════════════════════════════════════════════════
+class AskChatSessionNotifier extends Notifier<List<AskChatMessage>> {
+  @override
+  List<AskChatMessage> build() {
+    return [];
+  }
+
+  void addMessage(AskChatMessage message) {
+    state = [...state, message];
+  }
+
+  void clearSession() {
+    state = [];
+  }
+}
+
+final askChatSessionProvider = NotifierProvider<AskChatSessionNotifier, List<AskChatMessage>>(
+  AskChatSessionNotifier.new,
+);
 
 // ═══════════════════════════════════════════════════════════════════════
 // Static intro recommendation used for the layout skeleton
@@ -79,7 +102,6 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
   final _chatController = TextEditingController();
   final _chatFocusNode = FocusNode();
 
-  final List<_AskChatMessage> _messages = [];
   bool _isLoading = false;
 
   final _audioRecorder = CodaAudioRecorder();
@@ -368,25 +390,24 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
     final text = _chatController.text.trim();
     if (text.isEmpty || _isLoading) return;
 
+    final chatHistory = ref.read(askChatSessionProvider).map((m) {
+      var text = m.text;
+      if (m.recommendation != null) {
+        text += '\n[System: Coda recommended the work: "${m.recommendation!.title}" (${m.recommendation!.mediaType.label})]';
+      }
+      return {'isUser': m.isUser, 'text': text};
+    }).toList();
+
+    ref.read(askChatSessionProvider.notifier).addMessage(
+      AskChatMessage(text: text, isUser: true),
+    );
+
     setState(() {
-      _messages.add(_AskChatMessage(text: text, isUser: true));
       _isLoading = true;
     });
     _chatController.clear();
     _chatFocusNode.unfocus();
     _scrollToBottom();
-
-    // Build chat history from previous messages (exclude the one just added)
-    final chatHistory = _messages
-        .sublist(0, _messages.length - 1)
-        .map((m) {
-          var text = m.text;
-          if (m.recommendation != null) {
-            text += '\n[System: Coda recommended the work: "${m.recommendation!.title}" (${m.recommendation!.mediaType.label})]';
-          }
-          return {'isUser': m.isUser, 'text': text};
-        })
-        .toList();
 
     try {
       final memory = ref.read(livingMemoryProvider);
@@ -405,7 +426,6 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
       if (status == 'success' && response['recommendation'] != null) {
         final recData = response['recommendation'] as Map<String, dynamic>;
         try {
-          // Build a RecommendationResult from backend data and convert to domain
           final result = RecommendationResult.fromJson(recData);
           recommendation = result.toDomain();
         } catch (e) {
@@ -413,22 +433,26 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
         }
       }
 
-      setState(() {
-        _messages.add(_AskChatMessage(
+      ref.read(askChatSessionProvider.notifier).addMessage(
+        AskChatMessage(
           text: message,
           isUser: false,
           recommendation: recommendation,
-        ));
+        ),
+      );
+      setState(() {
         _isLoading = false;
       });
       _scrollToBottom();
     } catch (e) {
       if (!mounted) return;
-      setState(() {
-        _messages.add(_AskChatMessage(
+      ref.read(askChatSessionProvider.notifier).addMessage(
+        AskChatMessage(
           text: "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
           isUser: false,
-        ));
+        ),
+      );
+      setState(() {
         _isLoading = false;
       });
       _scrollToBottom();
@@ -497,6 +521,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
   Widget build(BuildContext context) {
     const rec = _askRecommendation;
     final activeRec = ref.watch(homeRecommendationProvider).value;
+    final messages = ref.watch(askChatSessionProvider);
 
     return PopScope<Object?>(
       canPop: !_chatFocusNode.hasFocus,
@@ -608,7 +633,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
                                 recommendation: rec,
                                 isKnockoutLayer: true,
                                 scrollController: _maskScrollController,
-                                messages: _messages,
+                                messages: messages,
                                 isLoading: _isLoading,
                                 onSeeThePick: (_) {},
                               ),
@@ -642,7 +667,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
                             recommendation: rec,
                             isKnockoutLayer: false,
                             scrollController: _topScrollController,
-                            messages: _messages,
+                            messages: messages,
                             isLoading: _isLoading,
                             onSeeThePick: _seeThePick,
                           ),
@@ -745,7 +770,7 @@ class _PitchLayout extends StatelessWidget {
   final Recommendation recommendation;
   final bool isKnockoutLayer;
   final ScrollController scrollController;
-  final List<_AskChatMessage> messages;
+  final List<AskChatMessage> messages;
   final bool isLoading;
   final void Function(Recommendation rec) onSeeThePick;
 
@@ -1018,61 +1043,64 @@ class _PromptBar extends StatelessWidget {
         onPointerDown: isKnockoutLayer ? null : onPointerDown,
         onPointerUp: isKnockoutLayer ? null : onPointerUp,
         onPointerCancel: isKnockoutLayer ? null : onPointerCancel,
-        child: Container(
+        child: SizedBox(
           height: 51,
-          decoration: BoxDecoration(
-            color: isKnockoutLayer ? Colors.black : Colors.transparent,
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: Opacity(
-            opacity: isKnockoutLayer ? 0.0 : 1.0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              alignment: Alignment.centerLeft,
-              child: isRecording
-                  ? const Center(child: _SoundwaveAnimator())
-                  : Row(
-                      children: [
-                        Expanded(
-                          child: IgnorePointer(
-                            ignoring: isKnockoutLayer || !chatFocusNode.hasFocus,
-                            child: TextField(
-                              controller: isKnockoutLayer ? null : chatController,
-                              focusNode: isKnockoutLayer ? null : chatFocusNode,
-                              enabled: !isKnockoutLayer,
-                              style: GoogleFonts.inter(
-                                color: Colors.black.withValues(alpha: 0.8),
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: "Let's Talk",
-                                hintStyle: GoogleFonts.inter(
-                                  color: Colors.black.withValues(alpha: 0.7),
+          width: double.infinity,
+          child: isRecording
+              ? _SineWaveVisualizer(isKnockoutLayer: isKnockoutLayer)
+              : Container(
+                  decoration: BoxDecoration(
+                    color: isKnockoutLayer ? Colors.black : Colors.transparent,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Opacity(
+                    opacity: isKnockoutLayer ? 0.0 : 1.0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: IgnorePointer(
+                              ignoring: isKnockoutLayer || !chatFocusNode.hasFocus,
+                              child: TextField(
+                                controller: isKnockoutLayer ? null : chatController,
+                                focusNode: isKnockoutLayer ? null : chatFocusNode,
+                                enabled: !isKnockoutLayer,
+                                style: GoogleFonts.inter(
+                                  color: Colors.black.withValues(alpha: 0.8),
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
                                 ),
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.zero,
+                                decoration: InputDecoration(
+                                  hintText: "Let's Talk",
+                                  hintStyle: GoogleFonts.inter(
+                                    color: Colors.black.withValues(alpha: 0.7),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                onSubmitted: (_) => onSend(),
                               ),
-                              onSubmitted: (_) => onSend(),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        GestureDetector(
-                          onTap: onSend,
-                          child: Icon(
-                            PhosphorIconsFill.paperPlaneTilt,
-                            color: Colors.black.withValues(alpha: 0.7),
-                            size: 20,
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: onSend,
+                            child: Icon(
+                              PhosphorIconsFill.paperPlaneTilt,
+                              color: Colors.black.withValues(alpha: 0.7),
+                              size: 20,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-            ),
-          ),
+                  ),
+                ),
         ),
       ),
     );
@@ -1080,16 +1108,20 @@ class _PromptBar extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// Animated 3-peak soundwave widget
+// Animated waving sine wave visualizer widget
 // ═══════════════════════════════════════════════════════════════════════
-class _SoundwaveAnimator extends StatefulWidget {
-  const _SoundwaveAnimator();
+class _SineWaveVisualizer extends StatefulWidget {
+  const _SineWaveVisualizer({
+    required this.isKnockoutLayer,
+  });
+
+  final bool isKnockoutLayer;
 
   @override
-  State<_SoundwaveAnimator> createState() => _SoundwaveAnimatorState();
+  State<_SineWaveVisualizer> createState() => _SineWaveVisualizerState();
 }
 
-class _SoundwaveAnimatorState extends State<_SoundwaveAnimator>
+class _SineWaveVisualizerState extends State<_SineWaveVisualizer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
@@ -1098,8 +1130,11 @@ class _SoundwaveAnimatorState extends State<_SoundwaveAnimator>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..repeat();
+      duration: const Duration(milliseconds: 1200),
+    );
+    if (widget.isKnockoutLayer) {
+      _controller.repeat();
+    }
   }
 
   @override
@@ -1110,30 +1145,77 @@ class _SoundwaveAnimatorState extends State<_SoundwaveAnimator>
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.isKnockoutLayer) {
+      // Visible layer: just a transparent container to receive touch/events
+      return Container(
+        height: 51,
+        color: Colors.transparent,
+      );
+    }
+
+    // Knockout layer: paint the moving sine wave in black (BlendMode.srcOut subtracts it)
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: List.generate(3, (index) {
-            // Alternating staggered values for heights
-            double wavePhase = (_controller.value + (index * 0.33)) % 1.0;
-            // Map phase to height from 8 to 28
-            double height = 8.0 + (20.0 * (0.5 - (wavePhase - 0.5).abs()).abs() * 2.0);
-            
-            return Container(
-              width: 8,
-              height: height,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.7),
-                borderRadius: BorderRadius.circular(4),
-              ),
-            );
-          }),
+        final phase = _controller.value * 2.0 * math.pi;
+        return CustomPaint(
+          size: const Size(double.infinity, 51),
+          painter: _SineWavePainter(
+            phase: phase,
+            color: Colors.black,
+            strokeWidth: 3.0,
+          ),
         );
       },
     );
+  }
+}
+
+class _SineWavePainter extends CustomPainter {
+  final double phase;
+  final Color color;
+  final double strokeWidth;
+
+  _SineWavePainter({
+    required this.phase,
+    required this.color,
+    this.strokeWidth = 3.0,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path();
+    final midY = size.height / 2;
+    final width = size.width;
+
+    // 3 peaks (3 full cycles) across the width
+    final double frequency = (3.0 * 2.0 * math.pi) / width;
+    final double maxAmplitude = 15.0;
+
+    for (double x = 0.0; x <= width; x += 1.0) {
+      // Sine/Hann window to damp amplitude to 0 at edges
+      final double envelope = math.sin(math.pi * x / width);
+      final double y = midY + maxAmplitude * envelope * math.sin(frequency * x - phase);
+      if (x == 0.0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _SineWavePainter oldDelegate) {
+    return oldDelegate.phase != phase ||
+        oldDelegate.color != color ||
+        oldDelegate.strokeWidth != strokeWidth;
   }
 }

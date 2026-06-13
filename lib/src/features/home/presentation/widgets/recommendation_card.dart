@@ -510,24 +510,27 @@ class _PosterWithTrailerState extends State<_PosterWithTrailer> with SingleTicke
               // 2. YouTube Trailer (rendered if playing)
               if (widget.isPlayingTrailer && hasTrailer)
                 Positioned.fill(
-                  child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: 320,
-                      height: 180,
-                      child: CodaYoutubePlayer(
-                        videoId: widget.recommendation.trailerUrl!,
-                        autoPlay: true,
-                        showControls: false,
-                        mute: false,
-                        loop: true,
-                        onReady: () {
-                          if (mounted) {
-                            setState(() {
-                              _isPlayerReady = true;
-                            });
-                          }
-                        },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: FittedBox(
+                      fit: BoxFit.cover,
+                      child: SizedBox(
+                        width: 320,
+                        height: 180,
+                        child: CodaYoutubePlayer(
+                          videoId: widget.recommendation.trailerUrl!,
+                          autoPlay: true,
+                          showControls: false,
+                          mute: false,
+                          loop: true,
+                          onReady: () {
+                            if (mounted) {
+                              setState(() {
+                                _isPlayerReady = true;
+                              });
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ),
