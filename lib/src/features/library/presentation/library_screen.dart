@@ -62,14 +62,50 @@ class LibraryScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 Expanded(
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 250),
                     layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
                       return Stack(
                         fit: StackFit.expand,
                         children: <Widget>[
+                          if (previousChildren.isNotEmpty)
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(64),
+                              ),
+                              child: ShaderMask(
+                                shaderCallback: (Rect bounds) {
+                                  return LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.black.withValues(alpha: 0.35),
+                                      Colors.black.withValues(alpha: 0.35),
+                                      Colors.black.withValues(alpha: 0.20),
+                                    ],
+                                    stops: const [0.0, 0.65, 1.0],
+                                  ).createShader(bounds);
+                                },
+                                blendMode: BlendMode.srcOut,
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: Container(
+                                        color: Colors.black.withValues(alpha: 0.01),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ...previousChildren,
                           if (currentChild != null) currentChild,
                         ],
+                      );
+                    },
+                    transitionBuilder: (Widget child, Animation<double> animation) {
+                      return FadeBlurTransition(
+                        animation: animation,
+                        child: child,
                       );
                     },
                     child: LibraryCard(
@@ -505,6 +541,41 @@ class AddMediaDialogContentState extends State<AddMediaDialogContent> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class FadeBlurTransition extends StatelessWidget {
+  const FadeBlurTransition({
+    super.key,
+    required this.animation,
+    required this.child,
+  });
+
+  final Animation<double> animation;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        final double opacity = animation.value;
+        final double blur = kIsWeb ? 0.0 : (1.0 - animation.value) * 12.0;
+
+        Widget result = child!;
+        if (opacity < 1.0 && blur > 0.1) {
+          result = ImageFiltered(
+            imageFilter: dart_ui.ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+            child: result,
+          );
+        }
+        return Opacity(
+          opacity: opacity,
+          child: result,
+        );
+      },
+      child: child,
     );
   }
 }

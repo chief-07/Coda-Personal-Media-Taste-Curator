@@ -4,6 +4,7 @@ import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
+import 'package:coda/src/features/recommendation/application/audio_player_controller.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/core/providers/api_config.dart';
@@ -58,7 +59,7 @@ final activeMediaTypesProvider = Provider<List<MediaType>>((ref) {
                '${normalizedTypeLabel}s' == normalizedLabel ||
                normalizedTypeName == normalizedLabel;
       },
-      orElse: () => MediaType.movie,
+      orElse: () => MediaType.custom(label),
     );
   }).toSet().toList();
 });
@@ -159,6 +160,18 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     final activeTypes = ref.watch(activeMediaTypesProvider);
     final prefs = ref.watch(sharedPreferencesProvider);
 
+    // One-time cache migration: Clear stale recommendation cache that has missing/null trailerUrl
+    const migrationKey = 'coda_recommendation_cache_migrated_v4';
+    final hasMigrated = prefs.getBool(migrationKey) ?? false;
+    if (!hasMigrated) {
+      print('[Cache Migration] Clearing stale recommendation cache (active picks & queues) for v4 updates...');
+      for (final type in MediaType.values) {
+        await prefs.remove('coda_active_pick_${type.name}');
+        await prefs.remove('coda_recommendation_queue_${type.name}');
+      }
+      await prefs.setBool(migrationKey, true);
+    }
+
     // 1. Load queues from SharedPreferences if not already in memory
     for (final type in activeTypes) {
       if (_queues[type] == null) {
@@ -220,18 +233,28 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
       }
     }
 
-    // 5. Fetch new recommendations (with loading state)
-    final recs = await _fetchNewRecommendations(memory, selectedType);
-    if (recs.isNotEmpty) {
-      final active = recs.removeAt(0);
-      _activePicks[selectedType] = active;
-      await prefs.setString(key, jsonEncode(active.toJson()));
-      
-      _queues[selectedType] = recs;
-      await _saveQueue(selectedType);
+    // 5. Fetch new recommendations — retry up to 3 times before giving up
+    const maxRetries = 3;
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      final recs = await _fetchNewRecommendations(memory, selectedType);
+      if (recs.isNotEmpty) {
+        final active = recs.removeAt(0);
+        _activePicks[selectedType] = active;
+        await prefs.setString(key, jsonEncode(active.toJson()));
 
-      _startBackgroundTasksForActiveTab(memory, selectedType, activeTypes);
-      return active;
+        _queues[selectedType] = recs;
+        await _saveQueue(selectedType);
+
+        _startBackgroundTasksForActiveTab(memory, selectedType, activeTypes);
+        return active;
+      }
+
+      if (attempt < maxRetries) {
+        debugPrint('[Rec] Empty response for ${selectedType.name} (attempt $attempt/$maxRetries), retrying in 2s...');
+        await Future.delayed(const Duration(seconds: 2));
+      } else {
+        debugPrint('[Rec] No recommendations found for ${selectedType.name} after $maxRetries attempts.');
+      }
     }
     return null;
   }
@@ -285,6 +308,9 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
           fitSignals: active.fitSignals,
           posterGradient: active.posterGradient,
           releaseYear: active.releaseYear,
+          ostUrl: active.ostUrl,
+          trailerUrl: active.trailerUrl,
+          studio: active.studio,
         );
         _activePicks[type] = updated;
 
@@ -351,6 +377,9 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
           if (!_isExcluded(rec.title, memory)) {
             _activePicks[type] = rec;
             _precachePoster(rec.posterUrl);
+            if (rec.ostUrl != null && rec.ostUrl!.isNotEmpty) {
+              ref.read(audioPlayerControllerProvider.notifier).precacheAudio(rec.ostUrl!);
+            }
             
             final queue = _queues[type] ?? [];
             if (queue.length < 2) {
@@ -375,6 +404,9 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
         await prefs.setString(key, jsonEncode(first.toJson()));
         await _saveQueue(type);
         _precachePoster(first.posterUrl);
+        if (first.ostUrl != null && first.ostUrl!.isNotEmpty) {
+          ref.read(audioPlayerControllerProvider.notifier).precacheAudio(first.ostUrl!);
+        }
         return;
       }
 
@@ -416,6 +448,12 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
           .where((rec) => !_isExcluded(rec.title, memory))
           .toList();
       
+      for (final rec in newRecs) {
+        if (rec.ostUrl != null && rec.ostUrl!.isNotEmpty) {
+          ref.read(audioPlayerControllerProvider.notifier).precacheAudio(rec.ostUrl!);
+        }
+      }
+      
       final currentQueue = _queues[type] ?? [];
       final updatedQueue = [...currentQueue, ...newRecs];
       _queues[type] = updatedQueue;
@@ -455,9 +493,16 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
           .toList();
 
       if (recs.isNotEmpty) {
-        await _precacheImageAndWait(recs.first.posterUrl);
+        await Future.wait<void>([
+          _precacheImageAndWait(recs.first.posterUrl),
+          if (recs.first.ostUrl != null && recs.first.ostUrl!.isNotEmpty)
+            ref.read(audioPlayerControllerProvider.notifier).precacheAudio(recs.first.ostUrl!),
+        ]);
         if (recs.length > 1) {
           _precachePoster(recs[1].posterUrl);
+          if (recs[1].ostUrl != null && recs[1].ostUrl!.isNotEmpty) {
+            ref.read(audioPlayerControllerProvider.notifier).precacheAudio(recs[1].ostUrl!);
+          }
         }
       }
       return recs;
@@ -527,6 +572,19 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
       _startBackgroundTasksForActiveTab(ref.read(livingMemoryProvider), type, ref.read(activeMediaTypesProvider));
     }
   }
+
+  Future<void> clearActivePick() async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    _activePicks.clear();
+    _queues.clear();
+    _isRefilling.clear();
+    _isPreWarming.clear();
+    for (final type in MediaType.values) {
+      await prefs.remove('coda_active_pick_${type.name}');
+      await prefs.remove('coda_recommendation_queue_${type.name}');
+    }
+    state = const AsyncValue.data(null);
+  }
 }
 
 final homeRecommendationProvider = AsyncNotifierProvider<HomeRecommendationNotifier, Recommendation?>(
@@ -562,10 +620,8 @@ class SelectedMediaType extends Notifier<MediaType> {
     final savedTypeName = prefs.getString('coda_selected_media_type');
     if (savedTypeName != null) {
       try {
-        final savedType = MediaType.values.firstWhere((e) => e.name == savedTypeName);
-        if (activeTypes.contains(savedType)) {
-          return savedType;
-        }
+        final savedType = activeTypes.firstWhere((e) => e.name == savedTypeName);
+        return savedType;
       } catch (_) {}
     }
     return activeTypes.isNotEmpty ? activeTypes.first : MediaType.movie;
@@ -580,10 +636,37 @@ class SelectedMediaType extends Notifier<MediaType> {
 class ActiveSession extends Notifier<Recommendation?> {
   @override
   Recommendation? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final jsonStr = prefs.getString('coda_active_session_recommendation');
+    if (jsonStr != null) {
+      try {
+        final Map<String, dynamic> decoded = jsonDecode(jsonStr) as Map<String, dynamic>;
+        return Recommendation.fromJson(decoded);
+      } catch (e) {
+        debugPrint('Error decoding active session: $e');
+      }
+    }
     return null;
   }
 
   void start(Recommendation recommendation) {
     state = recommendation;
+    try {
+      ref.read(sharedPreferencesProvider).setString(
+        'coda_active_session_recommendation',
+        jsonEncode(recommendation.toJson()),
+      );
+    } catch (e) {
+      debugPrint('Error saving active session: $e');
+    }
+  }
+
+  void clear() {
+    state = null;
+    try {
+      ref.read(sharedPreferencesProvider).remove('coda_active_session_recommendation');
+    } catch (e) {
+      debugPrint('Error clearing active session: $e');
+    }
   }
 }

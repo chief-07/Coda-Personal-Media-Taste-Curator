@@ -1,4 +1,5 @@
 import 'dart:ui' as dart_ui;
+import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/onboarding/application/taste_profile_controller.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/core/providers/api_config.dart';
+import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
 
 class TasteProfileTabNotifier extends Notifier<String> {
   @override
@@ -20,7 +22,9 @@ class TasteProfileTabNotifier extends Notifier<String> {
 final tasteProfileTabProvider = NotifierProvider<TasteProfileTabNotifier, String>(TasteProfileTabNotifier.new);
 
 class TasteProfileScreen extends ConsumerWidget {
-  const TasteProfileScreen({super.key});
+  const TasteProfileScreen({this.customCategory, super.key});
+
+  final String? customCategory;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,10 +39,13 @@ class TasteProfileScreen extends ConsumerWidget {
       orElse: () => ChatMessage(chips: [], isUser: false),
     );
     final chips = lastChipsMessage.chips ?? [];
-    final tabsList = ['You', ...chips];
+    
+    final List<String> tabsList = customCategory != null 
+        ? [customCategory!] 
+        : ['You', ...chips];
 
-    // If selectedTab is not in tabsList (e.g. state reset or out of bounds), default to 'You'
-    final activeTab = tabsList.contains(selectedTab) ? selectedTab : 'You';
+    // Default active tab to customCategory if present, otherwise default to 'You'
+    final activeTab = tabsList.contains(selectedTab) ? selectedTab : tabsList.first;
 
     return Scaffold(
       backgroundColor: const Color(0xFF101114),
@@ -109,12 +116,51 @@ class TasteProfileScreen extends ConsumerWidget {
             bottom: false,
             child: Column(
               children: [
-                const SizedBox(height: 24),
-                TasteProfileTabBar(
-                  selected: activeTab,
-                  onSelected: (tab) => ref.read(tasteProfileTabProvider.notifier).setTab(tab),
-                  tabs: tabsList,
-                ),
+                if (customCategory != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () => context.pop(),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withValues(alpha: 0.07),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.12),
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          customCategory!,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(width: 40),
+                      ],
+                    ),
+                  )
+                else ...[
+                  const SizedBox(height: 24),
+                  TasteProfileTabBar(
+                    selected: activeTab,
+                    onSelected: (tab) => ref.read(tasteProfileTabProvider.notifier).setTab(tab),
+                    tabs: tabsList,
+                  ),
+                ],
                 const SizedBox(height: 16),
                 Expanded(
                   child: AnimatedSwitcher(
@@ -411,13 +457,15 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                                 }
                               },
                               onLater: () async {
-                                 await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
-                                 await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
-                                 if (isLastTab) {
-                                   await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
-                                 }
-                                 if (context.mounted) context.go('/home');
-                               },
+                                  await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
+                                  await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
+                                  if (isLastTab) {
+                                    await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
+                                  }
+                                  final customType = MediaType.custom(widget.tab);
+                                  ref.read(selectedMediaTypeProvider.notifier).select(customType);
+                                  if (context.mounted) context.go('/home');
+                                },
                               isLastTab: isLastTab,
                             ),
                           ),
@@ -465,6 +513,8 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                                  if (isLastTab) {
                                    await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
                                  }
+                                 final customType = MediaType.custom(widget.tab);
+                                 ref.read(selectedMediaTypeProvider.notifier).select(customType);
                                  if (context.mounted) context.go('/home');
                                },
                           isLastTab: isLastTab,
@@ -574,9 +624,11 @@ class _CardLayout extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     )
-                  : Opacity(
-                      opacity: 0,
-                      child: const SizedBox(width: 45, height: 45),
+                  : Image.asset(
+                      'assets/images/coda_logo.png',
+                      width: 45,
+                      height: 45,
+                      fit: BoxFit.contain,
                     ),
             ),
 
@@ -633,10 +685,14 @@ class _CardLayout extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
                 child: isKnockoutLayer
-                    ? _buildBodyText('Coda is thinking...', Colors.black)
-                    : Opacity(
-                        opacity: 0,
-                        child: _buildBodyText('Coda is thinking...', Colors.white),
+                    ? Icon(
+                        PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
+                        color: Colors.black,
+                        size: 28,
+                      )
+                    : const SparkleLoader(
+                        color: Colors.white,
+                        size: 28,
                       ),
               ),
 

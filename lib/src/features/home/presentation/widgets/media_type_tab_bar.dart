@@ -8,11 +8,15 @@ class MediaTypeTabBar extends StatefulWidget {
     required this.types,
     required this.selected,
     required this.onSelected,
+    this.onAddType,
+    this.onDeleteType,
   });
 
   final List<MediaType> types;
   final MediaType selected;
   final ValueChanged<MediaType> onSelected;
+  final ValueChanged<String>? onAddType;
+  final ValueChanged<MediaType>? onDeleteType;
 
   @override
   State<MediaTypeTabBar> createState() => _MediaTypeTabBarState();
@@ -20,7 +24,10 @@ class MediaTypeTabBar extends StatefulWidget {
 
 class _MediaTypeTabBarState extends State<MediaTypeTabBar> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _textController = TextEditingController();
+  final FocusNode _addFocusNode = FocusNode();
   bool _isScrolled = false;
+  bool _isAdding = false;
 
   @override
   void initState() {
@@ -38,6 +45,8 @@ class _MediaTypeTabBarState extends State<MediaTypeTabBar> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _textController.dispose();
+    _addFocusNode.dispose();
     super.dispose();
   }
 
@@ -70,10 +79,12 @@ class _MediaTypeTabBarState extends State<MediaTypeTabBar> {
             children: [
               for (var i = 0; i < widget.types.length; i++) ...[
                 _buildTab(widget.types[i], widget.types[i] == widget.selected),
-                if (i < widget.types.length - 1)
-                  const SizedBox(
-                    width: 0,
-                  ), // Total spacing 32px (16 padding + 0 gap + 16 padding)
+              ],
+              if (widget.onAddType != null) ...[
+                if (_isAdding)
+                  _buildAddField()
+                else
+                  _buildPlusButton(),
               ],
               const SizedBox(width: 32),
             ],
@@ -83,11 +94,101 @@ class _MediaTypeTabBarState extends State<MediaTypeTabBar> {
     );
   }
 
+  Widget _buildPlusButton() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isAdding = true;
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _addFocusNode.requestFocus();
+        });
+      },
+      child: Container(
+        width: 32,
+        height: 32,
+        margin: const EdgeInsets.only(left: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white60,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddField() {
+    return Container(
+      width: 150,
+      height: 32,
+      margin: const EdgeInsets.only(left: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _textController,
+              focusNode: _addFocusNode,
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              decoration: const InputDecoration(
+                hintText: 'New...',
+                hintStyle: TextStyle(color: Colors.white30, fontSize: 13),
+                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                border: InputBorder.none,
+                isDense: true,
+              ),
+              textInputAction: TextInputAction.done,
+              onSubmitted: (val) {
+                if (val.trim().isNotEmpty) {
+                  widget.onAddType?.call(val.trim());
+                  setState(() {
+                    _isAdding = false;
+                    _textController.clear();
+                  });
+                }
+              },
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isAdding = false;
+                _textController.clear();
+              });
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Icon(Icons.close, color: Colors.white30, size: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTab(MediaType type, bool isSelected) {
     final label = type == MediaType.visualNovel ? 'Visual Novel' : type.label;
 
     return GestureDetector(
       onTap: () => widget.onSelected(type),
+      onLongPress: widget.onDeleteType != null ? () => widget.onDeleteType!(type) : null,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: isSelected

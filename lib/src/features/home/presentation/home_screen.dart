@@ -12,6 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+import 'package:coda/src/core/providers/shared_preferences_provider.dart';
+import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -37,6 +40,134 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void _onTypeSelected(MediaType type) {
     ref.read(selectedMediaTypeProvider.notifier).select(type);
     setState(() => _dragOffset = 0);
+  }
+
+  void _onDeleteType(MediaType type) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
+      builder: (dialogCtx) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF16181C).withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Remove Category?',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Are you sure you want to remove "${type == MediaType.visualNovel ? "Visual Novel" : type.label}" from your tabs? You can add it back later.',
+                  style: GoogleFonts.inter(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogCtx).pop(),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.inter(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () async {
+                        Navigator.of(dialogCtx).pop();
+                        await _performDeleteType(type);
+                      },
+                      child: Text(
+                        'Remove',
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFFFF3B5C),
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _performDeleteType(MediaType type) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final currentChips = prefs.getStringList('coda_onboarding_chips') ?? [];
+    
+    final normalizedTarget = (type == MediaType.visualNovel ? 'Visual Novel' : type.label).replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
+    
+    final updatedChips = currentChips.where((chip) {
+      final normalizedChip = chip.replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
+      return normalizedChip != normalizedTarget;
+    }).toList();
+
+    if (updatedChips.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('You must keep at least one category.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
+
+    await prefs.setStringList('coda_onboarding_chips', updatedChips);
+    
+    // Invalidate onboarding controller to reload chips
+    ref.invalidate(onboardingControllerProvider);
+
+    // If we deleted the currently selected tab, select the first remaining active tab
+    final activeTypes = ref.read(activeMediaTypesProvider);
+    if (type == ref.read(selectedMediaTypeProvider)) {
+      final remainingTypes = activeTypes.where((t) => t != type).toList();
+      if (remainingTypes.isNotEmpty) {
+        _onTypeSelected(remainingTypes.first);
+      }
+    }
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Removed "${type == MediaType.visualNovel ? "Visual Novel" : type.label}" category.'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   // LEFT SWIPE (DEEP) — "Not for me" + open reasons sheet
@@ -285,6 +416,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         types: activeTypes,
                         selected: selectedType,
                         onSelected: _onTypeSelected,
+                        onDeleteType: _onDeleteType,
+                        onAddType: (newCategory) async {
+                          final prefs = ref.read(sharedPreferencesProvider);
+                          final currentChips = prefs.getStringList('coda_onboarding_chips') ?? [];
+                          if (!currentChips.contains(newCategory)) {
+                            final updatedChips = [...currentChips, newCategory];
+                            await prefs.setStringList('coda_onboarding_chips', updatedChips);
+                          }
+                          
+                          // Reload the Onboarding state to refresh chips list
+                          ref.invalidate(onboardingControllerProvider);
+                          
+                          // Navigate to Taste Profile Onboarding screen specifically for this custom category
+                          if (context.mounted) {
+                            context.push('/taste-profile?customCategory=$newCategory');
+                          }
+                        },
                       ),
                     ),
                     const _MusicTogglePill(),
@@ -293,21 +441,112 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: rec.when(
-                    data: (data) {
-                      if (data == null) {
-                        return Center(
-                          child: Text(
-                            'No recommendation for ${selectedType.label} yet.',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.4),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: <Widget>[
+                          ...previousChildren,
+                          if (currentChild != null) currentChild,
+                        ],
+                      );
+                    },
+                    transitionBuilder: (Widget child, Animation<double> animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                    child: rec.when(
+                      data: (data) {
+                        if (data == null) {
+                          return StaticCardFrame(
+                            key: ValueKey('${selectedType.name}_empty'),
+                            child: Center(
+                              child: Text(
+                                'No recommendation for ${selectedType.label} yet.',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.4),
+                                ),
+                              ),
                             ),
-                          ),
-                        );
-                      }
+                          );
+                        }
 
-                      if (data.mediaType != selectedType) {
-                        return Center(
+                        if (data.mediaType != selectedType) {
+                          return StaticCardFrame(
+                            key: ValueKey('${selectedType.name}_thinking'),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const CircularProgressIndicator(
+                                      color: Colors.white54),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Coda is curating...',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.5),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        return _SwipeableCard(
+                          key: ValueKey('${selectedType.name}_loaded_${data.id}'),
+                          recommendation: data,
+                          dragOffset: _dragOffset,
+                          isAnimatingOut: _isAnimatingOut,
+                          isDeepSwipeAnimating: _isDeepSwipeAnimating,
+                          swipeThreshold: _swipeThreshold,
+                          onDragUpdate: (dx) {
+                            if (!_isAnimatingOut) {
+                              final oldOffset = _dragOffset;
+                              final newOffset = _dragOffset + dx;
+                              final oldLevel = _calculateSwipeLevel(oldOffset);
+                              final newLevel = _calculateSwipeLevel(newOffset);
+                              
+                              if (oldLevel != newLevel && newLevel > 0) {
+                                if (newLevel == 1) {
+                                  HapticFeedback.selectionClick();
+                                } else if (newLevel == 2) {
+                                  HapticFeedback.mediumImpact();
+                                }
+                              }
+                              setState(() => _dragOffset = newOffset);
+                            }
+                          },
+                          onDragEnd: () {
+                            if (_isAnimatingOut) return;
+                            if (_dragOffset <= -160) {
+                              setState(() => _isDeepSwipeAnimating = true);
+                              _onSwipeLeft(data); // Deep Left: open feedback reasons sheet
+                            } else if (_dragOffset <= -80) {
+                              setState(() => _isDeepSwipeAnimating = false);
+                              _onSwipeLeftQuick(data); // Moderate Left: quick silent skip
+                            } else if (_dragOffset >= 160) {
+                              setState(() => _isDeepSwipeAnimating = true);
+                              _onSwipeRightLoved(data); // Deep Right: Loved it!
+                            } else if (_dragOffset >= 80) {
+                              setState(() => _isDeepSwipeAnimating = false);
+                              _onSwipeRight(data); // Moderate Right: Seen it quick skip
+                            } else {
+                              setState(() {
+                                _dragOffset = 0;
+                                _isDeepSwipeAnimating = false;
+                              });
+                            }
+                          },
+                        );
+                      },
+                      loading: () => StaticCardFrame(
+                        key: ValueKey('${selectedType.name}_loading'),
+                        child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -315,85 +554,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   color: Colors.white54),
                               const SizedBox(height: 16),
                               Text(
-                                'Coda is thinking...',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.5),
-                                  fontSize: 16,
-                                ),
-                              ),
+                                    'Coda is curating...',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.5),
+                                      fontSize: 16,
+                                    ),
+                                  ),
                             ],
                           ),
-                        );
-                      }
-
-                      return _SwipeableCard(
-                        recommendation: data,
-                        dragOffset: _dragOffset,
-                        isAnimatingOut: _isAnimatingOut,
-                        isDeepSwipeAnimating: _isDeepSwipeAnimating,
-                        swipeThreshold: _swipeThreshold,
-                        onDragUpdate: (dx) {
-                          if (!_isAnimatingOut) {
-                            final oldOffset = _dragOffset;
-                            final newOffset = _dragOffset + dx;
-                            final oldLevel = _calculateSwipeLevel(oldOffset);
-                            final newLevel = _calculateSwipeLevel(newOffset);
-                            
-                            if (oldLevel != newLevel && newLevel > 0) {
-                              if (newLevel == 1) {
-                                HapticFeedback.selectionClick();
-                              } else if (newLevel == 2) {
-                                HapticFeedback.mediumImpact();
-                              }
-                            }
-                            setState(() => _dragOffset = newOffset);
-                          }
-                        },
-                        onDragEnd: () {
-                          if (_isAnimatingOut) return;
-                          if (_dragOffset <= -160) {
-                            setState(() => _isDeepSwipeAnimating = true);
-                            _onSwipeLeft(data); // Deep Left: open feedback reasons sheet
-                          } else if (_dragOffset <= -80) {
-                            setState(() => _isDeepSwipeAnimating = false);
-                            _onSwipeLeftQuick(data); // Moderate Left: quick silent skip
-                          } else if (_dragOffset >= 160) {
-                            setState(() => _isDeepSwipeAnimating = true);
-                            _onSwipeRightLoved(data); // Deep Right: Loved it!
-                          } else if (_dragOffset >= 80) {
-                            setState(() => _isDeepSwipeAnimating = false);
-                            _onSwipeRight(data); // Moderate Right: Seen it quick skip
-                          } else {
-                            setState(() {
-                              _dragOffset = 0;
-                              _isDeepSwipeAnimating = false;
-                            });
-                          }
-                        },
-                      );
-                    },
-                    loading: () => Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const CircularProgressIndicator(
-                              color: Colors.white54),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Coda is thinking...',
+                        ),
+                      ),
+                      error: (e, st) => StaticCardFrame(
+                        key: ValueKey('${selectedType.name}_error'),
+                        child: Center(
+                          child: Text(
+                            "Couldn't fetch a pick right now.",
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              fontSize: 16,
+                              color: Colors.white.withValues(alpha: 0.4),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    error: (e, st) => Center(
-                      child: Text(
-                        "Couldn't fetch a pick right now.",
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.4),
                         ),
                       ),
                     ),
@@ -401,6 +580,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StaticCardFrame extends StatelessWidget {
+  const StaticCardFrame({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(
+        top: Radius.circular(64),
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ShaderMask(
+              shaderCallback: (Rect bounds) {
+                return LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.75),
+                    Colors.black.withValues(alpha: 0.75),
+                    Colors.black.withValues(alpha: 0.50),
+                  ],
+                  stops: const [0.0, 0.65, 1.0],
+                ).createShader(bounds);
+              },
+              blendMode: BlendMode.srcOut,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.black.withValues(alpha: 0.01),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: child,
           ),
         ],
       ),
@@ -421,6 +648,7 @@ class _SwipeableCard extends StatelessWidget {
     required this.swipeThreshold,
     required this.onDragUpdate,
     required this.onDragEnd,
+    super.key,
   });
 
   final Recommendation recommendation;

@@ -22,6 +22,7 @@ const mockRecommendations = [
     ],
     posterGradient: [Color(0xFF1A1228), Color(0xFF3D2B5A), Color(0xFF6B5B7B)],
     releaseYear: '1998',
+    studio: 'Triangle Staff',
     posterUrl: 'assets/lain.jpg',
   ),
   Recommendation(
@@ -44,6 +45,7 @@ const mockRecommendations = [
     posterGradient: [Color(0xFF0D1B2A), Color(0xFF1B3A4B), Color(0xFFC8956C)],
     posterUrl: 'assets/interstellar.jpg',
     releaseYear: '2014',
+    studio: 'Syncopy',
     pitch: [
       'Trust me, this one is very you.',
       'It has the huge sci-fi ideas, the impossible stakes, the beautiful score, all of that. But the reason I think you will really get it is because underneath the space stuff, it is made for people who feel things deeply.',
@@ -71,6 +73,7 @@ const mockRecommendations = [
     ],
     posterGradient: [Color(0xFF27212D), Color(0xFF6F3B44), Color(0xFFD0A95F)],
     releaseYear: '2012',
+    studio: 'Novectacle',
   ),
   Recommendation(
     id: 'manga-1',
@@ -91,6 +94,7 @@ const mockRecommendations = [
     ],
     posterGradient: [Color(0xFF1C1C1C), Color(0xFF3A3A3A), Color(0xFF8C7B6B)],
     releaseYear: '2007',
+    studio: 'Shogakukan',
   ),
   Recommendation(
     id: 'game-1',
@@ -111,6 +115,7 @@ const mockRecommendations = [
     ],
     posterGradient: [Color(0xFF0B1628), Color(0xFF1B4332), Color(0xFFE8A849)],
     releaseYear: '2019',
+    studio: 'Mobius Digital',
   ),
   Recommendation(
     id: 'music-1',
@@ -131,6 +136,7 @@ const mockRecommendations = [
     ],
     posterGradient: [Color(0xFF1A1A2E), Color(0xFF4A3F6B), Color(0xFFD4C5F9)],
     releaseYear: '2001',
+    studio: 'One Little Independent',
   ),
 ];
 

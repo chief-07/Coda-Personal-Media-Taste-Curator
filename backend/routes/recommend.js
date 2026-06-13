@@ -440,10 +440,18 @@ const runRecommendationPipeline = async (payload) => {
   console.log(`[Recommend]   Selected picks: ${JSON.stringify(finalPicks.map(p => p.title))}`);
 
   // ── Step 4: Asset Retrieval (Parallelized) ───────────────────────────────
-  console.log('[Recommend] → Step 4: Fetching posters and OSTs in parallel...');
+  console.log('[Recommend] → Step 4: Fetching posters, OSTs, metadata in parallel...');
   const resolvedPicks = await Promise.all(finalPicks.map(async (pick) => {
+    const candidateMeta = cleanCandidates.find(c => c.title === pick.title);
     try {
-      let { poster_url, ost_url } = await mediaService.fetchAssets(pick.title, media_type);
+      // Fetch media assets (poster/OST/trailer) and LLM metadata in parallel —
+      // they are fully independent and parallelising them halves per-pick latency.
+      const [assetsResult, llmMeta] = await Promise.all([
+        mediaService.fetchAssets(pick.title, media_type),
+        llmService.fetchMetadataViaLLM(pick.title, media_type).catch(() => null),
+      ]);
+
+      let { poster_url, ost_url, trailer_url } = assetsResult;
       
       // Watchlist item fallbacks if assets are empty or placeholder
       if (isDirectWatchlistRecommend && directWatchlistItem && directWatchlistItem.title === pick.title) {
@@ -453,11 +461,13 @@ const runRecommendationPipeline = async (payload) => {
         if (!ost_url) {
           ost_url = directWatchlistItem.ostUrl || directWatchlistItem.ost_url || ost_url;
         }
+        if (!trailer_url) {
+          trailer_url = directWatchlistItem.trailerUrl || directWatchlistItem.trailer_url || '';
+        }
       }
 
       let finalPosterUrl = poster_url;
       // Fallback: If mediaService did not find a poster or returned placeholder, use the metadata API image
-      const candidateMeta = cleanCandidates.find(c => c.title === pick.title);
       if ((!finalPosterUrl || finalPosterUrl.includes('placeholder')) && candidateMeta?.image) {
         finalPosterUrl = candidateMeta.image;
         console.log(`[Recommend]   Using metadata cover image fallback for "${pick.title}": ${finalPosterUrl}`);
@@ -466,27 +476,35 @@ const runRecommendationPipeline = async (payload) => {
       if (finalPosterUrl && finalPosterUrl.startsWith('http') && !finalPosterUrl.includes('localhost') && !finalPosterUrl.includes('127.0.0.1')) {
         finalPosterUrl = `/api/recommend/proxy-image?url=${encodeURIComponent(finalPosterUrl)}`;
       }
+
       return {
         title: pick.title,
         media_type: media_type,
         coda_blurb: pick.coda_blurb,
         pitch_paragraphs: [],
         poster_url: finalPosterUrl,
-        ost_url
+        ost_url,
+        trailer_url: trailer_url || '',
+        description: llmMeta?.description || candidateMeta?.description || pick.title,
+        genres: llmMeta?.genres || candidateMeta?.genres || [],
+        tags: llmMeta?.tags || candidateMeta?.tags || [],
+        release_year: llmMeta?.release_year || '',
+        studio: llmMeta?.studio || ''
       };
     } catch (err) {
       console.error(`Asset fetch failed for "${pick.title}":`, err.message);
       
       let finalPosterUrl = '';
       let finalOstUrl = '';
+      let finalTrailerUrl = '';
 
       if (isDirectWatchlistRecommend && directWatchlistItem && directWatchlistItem.title === pick.title) {
         finalPosterUrl = directWatchlistItem.posterUrl || directWatchlistItem.poster_url || '';
         finalOstUrl = directWatchlistItem.ostUrl || directWatchlistItem.ost_url || '';
-        console.log(`[Recommend]   Direct watchlist asset fallback triggered: poster=${finalPosterUrl}, ost=${finalOstUrl}`);
+        finalTrailerUrl = directWatchlistItem.trailerUrl || directWatchlistItem.trailer_url || '';
+        console.log(`[Recommend]   Direct watchlist asset fallback triggered: poster=${finalPosterUrl}, ost=${finalOstUrl}, trailer=${finalTrailerUrl}`);
       }
 
-      const candidateMeta = cleanCandidates.find(c => c.title === pick.title);
       if (!finalPosterUrl && candidateMeta?.image) {
         finalPosterUrl = candidateMeta.image;
       }
@@ -495,13 +513,21 @@ const runRecommendationPipeline = async (payload) => {
         finalPosterUrl = `/api/recommend/proxy-image?url=${encodeURIComponent(finalPosterUrl)}`;
       }
 
+      const llmMeta = await llmService.fetchMetadataViaLLM(pick.title, media_type).catch(() => null);
+
       return {
         title: pick.title,
         media_type: media_type,
         coda_blurb: pick.coda_blurb,
         pitch_paragraphs: [],
         poster_url: finalPosterUrl,
-        ost_url: finalOstUrl
+        ost_url: finalOstUrl,
+        trailer_url: finalTrailerUrl,
+        description: llmMeta?.description || candidateMeta?.description || pick.title,
+        genres: llmMeta?.genres || candidateMeta?.genres || [],
+        tags: llmMeta?.tags || candidateMeta?.tags || [],
+        release_year: llmMeta?.release_year || '',
+        studio: llmMeta?.studio || ''
       };
     }
   }));
@@ -534,6 +560,12 @@ const runRecommendationPipeline = async (payload) => {
     pitch_paragraphs: [],
     poster_url: resolvedPicks[0]?.poster_url || '',
     ost_url: resolvedPicks[0]?.ost_url || '',
+    trailer_url: resolvedPicks[0]?.trailer_url || '',
+    description: resolvedPicks[0]?.description || '',
+    genres: resolvedPicks[0]?.genres || [],
+    tags: resolvedPicks[0]?.tags || [],
+    release_year: resolvedPicks[0]?.release_year || '',
+    studio: resolvedPicks[0]?.studio || '',
     recommendations: resolvedPicks
   };
 };
@@ -575,15 +607,78 @@ router.post('/ask', async (req, res) => {
         finalMediaType = 'anime';
       }
 
+      // 1. Extract user messages from history (last 2 user messages) + current message
+      const recentUserTexts = (chat_history || [])
+        .filter(msg => msg.isUser)
+        .slice(-2)
+        .map(msg => msg.text);
+      recentUserTexts.push(user_message);
+      const combinedUserText = recentUserTexts.join('\n');
+
+      // 2. Extract specific media titles mentioned by the user
+      const userMentionedTitles = await llmService.extractTitlesFromText(combinedUserText);
+      console.log(`[Ask Coda Chat] Extracted user-mentioned titles: ${JSON.stringify(userMentionedTitles)}`);
+
+      // 3. Perform synchronous web research on user-mentioned titles in parallel
+      let askResearchContext = "";
+      if (userMentionedTitles && userMentionedTitles.length > 0) {
+        try {
+          console.log(`[Ask Coda Chat] Performing synchronous theme research on: ${JSON.stringify(userMentionedTitles)}`);
+          const researchPromises = userMentionedTitles.map(title => llmService.researchMediaThemes(title));
+          const researchResults = await Promise.all(researchPromises);
+          userMentionedTitles.forEach((title, idx) => {
+            if (researchResults[idx]) {
+              askResearchContext += `Title: ${title}\nResearch:\n${researchResults[idx]}\n\n---\n\n`;
+            }
+          });
+        } catch (e) {
+          console.error('[Ask Coda Chat] Theme research failed:', e.message);
+        }
+      }
+
+      // 4. Extract previously recommended Coda titles from chat history
+      const prevRecommendedTitles = [];
+      if (chat_history && Array.isArray(chat_history)) {
+        for (const msg of chat_history) {
+          if (!msg.isUser && msg.text) {
+            const match = msg.text.match(/\[System: Coda recommended the work: "(.*?)"(?:\s+\(.*?\))?\]/);
+            if (match && match[1]) {
+              prevRecommendedTitles.push(match[1]);
+            }
+          }
+        }
+      }
+      if (prevRecommendedTitles.length > 0) {
+        console.log(`[Ask Coda Chat] Found previously recommended titles to exclude: ${JSON.stringify(prevRecommendedTitles)}`);
+      }
+
+      // 5. Build the exclusions seenList combining user-mentioned, previously recommended, and profile seen lists
+      const profileSeen = current_memory.seen || [];
+      const combinedExclusions = [...profileSeen];
+      
+      // Add user mentioned titles to exclusions (as they are works they watched/finished/loved)
+      for (const title of userMentionedTitles) {
+        if (title && !combinedExclusions.some(e => e.toLowerCase() === title.toLowerCase())) {
+          combinedExclusions.push(title);
+        }
+      }
+      // Add previously recommended titles in this chat session to exclusions
+      for (const title of prevRecommendedTitles) {
+        if (title && !combinedExclusions.some(e => e.toLowerCase() === title.toLowerCase())) {
+          combinedExclusions.push(title);
+        }
+      }
+
       const payload = {
         core_identity: Object.values(current_memory.globalIdentity || []).join('. '),
         recent_context: parsed.recommendation_query,
         requested_media_type: finalMediaType,
-        seen: current_memory.seen || [],
+        seen: combinedExclusions,
         not_for_me: current_memory.notForMe || [],
         guardrails: [Object.values(current_memory.guardrails || []).join(', '), (parsed.hard_constraints || []).join('. ')].filter(Boolean).join('. '),
         platform_hint: parsed.hard_constraints || [],
-        hard_constraints: parsed.hard_constraints || []
+        hard_constraints: parsed.hard_constraints || [],
+        ask_research_context: askResearchContext || null
       };
 
       const rec = await runRecommendationPipeline(payload);
@@ -694,7 +789,11 @@ router.post('/chat', async (req, res) => {
     console.log('[Discuss Chat] Coda response generated successfully.');
     console.log('[Discuss Chat] ✅ Discussion complete.\n');
 
-    res.json({ message: response });
+    res.json({
+      message: response.message,
+      one_line_summary: response.one_line_summary,
+      memory_updates: response.memory_updates
+    });
   } catch (error) {
     console.error('[Discuss Chat Route Error]:', error);
     res.status(500).json({ error: 'Recommendation discussion failed', details: error.message });

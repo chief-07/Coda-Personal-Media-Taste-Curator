@@ -14,8 +14,10 @@ class Recommendation {
     required this.fitSignals,
     required this.posterGradient,
     required this.releaseYear,
+    this.studio = '',
     this.posterUrl,
     this.ostUrl,
+    this.trailerUrl,
     this.pitch = const [],
   });
 
@@ -51,8 +53,14 @@ class Recommendation {
   /// Optional network URL for the soundtrack audio preview stream.
   final String? ostUrl;
 
+  /// Optional YouTube video ID for the trailer.
+  final String? trailerUrl;
+
   /// Release year to show beside the title.
   final String releaseYear;
+
+  /// Studio, developer, publisher, or creator.
+  final String studio;
 
   /// Conversational pitch paragraphs shown on the pitch screen.
   final List<String> pitch;
@@ -70,15 +78,29 @@ class Recommendation {
         'posterGradient': posterGradient.map((c) => c.toARGB32()).toList(),
         'posterUrl': posterUrl,
         'ostUrl': ostUrl,
+        'trailerUrl': trailerUrl,
         'releaseYear': releaseYear,
+        'studio': studio,
         'pitch': pitch,
       };
 
   factory Recommendation.fromJson(Map<String, dynamic> json) {
+    final mediaTypeName = json['mediaType'] as String;
+    final typeEnum = MediaType.values.firstWhere(
+      (e) => e.name == mediaTypeName,
+      orElse: () {
+        final name = mediaTypeName;
+        final label = name.isEmpty
+            ? 'Custom'
+            : name[0].toUpperCase() + name.substring(1);
+        return MediaType(name: name, label: label, isCustom: true);
+      },
+    );
+
     return Recommendation(
       id: json['id'] as String,
       title: json['title'] as String,
-      mediaType: MediaType.values.firstWhere((e) => e.name == json['mediaType']),
+      mediaType: typeEnum,
       codaBlurb: json['codaBlurb'] as String,
       codaNote: json['codaNote'] as String,
       description: json['description'] as String,
@@ -91,7 +113,9 @@ class Recommendation {
           const [Color(0xFF2B5876), Color(0xFF4E4376)],
       posterUrl: json['posterUrl'] as String?,
       ostUrl: json['ostUrl'] as String?,
-      releaseYear: json['releaseYear'] as String? ?? '',
+      trailerUrl: json['trailerUrl'] as String? ?? json['trailer_url'] as String?,
+      releaseYear: json['releaseYear'] as String? ?? json['release_year'] as String? ?? '',
+      studio: json['studio'] as String? ?? '',
       pitch: List<String>.from(json['pitch'] ?? []),
     );
   }

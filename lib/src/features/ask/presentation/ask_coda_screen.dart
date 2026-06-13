@@ -1,13 +1,28 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io' show File;
 import 'package:coda/src/core/memory/living_memory.dart';
+import 'package:coda/src/core/providers/api_config.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:coda/src/features/ask/presentation/web_recorder_stub.dart'
+    if (dart.library.html) 'package:coda/src/features/ask/presentation/web_recorder_web.dart';
+import 'dart:ui' as dart_ui;
+import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
+import 'package:coda/src/features/shell/presentation/coda_shell.dart';
+import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
+
 
 // ═══════════════════════════════════════════════════════════════════════
 // Message model
@@ -67,9 +82,17 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
   final List<_AskChatMessage> _messages = [];
   bool _isLoading = false;
 
+  final _audioRecorder = CodaAudioRecorder();
+  bool _isRecording = false;
+  Timer? _longPressTimer;
+  bool _isLongPressActive = false;
+
   @override
   void initState() {
     super.initState();
+    _chatFocusNode.addListener(() {
+      if (mounted) setState(() {});
+    });
     _topScrollController.addListener(() {
       if (_maskScrollController.hasClients &&
           _topScrollController.offset != _maskScrollController.offset) {
@@ -80,6 +103,8 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
 
   @override
   void dispose() {
+    _longPressTimer?.cancel();
+    _audioRecorder.dispose();
     _maskScrollController.dispose();
     _topScrollController.dispose();
     _chatController.dispose();
@@ -99,6 +124,246 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
     });
   }
 
+  void _handlePointerDown(PointerDownEvent event) {
+    if (_isLoading) return;
+    if (_chatFocusNode.hasFocus) return;
+    _isLongPressActive = false;
+    _longPressTimer?.cancel();
+    _longPressTimer = Timer(const Duration(milliseconds: 500), () {
+      _isLongPressActive = true;
+      _startRecording();
+    });
+  }
+
+  void _handlePointerUp(PointerUpEvent event) {
+    _longPressTimer?.cancel();
+    if (_isLongPressActive) {
+      _stopRecording();
+    } else {
+      if (!_chatFocusNode.hasFocus) {
+        _chatFocusNode.requestFocus();
+      }
+    }
+  }
+
+  void _handlePointerCancel(PointerCancelEvent event) {
+    _longPressTimer?.cancel();
+    if (_isLongPressActive) {
+      _cancelRecording();
+    }
+  }
+
+  Future<void> _startRecording() async {
+    try {
+      if (await _audioRecorder.hasPermission()) {
+        if (!kIsWeb) {
+          await HapticFeedback.lightImpact();
+        }
+
+        setState(() {
+          _isRecording = true;
+        });
+
+        String path = kIsWeb ? 'audio.webm' : 'audio.m4a';
+        if (!kIsWeb) {
+          final tempDir = await getTemporaryDirectory();
+          path = '${tempDir.path}/audio.m4a';
+          final file = File(path);
+          if (await file.exists()) {
+            await file.delete();
+          }
+        }
+
+        await _audioRecorder.start(
+          path: path,
+        );
+      } else {
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierColor: Colors.black.withValues(alpha: 0.5),
+            builder: (dialogCtx) => BackdropFilter(
+              filter: dart_ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Dialog(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF16181C).withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Microphone Access Required',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        kIsWeb
+                            ? 'Coda needs microphone access for speech-to-text.\n\n'
+                                'Please click the site settings or lock icon next to the URL in your browser\'s address bar, allow the Microphone permission, and try again.'
+                            : 'Coda needs microphone access for speech-to-text.\n\n'
+                                'Please open your device settings, locate the Coda app, and enable Microphone permissions.',
+                        style: GoogleFonts.inter(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.of(dialogCtx).pop(),
+                            child: Text(
+                              'Got it',
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error starting record: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to start recording: $e'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      setState(() {
+        _isRecording = false;
+      });
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    if (!_isRecording) return;
+    try {
+      final pathResult = await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+      });
+
+      if (pathResult != null) {
+        _transcribeAndSend(pathResult);
+      }
+    } catch (e) {
+      debugPrint('Error stopping record: $e');
+      setState(() {
+        _isRecording = false;
+      });
+    }
+  }
+
+  Future<void> _cancelRecording() async {
+    if (!_isRecording) return;
+    try {
+      await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+      });
+    } catch (e) {
+      debugPrint('Error cancelling record: $e');
+    }
+  }
+
+  Future<void> _transcribeAndSend(String path) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      Uint8List bytes;
+      if (kIsWeb) {
+        final response = await http.get(Uri.parse(path));
+        bytes = response.bodyBytes;
+      } else {
+        bytes = await File(path).readAsBytes();
+      }
+
+      if (bytes.isEmpty) {
+        throw Exception('Audio recording was empty.');
+      }
+
+      final baseUrl = getApiBaseUrl();
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/api/openai/transcribe'),
+      );
+
+      final filename = kIsWeb ? 'audio.webm' : 'audio.m4a';
+      final multipartFile = http.MultipartFile.fromBytes(
+        'file',
+        bytes,
+        filename: filename,
+      );
+      request.files.add(multipartFile);
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final transcript = data['text'] as String? ?? '';
+        if (transcript.trim().isNotEmpty) {
+          _chatController.text = transcript;
+          _sendMessage();
+        } else {
+          _showErrorSnackBar('Could not understand the audio. Please try again.');
+        }
+      } else {
+        throw Exception('Server returned status ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Transcription error: $e');
+      _showErrorSnackBar('Failed to transcribe audio: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color(0xFFE03E3E),
+      ),
+    );
+  }
+
   Future<void> _sendMessage() async {
     final text = _chatController.text.trim();
     if (text.isEmpty || _isLoading) return;
@@ -114,7 +379,13 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
     // Build chat history from previous messages (exclude the one just added)
     final chatHistory = _messages
         .sublist(0, _messages.length - 1)
-        .map((m) => {'isUser': m.isUser, 'text': m.text})
+        .map((m) {
+          var text = m.text;
+          if (m.recommendation != null) {
+            text += '\n[System: Coda recommended the work: "${m.recommendation!.title}" (${m.recommendation!.mediaType.label})]';
+          }
+          return {'isUser': m.isUser, 'text': text};
+        })
         .toList();
 
     try {
@@ -190,7 +461,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
           final safeBottom = MediaQuery.of(context).padding.bottom;
 
           final bottomPadding = isKeyboardOpen
-              ? 16.0
+              ? keyboardHeight + 16.0
               : safeBottom + 83.0;
 
           final double promptBarTop = height - bottomPadding - 51.0;
@@ -225,6 +496,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
   @override
   Widget build(BuildContext context) {
     const rec = _askRecommendation;
+    final activeRec = ref.watch(homeRecommendationProvider).value;
 
     return PopScope<Object?>(
       canPop: !_chatFocusNode.hasFocus,
@@ -235,37 +507,144 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFF0A0A0C),
         resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            // ── Layer 1: Full-screen Knockout mask ──────────────────────
-            Positioned.fill(
-              child: ShaderMask(
-                shaderCallback: (Rect bounds) {
-                  return LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.75),
-                      Colors.black.withValues(alpha: 0.75),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final screenHeight = MediaQuery.of(context).size.height;
+            final screenWidth = MediaQuery.of(context).size.width;
+
+            final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+            final isKeyboardOpen = keyboardHeight > 0;
+            final safeBottom = MediaQuery.of(context).padding.bottom;
+
+            return Stack(
+              children: [
+                // ── Background ──
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  width: screenWidth,
+                  height: screenHeight,
+                  child: Stack(
+                    children: [
+                      // Base background color
+                      Positioned.fill(
+                        child: Container(color: const Color(0xFF101114)),
+                      ),
+                      // Default background blurred image
+                      Positioned.fill(
+                        child: Transform.scale(
+                          scale: 1.2,
+                          child: ImageFiltered(
+                            imageFilter: dart_ui.ImageFilter.blur(
+                              sigmaX: 80,
+                              sigmaY: 80,
+                              tileMode: dart_ui.TileMode.mirror,
+                            ),
+                            child: const Image(
+                              image: AssetImage('assets/images/default_bg.jpg'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Active recommendation blurred poster (if available)
+                      if (activeRec != null &&
+                          activeRec.posterUrl != null &&
+                          activeRec.posterUrl!.isNotEmpty &&
+                          !activeRec.posterUrl!.startsWith('holder:'))
+                        Positioned.fill(
+                          child: Transform.scale(
+                            scale: 1.2,
+                            child: ImageFiltered(
+                              imageFilter: dart_ui.ImageFilter.blur(
+                                sigmaX: 80,
+                                sigmaY: 80,
+                                tileMode: dart_ui.TileMode.mirror,
+                              ),
+                              child: FallbackImage(
+                                url: activeRec.posterUrl,
+                                fit: BoxFit.cover,
+                                errorWidget: const SizedBox.shrink(),
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
-                  ).createShader(bounds);
-                },
-                blendMode: BlendMode.srcOut,
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.01),
+                  ),
+                ),
+
+                // ── Global 15% White Overlay (brightens all cutouts) ──────────
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  width: screenWidth,
+                  height: screenHeight,
+                  child: Container(color: Colors.white.withValues(alpha: 0.05)),
+                ),
+
+                // ── Layer 1: Full-screen Knockout mask ──────────────────────
+                Positioned.fill(
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.75),
+                          Colors.black.withValues(alpha: 0.75),
+                        ],
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.srcOut,
+                    child: Container(
+                      color: Colors.black.withValues(alpha: 0.01),
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: _buildFadedContent(
+                              _PitchLayout(
+                                recommendation: rec,
+                                isKnockoutLayer: true,
+                                scrollController: _maskScrollController,
+                                messages: _messages,
+                                isLoading: _isLoading,
+                                onSeeThePick: (_) {},
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: _PromptBar(
+                              isKnockoutLayer: true,
+                              chatController: _chatController,
+                              chatFocusNode: _chatFocusNode,
+                              onSend: () {},
+                              isRecording: _isRecording,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // ── Layer 2: Normal visible elements (overlay + real pills) ───
+                Positioned.fill(
                   child: Stack(
                     children: [
                       Positioned.fill(
                         child: _buildFadedContent(
                           _PitchLayout(
                             recommendation: rec,
-                            isKnockoutLayer: true,
-                            scrollController: _maskScrollController,
+                            isKnockoutLayer: false,
+                            scrollController: _topScrollController,
                             messages: _messages,
                             isLoading: _isLoading,
-                            onSeeThePick: (_) {},
+                            onSeeThePick: _seeThePick,
                           ),
                         ),
                       ),
@@ -274,49 +653,76 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
                         right: 0,
                         bottom: 0,
                         child: _PromptBar(
-                          isKnockoutLayer: true,
+                          isKnockoutLayer: false,
                           chatController: _chatController,
                           chatFocusNode: _chatFocusNode,
-                          onSend: () {},
+                          onSend: _sendMessage,
+                          isRecording: _isRecording,
+                          onPointerDown: _handlePointerDown,
+                          onPointerUp: _handlePointerUp,
+                          onPointerCancel: _handlePointerCancel,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ),
 
-            // ── Layer 2: Normal visible elements (overlay + real pills) ───
-            Positioned.fill(
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: _buildFadedContent(
-                      _PitchLayout(
-                        recommendation: rec,
-                        isKnockoutLayer: false,
-                        scrollController: _topScrollController,
-                        messages: _messages,
-                        isLoading: _isLoading,
-                        onSeeThePick: _seeThePick,
+                // ── Floating glass back button ──────────────────────────────
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 12,
+                  left: 16,
+                  child: GestureDetector(
+                    onTap: () => context.pop(),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: BackdropFilter(
+                        filter: dart_ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
                       ),
                     ),
                   ),
+                ),
+
+                // ── Floating navbar ──────────────────────────────
+                if (!isKeyboardOpen)
                   Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 0,
-                    child: _PromptBar(
-                      isKnockoutLayer: false,
-                      chatController: _chatController,
-                      chatFocusNode: _chatFocusNode,
-                      onSend: _sendMessage,
+                    bottom: safeBottom + 16.0,
+                    child: Center(
+                      child: FloatingNavBar(
+                        currentIndex: 2, // Ask Coda is index 2
+                        onTap: (index) {
+                          if (index != 2) {
+                            if (index == 0) {
+                              context.go('/library');
+                            } else if (index == 1) {
+                              context.go('/home');
+                            }
+                          }
+                        },
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
@@ -349,7 +755,7 @@ class _PitchLayout extends StatelessWidget {
     final isKeyboardOpen = keyboardHeight > 0;
     final safeBottom = MediaQuery.of(context).padding.bottom;
     final bottomPadding = isKeyboardOpen
-        ? 83.0
+        ? keyboardHeight + 120.0
         : safeBottom + 150.0;
 
     return SingleChildScrollView(
@@ -366,7 +772,7 @@ class _PitchLayout extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 29),
+            const SizedBox(height: 80),
 
             // ── Coda Avatar ──────────────────────────────────────────
             Padding(
@@ -380,13 +786,16 @@ class _PitchLayout extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     )
-                  : const Opacity(
-                      opacity: 0,
-                      child: SizedBox(width: 45, height: 45),
+                  : Image.asset(
+                      'assets/images/coda_logo.png',
+                      width: 45,
+                      height: 45,
+                      fit: BoxFit.contain,
                     ),
             ),
 
             const SizedBox(height: 16),
+
 
             // ── Hero Text ────────────────────────────────────────────
             Padding(
@@ -441,15 +850,18 @@ class _PitchLayout extends StatelessWidget {
               ],
             ],
 
-            // ── Loading indicator ────────────────────────────────────
             if (isLoading)
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
                 child: isKnockoutLayer
-                    ? _buildBodyText('Coda is thinking...', Colors.black)
-                    : Opacity(
-                        opacity: 0,
-                        child: _buildBodyText('Coda is thinking...', Colors.white),
+                    ? Icon(
+                        PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
+                        color: Colors.black,
+                        size: 28,
+                      )
+                    : const SparkleLoader(
+                        color: Colors.white,
+                        size: 28,
                       ),
               ),
           ],
@@ -569,12 +981,20 @@ class _PromptBar extends StatelessWidget {
     required this.chatController,
     required this.chatFocusNode,
     required this.onSend,
+    required this.isRecording,
+    this.onPointerDown,
+    this.onPointerUp,
+    this.onPointerCancel,
   });
 
   final bool isKnockoutLayer;
   final TextEditingController chatController;
   final FocusNode chatFocusNode;
   final VoidCallback onSend;
+  final bool isRecording;
+  final void Function(PointerDownEvent)? onPointerDown;
+  final void Function(PointerUpEvent)? onPointerUp;
+  final void Function(PointerCancelEvent)? onPointerCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -583,7 +1003,7 @@ class _PromptBar extends StatelessWidget {
     final safeBottom = MediaQuery.of(context).padding.bottom;
 
     final bottomPadding = isKeyboardOpen
-        ? 16.0
+        ? keyboardHeight + 16.0
         : safeBottom + 83.0;
 
     return Padding(
@@ -593,57 +1013,127 @@ class _PromptBar extends StatelessWidget {
         bottom: bottomPadding,
         top: 8,
       ),
-      child: Container(
-        height: 51,
-        decoration: BoxDecoration(
-          color: isKnockoutLayer ? Colors.black : Colors.transparent,
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: Opacity(
-          opacity: isKnockoutLayer ? 0.0 : 1.0,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: isKnockoutLayer ? null : chatController,
-                    focusNode: isKnockoutLayer ? null : chatFocusNode,
-                    enabled: !isKnockoutLayer,
-                    style: GoogleFonts.inter(
-                      color: Colors.black.withValues(alpha: 0.8),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
+      child: Listener(
+        behavior: HitTestBehavior.opaque,
+        onPointerDown: isKnockoutLayer ? null : onPointerDown,
+        onPointerUp: isKnockoutLayer ? null : onPointerUp,
+        onPointerCancel: isKnockoutLayer ? null : onPointerCancel,
+        child: Container(
+          height: 51,
+          decoration: BoxDecoration(
+            color: isKnockoutLayer ? Colors.black : Colors.transparent,
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: Opacity(
+            opacity: isKnockoutLayer ? 0.0 : 1.0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              alignment: Alignment.centerLeft,
+              child: isRecording
+                  ? const Center(child: _SoundwaveAnimator())
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: IgnorePointer(
+                            ignoring: isKnockoutLayer || !chatFocusNode.hasFocus,
+                            child: TextField(
+                              controller: isKnockoutLayer ? null : chatController,
+                              focusNode: isKnockoutLayer ? null : chatFocusNode,
+                              enabled: !isKnockoutLayer,
+                              style: GoogleFonts.inter(
+                                color: Colors.black.withValues(alpha: 0.8),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: "Let's Talk",
+                                hintStyle: GoogleFonts.inter(
+                                  color: Colors.black.withValues(alpha: 0.7),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              onSubmitted: (_) => onSend(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: onSend,
+                          child: Icon(
+                            PhosphorIconsFill.paperPlaneTilt,
+                            color: Colors.black.withValues(alpha: 0.7),
+                            size: 20,
+                          ),
+                        ),
+                      ],
                     ),
-                    decoration: InputDecoration(
-                      hintText: "Let's Talk",
-                      hintStyle: GoogleFonts.inter(
-                        color: Colors.black.withValues(alpha: 0.7),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                      ),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    onSubmitted: (_) => onSend(),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: onSend,
-                  child: Icon(
-                    PhosphorIconsFill.paperPlaneTilt,
-                    color: Colors.black.withValues(alpha: 0.7),
-                    size: 20,
-                  ),
-                ),
-              ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Animated 3-peak soundwave widget
+// ═══════════════════════════════════════════════════════════════════════
+class _SoundwaveAnimator extends StatefulWidget {
+  const _SoundwaveAnimator();
+
+  @override
+  State<_SoundwaveAnimator> createState() => _SoundwaveAnimatorState();
+}
+
+class _SoundwaveAnimatorState extends State<_SoundwaveAnimator>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(3, (index) {
+            // Alternating staggered values for heights
+            double wavePhase = (_controller.value + (index * 0.33)) % 1.0;
+            // Map phase to height from 8 to 28
+            double height = 8.0 + (20.0 * (0.5 - (wavePhase - 0.5).abs()).abs() * 2.0);
+            
+            return Container(
+              width: 8,
+              height: height,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            );
+          }),
+        );
+      },
     );
   }
 }

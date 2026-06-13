@@ -267,10 +267,17 @@ class _ShareReceiveScreenState extends ConsumerState<ShareReceiveScreen> {
                     height: 36,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF1A1C22).withValues(alpha: 0.9),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.15),
+                        color: Colors.white.withValues(alpha: 0.25),
                         width: 1.5,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/images/coda_logo.png',
+                        width: 36,
+                        height: 36,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),

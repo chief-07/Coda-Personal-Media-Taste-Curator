@@ -10,6 +10,12 @@ let assetCache = {};
 if (fs.existsSync(ASSET_CACHE_FILE)) {
   try {
     assetCache = JSON.parse(fs.readFileSync(ASSET_CACHE_FILE, 'utf8'));
+    // Clean up empty trailer_urls so they can be re-resolved with the new direct scraper
+    for (const key in assetCache) {
+      if (assetCache[key] && assetCache[key].trailer_url === '') {
+        delete assetCache[key].trailer_url;
+      }
+    }
   } catch (_) {}
 }
 
@@ -791,18 +797,111 @@ const fetchOST = async (title, mediaType) => {
   return '';
 };
 
+const extractYoutubeId = (url) => {
+  if (!url) return null;
+  const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
+  return match ? match[1] : null;
+};
+
+const scrapeYoutubeDirect = async (query) => {
+  try {
+    const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9'
+      },
+      timeout: 15000
+    });
+    const regex = /"videoId":"([^"]{11})"/g;
+    const matches = [];
+    let match;
+    while ((match = regex.exec(response.data)) !== null) {
+      if (!matches.includes(match[1])) {
+        matches.push(match[1]);
+      }
+    }
+    return matches;
+  } catch (e) {
+    console.error(`[YouTube Direct Scrape Error] Failed to search YouTube directly for "${query}":`, e.message);
+    return [];
+  }
+};
+
+const fetchYoutubeTrailer = async (title, mediaType) => {
+  try {
+    const cleanedTitle = cleanTitle(title);
+    
+    let displayMediaType = mediaType || '';
+    if (displayMediaType === 'visualNovel') {
+      displayMediaType = 'visual novel';
+    }
+
+    let exclusionKeywords = '';
+    if (mediaType && mediaType !== 'movie' && mediaType !== 'tv') {
+      exclusionKeywords = ' -"live action" -"live-action"';
+    }
+    
+    // 1. Try direct YouTube search scraping first
+    const ytQuery = `${cleanedTitle} ${displayMediaType} official trailer${exclusionKeywords}`;
+    console.log(`[Trailer Search] Searching YouTube directly: "${ytQuery}"`);
+    const ytVideoIds = await scrapeYoutubeDirect(ytQuery);
+    if (ytVideoIds.length > 0) {
+      console.log(`[Trailer Search] ✅ Found trailer video ID directly from YouTube: ${ytVideoIds[0]}`);
+      return ytVideoIds[0];
+    }
+    
+    // 2. Fallback to scrapeForums (general search engines)
+    const query = `"${cleanedTitle}" ${displayMediaType} official trailer${exclusionKeywords} youtube`;
+    console.log(`[Trailer Search] Fallback to scrapeForums: "${query}"`);
+    const results = await searchService.scrapeForums(query);
+    
+    for (const r of results) {
+      const videoId = extractYoutubeId(r.link) || extractYoutubeId(r.snippet);
+      if (videoId) {
+        console.log(`[Trailer Search] ✅ Found trailer video ID: ${videoId} from link: ${r.link}`);
+        return videoId;
+      }
+    }
+    
+    // Fallback: try without quotes
+    const fallbackQuery = `${cleanedTitle} ${displayMediaType} trailer youtube`;
+    console.log(`[Trailer Search] Fallback search without quotes: "${fallbackQuery}"`);
+    const fallbackResults = await searchService.scrapeForums(fallbackQuery);
+    for (const r of fallbackResults) {
+      const videoId = extractYoutubeId(r.link) || extractYoutubeId(r.snippet);
+      if (videoId) {
+        console.log(`[Trailer Search] ✅ Found trailer video ID (fallback): ${videoId} from link: ${r.link}`);
+        return videoId;
+      }
+    }
+  } catch (err) {
+    console.error(`[Trailer Search Error] Failed to fetch trailer for ${title}:`, err.message);
+  }
+  return '';
+};
+
 const fetchAssets = async (title, mediaType) => {
   const normMediaType = (mediaType || '').toLowerCase().trim();
   const key = `${cacheNormalize(title)}:${normMediaType}`;
-  if (assetCache[key]) {
+  
+  let assets = assetCache[key];
+  if (assets && assets.trailer_url !== undefined) {
     console.log(`[Asset Cache Hit] serving cached assets for: "${title}" (${mediaType})`);
-    return assetCache[key];
+    return assets;
   }
 
-  const poster_url = await fetchPoster(title, mediaType);
-  const ost_url = await fetchOST(title, mediaType);
-  const assets = { poster_url, ost_url };
-
+  // Parallelize all three independent asset fetches for maximum speed.
+  // poster_url and ost_url may already be cached individually; trailer_url is always re-fetched
+  // until it lands in the full-cache check above.
+  const [poster_url, ost_url, trailer_url] = await Promise.all([
+    assets ? Promise.resolve(assets.poster_url) : fetchPoster(title, mediaType),
+    assets ? Promise.resolve(assets.ost_url)    : fetchOST(title, mediaType),
+    fetchYoutubeTrailer(title, mediaType),
+  ]);
+  
+  assets = { poster_url, ost_url, trailer_url };
   assetCache[key] = assets;
   saveAssetCache();
   return assets;
@@ -811,3 +910,4 @@ const fetchAssets = async (title, mediaType) => {
 module.exports = {
   fetchAssets
 };
+

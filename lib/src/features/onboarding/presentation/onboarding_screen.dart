@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
+import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
 
 const _askRecommendation = Recommendation(
   id: 'ask-coda',
@@ -349,9 +350,11 @@ class _PitchLayout extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     )
-                  : Opacity(
-                      opacity: 0,
-                      child: const SizedBox(width: 45, height: 45),
+                  : Image.asset(
+                      'assets/images/coda_logo.png',
+                      width: 45,
+                      height: 45,
+                      fit: BoxFit.contain,
                     ),
             ),
 
@@ -403,10 +406,14 @@ class _PitchLayout extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
                 child: isKnockoutLayer
-                    ? _buildBodyText('Coda is thinking...', Colors.black)
-                    : Opacity(
-                        opacity: 0,
-                        child: _buildBodyText('Coda is thinking...', Colors.white),
+                    ? Icon(
+                        PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
+                        color: Colors.black,
+                        size: 28,
+                      )
+                    : const SparkleLoader(
+                        color: Colors.white,
+                        size: 28,
                       ),
               ),
           ],

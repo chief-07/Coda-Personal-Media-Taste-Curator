@@ -14,6 +14,12 @@ class RecommendationResult {
   final List<String> pitchParagraphs;
   final String posterUrl;
   final String ostUrl;
+  final String trailerUrl;
+  final String description;
+  final List<String> genres;
+  final List<String> tags;
+  final String releaseYear;
+  final String studio;
 
   RecommendationResult({
     required this.title,
@@ -22,6 +28,12 @@ class RecommendationResult {
     required this.pitchParagraphs,
     required this.posterUrl,
     required this.ostUrl,
+    required this.trailerUrl,
+    required this.description,
+    required this.genres,
+    required this.tags,
+    required this.releaseYear,
+    required this.studio,
   });
 
   factory RecommendationResult.fromJson(Map<String, dynamic> json) {
@@ -37,6 +49,12 @@ class RecommendationResult {
       pitchParagraphs: List<String>.from(json['pitch_paragraphs'] ?? []),
       posterUrl: rawPoster,
       ostUrl: json['ost_url'] ?? '',
+      trailerUrl: json['trailer_url'] ?? '',
+      description: json['description'] ?? '',
+      genres: List<String>.from(json['genres'] ?? []),
+      tags: List<String>.from(json['tags'] ?? []),
+      releaseYear: json['release_year'] ?? '',
+      studio: json['studio'] ?? '',
     );
   }
 
@@ -48,7 +66,12 @@ class RecommendationResult {
         final normalizedMediaType = mediaType.replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
         return normalizedEnumName == normalizedMediaType;
       },
-      orElse: () => coda_domain.MediaType.movie,
+      orElse: () {
+        final label = mediaType.isEmpty
+            ? 'Custom'
+            : mediaType[0].toUpperCase() + mediaType.substring(1);
+        return coda_domain.MediaType.custom(label);
+      },
     );
 
     return coda_domain.Recommendation(
@@ -59,15 +82,15 @@ class RecommendationResult {
       pitch: pitchParagraphs,
       posterUrl: posterUrl.isNotEmpty ? posterUrl : null,
       ostUrl: ostUrl.isNotEmpty ? ostUrl : null,
-      
-      // The Engine doesn't return these yet, so provide defaults
+      trailerUrl: trailerUrl.isNotEmpty ? trailerUrl : null,
       codaNote: "I picked this based on everything we've talked about.",
-      description: title,
-      genres: [],
-      tags: [],
+      description: description.isNotEmpty ? description : title,
+      genres: genres,
+      tags: tags,
       fitSignals: ['Perfect for your current mood'],
       posterGradient: [const Color(0xFF2B5876), const Color(0xFF4E4376)],
-      releaseYear: '',
+      releaseYear: releaseYear,
+      studio: studio,
     );
   }
 }
@@ -103,7 +126,7 @@ class RecommendationService {
     final coreIdentity = memory.globalIdentity.join('. ');
 
     // Normalize selectedMediaType name to find specific category profile key
-    String cleanKey;
+    String cleanKey = selectedMediaType.name;
     switch (selectedMediaType) {
       case coda_domain.MediaType.anime:
         cleanKey = 'anime';
@@ -131,6 +154,8 @@ class RecommendationService {
         break;
       case coda_domain.MediaType.music:
         cleanKey = 'music';
+        break;
+      default:
         break;
     }
 
@@ -351,4 +376,68 @@ class RecommendationService {
       return "Hmm, I'm having trouble connecting right now. Let's try again in a bit.";
     }
   }
+
+  /// Discusses a recommendation with Coda and retrieves experience summaries and memory refinements
+  Future<DiscussResult> discussRecommendationWithRefinements({
+    required LivingMemory memory,
+    required String title,
+    required String mediaType,
+    required String codaBlurb,
+    required List<String> pitchParagraphs,
+    required List<Map<String, dynamic>> chatHistory,
+    required String userMessage,
+  }) async {
+    final payload = {
+      'current_memory': memory.toJson(),
+      'title': title,
+      'media_type': mediaType,
+      'coda_blurb': codaBlurb,
+      'pitch_paragraphs': pitchParagraphs,
+      'chat_history': chatHistory,
+      'user_message': userMessage,
+    };
+
+    final targetUrl = '${getApiBaseUrl()}/api/recommend/chat';
+
+    try {
+      final response = await http.post(
+        Uri.parse(targetUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final message = data['message'] ?? "I'm not sure how to respond to that.";
+        final oneLineSummary = data['one_line_summary'] as String?;
+        final updatesJson = data['memory_updates'];
+        final memoryUpdates = updatesJson != null ? MemoryUpdates.fromJson(updatesJson) : null;
+
+        return DiscussResult(
+          message: message,
+          oneLineSummary: oneLineSummary,
+          memoryUpdates: memoryUpdates,
+        );
+      } else {
+        throw Exception('Failed to get chat response: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Chat network error: $e");
+      return DiscussResult(
+        message: "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
+      );
+    }
+  }
+}
+
+class DiscussResult {
+  final String message;
+  final String? oneLineSummary;
+  final MemoryUpdates? memoryUpdates;
+
+  DiscussResult({
+    required this.message,
+    this.oneLineSummary,
+    this.memoryUpdates,
+  });
 }

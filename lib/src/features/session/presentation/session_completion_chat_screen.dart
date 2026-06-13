@@ -1,7 +1,7 @@
 import 'dart:ui' as dart_ui;
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
-import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
+import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,30 +9,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
-import 'package:coda/src/core/memory/living_memory.dart';
-import 'package:coda/src/core/providers/shared_preferences_provider.dart';
-
-const _askRecommendation = Recommendation(
-  id: 'session-chat',
-  title: 'Coda Discussion',
-  mediaType: MediaType.movie,
-  codaBlurb: 'Let\'s talk about what\nyou just finished',
-  codaNote: '',
-  description: '',
-  genres: [],
-  tags: [],
-  fitSignals: [],
-  posterGradient: [Color(0xFF0F1A1C), Color(0xFF1E353B), Color(0xFF4C7D8A)],
-  releaseYear: '2026',
-  pitch: [
-    "I'd love to hear your thoughts on this.",
-    "Did it hit you in the way you expected? What was your favorite moment?",
-    "Let me know what you liked or what fell flat, and I'll use it to refine your taste profile.",
-  ],
-);
+import 'package:coda/src/features/session/application/session_chat_controller.dart';
+import 'package:coda/src/features/session/application/archived_sessions_controller.dart';
+import 'package:coda/src/features/session/domain/archived_session.dart';
+import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
 
 class SessionCompletionChatScreen extends ConsumerStatefulWidget {
-  const SessionCompletionChatScreen({super.key});
+  const SessionCompletionChatScreen({super.key, this.sessionId});
+
+  final String? sessionId;
 
   @override
   ConsumerState<SessionCompletionChatScreen> createState() => _SessionCompletionChatScreenState();
@@ -64,11 +49,10 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
     super.dispose();
   }
 
-  void _sendMessage() {
+  void _sendMessage(String resolvedSessionId) {
     final text = _chatController.text.trim();
     if (text.isNotEmpty) {
-      // For now, use the same onboarding controller logic or simulate a simple echoing reply
-      ref.read(onboardingControllerProvider.notifier).sendMessage(text);
+      ref.read(sessionChatControllerProvider(resolvedSessionId).notifier).sendMessage(text);
       _chatController.clear();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_topScrollController.hasClients) {
@@ -130,14 +114,85 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
 
   @override
   Widget build(BuildContext context) {
-    final activeRec = ref.watch(homeRecommendationProvider).value;
-    const rec = _askRecommendation;
+    final activeRec = ref.watch(activeSessionProvider) ?? ref.watch(homeRecommendationProvider).value;
+    final archivedSessions = ref.watch(archivedSessionsProvider);
 
-    final onboardingState = ref.watch(onboardingControllerProvider);
-    final messages = onboardingState.messages;
-    final isLoading = onboardingState.isLoading;
+    Recommendation? recommendation;
+    String resolvedSessionId;
 
-    ref.listen(onboardingControllerProvider, (previous, next) {
+    if (widget.sessionId != null) {
+      resolvedSessionId = widget.sessionId!;
+      final session = archivedSessions.firstWhere(
+        (s) => s.id == resolvedSessionId,
+        orElse: () => ArchivedSession(
+          id: resolvedSessionId,
+          title: 'Media Pick',
+          mediaType: 'movie',
+          posterUrl: '',
+          oneLineSummary: '',
+          chatHistory: [],
+          archivedAt: DateTime.now(),
+        ),
+      );
+
+      recommendation = Recommendation(
+        id: session.id,
+        title: session.title,
+        mediaType: MediaType.values.firstWhere(
+          (e) => e.name == session.mediaType,
+          orElse: () {
+            final name = session.mediaType;
+            final label = name.isEmpty
+                ? 'Custom'
+                : name[0].toUpperCase() + name.substring(1);
+            return MediaType(name: name, label: label, isCustom: true);
+          },
+        ),
+        codaBlurb: '',
+        codaNote: '',
+        description: '',
+        genres: [],
+        tags: [],
+        fitSignals: [],
+        posterGradient: const [Color(0xFF0F1A1C), Color(0xFF1E353B)],
+        releaseYear: '',
+        pitch: const [],
+        posterUrl: session.posterUrl.isNotEmpty ? session.posterUrl : null,
+      );
+    } else {
+      recommendation = activeRec;
+      resolvedSessionId = activeRec?.id ?? 'active_session';
+
+      // Auto-archive active session when started if it does not exist in the archive yet
+      if (activeRec != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final archived = ref.read(archivedSessionsProvider);
+          final exists = archived.any((s) => s.id == activeRec.id);
+          if (!exists) {
+            final initialMsg = ChatMessage(
+              text: 'What did you think of ${activeRec.title}?',
+              isUser: false,
+            );
+            final newSession = ArchivedSession(
+              id: activeRec.id,
+              title: activeRec.title,
+              mediaType: activeRec.mediaType.name,
+              posterUrl: activeRec.posterUrl ?? '',
+              oneLineSummary: 'Chatting about ${activeRec.title}...',
+              chatHistory: [initialMsg],
+              archivedAt: DateTime.now(),
+            );
+            ref.read(archivedSessionsProvider.notifier).archiveOrUpdateSession(newSession);
+          }
+        });
+      }
+    }
+
+    final sessionChatState = ref.watch(sessionChatControllerProvider(resolvedSessionId));
+    final messages = sessionChatState.messages;
+    final isLoading = sessionChatState.isLoading;
+
+    ref.listen<SessionChatState>(sessionChatControllerProvider(resolvedSessionId), (previous, next) {
       if (previous?.messages.length != next.messages.length ||
           previous?.isLoading != next.isLoading) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -155,7 +210,12 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
     return PopScope<Object?>(
       canPop: !_chatFocusNode.hasFocus,
       onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
+        if (didPop) {
+          if (widget.sessionId == null) {
+            ref.read(activeSessionProvider.notifier).clear();
+          }
+          return;
+        }
         if (_chatFocusNode.hasFocus) {
           _chatFocusNode.unfocus();
         }
@@ -169,19 +229,21 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
             Positioned.fill(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 600),
-                child: activeRec != null && activeRec.posterUrl != null && activeRec.posterUrl!.isNotEmpty
+                child: recommendation != null && recommendation.posterUrl != null && recommendation.posterUrl!.isNotEmpty
                     ? Transform.scale(
                         scale: 1.2,
                         child: ImageFiltered(
-                          key: ValueKey(activeRec.posterUrl),
+                          key: ValueKey(recommendation.posterUrl),
                           imageFilter: dart_ui.ImageFilter.blur(
                             sigmaX: 80,
                             sigmaY: 80,
                             tileMode: TileMode.mirror,
                           ),
                           child: FallbackImage(
-                            url: activeRec.posterUrl,
+                            url: recommendation.posterUrl,
                             fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
                             errorWidget: const SizedBox.shrink(),
                           ),
                         ),
@@ -230,7 +292,7 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
                       Positioned.fill(
                         child: _buildFadedContent(
                           _PitchLayout(
-                            recommendation: rec,
+                            recommendation: recommendation,
                             isKnockoutLayer: true,
                             scrollController: _maskScrollController,
                             messages: messages,
@@ -255,14 +317,14 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
               ),
             ),
 
-            // ── Layer 2: Normal visible elements (overlay + real pills) ───
+            // ── Layer 2: Normal visible elements ───────────────────────
             Positioned.fill(
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: _buildFadedContent(
                       _PitchLayout(
-                        recommendation: rec,
+                        recommendation: recommendation,
                         isKnockoutLayer: false,
                         scrollController: _topScrollController,
                         messages: messages,
@@ -278,70 +340,37 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
                       isKnockoutLayer: false,
                       chatController: _chatController,
                       chatFocusNode: _chatFocusNode,
-                      onSend: _sendMessage,
+                      onSend: () => _sendMessage(resolvedSessionId),
                     ),
                   ),
                   
-                  // Sticky Header with Completed Media Details and Back Button
+                  // Sticky Header with only Back Button
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 8,
                     left: 16,
-                    right: 16,
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => context.go('/home'),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.08),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.12),
-                              ),
-                            ),
-                            child: const Icon(
-                              PhosphorIconsBold.caretLeft,
-                              color: Colors.white,
-                              size: 20,
-                            ),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (widget.sessionId == null) {
+                          ref.read(activeSessionProvider.notifier).clear();
+                        }
+                        context.go('/home');
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.08),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.12),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        if (activeRec != null) ...[
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.15),
-                              ),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: FallbackImage(
-                                url: activeRec.posterUrl,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              activeRec.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
+                        child: const Icon(
+                          PhosphorIconsBold.caretLeft,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -363,7 +392,7 @@ class _PitchLayout extends StatelessWidget {
     required this.isLoading,
   });
 
-  final Recommendation recommendation;
+  final Recommendation? recommendation;
   final bool isKnockoutLayer;
   final ScrollController scrollController;
   final List<ChatMessage> messages;
@@ -402,9 +431,11 @@ class _PitchLayout extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     )
-                  : Opacity(
-                      opacity: 0,
-                      child: const SizedBox(width: 45, height: 45),
+                  : Image.asset(
+                      'assets/images/coda_logo.png',
+                      width: 45,
+                      height: 45,
+                      fit: BoxFit.contain,
                     ),
             ),
 
@@ -418,20 +449,26 @@ class _PitchLayout extends StatelessWidget {
                   : Opacity(opacity: 0, child: _buildHeroText(Colors.white)),
             ),
 
-            const SizedBox(height: 28),
+            const SizedBox(height: 16),
 
-            // ── Body Paragraphs ──────────────────────────────────────
-            ...recommendation.pitch.map(
-              (paragraph) => Padding(
-                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-                child: isKnockoutLayer
-                    ? _buildBodyText(paragraph, Colors.black)
-                    : Opacity(
-                        opacity: 0,
-                        child: _buildBodyText(paragraph, Colors.white),
+            // ── Body Text ────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: isKnockoutLayer
+                  ? _buildBodyText(
+                      "Tell me everything! Did you love it? Did it connect with you? Did you cry? Was it not what you expected?",
+                      Colors.black,
+                    )
+                  : Opacity(
+                      opacity: 0,
+                      child: _buildBodyText(
+                        "Tell me everything! Did you love it? Did it connect with you? Did you cry? Was it not what you expected?",
+                        Colors.white,
                       ),
-              ),
+                    ),
             ),
+
+            const SizedBox(height: 28),
 
             // ── Messages List ────────────────────────────────────────
             for (var i = 0; i < messages.length; i++) ...[
@@ -443,11 +480,6 @@ class _PitchLayout extends StatelessWidget {
                     child: _buildChatBubble(messages[i].text ?? ''),
                   ),
                 )
-              else if (messages[i].chips != null)
-                Padding(
-                  padding: const EdgeInsets.only(left: 24, right: 24, bottom: 40),
-                  child: _buildChipsWrap(context, messages[i].chips!),
-                )
               else
                 _buildCodaMessage(messages[i].text ?? ''),
             ],
@@ -456,10 +488,14 @@ class _PitchLayout extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
                 child: isKnockoutLayer
-                    ? _buildBodyText('Coda is thinking...', Colors.black)
-                    : Opacity(
-                        opacity: 0,
-                        child: _buildBodyText('Coda is thinking...', Colors.white),
+                    ? Icon(
+                        PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
+                        color: Colors.black,
+                        size: 28,
+                      )
+                    : const SparkleLoader(
+                        color: Colors.white,
+                        size: 28,
                       ),
               ),
           ],
@@ -469,8 +505,9 @@ class _PitchLayout extends StatelessWidget {
   }
 
   Widget _buildHeroText(Color color) {
+    final titleText = recommendation?.title ?? 'this';
     return Text(
-      recommendation.codaBlurb,
+      'What did you think about $titleText?',
       style: GoogleFonts.inter(
         color: color,
         fontSize: 30,
@@ -535,85 +572,6 @@ class _PitchLayout extends StatelessWidget {
             ),
     );
   }
-
-  Widget _buildChipsWrap(BuildContext context, List<String> chipsList) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 12,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        ...chipsList.map((chip) => _buildOutlineChip(chip)),
-        GestureDetector(
-          onTap: () => context.push('/taste-profile'),
-          child: _buildCheckmarkButton(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOutlineChip(String text) {
-    if (isKnockoutLayer) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 1.5),
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: Text(
-          text,
-          style: GoogleFonts.inter(
-            color: Colors.black,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      );
-    }
-
-    return Opacity(
-      opacity: 0,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 1.5),
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: Text(
-          text,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCheckmarkButton() {
-    if (isKnockoutLayer) {
-      return Container(
-        width: 48,
-        height: 36,
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(50),
-        ),
-      );
-    }
-
-    return SizedBox(
-      width: 48,
-      height: 36,
-      child: Center(
-        child: Icon(
-          Icons.check,
-          size: 24,
-          weight: 900,
-          color: Colors.black.withValues(alpha: 0.7),
-        ),
-      ),
-    );
-  }
 }
 
 class _PromptBar extends StatelessWidget {
@@ -670,7 +628,7 @@ class _PromptBar extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                     ),
                     decoration: InputDecoration(
-                      hintText: "Tell Coda what you thought...",
+                      hintText: "Let's talk",
                       hintStyle: GoogleFonts.inter(
                         color: Colors.black.withValues(alpha: 0.7),
                         fontSize: 16,

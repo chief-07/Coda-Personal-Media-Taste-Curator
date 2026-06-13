@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
 
 class _PitchChatMessage {
   final String text;
@@ -232,7 +233,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
                 left: 0,
                 width: screenWidth,
                 height: screenHeight,
-                child: Container(color: Colors.white.withValues(alpha: 0.15)),
+                child: Container(color: Colors.white.withValues(alpha: 0.05)),
               ),
 
               // ── Layer 1: Full-screen Knockout mask ──────────────────────
@@ -323,6 +324,37 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
                   ],
                 ),
               ),
+              // ── Floating glass back button ──────────────────────────────
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 12,
+                left: 16,
+                child: GestureDetector(
+                  onTap: () => context.pop(),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: BackdropFilter(
+                      filter: dart_ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            width: 1,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           );
         },
@@ -335,7 +367,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
 // ═══════════════════════════════════════════════════════════════════════
 // Pitch Layout — used for both knockout and visible layers
 // ═══════════════════════════════════════════════════════════════════════
-class _PitchLayout extends StatelessWidget {
+class _PitchLayout extends StatefulWidget {
   const _PitchLayout({
     required this.recommendation,
     required this.isKnockoutLayer,
@@ -351,9 +383,37 @@ class _PitchLayout extends StatelessWidget {
   final bool isLoading;
 
   @override
+  State<_PitchLayout> createState() => _PitchLayoutState();
+}
+
+class _PitchLayoutState extends State<_PitchLayout> with SingleTickerProviderStateMixin {
+
+  late final AnimationController _shimmerController;
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _shimmerController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final recommendation = widget.recommendation;
+    final isKnockoutLayer = widget.isKnockoutLayer;
+    final messages = widget.messages;
+    final isLoading = widget.isLoading;
+
     return SingleChildScrollView(
-      controller: scrollController,
+      controller: widget.scrollController,
       physics: isKnockoutLayer
           ? const NeverScrollableScrollPhysics()
           : const BouncingScrollPhysics(),
@@ -366,7 +426,7 @@ class _PitchLayout extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 29),
+            const SizedBox(height: 80),
 
           // ── Coda Avatar ──────────────────────────────────────────
           Padding(
@@ -380,9 +440,11 @@ class _PitchLayout extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                   )
-                : Opacity(
-                    opacity: 0,
-                    child: const SizedBox(width: 45, height: 45),
+                : Image.asset(
+                    'assets/images/coda_logo.png',
+                    width: 45,
+                    height: 45,
+                    fit: BoxFit.contain,
                   ),
           ),
 
@@ -402,7 +464,7 @@ class _PitchLayout extends StatelessWidget {
           if (recommendation.pitch.isEmpty)
             Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-              child: _buildWritingIndicator(context),
+              child: _buildShimmerSkeleton(isKnockoutLayer),
             )
           else
             ...recommendation.pitch.map(
@@ -435,10 +497,14 @@ class _PitchLayout extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
               child: isKnockoutLayer
-                  ? _buildBodyText('Coda is thinking...', Colors.black)
-                  : Opacity(
-                      opacity: 0,
-                      child: _buildBodyText('Coda is thinking...', Colors.white),
+                  ? Icon(
+                      PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
+                      color: Colors.black,
+                      size: 28,
+                    )
+                  : const SparkleLoader(
+                      color: Colors.white,
+                      size: 28,
                     ),
             ),
           ],
@@ -449,7 +515,7 @@ class _PitchLayout extends StatelessWidget {
 
   Widget _buildHeroText(Color color) {
     return Text(
-      recommendation.codaBlurb,
+      widget.recommendation.codaBlurb,
       style: GoogleFonts.inter(
         color: color,
         fontSize: 30,
@@ -472,59 +538,81 @@ class _PitchLayout extends StatelessWidget {
     );
   }
 
-  Widget _buildWritingIndicator(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: isKnockoutLayer ? Colors.transparent : Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isKnockoutLayer ? Colors.transparent : Colors.white.withValues(alpha: 0.1),
-          width: 1.5,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: isKnockoutLayer
-              ? dart_ui.ImageFilter.blur(sigmaX: 0, sigmaY: 0)
-              : dart_ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: isKnockoutLayer
-                      ? const SizedBox.shrink()
-                      : const CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: isKnockoutLayer
-                      ? _buildBodyText('Writing your personalized pitch...', Colors.black)
-                      : Opacity(
-                          opacity: 0,
-                          child: _buildBodyText('Writing your personalized pitch...', Colors.white),
-                        ),
-                ),
-              ],
+  /// Shimmer skeleton placeholder shown while pitch paragraphs are loading.
+  Widget _buildShimmerSkeleton(bool isKnockoutLayer) {
+    if (isKnockoutLayer) {
+      // Knockout: solid black bars to punch holes
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(width: double.infinity, height: 18, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(6))),
+          const SizedBox(height: 10),
+          Container(width: double.infinity, height: 18, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(6))),
+          const SizedBox(height: 10),
+          FractionallySizedBox(widthFactor: 0.7, child: Container(height: 18, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(6)))),
+          const SizedBox(height: 28),
+          Container(width: double.infinity, height: 18, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(6))),
+          const SizedBox(height: 10),
+          FractionallySizedBox(widthFactor: 0.85, child: Container(height: 18, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(6)))),
+          const SizedBox(height: 10),
+          FractionallySizedBox(widthFactor: 0.55, child: Container(height: 18, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(6)))),
+        ],
+      );
+    }
+
+    // Visible layer: animated shimmer sweep
+    return AnimatedBuilder(
+      animation: _shimmerController,
+      builder: (context, _) {
+        final shimmerX = _shimmerController.value;
+        final shimmerGradient = LinearGradient(
+          begin: Alignment(-1.5 + shimmerX * 4, 0),
+          end: Alignment(0.5 + shimmerX * 4, 0),
+          colors: [
+            Colors.white.withValues(alpha: 0.06),
+            Colors.white.withValues(alpha: 0.18),
+            Colors.white.withValues(alpha: 0.06),
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        );
+
+        Widget shimmerBar(double widthFactor) {
+          return FractionallySizedBox(
+            widthFactor: widthFactor,
+            child: Container(
+              height: 18,
+              decoration: BoxDecoration(
+                gradient: shimmerGradient,
+                borderRadius: BorderRadius.circular(6),
+              ),
             ),
-          ),
-        ),
-      ),
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            shimmerBar(1.0),
+            const SizedBox(height: 10),
+            shimmerBar(1.0),
+            const SizedBox(height: 10),
+            shimmerBar(0.7),
+            const SizedBox(height: 28),
+            shimmerBar(1.0),
+            const SizedBox(height: 10),
+            shimmerBar(0.85),
+            const SizedBox(height: 10),
+            shimmerBar(0.55),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildCodaMessage(String text) {
     return Padding(
       padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-      child: isKnockoutLayer
+      child: widget.isKnockoutLayer
           ? _buildBodyText(text, Colors.black)
           : Opacity(
               opacity: 0, // background is brightened globally
@@ -537,10 +625,10 @@ class _PitchLayout extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
-        color: isKnockoutLayer ? Colors.black : Colors.transparent,
+        color: widget.isKnockoutLayer ? Colors.black : Colors.transparent,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: isKnockoutLayer
+      child: widget.isKnockoutLayer
           ? Opacity(
               opacity: 0,
               child: Text(

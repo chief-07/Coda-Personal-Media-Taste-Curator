@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 class AudioPlayerState {
   final bool isMuted;
@@ -32,9 +33,25 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
   final _audioPlayer = AudioPlayer();
   static const _mutePrefsKey = 'coda_soundtracks_muted';
 
+  final Map<String, BytesSource> _cachedSources = {};
+
   Duration? _currentDuration;
   StreamSubscription? _positionSubscription;
   StreamSubscription? _durationSubscription;
+
+  Future<void> precacheAudio(String url) async {
+    if (url.isEmpty || _cachedSources.containsKey(url)) return;
+    try {
+      print('[Audio Cache] Pre-fetching OST preview: $url');
+      final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
+      if (res.statusCode == 200) {
+        _cachedSources[url] = BytesSource(res.bodyBytes);
+        print('[Audio Cache] Successfully pre-fetched ${res.bodyBytes.length} bytes for $url');
+      }
+    } catch (e) {
+      print('[Audio Cache Error] Pre-fetch failed for $url: $e');
+    }
+  }
 
   @override
   AudioPlayerState build() {
@@ -109,7 +126,8 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
       // Set volume soft for ambient background music (initially 0.0, fader will handle fade-in)
       await _audioPlayer.setVolume(0.0);
       
-      await _audioPlayer.setSource(UrlSource(url));
+      final source = _cachedSources[url] ?? UrlSource(url);
+      await _audioPlayer.setSource(source);
       
       if (!state.isMuted) {
         await _audioPlayer.resume();
@@ -157,7 +175,8 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
         await _audioPlayer.setVolume(0.06);
         if (state.currentUrl != null) {
           // Re-set source to force load under active user interaction context to bypass browser autoplay blocks
-          await _audioPlayer.setSource(UrlSource(state.currentUrl!));
+          final source = _cachedSources[state.currentUrl!] ?? UrlSource(state.currentUrl!);
+          await _audioPlayer.setSource(source);
           await _audioPlayer.resume();
         }
       }

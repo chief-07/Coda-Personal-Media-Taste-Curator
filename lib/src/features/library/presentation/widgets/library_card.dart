@@ -5,10 +5,12 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:coda/src/features/library/presentation/widgets/library_tab_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
+import 'package:coda/src/core/utils/linked_scroll_controller.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/library/presentation/library_screen.dart';
+import 'package:coda/src/features/session/application/archived_sessions_controller.dart';
 
 class LibraryCard extends ConsumerStatefulWidget {
   const LibraryCard({super.key, required this.tab});
@@ -23,27 +25,15 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
   final _maskScrollController = ScrollController();
   final _topScrollController = ScrollController();
 
-  // Map to store linked horizontal scroll controllers for each item title
-  final Map<String, (ScrollController, ScrollController)> _horizontalControllers = {};
+  // Map to store LinkedScrollControllers for each item title
+  final Map<String, LinkedScrollController> _horizontalControllers = {};
 
   bool _themeEnabled = true;
   bool _audioEnabled = true;
   bool _reduceAnimationsEnabled = false;
 
-  (ScrollController, ScrollController) _getHorizontalControllers(String title) {
-    if (!_horizontalControllers.containsKey(title)) {
-      final maskScroll = ScrollController();
-      final topScroll = ScrollController();
-
-      // Synchronize horizontal scrolling: scrolling top scrolls mask
-      topScroll.addListener(() {
-        if (maskScroll.hasClients && topScroll.offset != maskScroll.offset) {
-          maskScroll.jumpTo(topScroll.offset);
-        }
-      });
-      _horizontalControllers[title] = (maskScroll, topScroll);
-    }
-    return _horizontalControllers[title]!;
+  LinkedScrollController _getHorizontalController(String title) {
+    return _horizontalControllers.putIfAbsent(title, () => LinkedScrollController());
   }
 
   @override
@@ -62,9 +52,8 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
   void dispose() {
     _maskScrollController.dispose();
     _topScrollController.dispose();
-    for (final pair in _horizontalControllers.values) {
-      pair.$1.dispose();
-      pair.$2.dispose();
+    for (final controller in _horizontalControllers.values) {
+      controller.dispose();
     }
     _horizontalControllers.clear();
     super.dispose();
@@ -118,9 +107,7 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
                             audioValue: _audioEnabled,
                             reduceAnimationsValue: _reduceAnimationsEnabled,
                             currentTab: widget.tab,
-                            horizontalControllerProvider: (title, isMask) => isMask
-                                ? _getHorizontalControllers(title).$1
-                                : _getHorizontalControllers(title).$2,
+                            horizontalControllerProvider: _getHorizontalController,
                           ),
                         ),
                         if (widget.tab == LibraryTab.lists)
@@ -150,9 +137,7 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
                     audioValue: _audioEnabled,
                     reduceAnimationsValue: _reduceAnimationsEnabled,
                     currentTab: widget.tab,
-                    horizontalControllerProvider: (title, isMask) => isMask
-                        ? _getHorizontalControllers(title).$1
-                        : _getHorizontalControllers(title).$2,
+                    horizontalControllerProvider: _getHorizontalController,
                     onThemeChanged: (val) => setState(() => _themeEnabled = val),
                     onAudioChanged: (val) => setState(() => _audioEnabled = val),
                     onReduceAnimationsChanged: (val) => setState(() => _reduceAnimationsEnabled = val),
@@ -211,7 +196,7 @@ class _CardLayout extends ConsumerWidget {
   final bool audioValue;
   final bool reduceAnimationsValue;
   final LibraryTab currentTab;
-  final ScrollController Function(String title, bool isMask) horizontalControllerProvider;
+  final LinkedScrollController Function(String title) horizontalControllerProvider;
   final ValueChanged<bool>? onThemeChanged;
   final ValueChanged<bool>? onAudioChanged;
   final ValueChanged<bool>? onReduceAnimationsChanged;
@@ -241,9 +226,11 @@ class _CardLayout extends ConsumerWidget {
                       shape: BoxShape.circle,
                     ),
                   )
-                : Opacity(
-                    opacity: 0,
-                    child: const SizedBox(width: 45, height: 45),
+                : Image.asset(
+                    'assets/images/coda_logo.png',
+                    width: 45,
+                    height: 45,
+                    fit: BoxFit.contain,
                   ),
           ),
           
@@ -283,15 +270,36 @@ class _CardLayout extends ConsumerWidget {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (idx > 0) const SizedBox(height: 28) else const SizedBox(height: 8),
+                    if (idx > 0) const SizedBox(height: 48) else const SizedBox(height: 8),
                     _buildListItemRow(
                       item.title,
                       [item.mediaType, ...item.tags],
                       item.posterUrl,
-                      horizontalControllerProvider(item.title, isKnockoutLayer),
+                      horizontalControllerProvider(item.title),
                       onDelete: () async {
-                        await ref.read(livingMemoryProvider.notifier).applyUpdates(
-                          MemoryUpdates(watchlistRemoves: [item.title]),
+                        _showDeleteConfirmDialog(
+                          context,
+                          ref,
+                          title: 'Delete "${item.title}"?',
+                          message: 'Are you sure you want to remove this from your watchlist?',
+                          onDelete: () async {
+                            await ref.read(livingMemoryProvider.notifier).applyUpdates(
+                              MemoryUpdates(watchlistRemoves: [item.title]),
+                            );
+                          },
+                        );
+                      },
+                      onLongPress: () {
+                        _showDeleteConfirmDialog(
+                          context,
+                          ref,
+                          title: 'Delete "${item.title}"?',
+                          message: 'Are you sure you want to remove this from your watchlist?',
+                          onDelete: () async {
+                            await ref.read(livingMemoryProvider.notifier).applyUpdates(
+                              MemoryUpdates(watchlistRemoves: [item.title]),
+                            );
+                          },
                         );
                       },
                     ),
@@ -303,41 +311,105 @@ class _CardLayout extends ConsumerWidget {
           ],
 
           if (currentTab == LibraryTab.settings) ...[
-            const SizedBox(height: 35),
-            
-            _buildSettingsRow('Theme', hasToggle: true, toggleValue: themeValue, onToggle: onThemeChanged),
-            const SizedBox(height: 35),
-            _buildSettingsRow('Privacy policy'),
-            const SizedBox(height: 35),
-            _buildSettingsRow('Memories'),
-            const SizedBox(height: 35),
+            const SizedBox(height: 48),
             _buildSettingsRow(
-              'Reset Account',
-              onTap: () => _showResetProfileDialog(context, ref),
+              'Account',
+              onTap: () => context.push('/account'),
             ),
-            const SizedBox(height: 35),
+            const SizedBox(height: 48),
             _buildSettingsRow(
-              'Reduce animations',
+              'Coda Plus',
+              onTap: () => context.push('/support-coda'),
+            ),
+            const SizedBox(height: 48),
+            _buildSettingsRow(
+              'Memories',
+              onTap: () => context.push('/memories?tab=0'),
+            ),
+            const SizedBox(height: 48),
+            _buildSettingsRow(
+              'Manage Guardrails',
+              onTap: () => context.push('/memories?tab=2'),
+            ),
+            const SizedBox(height: 48),
+            _buildSettingsRow(
+              'Audio',
               hasToggle: true,
-              toggleValue: reduceAnimationsValue,
-              onToggle: onReduceAnimationsChanged,
+              toggleValue: audioValue,
+              onToggle: onAudioChanged,
             ),
-            const SizedBox(height: 35),
-            _buildSettingsRow('Audio', hasToggle: true, toggleValue: audioValue, onToggle: onAudioChanged),
-            
+            const SizedBox(height: 48),
+            _buildSettingsRow('Privacy policy'),
             const SizedBox(height: 64),
           ],
 
           if (currentTab == LibraryTab.archive) ...[
             const SizedBox(height: 35),
-            _buildArchiveRow('Serial Experiment Lain', 'Psychological trauma dressed as a teddy'),
-            const SizedBox(height: 35),
-            _buildArchiveRow('Interstellar', 'Love transcends time and space'),
+            (() {
+              final archivedSessions = ref.watch(archivedSessionsProvider);
+              if (archivedSessions.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: isKnockoutLayer
+                      ? Text(
+                          'Your archive is empty.',
+                          style: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        )
+                      : Opacity(
+                          opacity: 0,
+                          child: Text(
+                            'Your archive is empty.',
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                );
+              }
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ...archivedSessions.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final session = entry.value;
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (idx > 0) const SizedBox(height: 35),
+                        _buildArchiveRow(
+                          session.title,
+                          session.oneLineSummary,
+                          onTap: () {
+                            context.push('/session-chat?id=${session.id}');
+                          },
+                          onLongPress: () {
+                            _showDeleteConfirmDialog(
+                              context,
+                              ref,
+                              title: 'Delete Session?',
+                              message: 'Are you sure you want to delete this session? This will remove all chat logs and history associated with this recommendation.',
+                              onDelete: () async {
+                                await ref.read(archivedSessionsProvider.notifier).deleteSession(session.id);
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  }),
+                ],
+              );
+            })(),
             const SizedBox(height: 64),
           ],
 
           if (currentTab == LibraryTab.seen) ...[
-            const SizedBox(height: 35),
+            const SizedBox(height: 48),
             if (memory.seen.isEmpty && memory.notForMe.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -390,19 +462,50 @@ class _CardLayout extends ConsumerWidget {
                 ...memory.seen.map((title) => _buildSeenRow(
                       title,
                       onDelete: () async {
-                        final newSeen = List<String>.from(memory.seen)..remove(title);
-                        final newGuardrails = List<String>.from(memory.guardrails)
-                          ..remove('Already watched: $title');
-                        final updates = LivingMemory(
-                          globalIdentity: memory.globalIdentity,
-                          categoryProfiles: memory.categoryProfiles,
-                          recentContext: memory.recentContext,
-                          guardrails: newGuardrails,
-                          seen: newSeen,
-                          notForMe: memory.notForMe,
-                          watchlist: memory.watchlist,
+                        _showDeleteConfirmDialog(
+                          context,
+                          ref,
+                          title: 'Delete "$title"?',
+                          message: 'Are you sure you want to remove this from your history?',
+                          onDelete: () async {
+                            final newSeen = List<String>.from(memory.seen)..remove(title);
+                            final newGuardrails = List<String>.from(memory.guardrails)
+                              ..remove('Already watched: $title');
+                            final updates = LivingMemory(
+                              globalIdentity: memory.globalIdentity,
+                              categoryProfiles: memory.categoryProfiles,
+                              recentContext: memory.recentContext,
+                              guardrails: newGuardrails,
+                              seen: newSeen,
+                              notForMe: memory.notForMe,
+                              watchlist: memory.watchlist,
+                            );
+                            await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
+                          },
                         );
-                        await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
+                      },
+                      onLongPress: () {
+                        _showDeleteConfirmDialog(
+                          context,
+                          ref,
+                          title: 'Delete "$title"?',
+                          message: 'Are you sure you want to remove this from your history?',
+                          onDelete: () async {
+                            final newSeen = List<String>.from(memory.seen)..remove(title);
+                            final newGuardrails = List<String>.from(memory.guardrails)
+                              ..remove('Already watched: $title');
+                            final updates = LivingMemory(
+                              globalIdentity: memory.globalIdentity,
+                              categoryProfiles: memory.categoryProfiles,
+                              recentContext: memory.recentContext,
+                              guardrails: newGuardrails,
+                              seen: newSeen,
+                              notForMe: memory.notForMe,
+                              watchlist: memory.watchlist,
+                            );
+                            await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
+                          },
+                        );
                       },
                     )),
               ],
@@ -435,19 +538,50 @@ class _CardLayout extends ConsumerWidget {
                 ...memory.notForMe.map((title) => _buildSeenRow(
                       title,
                       onDelete: () async {
-                        final newNotForMe = List<String>.from(memory.notForMe)..remove(title);
-                        final newGuardrails = List<String>.from(memory.guardrails)
-                          ..remove('Avoid: $title (rejected)');
-                        final updates = LivingMemory(
-                          globalIdentity: memory.globalIdentity,
-                          categoryProfiles: memory.categoryProfiles,
-                          recentContext: memory.recentContext,
-                          guardrails: newGuardrails,
-                          seen: memory.seen,
-                          notForMe: newNotForMe,
-                          watchlist: memory.watchlist,
+                        _showDeleteConfirmDialog(
+                          context,
+                          ref,
+                          title: 'Delete "$title"?',
+                          message: 'Are you sure you want to remove this from your history?',
+                          onDelete: () async {
+                            final newNotForMe = List<String>.from(memory.notForMe)..remove(title);
+                            final newGuardrails = List<String>.from(memory.guardrails)
+                              ..remove('Avoid: $title (rejected)');
+                            final updates = LivingMemory(
+                              globalIdentity: memory.globalIdentity,
+                              categoryProfiles: memory.categoryProfiles,
+                              recentContext: memory.recentContext,
+                              guardrails: newGuardrails,
+                              seen: memory.seen,
+                              notForMe: newNotForMe,
+                              watchlist: memory.watchlist,
+                            );
+                            await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
+                          },
                         );
-                        await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
+                      },
+                      onLongPress: () {
+                        _showDeleteConfirmDialog(
+                          context,
+                          ref,
+                          title: 'Delete "$title"?',
+                          message: 'Are you sure you want to remove this from your history?',
+                          onDelete: () async {
+                            final newNotForMe = List<String>.from(memory.notForMe)..remove(title);
+                            final newGuardrails = List<String>.from(memory.guardrails)
+                              ..remove('Avoid: $title (rejected)');
+                            final updates = LivingMemory(
+                              globalIdentity: memory.globalIdentity,
+                              categoryProfiles: memory.categoryProfiles,
+                              recentContext: memory.recentContext,
+                              guardrails: newGuardrails,
+                              seen: memory.seen,
+                              notForMe: newNotForMe,
+                              watchlist: memory.watchlist,
+                            );
+                            await ref.read(livingMemoryProvider.notifier).seedMemory(updates);
+                          },
+                        );
                       },
                     )),
               ],
@@ -459,8 +593,13 @@ class _CardLayout extends ConsumerWidget {
     );
   }
 
-  Widget _buildArchiveRow(String title, String subtitle) {
-    return Padding(
+  Widget _buildArchiveRow(
+    String title,
+    String subtitle, {
+    VoidCallback? onTap,
+    VoidCallback? onLongPress,
+  }) {
+    final rowContent = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -530,11 +669,26 @@ class _CardLayout extends ConsumerWidget {
         ],
       ),
     );
+
+    if (isKnockoutLayer || (onTap == null && onLongPress == null)) {
+      return rowContent;
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      behavior: HitTestBehavior.opaque,
+      child: rowContent,
+    );
   }
 
-  Widget _buildSeenRow(String title, {VoidCallback? onDelete}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+  Widget _buildSeenRow(
+    String title, {
+    VoidCallback? onDelete,
+    VoidCallback? onLongPress,
+  }) {
+    final rowContent = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -572,6 +726,16 @@ class _CardLayout extends ConsumerWidget {
         ],
       ),
     );
+
+    if (isKnockoutLayer || onLongPress == null) {
+      return rowContent;
+    }
+
+    return GestureDetector(
+      onLongPress: onLongPress,
+      behavior: HitTestBehavior.opaque,
+      child: rowContent,
+    );
   }
 
   Widget _buildListItemRow(
@@ -580,8 +744,9 @@ class _CardLayout extends ConsumerWidget {
     String imageAsset,
     ScrollController horizontalScroll, {
     VoidCallback? onDelete,
+    VoidCallback? onLongPress,
   }) {
-    return Padding(
+    final rowContent = Padding(
       padding: const EdgeInsets.only(left: 24, right: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -646,7 +811,10 @@ class _CardLayout extends ConsumerWidget {
                 SingleChildScrollView(
                   controller: horizontalScroll,
                   scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  clipBehavior: Clip.hardEdge,
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: tags.map((tag) => Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: _buildTagPill(tag),
@@ -656,7 +824,7 @@ class _CardLayout extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 24),
           if (onDelete != null) ...[
             if (!isKnockoutLayer)
               IconButton(
@@ -672,43 +840,122 @@ class _CardLayout extends ConsumerWidget {
         ],
       ),
     );
+
+    if (isKnockoutLayer || onLongPress == null) {
+      return rowContent;
+    }
+
+    return GestureDetector(
+      onLongPress: onLongPress,
+      behavior: HitTestBehavior.opaque,
+      child: rowContent,
+    );
   }
 
   Widget _buildTagPill(String text) {
-    if (isKnockoutLayer) {
-      // Punch a partial hole for the tag background
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: ShapeDecoration(
-          color: Colors.black.withValues(alpha: 0.55), // 55% knockout hole
-          shape: const StadiumBorder(),
-        ),
-        child: Opacity(
-          opacity: 0, // Text doesn't punch a hole
-          child: Text(
-            text,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      );
-    }
+    final textStyle = GoogleFonts.inter(
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+    );
 
-    // Normal layer: Just draw the text over the hole
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: const ShapeDecoration(
-        color: Colors.transparent, // Background is punched out
-        shape: StadiumBorder(),
+      decoration: ShapeDecoration(
+        color: isKnockoutLayer
+            ? Colors.black.withValues(alpha: 0.55) // 55% knockout hole
+            : Colors.transparent, // Background is punched out
+        shape: const StadiumBorder(),
       ),
       child: Text(
         text,
-        style: GoogleFonts.inter(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: Colors.black87, // Dark text over bright hole
+        style: textStyle.copyWith(
+          color: isKnockoutLayer ? Colors.transparent : Colors.black87,
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmDialog(
+    BuildContext context,
+    WidgetRef ref, {
+    required String title,
+    required String message,
+    required VoidCallback onDelete,
+  }) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
+      builder: (dialogCtx) => BackdropFilter(
+        filter: dart_ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF16181C).withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  message,
+                  style: GoogleFonts.inter(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogCtx).pop(),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.inter(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(dialogCtx).pop();
+                        onDelete();
+                      },
+                      child: Text(
+                        'Delete',
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFFFF3B5C),
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

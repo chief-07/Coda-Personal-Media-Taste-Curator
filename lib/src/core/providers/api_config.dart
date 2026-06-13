@@ -5,10 +5,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 String getApiBaseUrl() {
   if (kIsWeb) {
     final uri = Uri.base;
-    // If the web app is loaded from port 8085 (which is the http-server LAN preview),
-    // we want all API requests to target the backend server running on port 8080.
-    if (uri.port != 8080) {
-      return '${uri.scheme}://${uri.host}:8080';
+    // If the web app is loaded from some other port (e.g. dev server),
+    // point to the backend server.
+    // If the scheme is https, point to 8443. If http, point to 8080.
+    if (uri.port != 8080 && uri.port != 8443) {
+      final targetPort = uri.scheme == 'https' ? 8443 : 8080;
+      return '${uri.scheme}://${uri.host}:$targetPort';
     }
     return uri.origin;
   } else {

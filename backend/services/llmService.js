@@ -97,6 +97,15 @@ Your job is to:
 - The payload contains a "loved_titles" array listing works the user explicitly swiped right / loved in the past.
 - You MUST prioritize using titles from this "loved_titles" array for your seed-based queries (Seed-Based Query 1 and 2), rather than guessing from the text profile or seen list.
 
+**ASK CODA RESEARCH CONTEXT (CRITICAL):**
+- If the payload contains an "ask_research_context" string (which has Wikipedia and forum summaries of the works the user explicitly mentioned in their request), you MUST read and analyze it carefully.
+- Decode and identify:
+  1. What makes these works unique? Is there a specific animation style (e.g. experimental direction), director traits (e.g. Akiyuki Shinbo), studio style (e.g. Studio Shaft's signature surreal framing), narrative pacing, or musical lining?
+  2. The underlying thematic or atmospheric qualities that connect them (e.g. Hikikomori anxiety, psychological distress, tragic romance, surreal/eerie atmosphere).
+- You MUST use these decoded themes, styles, studios, or directors as the primary driver for your recommendation routing. Bake these characteristics directly into your "selected_vibe_focus", Master Directive, and at least 3 of your 5 search queries (e.g. "experimental anime by Shaft", "surreal psychological anime with existential dread").
+- Do NOT just copy the names of the titles themselves. Dig deeper into the commonalities shown in the research context.
+- Use the user's historical profile ("core_identity") only as a subtle touch to align tone, but prioritize the immediate craving and research context insights above all else.
+
 
 **SEARCH QUERY CRITERIA (STRICT 3+2 SPLIT):**
 - You MUST generate exactly 5 search queries.
@@ -566,9 +575,10 @@ You will perform a global harmonization pass:
    - Find cross-media and cultural/geographic correlations: for example, if they like Anime (e.g., Steins;Gate, Monogatari) and also mention Visual Novels (e.g., Tsukihime, Katawa Shoujo), explicitly deduce and record their strong preference for Japanese media aesthetics, character tropes, sub-genres like nakige/utsuge, and visual novel/light novel storytelling styles.
    - Trace the psychological relationships between these likes (e.g., how their love of a painter protagonist or a tragic romance in one format maps onto their overall preference for stories about the beauty and cruelty of life).
    - Prioritize their specifically marked "loved" works (highly valued items) as the absolute core of their identity.
-4. Synthesize a clean, 2-paragraph core identity:
-   - First paragraph: Describe who they are, their general temperament, likely age/demographic context, and the psychological/emotional needs their media satisfies. Integrate their harvested emotional triggers and reaction styles (e.g., how they use specific formats for catharsis/crying, emotional wreckage, or comfort) and explain what psychological role these stories play in their life. Explicitly mention any strong cultural or stylistic inclinations (such as a deep alignment with Japanese anime/VN aesthetics and narrative structures).
-   - Second paragraph: Describe the specific unifying themes, motifs, and narrative styles they seek across different formats, explicitly weaving in their emotional drivers and the specific feelings they look to evoke. Make it beautiful, cohesive prose (no bullet points or lists).
+4. Synthesize a clean, multi-paragraph core identity:
+   - Generate a list of paragraphs (typically 2 to 4 paragraphs, depending on the complexity and variety of their tastes).
+   - Do not artificially restrict it to a fixed length if they have diverse or detailed tastes. Let it grow organically to capture separate aspects of their identity, temperament, narrative interests, or cross-media stylistic preferences (e.g. one paragraph for core temperament and psychological drivers, one for Japanese/anime aesthetics, one for space/sci-fi tactical RPG preferences if they have distinct separate tastes).
+   - Make it beautiful, cohesive prose per paragraph (no bullet points or lists).
 5. Clean and consolidate the category-specific profiles, outputting them in "category_profiles_overwrite". 
    CRITICAL: Remove all redundancies, word soup, and exact duplicates. Cleanly rewrite each category's list to compress and merge similar-meaning points (e.g., if there are multiple entries like "Loves Steins;Gate" and "Loves Steins;Gate for romance", consolidate them into a single clean statement like "Loves Steins;Gate for its romance and psychological depth"). Keep specifically marked loved works preserved clearly.
 
@@ -582,8 +592,9 @@ ${JSON.stringify(currentMemory)}
 Respond ONLY with a JSON object in this format:
 {
   "global_identity_overwrite": [
-    "First paragraph describing who they are, their general vibe, personality, likely age group, and underlying psychological traits extracted from their interests.",
-    "Second paragraph describing the unifying threads in what they look for in stories, art, and experiences, connecting their various interests."
+    "Paragraph 1 describing who they are, their general vibe, personality, likely age group, and underlying psychological traits.",
+    "Paragraph 2 describing a cohesive facet of their tastes (e.g. love for melancholy, tragic romance, and Japanese visual novel aesthetics).",
+    "Paragraph 3 describing another distinct facet of their tastes if applicable (e.g. space operas and tactical RPG gaming), or more detailed traits."
   ],
   "category_profiles_overwrite": {
     "category_name_1": ["Clean, refined preference statement 1", "Clean, refined preference statement 2"],
@@ -695,8 +706,10 @@ const discussRecommendation = async (memory, title, mediaType, codaBlurb, pitchP
 
   const systemPrompt = `
 You are Coda. 
-You are a close friend with impeccable, artistic taste in books, anime, movies, games, and music.
-You recommended the work "${title}" (${mediaType}) to the user.
+You are a close, highly excited friend who has impeccable, artistic taste in books, anime, movies, games, and music.
+The user just finished the recommendation "${title}" (${mediaType}).
+You are absolutely thrilled and excited that they finished it, and you want to share the "afterglow" experience with them!
+
 Here is what you told them when you recommended it:
 - Your hook/blurb: "${codaBlurb}"
 - Your detailed pitch:
@@ -711,17 +724,30 @@ USER PROFILE CONTEXT:
 COMMUNITY TALK & FACTS (from web search):
 ${scrapedContext || 'No additional community threads retrieved.'}
 
-Your job is to talk with the user about "${title}".
-- Answer their questions about the plot, style, pacing, length, triggers, or tone of "${title}".
-- Relate your answers to their profile preferences (e.g. why they will connect or disconnect with certain aspects).
-- Speak with warmth, authenticity, and maturity.
-- Avoid typical AI transitions, bulleted lists, and robotic lists. Talk like a real person over text or a casual coffee.
-- If they ask for spoilers, warn them but satisfy their curiosity if they insist.
-- If the scraped context does not have the exact answer, use your pre-trained knowledge about "${title}" but remain accurate and honest.
+Your job is to talk with the user about "${title}":
+1. Speak with high warmth, enthusiasm, and companionable excitement. Share your own favorite moments, ask them how they felt about key events/scenes, and use exclamation marks where natural.
+2. Avoid typical robotic AI transitions, bulleted lists, and formal summaries. Talk like an excited friend texting or chatting over coffee.
+3. If the scraped context does not have the exact answer, use your pre-trained knowledge about "${title}" but remain accurate and honest.
+4. Do NOT self-censor or restrict discussions of mature themes, adult/eroge visual novels, horror/gore elements, or tragedy. Address them openly and naturally as a companion.
+5. Analyze the conversation history and the user's new message to identify if they express new tastes, likes/dislikes, or dealbreakers/guardrails:
+   - Extract these new preference statements into the "memory_updates" JSON object.
+   - For example: if they say "I hate visual novels with bad endings", add "No visual novels with bad endings" to "guardrails_appends".
+   - Valid category keys in "category_appends" are: "anime", "movies", "tv_shows", "visual_novels", "books", "games", "manga", "youtube", "music".
+6. Generate or update a "one_line_summary" summarizing their overall experience with this media so far based on their chat responses (e.g. "Loved the characters but felt the pacing dragged in the middle", or "Cried for three days straight at the ending").
 
-CRITICAL RULE:
-- Do NOT self-censor or restrict discussions of mature themes, adult/eroge visual novels, horror/gore elements, or tragedy. Address them openly and naturally as a companion.
-- Respond with a natural, conversational response (1-3 paragraphs maximum). Keep it formatted as plain text paragraphs without markdown bullet points.
+Respond ONLY with a JSON object:
+{
+  "message": "Coda's conversational response here (1-3 paragraphs, plain text without markdown bullet points)",
+  "one_line_summary": "One line summary of their experience so far",
+  "memory_updates": {
+    "global_identity_appends": ["Any new broad identity traits if applicable"],
+    "category_appends": {
+      "media_type_key": ["Any new media type specific preferences if applicable"]
+    },
+    "recent_context_overwrite": "Any new active direction if applicable",
+    "guardrails_appends": ["Any new negative dealbreakers if applicable"]
+  }
+}
 `;
 
   const messagesPayload = [
@@ -741,8 +767,17 @@ CRITICAL RULE:
   // Add user's latest message
   messagesPayload.push({ role: 'user', content: userMessage });
 
-  const response = await callOpenAI(messagesPayload);
-  return response;
+  try {
+    const responseJson = await callOpenAI(messagesPayload, { type: 'json_object' });
+    return JSON.parse(responseJson);
+  } catch (e) {
+    console.error('[Discuss Chat LLM Parse Error]:', e.message);
+    return {
+      message: "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
+      one_line_summary: "Chatting about " + title,
+      memory_updates: {}
+    };
+  }
 };
 
 const handleAskChat = async (memory, chatHistory, userMessage) => {
@@ -769,7 +804,12 @@ YOUR DIRECTIVE / FIRST MESSAGE (what you previously showed the user as an intro)
 YOUR JOB:
 1. Converse naturally with the user. Answer their questions, validate their feelings/mood, and ask clarifying questions if needed.
 2. Maintain a warm, artistic, friend-like, and casual tone. Avoid robotic assistant-speak.
-3. If they describe a craving or look for recommendations:
+3. CONVERSATION OVER NEW RECOMMENDATIONS:
+   - Check the chat history for metadata tags like \`[System: Coda recommended the work: "Title" (Type)]\`.
+   - If the user is asking questions about the recommended work (e.g., "why did you pick this?", "what is it about?", "who directed it?", or having a conversation about it), you MUST set "status": "chatting" and converse about that specific work.
+   - Do NOT trigger a new recommendation (i.e., do NOT set "status": "success") when the user is discussing the current recommendation, unless they explicitly ask for a different recommendation or a new pick (e.g., "give me a different one", "recommend something else", "let's try another").
+   - While you are banned from naming the pick in the chat text when first recommending it (Rule 5), you ARE allowed (and expected) to name and discuss the recommended work once the user has received it and is asking questions about it.
+4. If they describe a craving or look for recommendations:
    - If you still need more details to make a high-fidelity recommendation:
      - Set "status": "chatting".
      - Return your conversational response in "message".
@@ -779,7 +819,7 @@ YOUR JOB:
       - In "media_type", output the category of the pick (must be one of: "anime", "movie", "tv", "visual novel", "book", "game", "youtube", "music"). NOTE: Anime movies, anime films, and anime OVAs/specials must ALWAYS be routed as "anime" (not "movie" or "tv") so they use the correct anime metadata sources.
       - In "recommendation_query", write a highly descriptive search query that captures their craving (e.g. "intricate time-travel anime with emotional romance like Steins Gate" or "slow-burn visual novel set in school with gothic tragedy"). This query will be used to scrape actual recommendation threads.
       - In "hard_constraints", output an array of strings representing any strict constraints the user mentioned (e.g., ["Android only", "eroge / adult content", "male protagonist with female heroines", "no NTR", "web browser only"]). If no strict constraints are requested, output an empty array [].
-4. Banned: Do NOT recommend or name the pick directly in the chat text! Keep the title a surprise for the homescreen.
+5. Banned: When first generating a recommendation (setting "status": "success"), do NOT name or recommend the pick directly in the chat text! Keep the title a surprise for the homescreen. Once the recommendation has been made and the user is asking questions about it, this ban no longer applies.
 
 Respond ONLY with a JSON object in this format:
 {
@@ -812,7 +852,7 @@ Respond ONLY with a JSON object in this format:
 };
 
 const fetchMetadataViaLLM = async (title, mediaType) => {
-  const prompt = `You are a metadata assistant. For the given title and media type, provide the official genres and tags.
+  const prompt = `You are a metadata assistant. For the given title and media type, provide the official genres, tags, release year, and studio/developer/creator/director.
 Title: "${title}"
 Media Type: "${mediaType}"
 
@@ -821,7 +861,9 @@ Respond with ONLY a JSON object in this format:
   "title": "Clean Official Title",
   "genres": ["Genre1", "Genre2"],
   "tags": ["Tag1", "Tag2"],
-  "description": "Short synopsis/description of the work (max 2 sentences)."
+  "description": "Short synopsis/description of the work (max 2 sentences).",
+  "release_year": "YYYY",
+  "studio": "Studio name or developer or publisher or creator/director"
 }`;
   try {
     const responseJson = await callOpenAI([
@@ -831,6 +873,34 @@ Respond with ONLY a JSON object in this format:
   } catch (e) {
     console.error(`[LLM Metadata Fallback failed for "${title}"]:`, e.message);
     return null;
+  }
+};
+
+const extractTitlesFromText = async (text) => {
+  if (!text || typeof text !== 'string' || text.trim().length === 0) {
+    return [];
+  }
+  const prompt = `You are a media title extractor. Extract any specific media titles (movies, anime, games, books, manga, visual novels) explicitly mentioned in this text.
+Return ONLY a JSON object containing an array of strings under the key "titles". If no titles are mentioned, return an empty array under the key "titles".
+
+Text to extract from: "${text}"
+
+Respond with ONLY a JSON object:
+{
+  "titles": ["Title 1", "Title 2"]
+}`;
+  try {
+    const responseJson = await callOpenAI([
+      { role: 'user', content: prompt }
+    ], { type: 'json_object' });
+    const parsed = JSON.parse(responseJson);
+    if (parsed && Array.isArray(parsed.titles)) {
+      return parsed.titles;
+    }
+    return [];
+  } catch (e) {
+    console.error("[llmService] extractTitlesFromText failed:", e.message);
+    return [];
   }
 };
 
@@ -846,5 +916,7 @@ module.exports = {
   refineTasteFromFeedback,
   discussRecommendation,
   handleAskChat,
-  fetchMetadataViaLLM
+  fetchMetadataViaLLM,
+  extractTitlesFromText,
+  researchMediaThemes
 };

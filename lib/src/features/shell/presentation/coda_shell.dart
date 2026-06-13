@@ -11,6 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+
+import 'package:coda/src/features/home/presentation/home_screen.dart';
 import 'package:coda/src/features/library/presentation/library_screen.dart';
 import 'package:coda/src/features/library/presentation/widgets/library_tab_bar.dart';
 import 'package:coda/src/features/recommendation/application/audio_player_controller.dart';
@@ -25,13 +27,37 @@ class CodaShell extends ConsumerStatefulWidget {
   ConsumerState<CodaShell> createState() => _CodaShellState();
 }
 
-class _CodaShellState extends ConsumerState<CodaShell> {
+class _CodaShellState extends ConsumerState<CodaShell> with TickerProviderStateMixin {
   StreamSubscription? _intentSub;
   bool _isAnalyzingSharedImage = false;
+  
+  late final AnimationController _branchAnimationController;
+  late int _visibleIndex;
+  bool _isTransitioning = false;
+  int? _targetIndex;
+
+  int? _fromIndex;
+  int? _toIndex;
+
+  /// Persistent branch widget references – avoids depending on the removed
+  /// StatefulNavigationShell.children getter (go_router ≥17).
+  late final List<Widget> _branchWidgets;
 
   @override
   void initState() {
     super.initState();
+    _visibleIndex = widget.navigationShell.currentIndex;
+    _branchAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+      value: 1.0,
+    );
+    // Branch order mirrors router.dart: 0=Library, 1=Home
+    // Ask (index 2) is pushed as a root route, not a shell branch
+    _branchWidgets = const [
+      LibraryScreen(),
+      HomeScreen(),
+    ];
     if (!kIsWeb) {
       // Listener for media sharing when app is in background or foreground
       _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
@@ -52,8 +78,21 @@ class _CodaShellState extends ConsumerState<CodaShell> {
   }
 
   @override
+  void didUpdateWidget(covariant CodaShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.navigationShell.currentIndex != oldWidget.navigationShell.currentIndex) {
+      if (!_isTransitioning) {
+        setState(() {
+          _visibleIndex = widget.navigationShell.currentIndex;
+        });
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _intentSub?.cancel();
+    _branchAnimationController.dispose();
     super.dispose();
   }
 
@@ -117,6 +156,49 @@ class _CodaShellState extends ConsumerState<CodaShell> {
     }
   }
 
+  void _handleTap(int index) {
+    // Ask Coda (index 2) is a pushed root route — use context.push
+    if (index == 2) {
+      context.push('/ask');
+      return;
+    }
+
+    if (index == widget.navigationShell.currentIndex) return;
+
+    if (index == 0) {
+      ref.read(libraryTabProvider.notifier).setTab(LibraryTab.lists);
+    }
+
+    final fromIndex = widget.navigationShell.currentIndex;
+    final toIndex = index;
+
+    // Crossfade between Home (1) and Library (0)
+    setState(() {
+      _fromIndex = fromIndex;
+      _toIndex = toIndex;
+      _visibleIndex = toIndex;
+      _targetIndex = toIndex;
+      _isTransitioning = true;
+    });
+
+    widget.navigationShell.goBranch(
+      toIndex,
+      initialLocation: toIndex == widget.navigationShell.currentIndex,
+    );
+
+    _branchAnimationController.duration = const Duration(milliseconds: 250);
+    _branchAnimationController.forward(from: kIsWeb ? 0.6 : 0.3).then((_) {
+      if (mounted) {
+        setState(() {
+          _isTransitioning = false;
+          _targetIndex = null;
+          _fromIndex = null;
+          _toIndex = null;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final navigationShell = widget.navigationShell;
@@ -132,6 +214,7 @@ class _CodaShellState extends ConsumerState<CodaShell> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF101114),
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // ── Global Background ────────────────────────────
@@ -177,11 +260,57 @@ class _CodaShellState extends ConsumerState<CodaShell> {
                 ),
               ),
             ),
-          Positioned.fill(
-            child: Container(color: Colors.white.withValues(alpha: 0.15)),
+          TweenAnimationBuilder<double>(
+            key: ValueKey(rec?.id ?? 'default_bg'),
+            tween: Tween<double>(begin: 0.0, end: 0.05),
+            duration: const Duration(milliseconds: 1500),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Positioned.fill(
+                child: Container(color: Colors.white.withValues(alpha: value)),
+              );
+            },
           ),
-          // ── Page content ─────────────────────────────────
-          navigationShell,
+          AnimatedBuilder(
+            animation: _branchAnimationController,
+            builder: (context, _) {
+              final double t = _branchAnimationController.value;
+              final double cardTopOffset = (mediaQuery?.padding.top ?? 0) + 81.0;
+
+              Widget finalWidget;
+
+              if (_isTransitioning && _fromIndex != null && _toIndex != null) {
+                // Crossfade between Home (1) and Library (0)
+                  final Widget fromWidget = _branchWidgets[_fromIndex!];
+                  final Widget toWidget = _branchWidgets[_toIndex!];
+
+                  final double startFrom = kIsWeb ? 0.6 : 0.3;
+                  final double crossFadeT = ((t - startFrom) / (1.0 - startFrom)).clamp(0.0, 1.0);
+
+                  finalWidget = Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Opacity(
+                          opacity: (1.0 - crossFadeT).clamp(0.0, 1.0),
+                          child: fromWidget,
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: Opacity(
+                          opacity: crossFadeT,
+                          child: toWidget,
+                        ),
+                      ),
+                    ],
+                  );
+              } else {
+                // Not transitioning — render the shell directly
+                finalWidget = navigationShell;
+              }
+
+              return finalWidget;
+            },
+          ),
 
           // ── Floating navbar ──────────────────────────────
           if (!isKeyboardOpen)
@@ -190,17 +319,9 @@ class _CodaShellState extends ConsumerState<CodaShell> {
               right: 0,
               bottom: bottomPadding,
               child: Center(
-                child: _FloatingNavBar(
-                  currentIndex: navigationShell.currentIndex,
-                  onTap: (index) {
-                    if (index == 0) {
-                      ref.read(libraryTabProvider.notifier).setTab(LibraryTab.lists);
-                    }
-                    navigationShell.goBranch(
-                      index,
-                      initialLocation: index == navigationShell.currentIndex,
-                    );
-                  },
+                child: FloatingNavBar(
+                  currentIndex: _targetIndex ?? navigationShell.currentIndex,
+                  onTap: _handleTap,
                 ),
               ),
             ),
@@ -240,19 +361,19 @@ class _CodaShellState extends ConsumerState<CodaShell> {
   }
 }
 
-class _FloatingNavBar extends StatelessWidget {
-  const _FloatingNavBar({required this.currentIndex, required this.onTap});
+class FloatingNavBar extends StatelessWidget {
+  const FloatingNavBar({required this.currentIndex, required this.onTap, super.key});
 
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  static final List<_NavItem> _items = [
-    _NavItem(icon: PhosphorIcons.cards(PhosphorIconsStyle.fill), label: 'List'),
-    _NavItem(
+  static final List<NavItem> _items = [
+    NavItem(icon: PhosphorIcons.cards(PhosphorIconsStyle.fill), label: 'List'),
+    NavItem(
       icon: PhosphorIcons.houseSimple(PhosphorIconsStyle.fill),
       label: 'Home',
     ),
-    _NavItem(
+    NavItem(
       icon: PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
       label: 'Ask',
     ),
@@ -322,8 +443,8 @@ class _FloatingNavBar extends StatelessWidget {
   }
 }
 
-class _NavItem {
-  const _NavItem({required this.icon, required this.label});
+class NavItem {
+  const NavItem({required this.icon, required this.label});
 
   final IconData icon;
   final String label;

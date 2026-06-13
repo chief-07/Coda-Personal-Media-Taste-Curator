@@ -2,89 +2,154 @@ import 'dart:ui' as dart_ui;
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
+import 'package:coda/src/features/recommendation/application/audio_player_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:coda/src/core/providers/api_config.dart';
+import 'package:coda/src/features/home/domain/media_type.dart';
+import 'package:coda/src/core/utils/url_helper.dart';
+import 'package:coda/src/core/utils/coda_youtube_player.dart';
 
 class MediaDetailScreen extends ConsumerWidget {
   const MediaDetailScreen({required this.recommendation, super.key});
 
   final Recommendation recommendation;
 
-  List<Widget> _buildStreamingButtons(BuildContext context) {
-    final type = recommendation.mediaType.name.toLowerCase();
-    
-    // Quick links based on media type
-    if (type == 'anime' || type == 'manga') {
-      return [
-        _buildLinkButton(context, 'Crunchyroll', PhosphorIconsBold.playCircle, 'https://www.crunchyroll.com'),
-        _buildLinkButton(context, 'Netflix', PhosphorIconsBold.filmStrip, 'https://www.netflix.com'),
-      ];
-    } else if (type == 'movie' || type == 'tv' || type == 'show') {
-      return [
-        _buildLinkButton(context, 'Netflix', PhosphorIconsBold.filmStrip, 'https://www.netflix.com'),
-        _buildLinkButton(context, 'Prime Video', PhosphorIconsBold.television, 'https://www.amazon.com/Prime-Video'),
-      ];
-    } else if (type == 'game' || type == 'visual novel' || type == 'visualnovel') {
-      return [
-        _buildLinkButton(context, 'Steam', PhosphorIconsBold.gameController, 'https://store.steampowered.com'),
-      ];
-    } else if (type == 'book') {
-      return [
-        _buildLinkButton(context, 'Google Books', PhosphorIconsBold.bookOpen, 'https://books.google.com'),
-        _buildLinkButton(context, 'Open Library', PhosphorIconsBold.bookmarks, 'https://openlibrary.org'),
-      ];
+  Future<void> _launchUrl(BuildContext context, String urlString) async {
+    try {
+      await openUrl(urlString);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error launching link: $e'),
+            backgroundColor: const Color(0xFFE03E3E),
+          ),
+        );
+      }
     }
-    
-    // Default fallback
-    return [
-      _buildLinkButton(context, 'Google Search', PhosphorIconsBold.magnifyingGlass, 'https://www.google.com'),
-    ];
   }
 
-  Widget _buildLinkButton(BuildContext context, String label, IconData icon, String url) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          // Placeholder action
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Opening $label...'),
-              backgroundColor: const Color(0xFF16181C),
-            ),
-          );
-        },
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1,
-            ),
+  Widget _buildLinkButton(BuildContext context, WidgetRef ref, String label, IconData icon, String url) {
+    return GestureDetector(
+      onTap: () {
+        ref.read(activeSessionProvider.notifier).start(recommendation);
+        context.go('/session');
+        _launchUrl(context, url);
+      },
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.08),
+            width: 1,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: Colors.white70, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white70, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  List<Widget> _buildLinkButtons(BuildContext context, WidgetRef ref) {
+    final List<Widget> buttons = [];
+    final type = recommendation.mediaType;
+    final query = recommendation.title;
+    
+    void addButton(String label, IconData icon, String url) {
+      buttons.add(_buildLinkButton(context, ref, label, icon, url));
+    }
+
+    switch (type) {
+      case MediaType.anime:
+        addButton('Crunchyroll', PhosphorIconsBold.playCircle, 'https://www.crunchyroll.com/search?q=${Uri.encodeComponent(query)}');
+        addButton('Netflix', PhosphorIconsBold.filmStrip, 'https://www.netflix.com/search?q=${Uri.encodeComponent(query)}');
+        break;
+      case MediaType.manga:
+        addButton('MangaDex', PhosphorIconsBold.bookOpen, 'https://mangadex.org/search?q=${Uri.encodeComponent(query)}');
+        addButton('Netflix', PhosphorIconsBold.filmStrip, 'https://www.netflix.com/search?q=${Uri.encodeComponent(query)}');
+        break;
+      case MediaType.movie:
+      case MediaType.tv:
+        addButton('Netflix', PhosphorIconsBold.filmStrip, 'https://www.netflix.com/search?q=${Uri.encodeComponent(query)}');
+        addButton('Prime Video', PhosphorIconsBold.television, 'https://www.amazon.com/s?k=${Uri.encodeComponent(query)}');
+        break;
+      case MediaType.visualNovel:
+        addButton('VNDB', PhosphorIconsBold.bookBookmark, 'https://vndb.org/v?sq=${Uri.encodeComponent(query)}');
+        addButton('Steam', PhosphorIconsBold.gameController, 'https://store.steampowered.com/search/?term=${Uri.encodeComponent(query)}');
+        break;
+      case MediaType.game:
+        addButton('Steam', PhosphorIconsBold.gameController, 'https://store.steampowered.com/search/?term=${Uri.encodeComponent(query)}');
+        addButton('Epic Games', PhosphorIconsBold.gameController, 'https://store.epicgames.com/en-US/browse?q=${Uri.encodeComponent(query)}');
+        break;
+      case MediaType.book:
+        addButton('Google Books', PhosphorIconsBold.bookOpen, 'https://books.google.com/books?q=${Uri.encodeComponent(query)}');
+        addButton('Open Library', PhosphorIconsBold.bookmarks, 'https://openlibrary.org/search?q=${Uri.encodeComponent(query)}');
+        break;
+      case MediaType.youtube:
+        addButton('YouTube', PhosphorIconsBold.youtubeLogo, 'https://www.youtube.com/results?search_query=${Uri.encodeComponent(query)}');
+        break;
+      case MediaType.music:
+        addButton('Spotify', PhosphorIconsBold.musicNotes, 'https://open.spotify.com/search/${Uri.encodeComponent(query)}');
+        addButton('YouTube Music', PhosphorIconsBold.youtubeLogo, 'https://music.youtube.com/search?q=${Uri.encodeComponent(query)}');
+        break;
+      default:
+        break;
+    }
+
+    // Always add Google Search at the end
+    addButton(
+      'Google Search',
+      PhosphorIconsBold.magnifyingGlass,
+      'https://www.google.com/search?q=${Uri.encodeComponent('$query ${type.label}')}',
+    );
+
+    return buttons;
+  }
+
+  List<Widget> _buildLinkGrid(BuildContext context, WidgetRef ref) {
+    final buttons = _buildLinkButtons(context, ref);
+    final List<Widget> rows = [];
+    
+    for (int i = 0; i < buttons.length; i += 2) {
+      if (i + 1 < buttons.length) {
+        rows.add(
+          Row(
+            children: [
+              Expanded(child: buttons[i]),
+              const SizedBox(width: 12),
+              Expanded(child: buttons[i + 1]),
+            ],
+          ),
+        );
+      } else {
+        rows.add(buttons[i]);
+      }
+      if (i + 2 < buttons.length) {
+        rows.add(const SizedBox(height: 12));
+      }
+    }
+    
+    return rows;
   }
 
   @override
@@ -130,7 +195,6 @@ class MediaDetailScreen extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
                         onTap: () => context.pop(),
@@ -151,16 +215,6 @@ class MediaDetailScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      Text(
-                        recommendation.mediaType.name.toUpperCase(),
-                        style: GoogleFonts.inter(
-                          color: Colors.white60,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                      const SizedBox(width: 40), // spacer for symmetry
                     ],
                   ),
                 ),
@@ -176,24 +230,41 @@ class MediaDetailScreen extends ConsumerWidget {
                         
                         // Centered Poster Layout
                         Center(
-                          child: Container(
-                            width: screenWidth * 0.58,
-                            height: (screenWidth * 0.58) * 1.5,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(24),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.4),
-                                  blurRadius: 30,
-                                  offset: const Offset(0, 15),
+                          child: GestureDetector(
+                            onTap: () {
+                              if (recommendation.trailerUrl != null && recommendation.trailerUrl!.isNotEmpty) {
+                                _showTrailerDialog(context, ref, recommendation.trailerUrl!, recommendation.title);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('No trailer available for this pick'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Container(
+                              width: screenWidth * 0.58,
+                              height: (screenWidth * 0.58) * 1.5,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.4),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, 15),
+                                  ),
+                                ],
+                              ),
+                              child: Hero(
+                                tag: 'poster_${recommendation.id}',
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: FallbackImage(
+                                    url: recommendation.posterUrl,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: FallbackImage(
-                                url: recommendation.posterUrl,
-                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
@@ -215,56 +286,61 @@ class MediaDetailScreen extends ConsumerWidget {
                         
                         const SizedBox(height: 8),
                         
-                        // Year & Tags
-                        Row(
-                          children: [
-                            if (recommendation.releaseYear != null) ...[
-                              Text(
-                                recommendation.releaseYear!,
-                                style: GoogleFonts.inter(
-                                  color: Colors.white38,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Container(
-                                width: 4,
-                                height: 4,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white24,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                            ],
-                            Expanded(
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
-                                child: Row(
-                                  children: recommendation.tags.map((tag) {
-                                    return Container(
-                                      margin: const EdgeInsets.only(right: 8),
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withValues(alpha: 0.06),
-                                        borderRadius: BorderRadius.circular(20),
+                        // Year, Studio, Genre, Themes Detail Items
+                        Builder(
+                          builder: (context) {
+                            final List<String> detailItems = [];
+                            if (recommendation.releaseYear.isNotEmpty) {
+                              detailItems.add(recommendation.releaseYear);
+                            }
+                            if (recommendation.studio.isNotEmpty) {
+                              detailItems.add(recommendation.studio);
+                            }
+                            if (recommendation.genres.isNotEmpty) {
+                              detailItems.addAll(recommendation.genres.take(2));
+                            }
+                            if (recommendation.tags.isNotEmpty) {
+                              final uniqueTags = recommendation.tags
+                                  .where((t) => !detailItems.contains(t))
+                                  .take(2);
+                              detailItems.addAll(uniqueTags);
+                            }
+                            if (recommendation.fitSignals.isNotEmpty) {
+                              final uniqueThemes = recommendation.fitSignals
+                                  .where((t) => !detailItems.contains(t))
+                                  .take(2);
+                              detailItems.addAll(uniqueThemes);
+                            }
+
+                            if (detailItems.isEmpty) return const SizedBox.shrink();
+
+                            return Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 8,
+                              runSpacing: 6,
+                              children: [
+                                for (int i = 0; i < detailItems.length; i++) ...[
+                                  Text(
+                                    detailItems[i],
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white60,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  if (i < detailItems.length - 1)
+                                    Container(
+                                      width: 4,
+                                      height: 4,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white24,
                                       ),
-                                      child: Text(
-                                        tag,
-                                        style: GoogleFonts.inter(
-                                          color: Colors.white60,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ),
-                          ],
+                                    ),
+                                ],
+                              ],
+                            );
+                          },
                         ),
                         
                         const SizedBox(height: 24),
@@ -283,7 +359,8 @@ class MediaDetailScreen extends ConsumerWidget {
                         const SizedBox(height: 16),
                         
                         // Description
-                        if (recommendation.description.isNotEmpty)
+                        if (recommendation.description.isNotEmpty &&
+                            recommendation.description.toLowerCase() != recommendation.title.toLowerCase())
                           Text(
                             recommendation.description,
                             style: GoogleFonts.inter(
@@ -307,11 +384,7 @@ class MediaDetailScreen extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            ..._buildStreamingButtons(context),
-                          ],
-                        ),
+                        ..._buildLinkGrid(context, ref),
                         
                         const SizedBox(height: 120), // bottom spacing for Watch button
                       ],
@@ -364,6 +437,83 @@ class MediaDetailScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showTrailerDialog(BuildContext context, WidgetRef ref, String videoId, String title) {
+    ref.read(audioPlayerControllerProvider.notifier).pause();
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withValues(alpha: 0.85),
+      builder: (context) {
+        return _TrailerDialog(videoId: videoId, title: title);
+      },
+    ).then((_) {
+      ref.read(audioPlayerControllerProvider.notifier).resume();
+    });
+  }
+}
+
+class _TrailerDialog extends StatelessWidget {
+  const _TrailerDialog({required this.videoId, required this.title});
+
+  final String videoId;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.15),
+              ),
+              child: const Icon(Icons.close, color: Colors.white, size: 20),
+            ),
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              color: Colors.black,
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: CodaYoutubePlayer(
+                  videoId: videoId,
+                  autoPlay: true,
+                  showControls: true,
+                  mute: false,
+                  loop: false,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: Colors.white70,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

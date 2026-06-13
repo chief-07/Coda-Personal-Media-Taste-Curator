@@ -60,7 +60,10 @@ class CurrentSessionScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: () => context.go('/home'),
+                        onTap: () {
+                          ref.read(activeSessionProvider.notifier).clear();
+                          context.go('/home');
+                        },
                         child: Container(
                           width: 40,
                           height: 40,
@@ -114,11 +117,14 @@ class CurrentSessionScreen extends ConsumerWidget {
                                   ),
                                 ],
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: FallbackImage(
-                                  url: recommendation?.posterUrl,
-                                  fit: BoxFit.cover,
+                              child: Hero(
+                                tag: 'poster_${recommendation?.id}',
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: FallbackImage(
+                                    url: recommendation?.posterUrl,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
