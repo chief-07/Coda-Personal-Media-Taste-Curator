@@ -356,6 +356,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         onFeedbackSubmitted: (reason) async {
           Navigator.of(ctx).pop();
           
+          // 1. Instantly clear active pick and queue (shows loading shimmer immediately)
+          await ref.read(homeRecommendationProvider.notifier).clearActivePickQueue(rec.mediaType);
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Coda is refining your taste memory...'),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: Colors.white.withValues(alpha: 0.12),
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
+
           final localUpdates = MemoryUpdates(
             guardrailsAppends: ['Avoid: ${rec.title} (rejected)'],
             notForMeAppends: [rec.title],
@@ -367,23 +382,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             debugPrint('Error applying local feedback updates: $e');
           }
 
+          // 2. Await the LLM taste refinement first so the next fetch uses the updated tastes
+          await _runBackgroundRefinement(rec, reason);
+
+          // 3. Reload to fetch a fresh recommendation from the backend
           ref.read(homeRecommendationProvider.notifier).reload();
-
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Getting a better pick...'),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                backgroundColor: Colors.white.withValues(alpha: 0.12),
-                duration: const Duration(seconds: 1),
-              ),
-            );
-          }
-
-          // Trigger remote LLM refinement in the background without blocking the UI
-          _runBackgroundRefinement(rec, reason);
         },
         onSkip: () {
           Navigator.of(ctx).pop();

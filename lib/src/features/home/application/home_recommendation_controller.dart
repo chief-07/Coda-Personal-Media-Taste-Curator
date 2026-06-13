@@ -261,19 +261,16 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
 
   void _startBackgroundTasksForActiveTab(LivingMemory memory, MediaType selectedType, List<MediaType> activeTypes) {
     Future.microtask(() async {
-      // 1. Lazy-fetch the pitch paragraphs for the active card (does not block showing card)
-      await fetchPitchForActivePick(selectedType);
-
-      // 2. Wait 2 seconds to give active card image full priority before refilling queue
-      await Future.delayed(const Duration(milliseconds: 2000));
-      if (selectedType != ref.read(selectedMediaTypeProvider)) return;
-      
+      // 1. If queue is low, trigger background refill immediately (no delay!)
       final currentQueue = _queues[selectedType] ?? [];
-      if (currentQueue.length < 2) {
-        await _refillQueue(memory, selectedType);
+      if (currentQueue.length < 3) {
+        _refillQueue(memory, selectedType);
       }
 
-      // 3. Wait 2 seconds (total 4s) before pre-warming other tabs sequentially
+      // 2. Lazy-fetch the pitch paragraphs for the active card (does not block showing card)
+      await fetchPitchForActivePick(selectedType);
+
+      // 3. Wait 2 seconds before pre-warming other tabs sequentially
       await Future.delayed(const Duration(milliseconds: 2000));
       if (selectedType != ref.read(selectedMediaTypeProvider)) return;
       _scheduleStaggeredPreWarming(memory, selectedType, activeTypes);
@@ -432,35 +429,53 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     _isRefilling[type] = true;
 
     try {
-      final queueTitles = (_queues[type] ?? []).map((r) => r.title).toList();
-      final activeTitle = _activePicks[type]?.title;
-      final exclusions = [...queueTitles, if (activeTitle != null) activeTitle];
+      while (true) {
+        final currentSelected = ref.read(selectedMediaTypeProvider);
+        final targetLimit = (type == currentSelected) ? 3 : 2;
 
-      final service = ref.read(recommendationServiceProvider);
-      final results = await service.fetchRecommendations(
-        memory, 
-        type, 
-        additionalExclusions: exclusions
-      );
+        final currentQueue = _queues[type] ?? [];
+        if (currentQueue.length >= targetLimit) {
+          break;
+        }
 
-      final newRecs = results
-          .map((r) => r.toDomain())
-          .where((rec) => !_isExcluded(rec.title, memory))
-          .toList();
-      
-      for (final rec in newRecs) {
-        if (rec.ostUrl != null && rec.ostUrl!.isNotEmpty) {
-          ref.read(audioPlayerControllerProvider.notifier).precacheAudio(rec.ostUrl!);
+        final queueTitles = currentQueue.map((r) => r.title).toList();
+        final activeTitle = _activePicks[type]?.title;
+        final exclusions = [...queueTitles, if (activeTitle != null) activeTitle];
+
+        print('[Queue Refill] Fetching 1 background recommendation for ${type.name} to refill queue...');
+        final service = ref.read(recommendationServiceProvider);
+        final results = await service.fetchRecommendations(
+          memory, 
+          type, 
+          additionalExclusions: exclusions,
+          limit: 1,
+        );
+
+        if (results.isEmpty) {
+          print('[Queue Refill] No recommendations returned for ${type.name}. Stopping refill.');
+          break;
+        }
+
+        final newRecs = results
+            .map((r) => r.toDomain())
+            .where((rec) => !_isExcluded(rec.title, memory))
+            .toList();
+        
+        for (final rec in newRecs) {
+          if (rec.ostUrl != null && rec.ostUrl!.isNotEmpty) {
+            ref.read(audioPlayerControllerProvider.notifier).precacheAudio(rec.ostUrl!);
+          }
+        }
+        
+        if (newRecs.isNotEmpty) {
+          _queues[type] = [..._queues[type] ?? [], ...newRecs];
+          await _saveQueue(type);
+          _precachePoster(newRecs.first.posterUrl);
+          print('[Queue Refill] Successfully added "${newRecs.first.title}" to ${type.name} queue. Current size: ${_queues[type]?.length}');
+        } else {
+          break;
         }
       }
-      
-      final currentQueue = _queues[type] ?? [];
-      final updatedQueue = [...currentQueue, ...newRecs];
-      _queues[type] = updatedQueue;
-      
-      await _saveQueue(type);
-
-      print('[Queue Refill] successfully refilled queue for ${type.name}. Length: ${updatedQueue.length}');
     } catch (e) {
       print('[Queue Refill Error] Failed for ${type.name}: $e');
     } finally {
@@ -479,14 +494,14 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     }
   }
 
-  Future<List<Recommendation>> _fetchNewRecommendations(LivingMemory memory, MediaType selectedType) async {
+  Future<List<Recommendation>> _fetchNewRecommendations(LivingMemory memory, MediaType selectedType, {int limit = 1}) async {
     if (memory.globalIdentity.isEmpty && memory.categoryProfiles.isEmpty && memory.recentContext.isEmpty) {
       return [];
     }
 
     final service = ref.read(recommendationServiceProvider);
     try {
-      final results = await service.fetchRecommendations(memory, selectedType);
+      final results = await service.fetchRecommendations(memory, selectedType, limit: limit);
       final recs = results
           .map((r) => r.toDomain())
           .where((rec) => !_isExcluded(rec.title, memory))
@@ -584,6 +599,15 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
       await prefs.remove('coda_recommendation_queue_${type.name}');
     }
     state = const AsyncValue.data(null);
+  }
+
+  Future<void> clearActivePickQueue(MediaType type) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    _activePicks.remove(type);
+    _queues.remove(type);
+    await prefs.remove('coda_active_pick_${type.name}');
+    await prefs.remove('coda_recommendation_queue_${type.name}');
+    state = const AsyncValue.loading();
   }
 }
 

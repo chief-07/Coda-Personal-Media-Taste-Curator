@@ -39,6 +39,77 @@ const saveSearchCache = () => {
   }
 };
 
+// Metadata Cache setup
+const METADATA_CACHE_FILE = path.join(__dirname, '../cache/metadata_cache.json');
+let metadataCache = {};
+if (fs.existsSync(METADATA_CACHE_FILE)) {
+  try {
+    metadataCache = JSON.parse(fs.readFileSync(METADATA_CACHE_FILE, 'utf8'));
+  } catch (_) {}
+}
+
+const saveMetadataCache = () => {
+  try {
+    const cacheDir = path.dirname(METADATA_CACHE_FILE);
+    if (!fs.existsSync(cacheDir)) {
+      fs.mkdirSync(cacheDir, { recursive: true });
+    }
+    fs.writeFileSync(METADATA_CACHE_FILE, JSON.stringify(metadataCache, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[Metadata Cache Save Error]:', e.message);
+  }
+};
+
+const getCachedMetadata = async (title, mediaType) => {
+  const key = `${mediaType.toLowerCase().replace(/[^a-z0-9]/g, '')}:${title.toLowerCase().trim()}`;
+  if (metadataCache[key]) {
+    console.log(`[Metadata Cache Hit] serving cached metadata for: "${title}" (${mediaType})`);
+    return metadataCache[key];
+  }
+
+  console.log(`[Metadata Cache Miss] fetching metadata for: "${title}" (${mediaType})...`);
+  let meta = await searchService.fetchMetadataForCandidate(title, mediaType);
+  if (!meta || (!meta.genres?.length && !meta.tags?.length)) {
+    const llmMeta = await llmService.fetchMetadataViaLLM(title, mediaType);
+    if (llmMeta) {
+      meta = {
+        title: llmMeta.title || title,
+        genres: llmMeta.genres || [],
+        tags: llmMeta.tags || [],
+        description: llmMeta.description || '',
+        image: meta?.image || '',
+        release_year: llmMeta.release_year || '',
+        studio: llmMeta.studio || ''
+      };
+    }
+  }
+
+  if (meta) {
+    const cachedMeta = {
+      title: meta.title || title,
+      genres: meta.genres || [],
+      tags: meta.tags || [],
+      description: meta.description || '',
+      image: meta.image || '',
+      release_year: meta.release_year || '',
+      studio: meta.studio || ''
+    };
+    metadataCache[key] = cachedMeta;
+    saveMetadataCache();
+    return cachedMeta;
+  }
+
+  return {
+    title: title,
+    genres: [],
+    tags: [],
+    description: '',
+    image: '',
+    release_year: '',
+    studio: ''
+  };
+};
+
 const getCachedSnippetData = async (key, fetchFn) => {
   const now = Date.now();
   const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -153,37 +224,14 @@ const isExcluded = (candidateTitle, excludedTitles) => {
 const runRecommendationPipeline = async (payload) => {
   console.log('\n[Recommend] ═══════════════════════════════════════════════════');
   console.log('[Recommend] Starting recommendation pipeline for media type:', payload.requested_media_type);
-  console.log('[Profile]   core_identity:', payload.core_identity);
-  console.log('[Profile]   guardrails:', payload.guardrails);
-  console.log('[Profile]   seen (' + (payload.seen?.length || 0) + '):', JSON.stringify(payload.seen));
-  console.log('[Profile]   not_for_me:', JSON.stringify(payload.not_for_me));
-  console.log('[Profile]   recent_context:', payload.recent_context);
-
-  // Extract seen and not-for-me lists early so they are available everywhere
+  
+  const limit = typeof payload.limit === 'number' ? payload.limit : 1;
   const seenList = Array.isArray(payload.seen) ? payload.seen : [];
   const notForMeList = Array.isArray(payload.not_for_me) ? payload.not_for_me : [];
-
-  // ── Step 0: Watchlist Checking & Blending (15% direct recommend, 15% seed blend) ──
   const watchlist = payload.watchlist || [];
   const requestedType = payload.requested_media_type;
-  const matchingWatchlistItems = watchlist.filter(item => {
-    const itemType = (item.mediaType || item.media_type || '').toLowerCase();
-    const normRequested = (requestedType || '').toLowerCase();
-    if (normRequested === 'anime' && itemType === 'anime') return true;
-    if (normRequested === 'movie' && itemType === 'movie') return true;
-    if (normRequested === 'tv' && itemType === 'tv') return true;
-    if (normRequested === 'visualnovel' && (itemType === 'visual novel' || itemType === 'visualnovel')) return true;
-    if (normRequested === 'manga' && itemType === 'manga') return true;
-    if (normRequested === 'book' && itemType === 'book') return true;
-    if (normRequested === 'game' && itemType === 'game') return true;
-    return itemType === normRequested;
-  });
 
-  let isDirectWatchlistRecommend = false;
-  let directWatchlistTitle = null;
-  let directWatchlistItem = null;
-
-  // Extract loved titles for the active media type from core_identity
+  // Extract loved titles
   const lovedTitles = [];
   if (typeof payload.core_identity === 'string') {
     const highlyValuesMatches = payload.core_identity.matchAll(/Highly values:\s*(.*?)\s*\(loved work\)/ig);
@@ -198,279 +246,257 @@ const runRecommendationPipeline = async (payload) => {
     }
   }
   payload.loved_titles = lovedTitles;
-  console.log('[Recommend] Extracted loved titles for active category:', lovedTitles);
 
-  if (matchingWatchlistItems.length > 0) {
-    const rand = Math.random();
-    if (payload.force_direct_watchlist || (rand < 0.15 && !payload.force_watchlist_blend && !payload.force_loved_seed)) {
-      // Direct Watchlist Recommendation (15% chance, or forced)
-      isDirectWatchlistRecommend = true;
-      directWatchlistItem = matchingWatchlistItems[Math.floor(Math.random() * matchingWatchlistItems.length)];
-      directWatchlistTitle = directWatchlistItem.title;
-      console.log(`[Recommend] 🎲 Direct Watchlist Recommendation triggered! Selecting: "${directWatchlistTitle}"`);
-      recentWatchlistPicks.add(directWatchlistTitle);
-    } else if (payload.force_watchlist_blend || (rand < 0.30 && !payload.force_loved_seed)) {
-      // Watchlist Blending (15% chance, or forced)
-      const seedItem = matchingWatchlistItems[Math.floor(Math.random() * matchingWatchlistItems.length)];
-      console.log(`[Recommend] 🎲 Watchlist blending triggered! Seeding from: "${seedItem.title}"`);
-      payload.watchlist_seed_title = seedItem.title;
-    }
-  }
-
-  // Loved Seed Blending (25% chance if watchlist triggers didn't run and loved titles exist)
-  if (!isDirectWatchlistRecommend && !payload.watchlist_seed_title && lovedTitles.length > 0) {
-    const rand = Math.random();
-    if (payload.force_loved_seed || rand < 0.25) {
-      const lovedSeed = lovedTitles[Math.floor(Math.random() * lovedTitles.length)];
-      payload.loved_seed_title = lovedSeed;
-      console.log(`[Recommend] 🎲 Loved seed blending triggered! Seeding from: "${lovedSeed}"`);
-    }
-  }
-
-  let media_type;
-  let search_queries;
-  let master_directive;
-  let seed_titles;
-  let selected_vibe_focus;
+  const maxRetries = 3;
+  let attempt = 0;
+  let finalPicks = [];
+  let cleanCandidates = [];
+  let media_type = (requestedType || '').toLowerCase();
+  let search_queries = [];
+  let master_directive = '';
   let scrapedSnippets = [];
 
-  if (isDirectWatchlistRecommend) {
-    console.log('[Recommend] → Bypassing Step 1 (Direct Watchlist Mode)');
-    media_type = (directWatchlistItem.mediaType || directWatchlistItem.media_type || requestedType || '').toLowerCase();
-    if (media_type === 'visualnovel' || media_type === 'visual novel') {
-      media_type = 'visual novel';
-    }
-    selected_vibe_focus = "Watchlist Curation";
-    master_directive = `Recommend and pitch the user's watchlist item '${directWatchlistTitle}'.`;
-    search_queries = [`"${directWatchlistTitle}" ${media_type} review site:reddit.com`];
-    seed_titles = [];
+  // Used seeds to avoid picking the same seed on retry
+  const usedSeeds = new Set();
 
-    console.log(`[Recommend] → Step 2: Gathering discussion context specifically for: "${directWatchlistTitle}"`);
-    scrapedSnippets = await cachedScrapeForums(search_queries[0]);
-    console.log(`[Recommend]   Gathered ${scrapedSnippets.length} discussion snippets for pitch context.`);
-  } else {
-    // ── Step 1: Synthesis & Routing ─────────────────────────────────────────
-    console.log('[Recommend] → Step 1: Synthesizing context and routing...');
-    const routingResult = await llmService.synthesizeAndRoute(payload);
-    media_type = routingResult.media_type;
-    search_queries = routingResult.search_queries;
-    master_directive = routingResult.master_directive;
-    seed_titles = routingResult.seed_titles;
-    selected_vibe_focus = routingResult.selected_vibe_focus;
+  while (attempt <= maxRetries) {
+    console.log(`[Recommend] Running Curation Caching attempt ${attempt + 1}/${maxRetries + 1}...`);
+    
+    let isDirectWatchlistRecommend = false;
+    let directWatchlistTitle = null;
+    let directWatchlistItem = null;
 
-    console.log(`[Recommend]   Media type: ${media_type}`);
-    console.log(`[Recommend]   Selected vibe focus: ${selected_vibe_focus}`);
-    console.log(`[Recommend]   Queries: ${JSON.stringify(search_queries)}`);
-    if (seed_titles?.length > 0) {
-      console.log(`[Recommend]   Seed titles: ${JSON.stringify(seed_titles)}`);
-    }
+    // Reset loop variables
+    scrapedSnippets = [];
+    cleanCandidates = [];
+    finalPicks = [];
 
-    // ── Step 2: Data Gathering (Parallelized & Cached) ───────────────────────
-    console.log('[Recommend] → Step 2: Gathering data from APIs and web search...');
-    const resolvedSeeds = (seed_titles && Array.isArray(seed_titles)) ? seed_titles : [];
-    const sourceResults = [];
+    // Filter matching watchlist items
+    const matchingWatchlistItems = watchlist.filter(item => {
+      const itemType = (item.mediaType || item.media_type || '').toLowerCase();
+      const normRequested = (requestedType || '').toLowerCase();
+      if (normRequested === 'anime' && itemType === 'anime') return true;
+      if (normRequested === 'movie' && itemType === 'movie') return true;
+      if (normRequested === 'tv' && itemType === 'tv') return true;
+      if (normRequested === 'visualnovel' && (itemType === 'visual novel' || itemType === 'visualnovel')) return true;
+      if (normRequested === 'manga' && itemType === 'manga') return true;
+      if (normRequested === 'book' && itemType === 'book') return true;
+      if (normRequested === 'game' && itemType === 'game') return true;
+      return itemType === normRequested;
+    }).filter(item => !usedSeeds.has(item.title));
 
-    if (media_type === 'anime') {
-      const taggedPromises = [];
-      if (resolvedSeeds.length > 0) {
-        taggedPromises.push(cachedFetchMAL(resolvedSeeds).then(r => ({ source: `MAL community recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
-        taggedPromises.push(cachedFetchAniListRecs(resolvedSeeds).then(r => ({ source: `AniList graph recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
-        const reviewCacheKey = `mal_reviews:${resolvedSeeds.slice(0,3).join(',')}`;
-        taggedPromises.push(getCachedSnippetData(reviewCacheKey, () => searchService.fetchMALReviews(resolvedSeeds)).then(r => ({ source: `MAL user reviews (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
-      }
-      for (const query of search_queries) {
-        if (!query.includes('site:')) {
-          taggedPromises.push(cachedFetchKitsu(query).then(r => ({ source: `Jikan/MAL genre search: "${query}"`, results: r || [] })));
-          taggedPromises.push(cachedFetchAniListSearch(query).then(r => ({ source: `AniList title/tag search: "${query}"`, results: r || [] })));
+    // Dynamic Seed and Vibe Selection based on attempt count
+    if (attempt === 0) {
+      if (matchingWatchlistItems.length > 0) {
+        const rand = Math.random();
+        if (payload.force_direct_watchlist || (rand < 0.15 && !payload.force_watchlist_blend && !payload.force_loved_seed)) {
+          isDirectWatchlistRecommend = true;
+          directWatchlistItem = matchingWatchlistItems[Math.floor(Math.random() * matchingWatchlistItems.length)];
+          directWatchlistTitle = directWatchlistItem.title;
+          usedSeeds.add(directWatchlistTitle);
+          recentWatchlistPicks.add(directWatchlistTitle);
+        } else if (payload.force_watchlist_blend || (rand < 0.30 && !payload.force_loved_seed)) {
+          const seedItem = matchingWatchlistItems[Math.floor(Math.random() * matchingWatchlistItems.length)];
+          payload.watchlist_seed_title = seedItem.title;
+          usedSeeds.add(seedItem.title);
         }
-        taggedPromises.push(cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] })));
       }
-      const resolved = await Promise.all(taggedPromises);
-      sourceResults.push(...resolved);
 
-    } else if (media_type === 'visual novel') {
-      const taggedPromises = [];
-      if (resolvedSeeds.length > 0) {
-        taggedPromises.push(cachedFetchVNDBRecs(resolvedSeeds).then(r => ({ source: `VNDB similar-tag recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
-      }
-      for (const query of search_queries) {
-        if (!query.includes('site:')) {
-          taggedPromises.push(cachedFetchVNDBSnippets(query, 6, payload.platform_hint).then(r => ({ source: `VNDB text search: "${query}"`, results: r || [] })));
-        }
-        taggedPromises.push(cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] })));
-      }
-      const resolved = await Promise.all(taggedPromises);
-      sourceResults.push(...resolved);
-
-    } else {
-      const taggedPromises = search_queries.map(query =>
-        cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] }))
-      );
-      const resolved = await Promise.all(taggedPromises);
-      sourceResults.push(...resolved);
-    }
-
-    // Log per-source breakdown
-    console.log('[Recommend]   ── Source breakdown ──');
-    for (const sr of sourceResults) {
-      const titles = sr.results.map(r => `"${r.title}"`).join(', ') || '(none)';
-      console.log(`[Source] ${sr.source} → ${sr.results.length} snippets: ${titles}`);
-      scrapedSnippets = scrapedSnippets.concat(sr.results);
-    }
-    console.log(`[Recommend]   Total snippets across all sources: ${scrapedSnippets.length}`);
-  }
-
-  // ── Step 2.5: Candidate Extraction & Metadata Resolution ─────────────────
-  let cleanCandidates = [];
-
-  if (isDirectWatchlistRecommend) {
-    console.log('[Recommend] → Step 2.5: Resolving metadata for direct watchlist item...');
-    let candidateMeta = {
-      title: directWatchlistTitle,
-      genres: directWatchlistItem.tags || [],
-      tags: directWatchlistItem.tags || [],
-      description: directWatchlistItem.description || '',
-      image: directWatchlistItem.posterUrl || directWatchlistItem.poster_url || ''
-    };
-
-    if (!candidateMeta.description || (!candidateMeta.genres.length && !candidateMeta.tags.length)) {
-      console.log(`[Recommend]   Direct watchlist item "${directWatchlistTitle}" has incomplete metadata. Fetching...`);
-      try {
-        let meta = await searchService.fetchMetadataForCandidate(directWatchlistTitle, media_type);
-        if (!meta || (!meta.genres?.length && !meta.tags?.length)) {
-          const llmMeta = await llmService.fetchMetadataViaLLM(directWatchlistTitle, media_type);
-          if (llmMeta) {
-            meta = {
-              title: llmMeta.title || directWatchlistTitle,
-              genres: llmMeta.genres || [],
-              tags: llmMeta.tags || [],
-              description: llmMeta.description || '',
-              image: meta?.image || ''
-            };
+      if (!isDirectWatchlistRecommend && !payload.watchlist_seed_title && lovedTitles.length > 0) {
+        const rand = Math.random();
+        if (payload.force_loved_seed || rand < 0.25) {
+          const unusedLoved = lovedTitles.filter(t => !usedSeeds.has(t));
+          if (unusedLoved.length > 0) {
+            const lovedSeed = unusedLoved[Math.floor(Math.random() * unusedLoved.length)];
+            payload.loved_seed_title = lovedSeed;
+            usedSeeds.add(lovedSeed);
           }
         }
-        if (meta) {
-          candidateMeta.title = meta.title || candidateMeta.title;
-          candidateMeta.genres = meta.genres?.length ? meta.genres : candidateMeta.genres;
-          candidateMeta.tags = meta.tags?.length ? meta.tags : candidateMeta.tags;
-          candidateMeta.description = meta.description || candidateMeta.description;
-          candidateMeta.image = meta.image || candidateMeta.image;
-        }
-      } catch (err) {
-        console.error(`Metadata fetch failed for direct watchlist item "${directWatchlistTitle}":`, err.message);
+      }
+    } else {
+      // Rotations on subsequent attempts:
+      payload.watchlist_seed_title = null;
+      payload.loved_seed_title = null;
+      payload.force_loved_seed = false;
+      payload.force_watchlist_blend = false;
+      payload.force_direct_watchlist = false;
+
+      // Rotate to an unused loved title or watchlist title if possible
+      const unusedLoved = lovedTitles.filter(t => !usedSeeds.has(t));
+      const unusedWatchlist = matchingWatchlistItems.map(item => item.title).filter(t => !usedSeeds.has(t));
+
+      if (unusedWatchlist.length > 0 && Math.random() < 0.5) {
+        const nextWatchlistSeed = unusedWatchlist[Math.floor(Math.random() * unusedWatchlist.length)];
+        payload.watchlist_seed_title = nextWatchlistSeed;
+        usedSeeds.add(nextWatchlistSeed);
+        console.log(`[Recommend Rotation] Attempt ${attempt}: Rotating watchlist seed to: "${nextWatchlistSeed}"`);
+      } else if (unusedLoved.length > 0) {
+        const nextLovedSeed = unusedLoved[Math.floor(Math.random() * unusedLoved.length)];
+        payload.loved_seed_title = nextLovedSeed;
+        usedSeeds.add(nextLovedSeed);
+        console.log(`[Recommend Rotation] Attempt ${attempt}: Rotating loved title seed to: "${nextLovedSeed}"`);
+      } else {
+        // Fallback: Rotate vibe focus by telling the LLM to force rotation
+        payload.force_rotation = true;
+        console.log(`[Recommend Rotation] Attempt ${attempt}: Forcing routing LLM to rotate its vibe focus & search queries.`);
       }
     }
-    cleanCandidates = [candidateMeta];
-  } else {
-    // Filter snippets: hard exclusion of already-seen/not-for-me titles only
-    const filteredSnippets = scrapedSnippets.filter(snippet => {
-      const excluded = isExcluded(snippet.title, seenList) || isExcluded(snippet.title, notForMeList);
-      if (excluded) {
-        console.log(`[Recommend]   ✗ Excluding snippet (seen/not-for-me): "${snippet.title}"`);
-      }
-      return !excluded;
-    });
 
-    console.log(`[Recommend]   Snippets after seen/not-for-me exclusion: ${filteredSnippets.length}`);
+    let seed_titles = [];
+    let selected_vibe_focus = '';
 
-    console.log('[Recommend] → Step 2.5: Extracting candidates and resolving metadata...');
-    
-    // 1. Extract candidate titles from the snippets using LLM
-    const candidateTitles = await llmService.extractCandidateTitles(filteredSnippets, media_type);
-    console.log(`[Recommend]   LLM extracted ${candidateTitles.length} candidate titles: ${JSON.stringify(candidateTitles)}`);
+    try {
+      if (isDirectWatchlistRecommend) {
+        media_type = (directWatchlistItem.mediaType || directWatchlistItem.media_type || requestedType || '').toLowerCase();
+        if (media_type === 'visualnovel' || media_type === 'visual novel') {
+          media_type = 'visual novel';
+        }
+        selected_vibe_focus = "Watchlist Curation";
+        master_directive = `Recommend and pitch the user's watchlist item '${directWatchlistTitle}'.`;
+        search_queries = [`"${directWatchlistTitle}" ${media_type} review site:reddit.com`];
+        seed_titles = [];
+        scrapedSnippets = await cachedScrapeForums(search_queries[0]);
+      } else {
+        const routingResult = await llmService.synthesizeAndRoute(payload);
+        media_type = routingResult.media_type;
+        search_queries = routingResult.search_queries;
+        master_directive = routingResult.master_directive;
+        seed_titles = routingResult.seed_titles;
+        selected_vibe_focus = routingResult.selected_vibe_focus;
 
-    // 2. Fetch real metadata for each candidate in parallel
-    const candidatesWithMetadata = await Promise.all(candidateTitles.map(async (title) => {
-      let meta = await searchService.fetchMetadataForCandidate(title, media_type);
-      if (!meta || (!meta.genres?.length && !meta.tags?.length)) {
-        console.log(`[Recommend]   ⚠ API metadata empty for "${title}" — using LLM fallback...`);
-        const llmMeta = await llmService.fetchMetadataViaLLM(title, media_type);
-        if (llmMeta) {
-          meta = {
-            title: llmMeta.title || title,
-            genres: llmMeta.genres || [],
-            tags: llmMeta.tags || [],
-            description: llmMeta.description || '',
-            image: meta?.image || ''
-          };
+        const resolvedSeeds = (seed_titles && Array.isArray(seed_titles)) ? seed_titles : [];
+        const sourceResults = [];
+
+        if (media_type === 'anime') {
+          const taggedPromises = [];
+          if (resolvedSeeds.length > 0) {
+            taggedPromises.push(cachedFetchMAL(resolvedSeeds).then(r => ({ source: `MAL community recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
+            taggedPromises.push(cachedFetchAniListRecs(resolvedSeeds).then(r => ({ source: `AniList graph recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
+            const reviewCacheKey = `mal_reviews:${resolvedSeeds.slice(0,3).join(',')}`;
+            taggedPromises.push(getCachedSnippetData(reviewCacheKey, () => searchService.fetchMALReviews(resolvedSeeds)).then(r => ({ source: `MAL user reviews (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
+          }
+          for (const query of search_queries) {
+            if (!query.includes('site:')) {
+              taggedPromises.push(cachedFetchKitsu(query).then(r => ({ source: `Jikan/MAL genre search: "${query}"`, results: r || [] })));
+              taggedPromises.push(cachedFetchAniListSearch(query).then(r => ({ source: `AniList title/tag search: "${query}"`, results: r || [] })));
+            }
+            taggedPromises.push(cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] })));
+          }
+          const resolved = await Promise.all(taggedPromises);
+          sourceResults.push(...resolved);
+        } else if (media_type === 'visual novel') {
+          const taggedPromises = [];
+          if (resolvedSeeds.length > 0) {
+            taggedPromises.push(cachedFetchVNDBRecs(resolvedSeeds).then(r => ({ source: `VNDB similar-tag recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
+          }
+          for (const query of search_queries) {
+            if (!query.includes('site:')) {
+              taggedPromises.push(cachedFetchVNDBSnippets(query, 6, payload.platform_hint).then(r => ({ source: `VNDB text search: "${query}"`, results: r || [] })));
+            }
+            taggedPromises.push(cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] })));
+          }
+          const resolved = await Promise.all(taggedPromises);
+          sourceResults.push(...resolved);
+        } else {
+          const taggedPromises = search_queries.map(query =>
+            cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] }))
+          );
+          const resolved = await Promise.all(taggedPromises);
+          sourceResults.push(...resolved);
+        }
+
+        for (const sr of sourceResults) {
+          scrapedSnippets = scrapedSnippets.concat(sr.results);
         }
       }
-      const resolved = {
-        title: meta?.title || title,
-        genres: meta?.genres || [],
-        tags: meta?.tags || [],
-        description: meta?.description || '',
-        image: meta?.image || ''
-      };
-      console.log(`[Metadata] "${resolved.title}" → genres: [${resolved.genres.join(', ')}] | tags: [${resolved.tags.slice(0,6).join(', ')}]`);
-      return resolved;
-    }));
 
-    // 3. Hard-filter only seen/not-for-me titles — guardrail nuance left to LLM
-    cleanCandidates = candidatesWithMetadata.filter(candidate => {
-      if (isExcluded(candidate.title, seenList) || isExcluded(candidate.title, notForMeList)) {
-        console.log(`[Recommend]   ✗ Hard-excluding seen/not-for-me candidate: "${candidate.title}"`);
-        return false;
+      if (isDirectWatchlistRecommend) {
+        let candidateMeta = {
+          title: directWatchlistTitle,
+          genres: directWatchlistItem.tags || [],
+          tags: directWatchlistItem.tags || [],
+          description: directWatchlistItem.description || '',
+          image: directWatchlistItem.posterUrl || directWatchlistItem.poster_url || ''
+        };
+        cleanCandidates = [candidateMeta];
+      } else {
+        const filteredSnippets = scrapedSnippets.filter(snippet => {
+          return !isExcluded(snippet.title, seenList) && !isExcluded(snippet.title, notForMeList);
+        });
+
+        if (filteredSnippets.length > 0) {
+          const candidateTitles = await llmService.extractCandidateTitles(filteredSnippets, media_type);
+          const candidatesWithMetadata = await Promise.all(candidateTitles.map(async (title) => {
+            return await getCachedMetadata(title, media_type);
+          }));
+
+          cleanCandidates = candidatesWithMetadata.filter(candidate => {
+            return !isExcluded(candidate.title, seenList) && !isExcluded(candidate.title, notForMeList);
+          });
+        }
       }
-      return true;
-    });
-  }
 
-  console.log(`[Recommend]   ${cleanCandidates.length} verified candidates passed to LLM scoring: ${JSON.stringify(cleanCandidates.map(c => c.title))}`);
+      if (cleanCandidates.length > 0) {
+        if (limit > 1 && !isDirectWatchlistRecommend) {
+          const result = await llmService.scoreAndSelectMultiple(
+            master_directive,
+            cleanCandidates,
+            payload.guardrails,
+            seenList,
+            notForMeList,
+            limit
+          );
+          if (result && Array.isArray(result.picks)) {
+            finalPicks = result.picks.filter(p => p && p.title);
+          }
+        } else {
+          const single = await llmService.scoreAndSelect(
+            master_directive,
+            cleanCandidates,
+            payload.guardrails,
+            seenList,
+            notForMeList,
+            directWatchlistTitle
+          );
+          if (single && single.title) {
+            finalPicks = [single];
+          }
+        }
+      }
 
-  // ── Step 3: Scoring & Selection (Single Pick) ─────────────────────────
-  console.log('[Recommend] → Step 3: Scoring candidates and selecting top pick...');
-  let finalPicks = [];
-  try {
-    const single = await llmService.scoreAndSelect(
-      master_directive,
-      cleanCandidates,
-      payload.guardrails,
-      seenList,
-      notForMeList,
-      directWatchlistTitle
-    );
-    if (single && single.title) {
-      finalPicks = [single];
+      if (finalPicks.length > 0) {
+        console.log(`[Recommend] Success! Selected ${finalPicks.length} pick(s) on attempt ${attempt + 1}.`);
+        break;
+      }
+    } catch (err) {
+      console.error(`[Recommend attempt ${attempt + 1} Error]:`, err.message);
     }
-  } catch (err) {
-    console.error('[Recommend] scoreAndSelect failed:', err.message);
+
+    attempt++;
   }
-  
-  console.log(`[Recommend]   Selected picks: ${JSON.stringify(finalPicks.map(p => p.title))}`);
+
+  if (finalPicks.length === 0) {
+    throw new Error(`Failed to curation-find any recommendations for type "${requestedType}" after ${maxRetries + 1} rotated attempts.`);
+  }
 
   // ── Step 4: Asset Retrieval (Parallelized) ───────────────────────────────
   console.log('[Recommend] → Step 4: Fetching posters, OSTs, metadata in parallel...');
   const resolvedPicks = await Promise.all(finalPicks.map(async (pick) => {
     const candidateMeta = cleanCandidates.find(c => c.title === pick.title);
     try {
-      // Fetch media assets (poster/OST/trailer) and LLM metadata in parallel —
-      // they are fully independent and parallelising them halves per-pick latency.
+      const needsLlmMetadata = !candidateMeta || !candidateMeta.release_year || !candidateMeta.studio;
       const [assetsResult, llmMeta] = await Promise.all([
         mediaService.fetchAssets(pick.title, media_type),
-        llmService.fetchMetadataViaLLM(pick.title, media_type).catch(() => null),
+        needsLlmMetadata 
+          ? llmService.fetchMetadataViaLLM(pick.title, media_type).catch(() => null) 
+          : Promise.resolve(candidateMeta),
       ]);
 
       let { poster_url, ost_url, trailer_url } = assetsResult;
       
-      // Watchlist item fallbacks if assets are empty or placeholder
-      if (isDirectWatchlistRecommend && directWatchlistItem && directWatchlistItem.title === pick.title) {
-        if (!poster_url || poster_url.includes('placeholder')) {
-          poster_url = directWatchlistItem.posterUrl || directWatchlistItem.poster_url || poster_url;
-        }
-        if (!ost_url) {
-          ost_url = directWatchlistItem.ostUrl || directWatchlistItem.ost_url || ost_url;
-        }
-        if (!trailer_url) {
-          trailer_url = directWatchlistItem.trailerUrl || directWatchlistItem.trailer_url || '';
-        }
-      }
-
       let finalPosterUrl = poster_url;
-      // Fallback: If mediaService did not find a poster or returned placeholder, use the metadata API image
       if ((!finalPosterUrl || finalPosterUrl.includes('placeholder')) && candidateMeta?.image) {
         finalPosterUrl = candidateMeta.image;
-        console.log(`[Recommend]   Using metadata cover image fallback for "${pick.title}": ${finalPosterUrl}`);
       }
 
       if (finalPosterUrl && finalPosterUrl.startsWith('http') && !finalPosterUrl.includes('localhost') && !finalPosterUrl.includes('127.0.0.1')) {
@@ -488,32 +514,20 @@ const runRecommendationPipeline = async (payload) => {
         description: llmMeta?.description || candidateMeta?.description || pick.title,
         genres: llmMeta?.genres || candidateMeta?.genres || [],
         tags: llmMeta?.tags || candidateMeta?.tags || [],
-        release_year: llmMeta?.release_year || '',
-        studio: llmMeta?.studio || ''
+        release_year: llmMeta?.release_year || candidateMeta?.release_year || '',
+        studio: llmMeta?.studio || candidateMeta?.studio || ''
       };
     } catch (err) {
       console.error(`Asset fetch failed for "${pick.title}":`, err.message);
-      
-      let finalPosterUrl = '';
-      let finalOstUrl = '';
-      let finalTrailerUrl = '';
-
-      if (isDirectWatchlistRecommend && directWatchlistItem && directWatchlistItem.title === pick.title) {
-        finalPosterUrl = directWatchlistItem.posterUrl || directWatchlistItem.poster_url || '';
-        finalOstUrl = directWatchlistItem.ostUrl || directWatchlistItem.ost_url || '';
-        finalTrailerUrl = directWatchlistItem.trailerUrl || directWatchlistItem.trailer_url || '';
-        console.log(`[Recommend]   Direct watchlist asset fallback triggered: poster=${finalPosterUrl}, ost=${finalOstUrl}, trailer=${finalTrailerUrl}`);
-      }
-
-      if (!finalPosterUrl && candidateMeta?.image) {
-        finalPosterUrl = candidateMeta.image;
-      }
-
+      let finalPosterUrl = candidateMeta?.image || '';
       if (finalPosterUrl && finalPosterUrl.startsWith('http') && !finalPosterUrl.includes('localhost') && !finalPosterUrl.includes('127.0.0.1')) {
         finalPosterUrl = `/api/recommend/proxy-image?url=${encodeURIComponent(finalPosterUrl)}`;
       }
-
-      const llmMeta = await llmService.fetchMetadataViaLLM(pick.title, media_type).catch(() => null);
+      
+      const needsLlmMetadata = !candidateMeta || !candidateMeta.release_year || !candidateMeta.studio;
+      const llmMeta = needsLlmMetadata 
+        ? await llmService.fetchMetadataViaLLM(pick.title, media_type).catch(() => null) 
+        : candidateMeta;
 
       return {
         title: pick.title,
@@ -521,18 +535,18 @@ const runRecommendationPipeline = async (payload) => {
         coda_blurb: pick.coda_blurb,
         pitch_paragraphs: [],
         poster_url: finalPosterUrl,
-        ost_url: finalOstUrl,
-        trailer_url: finalTrailerUrl,
+        ost_url: '',
+        trailer_url: '',
         description: llmMeta?.description || candidateMeta?.description || pick.title,
         genres: llmMeta?.genres || candidateMeta?.genres || [],
         tags: llmMeta?.tags || candidateMeta?.tags || [],
-        release_year: llmMeta?.release_year || '',
-        studio: llmMeta?.studio || ''
+        release_year: llmMeta?.release_year || candidateMeta?.release_year || '',
+        studio: llmMeta?.studio || candidateMeta?.studio || ''
       };
     }
   }));
 
-  // ── Trace Log (using first pick for logging compatibility) ────────────────
+  // Trace Log first pick
   if (resolvedPicks.length > 0) {
     loggerService.logRecommendation({
       payload,

@@ -160,6 +160,13 @@ Your job is to:
 - **BAKE HARD CONSTRAINTS INTO QUERIES (CRITICAL):** If the input payload contains any "hard_constraints" or platform/content guardrails (e.g., "Android only", "web browser", "eroge"), you MUST explicitly bake/weave these keyword constraints directly into ALL 5 generated search queries. Examples: "android eroge nakige r/visualnovels site:reddit.com" or "romance visual novels for android site:reddit.com". Do not emit generic queries that lack these constraint keywords.
 - **NO BRAND POLLUTION:** The standalone word "deep" is strictly forbidden in all queries. Use terms like "profound", "existential", "intricate", or "emotional depth".
 
+**ROTATION AND RETRY (CRITICAL):**
+- If the payload contains "force_rotation": true, it means a previous search attempt failed to find new unseen titles.
+- You MUST ignore the current "recent_context" or immediate craving, and instead rotate your vibe focus to a completely different, older, nostalgic, or less-represented taste/genre facet in their profile.
+- You MUST generate 5 completely different queries that do not overlap with typical recommendations for their most recent likes.
+- In "selected_vibe_focus", clearly describe the new rotated direction you are targeting.
+
+
 Respond ONLY with a JSON object:
 {
   "media_type": "${requestedMediaType}",

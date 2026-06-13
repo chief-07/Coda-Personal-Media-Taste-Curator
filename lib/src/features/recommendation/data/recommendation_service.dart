@@ -103,6 +103,7 @@ class RecommendationService {
     LivingMemory memory, 
     coda_domain.MediaType selectedMediaType, {
     List<String> additionalExclusions = const [],
+    int limit = 1,
   }) async {
     final now = DateTime.now();
     final hour = now.hour;
@@ -181,7 +182,9 @@ class RecommendationService {
       'seen': finalSeen,
       'not_for_me': memory.notForMe,
       'watchlist': memory.watchlist.map((e) => e.toJson()).toList(),
+      'limit': limit,
     };
+
 
     final targetUrl = _baseUrl;
 
