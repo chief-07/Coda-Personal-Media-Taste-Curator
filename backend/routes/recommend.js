@@ -255,6 +255,8 @@ const runRecommendationPipeline = async (payload) => {
   let search_queries = [];
   let master_directive = '';
   let scrapedSnippets = [];
+  let seed_titles = [];
+  let selected_vibe_focus = '';
 
   // Used seeds to avoid picking the same seed on retry
   const usedSeeds = new Set();
@@ -342,8 +344,8 @@ const runRecommendationPipeline = async (payload) => {
       }
     }
 
-    let seed_titles = [];
-    let selected_vibe_focus = '';
+    seed_titles = [];
+    selected_vibe_focus = '';
 
     try {
       if (isDirectWatchlistRecommend) {
