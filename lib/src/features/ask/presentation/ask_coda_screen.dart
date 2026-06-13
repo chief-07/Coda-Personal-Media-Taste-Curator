@@ -1047,7 +1047,10 @@ class _PromptBar extends StatelessWidget {
           height: 51,
           width: double.infinity,
           child: isRecording
-              ? _SineWaveVisualizer(isKnockoutLayer: isKnockoutLayer)
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _SineWaveVisualizer(isKnockoutLayer: isKnockoutLayer),
+                )
               : Container(
                   decoration: BoxDecoration(
                     color: isKnockoutLayer ? Colors.black : Colors.transparent,
@@ -1163,7 +1166,7 @@ class _SineWaveVisualizerState extends State<_SineWaveVisualizer>
           painter: _SineWavePainter(
             phase: phase,
             color: Colors.black,
-            strokeWidth: 3.0,
+            strokeWidth: 6.0,
           ),
         );
       },
@@ -1179,7 +1182,7 @@ class _SineWavePainter extends CustomPainter {
   _SineWavePainter({
     required this.phase,
     required this.color,
-    this.strokeWidth = 3.0,
+    this.strokeWidth = 6.0,
   });
 
   @override
@@ -1194,18 +1197,23 @@ class _SineWavePainter extends CustomPainter {
     final midY = size.height / 2;
     final width = size.width;
 
-    // 3 peaks (3 full cycles) across the width
-    final double frequency = (3.0 * 2.0 * math.pi) / width;
+    // Inset start and end to prevent the round caps from being clipped by the canvas boundary
+    final margin = strokeWidth / 2;
+    final drawWidth = width - (margin * 2);
+
+    // 3 peaks (3 full cycles) across the drawn width
+    final double frequency = (3.0 * 2.0 * math.pi) / drawWidth;
     final double maxAmplitude = 15.0;
 
-    for (double x = 0.0; x <= width; x += 1.0) {
+    for (double x = 0.0; x <= drawWidth; x += 1.0) {
+      final double actualX = x + margin;
       // Sine/Hann window to damp amplitude to 0 at edges
-      final double envelope = math.sin(math.pi * x / width);
+      final double envelope = math.sin(math.pi * x / drawWidth);
       final double y = midY + maxAmplitude * envelope * math.sin(frequency * x - phase);
       if (x == 0.0) {
-        path.moveTo(x, y);
+        path.moveTo(actualX, y);
       } else {
-        path.lineTo(x, y);
+        path.lineTo(actualX, y);
       }
     }
 
