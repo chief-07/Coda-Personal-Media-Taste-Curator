@@ -38,9 +38,18 @@ app.use('/share', detectRoute); // Mount PWA share target at root /share
 const webBuildPath = path.join(projectRoot, 'build', 'web');
 app.use(express.static(webBuildPath));
 
-// Fallback to index.html for SPA routing
+// Fallback to index.html for SPA routing (or JSON status if files don't exist)
 app.use((req, res) => {
-  res.sendFile(path.join(webBuildPath, 'index.html'));
+  const indexPath = path.join(webBuildPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(200).json({
+      status: "online",
+      message: "Coda Backend API is live.",
+      frontendInfo: "Host the compiled web frontend on Cloudflare Pages to view the application UI."
+    });
+  }
 });
 
 // ── HTTP server (localhost dev) ───────────────────────────────────────────────
