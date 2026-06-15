@@ -233,7 +233,7 @@ const runRecommendationPipeline = async (payload) => {
 
   // Extract loved titles
   const lovedTitles = [];
-  if (typeof payload.core_identity === 'string') {
+  if (typeof payload.core_identity === 'string' && !payload.skip_random_seeds) {
     const highlyValuesMatches = payload.core_identity.matchAll(/Highly values:\s*(.*?)\s*\(loved work\)/ig);
     for (const match of highlyValuesMatches) {
       if (match[1]) lovedTitles.push(match[1].trim());
@@ -289,7 +289,7 @@ const runRecommendationPipeline = async (payload) => {
 
     // Dynamic Seed and Vibe Selection based on attempt count
     if (attempt === 0) {
-      if (matchingWatchlistItems.length > 0) {
+      if (matchingWatchlistItems.length > 0 && !payload.skip_random_seeds) {
         const rand = Math.random();
         if (payload.force_direct_watchlist || (rand < 0.15 && !payload.force_watchlist_blend && !payload.force_loved_seed)) {
           isDirectWatchlistRecommend = true;
@@ -304,7 +304,7 @@ const runRecommendationPipeline = async (payload) => {
         }
       }
 
-      if (!isDirectWatchlistRecommend && !payload.watchlist_seed_title && lovedTitles.length > 0) {
+      if (!isDirectWatchlistRecommend && !payload.watchlist_seed_title && lovedTitles.length > 0 && !payload.skip_random_seeds) {
         const rand = Math.random();
         if (payload.force_loved_seed || rand < 0.25) {
           const unusedLoved = lovedTitles.filter(t => !usedSeeds.has(t));
@@ -323,24 +323,29 @@ const runRecommendationPipeline = async (payload) => {
       payload.force_watchlist_blend = false;
       payload.force_direct_watchlist = false;
 
-      // Rotate to an unused loved title or watchlist title if possible
-      const unusedLoved = lovedTitles.filter(t => !usedSeeds.has(t));
-      const unusedWatchlist = matchingWatchlistItems.map(item => item.title).filter(t => !usedSeeds.has(t));
-
-      if (unusedWatchlist.length > 0 && Math.random() < 0.5) {
-        const nextWatchlistSeed = unusedWatchlist[Math.floor(Math.random() * unusedWatchlist.length)];
-        payload.watchlist_seed_title = nextWatchlistSeed;
-        usedSeeds.add(nextWatchlistSeed);
-        console.log(`[Recommend Rotation] Attempt ${attempt}: Rotating watchlist seed to: "${nextWatchlistSeed}"`);
-      } else if (unusedLoved.length > 0) {
-        const nextLovedSeed = unusedLoved[Math.floor(Math.random() * unusedLoved.length)];
-        payload.loved_seed_title = nextLovedSeed;
-        usedSeeds.add(nextLovedSeed);
-        console.log(`[Recommend Rotation] Attempt ${attempt}: Rotating loved title seed to: "${nextLovedSeed}"`);
-      } else {
-        // Fallback: Rotate vibe focus by telling the LLM to force rotation
+      if (payload.skip_random_seeds) {
         payload.force_rotation = true;
-        console.log(`[Recommend Rotation] Attempt ${attempt}: Forcing routing LLM to rotate its vibe focus & search queries.`);
+        console.log(`[Recommend Rotation] Attempt ${attempt}: Forcing routing LLM to rotate its vibe focus & search queries (skipping random seeds).`);
+      } else {
+        // Rotate to an unused loved title or watchlist title if possible
+        const unusedLoved = lovedTitles.filter(t => !usedSeeds.has(t));
+        const unusedWatchlist = matchingWatchlistItems.map(item => item.title).filter(t => !usedSeeds.has(t));
+
+        if (unusedWatchlist.length > 0 && Math.random() < 0.5) {
+          const nextWatchlistSeed = unusedWatchlist[Math.floor(Math.random() * unusedWatchlist.length)];
+          payload.watchlist_seed_title = nextWatchlistSeed;
+          usedSeeds.add(nextWatchlistSeed);
+          console.log(`[Recommend Rotation] Attempt ${attempt}: Rotating watchlist seed to: "${nextWatchlistSeed}"`);
+        } else if (unusedLoved.length > 0) {
+          const nextLovedSeed = unusedLoved[Math.floor(Math.random() * unusedLoved.length)];
+          payload.loved_seed_title = nextLovedSeed;
+          usedSeeds.add(nextLovedSeed);
+          console.log(`[Recommend Rotation] Attempt ${attempt}: Rotating loved title seed to: "${nextLovedSeed}"`);
+        } else {
+          // Fallback: Rotate vibe focus by telling the LLM to force rotation
+          payload.force_rotation = true;
+          console.log(`[Recommend Rotation] Attempt ${attempt}: Forcing routing LLM to rotate its vibe focus & search queries.`);
+        }
       }
     }
 
@@ -694,7 +699,8 @@ router.post('/ask', async (req, res) => {
         guardrails: [Object.values(current_memory.guardrails || []).join(', '), (parsed.hard_constraints || []).join('. ')].filter(Boolean).join('. '),
         platform_hint: parsed.hard_constraints || [],
         hard_constraints: parsed.hard_constraints || [],
-        ask_research_context: askResearchContext || null
+        ask_research_context: askResearchContext || null,
+        skip_random_seeds: true
       };
 
       const rec = await runRecommendationPipeline(payload);

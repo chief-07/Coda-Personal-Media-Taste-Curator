@@ -97,6 +97,11 @@ Your job is to:
 - The payload contains a "loved_titles" array listing works the user explicitly swiped right / loved in the past.
 - You MUST prioritize using titles from this "loved_titles" array for your seed-based queries (Seed-Based Query 1 and 2), rather than guessing from the text profile or seen list.
 
+**SKIP RANDOM SEEDS (CRITICAL):**
+- If the payload contains "skip_random_seeds": true, you MUST NOT generate any seed-based queries. You MUST ignore any watchlist seeds, loved seeds, and loved titles.
+- Instead, generate all 5 search queries as discovery queries that target the specific vibe, themes, or immediate craving described in "recent_context" (and "ask_research_context" if present).
+- Your Master Directive and selected vibe focus MUST focus entirely on the immediate craving / "recent_context", not on any historical favorites.
+
 **ASK CODA RESEARCH CONTEXT (CRITICAL):**
 - If the payload contains an "ask_research_context" string (which has Wikipedia and forum summaries of the works the user explicitly mentioned in their request), you MUST read and analyze it carefully.
 - Decode and identify:
