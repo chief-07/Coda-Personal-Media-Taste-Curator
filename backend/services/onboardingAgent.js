@@ -1,5 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs');
+const path = require('path');
 
 const BROWSER_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const WIKI_HEADERS = {
@@ -61,7 +63,31 @@ const callOpenAI = async (messages, tools, retries = 2) => {
   }
 };
 
-const themeResearchCache = new Map();
+const CACHE_DIR = path.join(__dirname, '..', 'cache');
+const THEME_CACHE_FILE = path.join(CACHE_DIR, 'theme_research_cache.json');
+
+let themeResearchCache = {};
+
+try {
+  if (!fs.existsSync(CACHE_DIR)) {
+    fs.mkdirSync(CACHE_DIR, { recursive: true });
+  }
+  if (fs.existsSync(THEME_CACHE_FILE)) {
+    themeResearchCache = JSON.parse(fs.readFileSync(THEME_CACHE_FILE, 'utf8'));
+    console.log(`[Research] Loaded ${Object.keys(themeResearchCache).length} cached theme research entries.`);
+  }
+} catch (err) {
+  console.warn('[Research] Failed to load theme cache:', err.message);
+  themeResearchCache = {};
+}
+
+const saveThemeCache = () => {
+  try {
+    fs.writeFileSync(THEME_CACHE_FILE, JSON.stringify(themeResearchCache, null, 2), 'utf8');
+  } catch (err) {
+    console.warn('[Research] Failed to save theme cache:', err.message);
+  }
+};
 
 const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -70,7 +96,7 @@ const escapeRegExp = (string) => {
 const getCachedResearchForMessage = (messageText) => {
   const hits = [];
   const lowercaseMsg = messageText.toLowerCase();
-  for (const [cachedTitle, researchText] of themeResearchCache.entries()) {
+  for (const [cachedTitle, researchText] of Object.entries(themeResearchCache)) {
     const escaped = escapeRegExp(cachedTitle.toLowerCase());
     const isAlphaNumericOnly = /^[a-z0-9 ]+$/i.test(cachedTitle);
     let isMatch = false;
@@ -89,9 +115,9 @@ const getCachedResearchForMessage = (messageText) => {
 
 const researchMediaThemes = async (query) => {
   const normalizedQuery = query.toLowerCase().trim();
-  if (themeResearchCache.has(normalizedQuery)) {
+  if (themeResearchCache[normalizedQuery]) {
     console.log(`[Research] Cache HIT for "${query}"`);
-    return themeResearchCache.get(normalizedQuery);
+    return themeResearchCache[normalizedQuery];
   }
 
   let wikiSummary = "";
@@ -103,7 +129,7 @@ const researchMediaThemes = async (query) => {
     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json`;
     const searchRes = await axios.get(searchUrl, {
       headers: WIKI_HEADERS,
-      timeout: 30000
+      timeout: 6000
     });
     const searchResults = searchRes.data?.query?.search;
 
@@ -115,7 +141,7 @@ const researchMediaThemes = async (query) => {
       const extractUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(pageTitle)}&redirects=1&format=json`;
       const extractRes = await axios.get(extractUrl, {
         headers: WIKI_HEADERS,
-        timeout: 30000
+        timeout: 6000
       });
       const pages = extractRes.data?.query?.pages;
       if (pages) {
@@ -134,49 +160,38 @@ const researchMediaThemes = async (query) => {
     console.error(`[Research] Wikipedia search FAILED for "${query}":`, e.message);
   }
 
-  // 2. Community themes: Try DuckDuckGo, fallback to Bing
+  // 2. Community themes: Try Yahoo first (unblocked), fallback to DDG, then Bing
   const communityQuery = `${query} themes analysis reddit`;
   try {
-    const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(communityQuery)}`;
-    const ddgRes = await axios.get(ddgUrl, {
-      headers: { 'User-Agent': BROWSER_USER_AGENT },
-      timeout: 30000
+    const yahooUrl = `https://search.yahoo.com/search?p=${encodeURIComponent(communityQuery)}`;
+    const yahooRes = await axios.get(yahooUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive'
+      },
+      timeout: 6000
     });
-    const $ = cheerio.load(ddgRes.data);
+    const $ = cheerio.load(yahooRes.data);
     const snippets = [];
-    $('.result__snippet').slice(0, 4).each((i, el) => {
-      snippets.push($(el).text().trim());
+    $('.algo').slice(0, 4).each((i, el) => {
+      const text = $(el).find('.compText').text().trim() || $(el).find('.lh-16').text().trim();
+      if (text) snippets.push(text);
     });
     if (snippets.length > 0) {
       communityThemes = snippets.join('\n');
-      console.log(`[Research] DDG returned ${snippets.length} community snippets for: "${query}"`);
+      console.log(`[Research] Yahoo returned ${snippets.length} community snippets for: "${query}"`);
     } else {
-      console.warn(`[Research] DDG returned 0 snippets for: "${communityQuery}". Trying Bing fallback...`);
-      throw new Error('DDG returned no snippets');
+      throw new Error('Yahoo returned no snippets');
     }
   } catch (e) {
-    // Bing fallback
-    try {
-      const bingUrl = `https://www.bing.com/search?q=${encodeURIComponent(communityQuery)}`;
-      const bingRes = await axios.get(bingUrl, {
-        headers: { 'User-Agent': BROWSER_USER_AGENT },
-        timeout: 30000
-      });
-      const $ = cheerio.load(bingRes.data);
-      const snippets = [];
-      $('.b_algo').slice(0, 4).each((i, el) => {
-        const text = $(el).find('.b_caption p').text().trim() || $(el).find('.b_algoSlug').text().trim();
-        if (text) snippets.push(text);
-      });
-      communityThemes = snippets.join('\n');
-      console.log(`[Research] Bing fallback returned ${snippets.length} community snippets for: "${query}"`);
-    } catch (e2) {
-      console.error(`[Research] Both DDG and Bing failed for community themes of "${query}":`, e2.message);
-    }
+    console.warn(`[Research] Yahoo failed for "${communityQuery}". Skipping further web fallbacks.`);
   }
 
   const result = `Wikipedia Summary:\n${wikiSummary || '(not found)'}\n\nCommunity Themes:\n${communityThemes || '(not found)'}`;
-  themeResearchCache.set(normalizedQuery, result);
+  themeResearchCache[normalizedQuery] = result;
+  saveThemeCache();
   return result;
 };
 

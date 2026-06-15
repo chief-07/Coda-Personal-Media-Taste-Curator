@@ -259,16 +259,7 @@ const scrapeForums = async (query) => {
   const yahooResults = await scrapeYahoo(cleanedQuery);
   if (yahooResults && yahooResults.length > 0) return yahooResults;
 
-  // ── FALLBACK 2: Bing ───────────────────────────────────────────────────
-  await delay(Math.floor(Math.random() * 300) + 200);
-  console.log(`[SearchService] Yahoo returned 0 results. Trying Bing fallback for: "${cleanedQuery}"`);
-  const bingResults = await scrapeBing(cleanedQuery);
-  if (bingResults && bingResults.length > 0) return bingResults;
-
-  // ── LAST RESORT: DDG ──────────────────────────────────────────────────
-  console.log(`[SearchService] Bing returned 0 results. Trying DDG...`);
-  await delay(Math.floor(Math.random() * 300) + 200);
-  return await scrapeDDG(cleanedQuery) || [];
+  return [];
 };
 
 

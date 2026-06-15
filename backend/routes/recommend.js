@@ -807,18 +807,23 @@ router.post('/ask', async (req, res) => {
       const userMentionedTitles = await llmService.extractTitlesFromText(combinedUserText);
       console.log(`[Ask Coda Chat] Extracted user-mentioned titles: ${JSON.stringify(userMentionedTitles)}`);
 
-      // 3. Perform synchronous web research on user-mentioned titles in parallel
+      // 3. Perform synchronous web research on user-mentioned titles sequentially
       let askResearchContext = "";
       if (userMentionedTitles && userMentionedTitles.length > 0) {
         try {
-          console.log(`[Ask Coda Chat] Performing synchronous theme research on: ${JSON.stringify(userMentionedTitles)}`);
-          const researchPromises = userMentionedTitles.map(title => llmService.researchMediaThemes(title));
-          const researchResults = await Promise.all(researchPromises);
-          userMentionedTitles.forEach((title, idx) => {
-            if (researchResults[idx]) {
-              askResearchContext += `Title: ${title}\nResearch:\n${researchResults[idx]}\n\n---\n\n`;
+          console.log(`[Ask Coda Chat] Performing sequential theme research on: ${JSON.stringify(userMentionedTitles)}`);
+          for (let i = 0; i < userMentionedTitles.length; i++) {
+            const title = userMentionedTitles[i];
+            const t0 = Date.now();
+            const researchText = await llmService.researchMediaThemes(title);
+            if (researchText) {
+              askResearchContext += `Title: ${title}\nResearch:\n${researchText}\n\n---\n\n`;
             }
-          });
+            const elapsed = Date.now() - t0;
+            if (elapsed > 100 && i < userMentionedTitles.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 800));
+            }
+          }
         } catch (e) {
           console.error('[Ask Coda Chat] Theme research failed:', e.message);
         }
