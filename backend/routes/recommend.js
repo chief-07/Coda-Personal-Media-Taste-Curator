@@ -139,6 +139,20 @@ const cachedFetchVNDBSnippets = (query, limit, platformHint = null) => {
   return getCachedSnippetData(`vndb_search:${query}:${limit}:${platKey}`, () => searchService.fetchVNDBSnippets(query, limit, platformHint));
 };
 
+const runSequentialTasksWithCacheDelay = async (tasks) => {
+  const results = [];
+  for (const task of tasks) {
+    const t0 = Date.now();
+    const res = await task();
+    results.push(res);
+    const elapsed = Date.now() - t0;
+    if (elapsed > 100) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+  return results;
+};
+
 router.get('/proxy-image', async (req, res) => {
   const { url } = req.query;
   try {
@@ -501,41 +515,58 @@ const runRecommendationPipeline = async (payload) => {
         const sourceResults = [];
 
         if (media_type === 'anime') {
-          const taggedPromises = [];
+          const parallelPromises = [];
+          const sequentialTasks = [];
+
           if (resolvedSeeds.length > 0) {
-            taggedPromises.push(cachedFetchMAL(resolvedSeeds).then(r => ({ source: `MAL community recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
-            taggedPromises.push(cachedFetchAniListRecs(resolvedSeeds).then(r => ({ source: `AniList graph recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
+            parallelPromises.push(cachedFetchAniListRecs(resolvedSeeds).then(r => ({ source: `AniList graph recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
+            sequentialTasks.push(() => cachedFetchMAL(resolvedSeeds).then(r => ({ source: `MAL community recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
             const reviewCacheKey = `mal_reviews:${resolvedSeeds.slice(0,3).join(',')}`;
-            taggedPromises.push(getCachedSnippetData(reviewCacheKey, () => searchService.fetchMALReviews(resolvedSeeds)).then(r => ({ source: `MAL user reviews (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
+            sequentialTasks.push(() => getCachedSnippetData(reviewCacheKey, () => searchService.fetchMALReviews(resolvedSeeds)).then(r => ({ source: `MAL user reviews (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
           }
+
           for (const query of search_queries) {
             if (!query.includes('site:')) {
-              taggedPromises.push(cachedFetchKitsu(query).then(r => ({ source: `Jikan/MAL genre search: "${query}"`, results: r || [] })));
-              taggedPromises.push(cachedFetchAniListSearch(query).then(r => ({ source: `AniList title/tag search: "${query}"`, results: r || [] })));
+              parallelPromises.push(cachedFetchAniListSearch(query).then(r => ({ source: `AniList title/tag search: "${query}"`, results: r || [] })));
+              sequentialTasks.push(() => cachedFetchKitsu(query).then(r => ({ source: `Jikan/MAL genre search: "${query}"`, results: r || [] })));
             }
-            taggedPromises.push(cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] })));
+            sequentialTasks.push(() => cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] })));
           }
-          const resolved = await Promise.all(taggedPromises);
-          sourceResults.push(...resolved);
+
+          const parallelResults = await Promise.all(parallelPromises);
+          sourceResults.push(...parallelResults);
+
+          // Sequential execution of rate-limited tasks with conditional cache delay
+          const staggeredResults = await runSequentialTasksWithCacheDelay(sequentialTasks);
+          sourceResults.push(...staggeredResults);
         } else if (media_type === 'visual novel') {
-          const taggedPromises = [];
+          const parallelPromises = [];
+          const sequentialTasks = [];
+
           if (resolvedSeeds.length > 0) {
-            taggedPromises.push(cachedFetchVNDBRecs(resolvedSeeds).then(r => ({ source: `VNDB similar-tag recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
+            parallelPromises.push(cachedFetchVNDBRecs(resolvedSeeds).then(r => ({ source: `VNDB similar-tag recs (seeds: ${resolvedSeeds.join(', ')})`, results: r || [] })));
           }
+
           for (const query of search_queries) {
             if (!query.includes('site:')) {
-              taggedPromises.push(cachedFetchVNDBSnippets(query, 6, payload.platform_hint).then(r => ({ source: `VNDB text search: "${query}"`, results: r || [] })));
+              parallelPromises.push(cachedFetchVNDBSnippets(query, 6, payload.platform_hint).then(r => ({ source: `VNDB text search: "${query}"`, results: r || [] })));
             }
-            taggedPromises.push(cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] })));
+            sequentialTasks.push(() => cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] })));
           }
-          const resolved = await Promise.all(taggedPromises);
-          sourceResults.push(...resolved);
+
+          const parallelResults = await Promise.all(parallelPromises);
+          sourceResults.push(...parallelResults);
+
+          // Sequential execution of rate-limited tasks with conditional cache delay
+          const staggeredResults = await runSequentialTasksWithCacheDelay(sequentialTasks);
+          sourceResults.push(...staggeredResults);
         } else {
-          const taggedPromises = search_queries.map(query =>
+          // Sequential execution of web scraping tasks with conditional cache delay
+          const tasks = search_queries.map(query => () =>
             cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] }))
           );
-          const resolved = await Promise.all(taggedPromises);
-          sourceResults.push(...resolved);
+          const staggeredResults = await runSequentialTasksWithCacheDelay(tasks);
+          sourceResults.push(...staggeredResults);
         }
 
         for (const sr of sourceResults) {
@@ -559,9 +590,16 @@ const runRecommendationPipeline = async (payload) => {
 
         if (filteredSnippets.length > 0) {
           const candidateTitles = await llmService.extractCandidateTitles(filteredSnippets, media_type);
-          const candidatesWithMetadata = await Promise.all(candidateTitles.map(async (title) => {
-            return await getCachedMetadata(title, media_type);
-          }));
+          const candidatesWithMetadata = [];
+          for (const title of candidateTitles) {
+            const key = `${media_type.toLowerCase().replace(/[^a-z0-9]/g, '')}:${title.toLowerCase().trim()}`;
+            const isMiss = !metadataCache[key];
+            const meta = await getCachedMetadata(title, media_type);
+            candidatesWithMetadata.push(meta);
+            if (isMiss) {
+              await new Promise(resolve => setTimeout(resolve, 150));
+            }
+          }
 
           const seenFiltered = candidatesWithMetadata.filter(candidate => {
             return !isExcluded(candidate.title, seenList) && !isExcluded(candidate.title, notForMeList);

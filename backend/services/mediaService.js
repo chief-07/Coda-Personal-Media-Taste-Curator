@@ -532,6 +532,20 @@ const fetchPenguinRandomHousePoster = async (title) => {
 };
 
 const fetchGoogleBooksPoster = async (title) => {
+  // Try iTunes first (fast and unblocked)
+  try {
+    const res = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(title)}&media=ebook&limit=1`, { timeout: 10000 });
+    const book = res.data?.results?.[0];
+    const img = book?.artworkUrl100?.replace('100x100bb', '600x900bb');
+    if (img) {
+      console.log(`[iTunes Book Poster] ✅ "${title}"`);
+      return img;
+    }
+  } catch (e) {
+    console.error('[iTunes Book Poster] Failed:', e.message);
+  }
+
+  // Fallback to Google Books
   try {
     const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}`, { timeout: 15000 });
     if (res.data.items && res.data.items.length > 0) {
@@ -655,12 +669,11 @@ const fetchPoster = async (title, mediaType) => {
     if (type === 'book') {
       // Open Library and Google Books in parallel
       try {
-        const [ol, gb] = await Promise.all([
-          fetchOpenLibraryPoster(cleanedTitle).catch(() => null),
-          fetchGoogleBooksPoster(cleanedTitle).catch(() => null)
-        ]);
-        if (ol) return ol;
+        const gb = await fetchGoogleBooksPoster(cleanedTitle).catch(() => null);
         if (gb) return gb;
+        
+        const ol = await fetchOpenLibraryPoster(cleanedTitle).catch(() => null);
+        if (ol) return ol;
       } catch (e) {}
       
       // Penguin Random House

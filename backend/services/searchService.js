@@ -22,16 +22,9 @@ const sanitizeQuery = (query) => {
 
 const getScraperHeaders = () => ({
   'User-Agent': getRandomUserAgent(),
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-  'Accept-Language': 'en-US,en;q=0.9',
-  'Upgrade-Insecure-Requests': '1',
-  'Sec-Ch-Ua': '"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"',
-  'Sec-Ch-Ua-Mobile': '?0',
-  'Sec-Ch-Ua-Platform': '"Windows"',
-  'Sec-Fetch-Dest': 'document',
-  'Sec-Fetch-Mode': 'navigate',
-  'Sec-Fetch-Site': 'none',
-  'Sec-Fetch-User': '?1'
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.5',
+  'Connection': 'keep-alive'
 });
 
 // ─────────────────────────────────────────────────
@@ -43,7 +36,7 @@ const scrapeDDG = async (query) => {
     const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
     const response = await axios.get(url, {
       headers: getScraperHeaders(),
-      timeout: 30000
+      timeout: 6000
     });
     const $ = cheerio.load(response.data);
     const results = [];
@@ -68,7 +61,7 @@ const scrapeYahoo = async (query) => {
     const url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`;
     const response = await axios.get(url, {
       headers: getScraperHeaders(),
-      timeout: 30000
+      timeout: 6000
     });
     const $ = cheerio.load(response.data);
     const results = [];
@@ -104,7 +97,7 @@ const scrapeBing = async (query) => {
     const url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
     const response = await axios.get(url, {
       headers: getScraperHeaders(),
-      timeout: 30000
+      timeout: 6000
     });
     const $ = cheerio.load(response.data);
     const results = [];
@@ -150,7 +143,7 @@ const getRedditToken = async () => {
           'User-Agent': 'CodaRecommendations/1.0',
           'Content-Type': 'application/x-www-form-urlencoded'
         },
-        timeout: 30000
+        timeout: 6000
       }
     );
     _redditToken = res.data.access_token;
@@ -180,7 +173,7 @@ const searchRedditDirect = async (subreddit, searchTerms, limit = 5) => {
           'Authorization': `Bearer ${token}`,
           'User-Agent': 'CodaRecommendations/1.0'
         },
-        timeout: 30000
+        timeout: 6000
       });
       const posts = res.data?.data?.children || [];
       if (posts.length > 0) {
@@ -211,7 +204,7 @@ const searchRedditDirect = async (subreddit, searchTerms, limit = 5) => {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       },
-      timeout: 30000
+      timeout: 6000
     });
     const submissions = res.data?.data || [];
     if (submissions.length > 0) {
@@ -266,16 +259,16 @@ const scrapeForums = async (query) => {
   const yahooResults = await scrapeYahoo(cleanedQuery);
   if (yahooResults && yahooResults.length > 0) return yahooResults;
 
-  // ── FALLBACK 2: DDG web scrape ───────────────────────────────────────
+  // ── FALLBACK 2: Bing ───────────────────────────────────────────────────
   await delay(Math.floor(Math.random() * 300) + 200);
-  console.log(`[SearchService] Yahoo returned 0 results. Trying DDG fallback for: "${cleanedQuery}"`);
-  const ddgResults = await scrapeDDG(cleanedQuery);
-  if (ddgResults && ddgResults.length > 0) return ddgResults;
+  console.log(`[SearchService] Yahoo returned 0 results. Trying Bing fallback for: "${cleanedQuery}"`);
+  const bingResults = await scrapeBing(cleanedQuery);
+  if (bingResults && bingResults.length > 0) return bingResults;
 
-  // ── LAST RESORT: Bing ────────────────────────────────────────────────
-  console.log(`[SearchService] DDG returned 0 results. Trying Bing...`);
+  // ── LAST RESORT: DDG ──────────────────────────────────────────────────
+  console.log(`[SearchService] Bing returned 0 results. Trying DDG...`);
   await delay(Math.floor(Math.random() * 300) + 200);
-  return await scrapeBing(cleanedQuery) || [];
+  return await scrapeDDG(cleanedQuery) || [];
 };
 
 
@@ -988,8 +981,27 @@ const fetchMovieMetadata = async (title) => {
 };
 
 const fetchBookMetadata = async (title) => {
+  // Try iTunes first (fast and unblocked)
   try {
-    const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(title)}&maxResults=1`, { timeout: 30000 });
+    const res = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(title)}&media=ebook&limit=1`, { timeout: 15000 });
+    const book = res.data?.results?.[0];
+    if (book) {
+      const genres = book.genres ? book.genres.filter(g => g !== 'Books') : [];
+      return {
+        title: book.trackName || title,
+        genres: genres,
+        tags: [],
+        description: book.description || '',
+        image: book.artworkUrl100?.replace('100x100bb', '600x900bb') || ''
+      };
+    }
+  } catch (err) {
+    console.warn(`[iTunes Book Metadata Lookup failed for "${title}"]:`, err.message);
+  }
+
+  // Fallback to Google Books
+  try {
+    const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(title)}&maxResults=1`, { timeout: 15000 });
     const book = res.data?.items?.[0]?.volumeInfo;
     if (book) {
       return {

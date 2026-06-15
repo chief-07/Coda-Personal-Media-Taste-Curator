@@ -174,13 +174,13 @@ Your job is to:
 **NEGATIVE QUERY KEYWORDS (CRITICAL):**
 - Read the "guardrails" field carefully for content restriction signals. Based on the signals present, you MUST append negative exclusion keywords to ALL 5 search queries to prevent inappropriate content from surfacing.
 - If guardrails contain ANY of the following signals, append the corresponding negative keyword suffixes to EVERY query:
-  - "christian" / "religious" / "faith-based" / "wholesome" / "family-friendly" / "clean content" / "no adult" / "no explicit" / "no 18+" / "no mature content" → append: `-erotic -eroge -adult -"18+" -hentai -explicit -nsfw`
-  - "no gore" / "no violence" / "no guro" / "no blood" → append: `-gore -guro -"graphic violence"`
-  - "no horror" / "avoid horror" → append: `-horror -"survival horror"`
-  - "no ntr" / "no netorare" → append: `-ntr -netorare`
-  - "no bl" / "no yaoi" → append: `-yaoi -"boys love"`
-  - "no gl" / "no yuri" → append: `-yuri -"girls love"`
-- IMPORTANT: Append these negative terms naturally at the END of each query string so they don't break site: constraints. Example: wholesome anime romance site:reddit.com/r/animesuggest -ecchi -hentai -18+.
+  - "christian" / "religious" / "faith-based" / "wholesome" / "family-friendly" / "clean content" / "no adult" / "no explicit" / "no 18+" / "no mature content" → suffix to append: -erotic -eroge -adult -18+ -hentai -explicit -nsfw
+  - "no gore" / "no violence" / "no guro" / "no blood" → suffix to append: -gore -guro -graphic-violence
+  - "no horror" / "avoid horror" → suffix to append: -horror -survival-horror
+  - "no ntr" / "no netorare" → suffix to append: -ntr -netorare
+  - "no bl" / "no yaoi" → suffix to append: -yaoi -boys-love
+  - "no gl" / "no yuri" → suffix to append: -yuri -girls-love
+- IMPORTANT: Append these negative terms naturally at the END of each query string so they do not break site: constraints. Example: wholesome anime romance site:reddit.com/r/animesuggest -ecchi -hentai -18+.
 - If NO content restriction signals are present in the guardrails, do NOT append any negative keywords.
 
 
@@ -234,6 +234,47 @@ Respond ONLY with a JSON object:
   }
 };
 
+const buildDynamicGuardrailInstructions = (guardrails) => {
+  if (!guardrails) return "";
+  const guardrailsLower = typeof guardrails === 'string'
+    ? guardrails.toLowerCase()
+    : JSON.stringify(guardrails).toLowerCase();
+
+  let instructions = "";
+
+  if (guardrailsLower.includes('christian') ||
+      guardrailsLower.includes('religious') ||
+      guardrailsLower.includes('wholesome') ||
+      guardrailsLower.includes('family-friendly') ||
+      guardrailsLower.includes('family friendly') ||
+      guardrailsLower.includes('clean content') ||
+      guardrailsLower.includes('no adult') ||
+      guardrailsLower.includes('no explicit') ||
+      guardrailsLower.includes('no sexual') ||
+      guardrailsLower.includes('no 18+') ||
+      guardrailsLower.includes('no mature content')) {
+    instructions += `\n- CRITICAL SAFETY RULE: The user has requested wholesome, family-friendly, clean, or Christian/religious content. You MUST NOT recommend any works containing explicit sexual themes, erotica, adult/18+ content, or highly inappropriate themes under any circumstances. For example, absolutely DO NOT select "Fifty Shades of Grey", "Game of Thrones", or other explicit works, even if they appear in the candidate list.`;
+  }
+
+  if (guardrailsLower.includes('no gore') ||
+      guardrailsLower.includes('no violence') ||
+      guardrailsLower.includes('no guro') ||
+      guardrailsLower.includes('avoid violence') ||
+      guardrailsLower.includes('avoid gore') ||
+      guardrailsLower.includes('no graphic violence') ||
+      guardrailsLower.includes('no blood')) {
+    instructions += `\n- CRITICAL SAFETY RULE: The user has requested no gore or violence. You MUST NOT select any works featuring graphic violence, body horror, gore, or extreme bloodshed.`;
+  }
+
+  if (guardrailsLower.includes('no horror') ||
+      guardrailsLower.includes('avoid horror') ||
+      guardrailsLower.includes('not horror')) {
+    instructions += `\n- CRITICAL SAFETY RULE: The user has requested no horror. You MUST NOT select any horror, thriller-horror, or highly disturbing/frightening works.`;
+  }
+
+  return instructions;
+};
+
 const scoreAndSelect = async (directive, candidatesWithMetadata, guardrails, seen = [], notForMe = [], directWatchlistTitle = null) => {
   let watchlistInstruction = "";
   let blurbInstruction = `Write a very short, friendly, and highly subjective "coda_blurb" (maximum 8-12 words) talking directly to the user (your friend) from your own perspective as someone who has personally watched/read/played this work and knows them inside out.
@@ -248,10 +289,12 @@ The candidate list contains this exact title. You MUST select "${directWatchlist
 `;
   }
 
+  const safetyInstructions = buildDynamicGuardrailInstructions(guardrails);
+
   const systemPrompt = `
 You are Coda, an expert curator.
 You have the Master Directive for this user: "${directive}"
-And their strict guardrails: "${JSON.stringify(guardrails)}"
+And their strict guardrails: "${JSON.stringify(guardrails)}"${safetyInstructions}
 And the works they have ALREADY watched, played, or seen (do NOT recommend these): "${JSON.stringify(seen)}"
 And the works they have explicitly rejected as "not for me" (do NOT recommend these): "${JSON.stringify(notForMe)}"
 ${watchlistInstruction}
@@ -290,10 +333,12 @@ Respond ONLY with a JSON object:
 };
 
 const scoreAndSelectMultiple = async (directive, candidatesWithMetadata, guardrails, seen = [], notForMe = [], count = 3) => {
+  const safetyInstructions = buildDynamicGuardrailInstructions(guardrails);
+
   const systemPrompt = `
 You are Coda, an expert curator.
 You have the Master Directive for this user: "${directive}"
-And their strict guardrails: "${JSON.stringify(guardrails)}"
+And their strict guardrails: "${JSON.stringify(guardrails)}"${safetyInstructions}
 And the works they have ALREADY watched, played, or seen (do NOT recommend these): "${JSON.stringify(seen)}"
 And the works they have explicitly rejected as "not for me" (do NOT recommend these): "${JSON.stringify(notForMe)}"
 
