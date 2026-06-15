@@ -22,9 +22,16 @@ const sanitizeQuery = (query) => {
 
 const getScraperHeaders = () => ({
   'User-Agent': getRandomUserAgent(),
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-  'Accept-Language': 'en-US,en;q=0.5',
-  'Connection': 'keep-alive'
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+  'Accept-Language': 'en-US,en;q=0.9',
+  'Accept-Encoding': 'gzip, deflate, br',
+  'Connection': 'keep-alive',
+  'Upgrade-Insecure-Requests': '1',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'none',
+  'Sec-Fetch-User': '?1',
+  'Cache-Control': 'max-age=0'
 });
 
 // ─────────────────────────────────────────────────
@@ -230,12 +237,17 @@ const scrapeForums = async (query) => {
   const yahooResults = await scrapeYahoo(cleanedQuery);
   if (yahooResults && yahooResults.length > 0) return yahooResults;
 
-  // ── FALLBACK 2: Bing web scrape (reliable fallback) ────────────────
-  console.log(`[SearchService] Yahoo failed/returned 0. Trying Bing search fallback for: "${cleanedQuery}"`);
+  // ── FALLBACK 2: DuckDuckGo web scrape ──────────────────────────────
+  console.log(`[SearchService] Yahoo failed/returned 0. Trying DuckDuckGo search fallback for: "${cleanedQuery}"`);
+  const ddgResults = await scrapeDDG(cleanedQuery);
+  if (ddgResults && ddgResults.length > 0) return ddgResults;
+
+  // ── FALLBACK 3: Bing web scrape (reliable fallback) ────────────────
+  console.log(`[SearchService] DuckDuckGo failed/returned 0. Trying Bing search fallback for: "${cleanedQuery}"`);
   const bingResults = await scrapeBing(cleanedQuery);
   if (bingResults && bingResults.length > 0) return bingResults;
 
-  // ── FALLBACK 3: Reddit PullPush API (throttled, keyless last-resort fallback) 
+  // ── FALLBACK 4: Reddit PullPush API (throttled, keyless last-resort fallback) 
   if (subreddit && !hasRedditCreds) {
     // 1.5s delay to prevent hammering PullPush
     console.log(`[SearchService] Search engines returned 0. Pacing PullPush delay (1500ms)...`);

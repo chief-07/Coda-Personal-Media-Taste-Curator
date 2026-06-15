@@ -274,6 +274,35 @@ const CONTENT_SIGNAL_BLOCKLISTS = [
 ];
 
 /**
+ * Helper to check if a tag matches a blocked term precisely.
+ * Avoids matching substring letters inside larger words (e.g., matching "bl" inside "ensemble").
+ * 
+ * @param {string} tag 
+ * @param {string} blockedTerm 
+ * @returns {boolean}
+ */
+const tagMatchesBlockedTerm = (tag, blockedTerm) => {
+  if (tag === blockedTerm) return true;
+  if (!tag.includes(blockedTerm)) return false;
+
+  let pos = tag.indexOf(blockedTerm);
+  while (pos !== -1) {
+    const charBefore = pos > 0 ? tag[pos - 1] : '';
+    const charAfter = pos + blockedTerm.length < tag.length ? tag[pos + blockedTerm.length] : '';
+
+    // Treat alphanumeric characters and hyphens as word characters
+    const isBeforeAlphanumeric = /[a-z0-9\-]/i.test(charBefore);
+    const isAfterAlphanumeric = /[a-z0-9\-]/i.test(charAfter);
+
+    if (!isBeforeAlphanumeric && !isAfterAlphanumeric) {
+      return true;
+    }
+    pos = tag.indexOf(blockedTerm, pos + 1);
+  }
+  return false;
+};
+
+/**
  * Filters candidates using deterministic content signal matching against guardrails.
  * Returns the filtered candidates array and logs removals.
  *
@@ -308,7 +337,7 @@ const filterByContentGuardrails = (candidates, guardrailsString) => {
     ].map(t => (t || '').toLowerCase());
 
     const blocked = allTags.find(tag => {
-      return [...activeBlockedTerms].some(blockedTerm => tag.includes(blockedTerm));
+      return [...activeBlockedTerms].some(blockedTerm => tagMatchesBlockedTerm(tag, blockedTerm));
     });
 
     if (blocked) {
@@ -618,9 +647,12 @@ const runRecommendationPipeline = async (payload) => {
         let candidateTitles = [];
         if (filteredSnippets.length > 0) {
           candidateTitles = await llmService.extractCandidateTitles(filteredSnippets, media_type);
-        } else {
-          // Fallback: Web search failed or returned 0 results. Ask the LLM to directly generate candidate titles.
-          console.log(`[Recommend] Web search returned 0 results. Activating LLM direct fallback to generate candidates for: "${media_type}"`);
+        }
+
+        if (candidateTitles.length === 0) {
+          // Fallback: Web search failed, returned 0 results, or yielded no extractable titles. Ask the LLM to directly generate candidate titles.
+          const reason = filteredSnippets.length > 0 ? "returned 0 candidates" : "returned 0 results";
+          console.log(`[Recommend] Web search ${reason}. Activating LLM direct fallback to generate candidates for: "${media_type}"`);
           candidateTitles = await llmService.generateDirectCandidates(
             master_directive,
             seed_titles,
