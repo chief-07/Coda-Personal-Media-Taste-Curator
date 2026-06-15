@@ -67,6 +67,69 @@ const normalizeMediaType = (type) => {
   return type;
 };
 
+const applyGuardrailSuffixes = (queries, guardrails) => {
+  if (!guardrails || !queries || !Array.isArray(queries)) return queries;
+  const guardrailsLower = typeof guardrails === 'string'
+    ? guardrails.toLowerCase()
+    : JSON.stringify(guardrails).toLowerCase();
+
+  return queries.map(query => {
+    let q = query;
+    if (guardrailsLower.includes('christian') ||
+        guardrailsLower.includes('religious') ||
+        guardrailsLower.includes('wholesome') ||
+        guardrailsLower.includes('family-friendly') ||
+        guardrailsLower.includes('family friendly') ||
+        guardrailsLower.includes('clean content') ||
+        guardrailsLower.includes('no adult') ||
+        guardrailsLower.includes('no explicit') ||
+        guardrailsLower.includes('no sexual') ||
+        guardrailsLower.includes('no 18+') ||
+        guardrailsLower.includes('no mature content')) {
+      if (!q.includes('-erotic') && !q.includes('-eroge')) {
+        q += " -erotic -eroge -adult -18+ -hentai -explicit -nsfw";
+      }
+    }
+    if (guardrailsLower.includes('no gore') ||
+        guardrailsLower.includes('no violence') ||
+        guardrailsLower.includes('no guro') ||
+        guardrailsLower.includes('avoid violence') ||
+        guardrailsLower.includes('avoid gore') ||
+        guardrailsLower.includes('no graphic violence') ||
+        guardrailsLower.includes('no blood')) {
+      if (!q.includes('-gore')) {
+        q += " -gore -guro -graphic-violence";
+      }
+    }
+    if (guardrailsLower.includes('no horror') ||
+        guardrailsLower.includes('avoid horror') ||
+        guardrailsLower.includes('not horror')) {
+      if (!q.includes('-horror')) {
+        q += " -horror -survival-horror";
+      }
+    }
+    if (guardrailsLower.includes('no ntr') ||
+        guardrailsLower.includes('no netorare')) {
+      if (!q.includes('-ntr')) {
+        q += " -ntr -netorare";
+      }
+    }
+    if (guardrailsLower.includes('no bl') ||
+        guardrailsLower.includes('no yaoi')) {
+      if (!q.includes('-yaoi')) {
+        q += " -yaoi -boys-love";
+      }
+    }
+    if (guardrailsLower.includes('no gl') ||
+        guardrailsLower.includes('no yuri')) {
+      if (!q.includes('-yuri')) {
+        q += " -yuri -girls-love";
+      }
+    }
+    return q;
+  });
+};
+
 const synthesizeAndRoute = async (payload) => {
   const requestedMediaType = normalizeMediaType(payload.requested_media_type);
 
@@ -171,19 +234,6 @@ Your job is to:
 - You MUST generate 5 completely different queries that do not overlap with typical recommendations for their most recent likes.
 - In "selected_vibe_focus", clearly describe the new rotated direction you are targeting.
 
-**NEGATIVE QUERY KEYWORDS (CRITICAL):**
-- Read the "guardrails" field carefully for content restriction signals. Based on the signals present, you MUST append negative exclusion keywords to ALL 5 search queries to prevent inappropriate content from surfacing.
-- If guardrails contain ANY of the following signals, append the corresponding negative keyword suffixes to EVERY query:
-  - "christian" / "religious" / "faith-based" / "wholesome" / "family-friendly" / "clean content" / "no adult" / "no explicit" / "no 18+" / "no mature content" → suffix to append: -erotic -eroge -adult -18+ -hentai -explicit -nsfw
-  - "no gore" / "no violence" / "no guro" / "no blood" → suffix to append: -gore -guro -graphic-violence
-  - "no horror" / "avoid horror" → suffix to append: -horror -survival-horror
-  - "no ntr" / "no netorare" → suffix to append: -ntr -netorare
-  - "no bl" / "no yaoi" → suffix to append: -yaoi -boys-love
-  - "no gl" / "no yuri" → suffix to append: -yuri -girls-love
-- IMPORTANT: Append these negative terms naturally at the END of each query string so they do not break site: constraints. Example: wholesome anime romance site:reddit.com/r/animesuggest -ecchi -hentai -18+.
-- If NO content restriction signals are present in the guardrails, do NOT append any negative keywords.
-
-
 Respond ONLY with a JSON object:
 {
   "media_type": "${requestedMediaType}",
@@ -201,7 +251,11 @@ Respond ONLY with a JSON object:
     { role: 'user', content: userPrompt }
   ], { type: 'json_object' });
 
-  return JSON.parse(responseJson);
+  const parsed = JSON.parse(responseJson);
+  if (parsed && Array.isArray(parsed.search_queries)) {
+    parsed.search_queries = applyGuardrailSuffixes(parsed.search_queries, payload.guardrails);
+  }
+  return parsed;
 };
 
 const extractCandidateTitles = async (scrapedSnippets, mediaType) => {
@@ -973,6 +1027,42 @@ Respond with ONLY a JSON object:
   }
 };
 
+const generateDirectCandidates = async (masterDirective, seedTitles, mediaType, seen = [], notForMe = []) => {
+  const prompt = `You are the Coda Candidate Generator. 
+We need to generate a list of recommendations for a user.
+Our web search indexing is temporarily unavailable, so you must generate candidate titles directly using your internal knowledge.
+
+Media Type requested: "${mediaType}"
+Master Directive: "${masterDirective}"
+Seed Titles (titles the user likes or wants similar recommendations to): ${JSON.stringify(seedTitles)}
+
+Excluded / already seen titles (DO NOT suggest these): ${JSON.stringify(seen)}
+Rejected / "not for me" titles (DO NOT suggest these): ${JSON.stringify(notForMe)}
+
+Your job:
+1. Generate exactly 6 to 8 highly specific, high-quality, and up-to-date candidate titles of type "${mediaType}" that perfectly match the Master Directive and seed titles.
+2. The titles MUST be the exact, clean official names of the individual works (e.g., "Inception", "Katawa Shoujo", "Steins;Gate").
+3. DO NOT output any compilation names, franchise names, or titles in the excluded/rejected lists.
+
+Respond with ONLY a JSON object:
+{
+  "candidates": ["Title 1", "Title 2", ...]
+}`;
+
+  try {
+    const responseJson = await callOpenAI([
+      { role: 'system', content: `You are a professional recommender system for ${mediaType}.` },
+      { role: 'user', content: prompt }
+    ], { type: 'json_object' });
+    
+    const parsed = JSON.parse(responseJson);
+    return parsed.candidates || [];
+  } catch (e) {
+    console.error("[llmService] generateDirectCandidates failed:", e.message);
+    return [];
+  }
+};
+
 module.exports = {
   callOpenAI,
   synthesizeAndRoute,
@@ -987,5 +1077,6 @@ module.exports = {
   handleAskChat,
   fetchMetadataViaLLM,
   extractTitlesFromText,
-  researchMediaThemes
+  researchMediaThemes,
+  generateDirectCandidates
 };

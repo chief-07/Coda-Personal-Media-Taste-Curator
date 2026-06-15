@@ -192,37 +192,7 @@ const searchRedditDirect = async (subreddit, searchTerms, limit = 5) => {
     } catch (e) {
       console.warn(`[Reddit OAuth] Search failed for r/${subreddit}:`, e.message);
     }
-  } else {
-    console.warn(`[Reddit] No credentials configured — trying PullPush API fallback for r/${subreddit}`);
   }
-
-  // ── Try PullPush API Fallback (free, keyless community archive) ──────
-  try {
-    const url = `https://api.pullpush.io/reddit/search/submission/?q=${encodeURIComponent(cleanTerms)}&subreddit=${subreddit}&limit=${limit}`;
-    console.log(`[Reddit PullPush] Searching r/${subreddit} for: "${cleanTerms}"`);
-    const res = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      },
-      timeout: 6000
-    });
-    const submissions = res.data?.data || [];
-    if (submissions.length > 0) {
-      console.log(`[Reddit PullPush] Got ${submissions.length} submissions from r/${subreddit}`);
-      return submissions.map(post => {
-        const title = post.title || '';
-        const body = (post.selftext || '').substring(0, 500);
-        return {
-          title,
-          snippet: `[Reddit r/${subreddit}] ${title}${body ? ' — ' + body : ''}`,
-          link: `https://www.reddit.com${post.permalink || ''}`
-        };
-      });
-    }
-  } catch (e) {
-    console.warn(`[Reddit PullPush] Failed for r/${subreddit}:`, e.message);
-  }
-
   return [];
 };
 
@@ -247,17 +217,68 @@ const scrapeForums = async (query) => {
     .replace(/\s+/g, ' ')
     .trim();
 
-  // ── PRIMARY: Reddit native JSON search ──────────────────────────────
-  if (subreddit) {
+  // ── PRIMARY: Reddit OAuth (only if configured) ──────────────────────────────
+  const hasRedditCreds = !!(process.env.REDDIT_CLIENT_ID && process.env.REDDIT_CLIENT_SECRET);
+  if (subreddit && hasRedditCreds) {
     const redditResults = await searchRedditDirect(subreddit, searchTerms);
     if (redditResults.length > 0) return redditResults;
   }
 
-  // ── FALLBACK 1: Yahoo web scrape (working and unblocked!) ──────────────
+  // ── FALLBACK 1: Yahoo web scrape ──────────────────────────────────
   await delay(Math.floor(Math.random() * 300) + 200);
-  console.log(`[SearchService] Reddit returned 0 results. Trying Yahoo fallback for: "${cleanedQuery}"`);
+  console.log(`[SearchService] Trying Yahoo search fallback for: "${cleanedQuery}"`);
   const yahooResults = await scrapeYahoo(cleanedQuery);
   if (yahooResults && yahooResults.length > 0) return yahooResults;
+
+  // ── FALLBACK 2: Bing web scrape (reliable fallback) ────────────────
+  console.log(`[SearchService] Yahoo failed/returned 0. Trying Bing search fallback for: "${cleanedQuery}"`);
+  const bingResults = await scrapeBing(cleanedQuery);
+  if (bingResults && bingResults.length > 0) return bingResults;
+
+  // ── FALLBACK 3: Reddit PullPush API (throttled, keyless last-resort fallback) 
+  if (subreddit && !hasRedditCreds) {
+    // 1.5s delay to prevent hammering PullPush
+    console.log(`[SearchService] Search engines returned 0. Pacing PullPush delay (1500ms)...`);
+    await delay(1500);
+    console.log(`[SearchService] Trying PullPush fallback for r/${subreddit}: "${searchTerms}"`);
+    
+    let attempt = 0;
+    while (attempt < 2) {
+      try {
+        const url = `https://api.pullpush.io/reddit/search/submission/?q=${encodeURIComponent(searchTerms.substring(0, 100))}&subreddit=${subreddit}&limit=5`;
+        const res = await axios.get(url, {
+          headers: {
+            'User-Agent': 'CodaRecommendationEngine/1.0 (contact: support@coda.local; keyless public search)'
+          },
+          timeout: 6000
+        });
+        const submissions = res.data?.data || [];
+        if (submissions.length > 0) {
+          console.log(`[Reddit PullPush] Got ${submissions.length} submissions from r/${subreddit}`);
+          return submissions.map(post => {
+            const title = post.title || '';
+            const body = (post.selftext || '').substring(0, 500);
+            return {
+              title,
+              snippet: `[Reddit r/${subreddit}] ${title}${body ? ' — ' + body : ''}`,
+              link: `https://www.reddit.com${post.permalink || ''}`
+            };
+          });
+        }
+        break; // Empty result but success, no need to retry
+      } catch (e) {
+        const status = e.response?.status;
+        console.warn(`[Reddit PullPush] Attempt ${attempt + 1} failed for r/${subreddit}: ${e.message} (status: ${status})`);
+        if (status === 429 && attempt === 0) {
+          console.log(`[Reddit PullPush] Rate limited (429). Backing off for 3 seconds before retry...`);
+          await delay(3000);
+          attempt++;
+        } else {
+          break; // Other error or 2nd retry, abort
+        }
+      }
+    }
+  }
 
   return [];
 };

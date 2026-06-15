@@ -561,12 +561,39 @@ const runRecommendationPipeline = async (payload) => {
           const staggeredResults = await runSequentialTasksWithCacheDelay(sequentialTasks);
           sourceResults.push(...staggeredResults);
         } else {
-          // Sequential execution of web scraping tasks with conditional cache delay
-          const tasks = search_queries.map(query => () =>
-            cachedScrapeForums(query).then(r => ({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results: r || [] }))
-          );
-          const staggeredResults = await runSequentialTasksWithCacheDelay(tasks);
-          sourceResults.push(...staggeredResults);
+          // Sequential execution of web scraping tasks with early exit
+          let consecutiveFailures = 0;
+          let tempSnippetsCount = 0;
+          for (let i = 0; i < search_queries.length; i++) {
+            const query = search_queries[i];
+            const t0 = Date.now();
+            const results = await cachedScrapeForums(query);
+            const elapsed = Date.now() - t0;
+
+            if (results && results.length > 0) {
+              consecutiveFailures = 0;
+              sourceResults.push({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results });
+              tempSnippetsCount += results.length;
+            } else {
+              consecutiveFailures++;
+            }
+
+            // Early exit if we collected enough snippets (5+)
+            if (tempSnippetsCount >= 5) {
+              console.log(`[Recommend] Collected ${tempSnippetsCount} snippets. Stopping search early after query ${i + 1}/${search_queries.length}.`);
+              break;
+            }
+
+            // Early exit on 2 consecutive failures/timeouts (likely blocked or offline)
+            if (consecutiveFailures >= 2) {
+              console.log(`[Recommend] Encountered 2 consecutive search failures/timeouts. Aborting search loop early to activate fallback.`);
+              break;
+            }
+
+            if (elapsed > 100 && i < search_queries.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+          }
         }
 
         for (const sr of sourceResults) {
@@ -588,8 +615,23 @@ const runRecommendationPipeline = async (payload) => {
           return !isExcluded(snippet.title, seenList) && !isExcluded(snippet.title, notForMeList);
         });
 
+        let candidateTitles = [];
         if (filteredSnippets.length > 0) {
-          const candidateTitles = await llmService.extractCandidateTitles(filteredSnippets, media_type);
+          candidateTitles = await llmService.extractCandidateTitles(filteredSnippets, media_type);
+        } else {
+          // Fallback: Web search failed or returned 0 results. Ask the LLM to directly generate candidate titles.
+          console.log(`[Recommend] Web search returned 0 results. Activating LLM direct fallback to generate candidates for: "${media_type}"`);
+          candidateTitles = await llmService.generateDirectCandidates(
+            master_directive,
+            seed_titles,
+            media_type,
+            seenList,
+            notForMeList
+          );
+          console.log(`[Recommend] LLM direct fallback generated candidates: ${JSON.stringify(candidateTitles)}`);
+        }
+
+        if (candidateTitles.length > 0) {
           const candidatesWithMetadata = [];
           for (const title of candidateTitles) {
             const key = `${media_type.toLowerCase().replace(/[^a-z0-9]/g, '')}:${title.toLowerCase().trim()}`;
