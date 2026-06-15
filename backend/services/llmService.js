@@ -1004,7 +1004,9 @@ const extractTitlesFromText = async (text) => {
     return [];
   }
   const prompt = `You are a media title extractor. Extract any specific media titles (movies, anime, games, books, manga, visual novels) explicitly mentioned in this text.
-Return ONLY a JSON object containing an array of strings under the key "titles". If no titles are mentioned, return an empty array under the key "titles".
+- Note: Users often write in lowercase without proper capitalization (e.g., 'obsession', 'steins gate', 'shutter island', 'slow west'). Use contextual clues like "watched...", "similar to...", "about...", "like...", "recommendations for..." to identify and extract these titles even if they are lowercase.
+- Extract the clean, capitalized proper name of the title if possible (e.g. "Obsession" instead of "obsession").
+- Return ONLY a JSON object containing an array of strings under the key "titles". If no titles are mentioned, return an empty array under the key "titles".
 
 Text to extract from: "${text}"
 

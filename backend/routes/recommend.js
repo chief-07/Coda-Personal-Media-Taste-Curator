@@ -426,6 +426,7 @@ const runRecommendationPipeline = async (payload) => {
   let scrapedSnippets = [];
   let seed_titles = [];
   let selected_vibe_focus = '';
+  let candidateTitles = [];
 
   // Used seeds to avoid picking the same seed on retry
   const usedSeeds = new Set();
@@ -441,6 +442,7 @@ const runRecommendationPipeline = async (payload) => {
     scrapedSnippets = [];
     cleanCandidates = [];
     finalPicks = [];
+    candidateTitles = [];
 
     // Filter matching watchlist items
     const matchingWatchlistItems = watchlist.filter(item => {
@@ -590,9 +592,8 @@ const runRecommendationPipeline = async (payload) => {
           const staggeredResults = await runSequentialTasksWithCacheDelay(sequentialTasks);
           sourceResults.push(...staggeredResults);
         } else {
-          // Sequential execution of web scraping tasks with early exit
+          // Sequential execution of web scraping tasks with incremental extraction
           let consecutiveFailures = 0;
-          let tempSnippetsCount = 0;
           for (let i = 0; i < search_queries.length; i++) {
             const query = search_queries[i];
             const t0 = Date.now();
@@ -601,21 +602,29 @@ const runRecommendationPipeline = async (payload) => {
 
             if (results && results.length > 0) {
               consecutiveFailures = 0;
-              sourceResults.push({ source: `Web scrape (DDG/Yahoo/Reddit): "${query}"`, results });
-              tempSnippetsCount += results.length;
+              const filtered = results.filter(snippet => {
+                return !isExcluded(snippet.title, seenList) && !isExcluded(snippet.title, notForMeList);
+              });
+
+              if (filtered.length > 0) {
+                console.log(`[Recommend] Query "${query}" returned ${filtered.length} snippets. Extracting candidates...`);
+                const extracted = await llmService.extractCandidateTitles(filtered, media_type);
+                if (extracted && extracted.length > 0) {
+                  candidateTitles = extracted;
+                  scrapedSnippets = scrapedSnippets.concat(filtered);
+                  console.log(`[Recommend] Query ${i + 1}/${search_queries.length} successfully yielded ${candidateTitles.length} candidates: ${JSON.stringify(candidateTitles)}`);
+                  break; // Found candidates! Exit search early.
+                } else {
+                  console.log(`[Recommend] Query ${i + 1}/${search_queries.length} snippets yielded 0 candidates. Continuing search...`);
+                }
+              }
             } else {
               consecutiveFailures++;
             }
 
-            // Early exit if we collected enough snippets (5+)
-            if (tempSnippetsCount >= 5) {
-              console.log(`[Recommend] Collected ${tempSnippetsCount} snippets. Stopping search early after query ${i + 1}/${search_queries.length}.`);
-              break;
-            }
-
             // Early exit on 2 consecutive failures/timeouts (likely blocked or offline)
             if (consecutiveFailures >= 2) {
-              console.log(`[Recommend] Encountered 2 consecutive search failures/timeouts. Aborting search loop early to activate fallback.`);
+              console.log(`[Recommend] Encountered 2 consecutive search failures/timeouts. Aborting search loop early.`);
               break;
             }
 
@@ -640,18 +649,19 @@ const runRecommendationPipeline = async (payload) => {
         };
         cleanCandidates = [candidateMeta];
       } else {
-        const filteredSnippets = scrapedSnippets.filter(snippet => {
-          return !isExcluded(snippet.title, seenList) && !isExcluded(snippet.title, notForMeList);
-        });
-
-        let candidateTitles = [];
-        if (filteredSnippets.length > 0) {
-          candidateTitles = await llmService.extractCandidateTitles(filteredSnippets, media_type);
+        // For visual novel (or any other case where candidateTitles was not set by the loop), we do extraction here
+        if (candidateTitles.length === 0 && scrapedSnippets.length > 0) {
+          const filteredSnippets = scrapedSnippets.filter(snippet => {
+            return !isExcluded(snippet.title, seenList) && !isExcluded(snippet.title, notForMeList);
+          });
+          if (filteredSnippets.length > 0) {
+            candidateTitles = await llmService.extractCandidateTitles(filteredSnippets, media_type);
+          }
         }
 
         if (candidateTitles.length === 0) {
           // Fallback: Web search failed, returned 0 results, or yielded no extractable titles. Ask the LLM to directly generate candidate titles.
-          const reason = filteredSnippets.length > 0 ? "returned 0 candidates" : "returned 0 results";
+          const reason = scrapedSnippets.length > 0 ? "returned 0 candidates" : "returned 0 results";
           console.log(`[Recommend] Web search ${reason}. Activating LLM direct fallback to generate candidates for: "${media_type}"`);
           candidateTitles = await llmService.generateDirectCandidates(
             master_directive,
@@ -869,10 +879,9 @@ router.post('/ask', async (req, res) => {
         finalMediaType = 'anime';
       }
 
-      // 1. Extract user messages from history (last 2 user messages) + current message
+      // 1. Extract user messages from history (all user messages) + current message
       const recentUserTexts = (chat_history || [])
         .filter(msg => msg.isUser)
-        .slice(-2)
         .map(msg => msg.text);
       recentUserTexts.push(user_message);
       const combinedUserText = recentUserTexts.join('\n');
