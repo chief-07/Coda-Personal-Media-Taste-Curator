@@ -221,6 +221,132 @@ const isExcluded = (candidateTitle, excludedTitles) => {
   return false;
 };
 
+// ── Content Guardrail Pre-Filter ─────────────────────────────────────────────
+// Deterministically filters candidates based on content signals in the guardrails
+// string BEFORE they reach the LLM scorer. No API call — pure tag/genre matching.
+
+// Map of guardrail signal words → genre/tag terms that should be blocked
+const CONTENT_SIGNAL_BLOCKLISTS = [
+  // Religious/values-based: block explicit sexual/adult content
+  {
+    signals: ['christian', 'religious', 'faith-based', 'faith based', 'wholesome', 'family-friendly', 'family friendly', 'clean content', 'no adult', 'no explicit', 'no sexual', 'no 18+', 'no mature content'],
+    blocked: ['erotica', 'erotic', 'eroge', 'adult', '18+', 'hentai', 'explicit', 'sexual content', 'nudity', 'ecchi', 'sexually explicit', 'pornographic', 'nsfw', 'eroticism', 'softcore', 'hardcore', 'adult content']
+  },
+  // No gore / violence
+  {
+    signals: ['no gore', 'no violence', 'no guro', 'avoid violence', 'avoid gore', 'no graphic violence', 'no blood'],
+    blocked: ['gore', 'guro', 'graphic violence', 'extreme violence', 'body horror', 'torture', 'snuff', 'splatter']
+  },
+  // No horror
+  {
+    signals: ['no horror', 'avoid horror', 'not horror'],
+    blocked: ['horror', 'psychological horror', 'survival horror', 'terror', 'disturbing']
+  },
+  // No NTR / cheating
+  {
+    signals: ['no ntr', 'no cheating', 'no netorare', 'avoid ntr'],
+    blocked: ['ntr', 'netorare', 'netori', 'cheating', 'cuckold']
+  },
+  // No BL / yaoi
+  {
+    signals: ['no bl', 'no yaoi', 'no boys love', 'no boyslove', 'no male romance'],
+    blocked: ['bl', 'yaoi', 'boys love', 'male x male', 'shounen ai', 'shounen-ai']
+  },
+  // No GL / yuri
+  {
+    signals: ['no gl', 'no yuri', 'no girls love', 'no girlslove', 'no female romance'],
+    blocked: ['gl', 'yuri', 'girls love', 'shoujo ai', 'shoujo-ai']
+  },
+];
+
+/**
+ * Filters candidates using deterministic content signal matching against guardrails.
+ * Returns the filtered candidates array and logs removals.
+ *
+ * @param {Array} candidates - Array of candidate objects with .genres and .tags
+ * @param {string} guardrailsString - The user's guardrails as a free-text string
+ * @returns {Array} Filtered candidates
+ */
+const filterByContentGuardrails = (candidates, guardrailsString) => {
+  if (!guardrailsString || !candidates || candidates.length === 0) return candidates;
+
+  const guardrailsLower = guardrailsString.toLowerCase();
+
+  // Build the active blocklist for this user based on their guardrail signals
+  const activeBlockedTerms = new Set();
+  for (const rule of CONTENT_SIGNAL_BLOCKLISTS) {
+    const signalTriggered = rule.signals.some(sig => guardrailsLower.includes(sig));
+    if (signalTriggered) {
+      for (const term of rule.blocked) {
+        activeBlockedTerms.add(term.toLowerCase());
+      }
+    }
+  }
+
+  if (activeBlockedTerms.size === 0) return candidates; // No content signals — skip filter
+
+  console.log(`[ContentFilter] Active blocked content terms: ${[...activeBlockedTerms].join(', ')}`);
+
+  const filtered = candidates.filter(candidate => {
+    const allTags = [
+      ...(candidate.genres || []),
+      ...(candidate.tags || []),
+    ].map(t => (t || '').toLowerCase());
+
+    const blocked = allTags.find(tag => {
+      return [...activeBlockedTerms].some(blockedTerm => tag.includes(blockedTerm));
+    });
+
+    if (blocked) {
+      console.log(`[ContentFilter] ✗ Dropping "${candidate.title}" — tag/genre "${blocked}" violates guardrails.`);
+      return false;
+    }
+    return true;
+  });
+
+  const dropped = candidates.length - filtered.length;
+  if (dropped > 0) {
+    console.log(`[ContentFilter] Dropped ${dropped} candidate(s) for content guardrail violations. ${filtered.length} remain.`);
+  }
+  return filtered;
+};
+
+// ── Slim Routing Payload Builder ──────────────────────────────────────────────
+// Builds a trimmed version of the payload for the synthesizeAndRoute LLM call.
+// Reduces token count without losing meaningful routing signal.
+const MAX_SEEN_FOR_ROUTING = 30;
+const MAX_CORE_IDENTITY_CHARS = 1500;
+const MAX_GUARDRAILS_CHARS = 500;
+
+const buildSlimRoutingPayload = (payload) => {
+  const slim = { ...payload };
+
+  // Watchlist: only title + mediaType (drop posterUrl, ostUrl, description, codaBlurb, addedAt)
+  if (Array.isArray(slim.watchlist)) {
+    slim.watchlist = slim.watchlist.map(item => ({
+      title: item.title || item.Title || '',
+      mediaType: item.mediaType || item.media_type || ''
+    }));
+  }
+
+  // Seen: cap at most recent 30 entries
+  if (Array.isArray(slim.seen) && slim.seen.length > MAX_SEEN_FOR_ROUTING) {
+    slim.seen = slim.seen.slice(-MAX_SEEN_FOR_ROUTING);
+  }
+
+  // Core identity: truncate at 1500 chars (harmonizer output is usually < 800)
+  if (typeof slim.core_identity === 'string' && slim.core_identity.length > MAX_CORE_IDENTITY_CHARS) {
+    slim.core_identity = slim.core_identity.slice(0, MAX_CORE_IDENTITY_CHARS) + '...';
+  }
+
+  // Guardrails: truncate at 500 chars
+  if (typeof slim.guardrails === 'string' && slim.guardrails.length > MAX_GUARDRAILS_CHARS) {
+    slim.guardrails = slim.guardrails.slice(0, MAX_GUARDRAILS_CHARS) + '...';
+  }
+
+  return slim;
+};
+
 const runRecommendationPipeline = async (payload) => {
   console.log('\n[Recommend] ═══════════════════════════════════════════════════');
   console.log('[Recommend] Starting recommendation pipeline for media type:', payload.requested_media_type);
@@ -364,7 +490,7 @@ const runRecommendationPipeline = async (payload) => {
         seed_titles = [];
         scrapedSnippets = await cachedScrapeForums(search_queries[0]);
       } else {
-        const routingResult = await llmService.synthesizeAndRoute(payload);
+        const routingResult = await llmService.synthesizeAndRoute(buildSlimRoutingPayload(payload));
         media_type = routingResult.media_type;
         search_queries = routingResult.search_queries;
         master_directive = routingResult.master_directive;
@@ -437,9 +563,12 @@ const runRecommendationPipeline = async (payload) => {
             return await getCachedMetadata(title, media_type);
           }));
 
-          cleanCandidates = candidatesWithMetadata.filter(candidate => {
+          const seenFiltered = candidatesWithMetadata.filter(candidate => {
             return !isExcluded(candidate.title, seenList) && !isExcluded(candidate.title, notForMeList);
           });
+
+          // Deterministic content pre-filter: removes guardrail violations before LLM scoring
+          cleanCandidates = filterByContentGuardrails(seenFiltered, payload.guardrails);
         }
       }
 

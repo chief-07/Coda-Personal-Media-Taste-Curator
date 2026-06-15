@@ -171,6 +171,18 @@ Your job is to:
 - You MUST generate 5 completely different queries that do not overlap with typical recommendations for their most recent likes.
 - In "selected_vibe_focus", clearly describe the new rotated direction you are targeting.
 
+**NEGATIVE QUERY KEYWORDS (CRITICAL):**
+- Read the "guardrails" field carefully for content restriction signals. Based on the signals present, you MUST append negative exclusion keywords to ALL 5 search queries to prevent inappropriate content from surfacing.
+- If guardrails contain ANY of the following signals, append the corresponding negative keyword suffixes to EVERY query:
+  - "christian" / "religious" / "faith-based" / "wholesome" / "family-friendly" / "clean content" / "no adult" / "no explicit" / "no 18+" / "no mature content" → append: `-erotic -eroge -adult -"18+" -hentai -explicit -nsfw`
+  - "no gore" / "no violence" / "no guro" / "no blood" → append: `-gore -guro -"graphic violence"`
+  - "no horror" / "avoid horror" → append: `-horror -"survival horror"`
+  - "no ntr" / "no netorare" → append: `-ntr -netorare`
+  - "no bl" / "no yaoi" → append: `-yaoi -"boys love"`
+  - "no gl" / "no yuri" → append: `-yuri -"girls love"`
+- IMPORTANT: Append these negative terms naturally at the END of each query string so they don't break site: constraints. Example: wholesome anime romance site:reddit.com/r/animesuggest -ecchi -hentai -18+.
+- If NO content restriction signals are present in the guardrails, do NOT append any negative keywords.
+
 
 Respond ONLY with a JSON object:
 {
