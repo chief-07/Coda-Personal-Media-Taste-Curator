@@ -175,16 +175,18 @@ Your job is to:
 - Use the user's historical profile ("core_identity") only as a subtle touch to align tone, but prioritize the immediate craving and research context insights above all else.
 
 
-**SEARCH QUERY CRITERIA (STRICT 3+2 SPLIT):**
+**SEARCH QUERY CRITERIA (CONVERSATIONAL VARIATIONS):**
 - You MUST generate exactly 5 search queries.
-- Structure of the 5 queries:
-  1. Discovery Query 1 (Vibe Focus Alignment): Match the "selected_vibe_focus" (genres, tone, styling) in "${requestedMediaType}" (e.g., "existential sci-fi anime").
-  2. Discovery Query 2 (Structural/Narrative & Length/Era): Match preferred structures, length, era, character types, or atmospheric themes from the profile (e.g., "90s slow-burn space anime with complex characters").
-  3. Discovery Query 3 (Global Profile Alignment): Project overall personality traits or demographic profile to find deep, character-driven recommendations.
-  4. Seed-Based Query 1 (Loved/Favorite Work): Identify a specific work the user loves/watchlist/seen in the active media type. Generate a conversational query simulating a community recommendation request: e.g., 'just finished [Title] what next site:reddit.com/r/animesuggest' or 'anime similar to [Title] site:reddit.com/r/animesuggest'.
-  5. Seed-Based Query 2 (Loved/Favorite Work): Identify a different title. Generate a conversational query simulating another community angle: e.g., '[Title] was peak what else site:reddit.com/r/animesuggest' or 'shows like [Title] with great characters site:reddit.com/r/animesuggest'.
-- If NO favorite or loved works are found in the Taste Profile or seen list for the requested media type, fallback to generating 5 Discovery queries.
-- Adjust the community subreddits/sites in the queries based on the media type (e.g. 'site:reddit.com/r/animesuggest' or 'site:anime-planet.com/anime' for anime, 'site:reddit.com/r/MovieSuggestions' for movies, 'site:reddit.com/r/suggestmeabook' for books, 'site:reddit.com/r/gamingsuggestions' for games).
+- All 5 queries MUST be phrased in a natural, highly conversational, and human-like manner, simulating a real person asking for recommendations on a community forum (like Reddit, Letterboxd, etc.).
+- **DO NOT** use dry, clinical, or academic search terms (e.g., instead of "psychological thriller with complex relationships", use "movies where the girl is crazy in love" or "movies similar to Gone Girl with obsessive love").
+- Structure and templates for the 5 queries (if seed titles are available from "watchlist_seed_title", "loved_seed_title", or the "loved_titles" array):
+  1. Query 1 (Direct Similar - Seed-based): A conversational search for recommendations similar to the seed title (e.g., 'movies similar to Gone Girl site:reddit.com/r/MovieSuggestions' or 'anime like Steins Gate site:reddit.com/r/animesuggest').
+  2. Query 2 (Conversational Post-Watch/Play/Read - Seed-based): Simulating a user who just finished the seed title (e.g., 'just finished Gone Girl what next site:reddit.com/r/MovieSuggestions' or 'finished Steins Gate what should I watch next site:reddit.com/r/animesuggest').
+  3. Query 3 (Conversational Trope/Theme - Craving-based): Phrased as a direct question targeting the specific narrative/character trope representing the user's active craving (e.g., 'movies where the girl is crazy in love site:reddit.com/r/MovieSuggestions', 'anime with a yandere crazy obsessed girl site:reddit.com/r/animesuggest', 'books with academic rivals to lovers site:reddit.com/r/suggestmeabook').
+  4. Query 4 (Descriptive Vibe & Atmospheric Craving - Craving-based): Simulating a request describing the atmosphere, tone, and character dynamics wanted (e.g., 'dark unsettling movies about obsessive romance site:reddit.com/r/MovieSuggestions', 'intense psychological anime about obsession site:reddit.com/r/animesuggest').
+  5. Query 5 (Alternative Community / Platform): Simulating a recommendation request targeting an alternative community platform or general search (e.g., 'movies like Gone Girl with obsessive romance site:letterboxd.com', 'anime similar to Steins Gate recommendations site:anime-planet.com/anime').
+- If NO seed titles are available (pure discovery mode), replace the seed-based templates with conversational variations of the user's active craving (e.g., Query 1: 'looking for movies with a crazy obsessed lover site:reddit.com/r/MovieSuggestions', Query 2: 'movies about obsessive toxic relationships recommendations site:reddit.com/r/MovieSuggestions').
+- Adjust the community subreddits/sites in the queries based on the media type (e.g. 'site:reddit.com/r/animesuggest' or 'site:anime-planet.com/anime' for anime, 'site:reddit.com/r/MovieSuggestions' or 'site:letterboxd.com' for movies, 'site:reddit.com/r/suggestmeabook' or 'site:goodreads.com' for books, 'site:reddit.com/r/gamingsuggestions' for games).
 - For anime, you MUST target Anime-Planet for at least 1 or 2 of the 5 queries using the constraint 'site:anime-planet.com/anime'. These queries MUST be strictly seed-based (e.g., 'anime similar to [Title] site:anime-planet.com/anime' or 'site:anime-planet.com/anime/[title-slug]/recommendations') using titles the user likes/loves, rather than general discovery queries, because Anime-Planet's most valuable user-voted recommendations are tied to specific starting titles.
 
 **VISUAL NOVEL SEARCH QUERY RULES (CRITICAL):**

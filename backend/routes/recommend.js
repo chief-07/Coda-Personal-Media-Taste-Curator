@@ -592,7 +592,7 @@ const runRecommendationPipeline = async (payload) => {
           const staggeredResults = await runSequentialTasksWithCacheDelay(sequentialTasks);
           sourceResults.push(...staggeredResults);
         } else {
-          // Sequential execution of web scraping tasks with incremental extraction
+          // Sequential execution of web scraping tasks to pool snippets from all queries
           let consecutiveFailures = 0;
           for (let i = 0; i < search_queries.length; i++) {
             const query = search_queries[i];
@@ -607,16 +607,8 @@ const runRecommendationPipeline = async (payload) => {
               });
 
               if (filtered.length > 0) {
-                console.log(`[Recommend] Query "${query}" returned ${filtered.length} snippets. Extracting candidates...`);
-                const extracted = await llmService.extractCandidateTitles(filtered, media_type);
-                if (extracted && extracted.length > 0) {
-                  candidateTitles = extracted;
-                  scrapedSnippets = scrapedSnippets.concat(filtered);
-                  console.log(`[Recommend] Query ${i + 1}/${search_queries.length} successfully yielded ${candidateTitles.length} candidates: ${JSON.stringify(candidateTitles)}`);
-                  break; // Found candidates! Exit search early.
-                } else {
-                  console.log(`[Recommend] Query ${i + 1}/${search_queries.length} snippets yielded 0 candidates. Continuing search...`);
-                }
+                console.log(`[Recommend] Query "${query}" returned ${filtered.length} matching snippets.`);
+                scrapedSnippets = scrapedSnippets.concat(filtered);
               }
             } else {
               consecutiveFailures++;
@@ -629,7 +621,7 @@ const runRecommendationPipeline = async (payload) => {
             }
 
             if (elapsed > 100 && i < search_queries.length - 1) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
+              await new Promise(resolve => setTimeout(resolve, 500));
             }
           }
         }
