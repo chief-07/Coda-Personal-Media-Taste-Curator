@@ -60,6 +60,41 @@ const saveMetadataCache = () => {
   }
 };
 
+// User Soul Graph cache setup
+const SOUL_GRAPH_FILE = path.join(__dirname, '../cache/user_soul_graph.json');
+let userSoulGraph = {};
+if (fs.existsSync(SOUL_GRAPH_FILE)) {
+  try {
+    userSoulGraph = JSON.parse(fs.readFileSync(SOUL_GRAPH_FILE, 'utf8'));
+  } catch (_) {}
+}
+
+const saveSoulGraph = () => {
+  try {
+    fs.writeFileSync(SOUL_GRAPH_FILE, JSON.stringify(userSoulGraph, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[Soul Graph Cache Save Error]:', e.message);
+  }
+};
+
+// Media Brain cache setup
+const MEDIA_BRAIN_FILE = path.join(__dirname, '../cache/media_brain.json');
+let mediaBrain = {};
+if (fs.existsSync(MEDIA_BRAIN_FILE)) {
+  try {
+    mediaBrain = JSON.parse(fs.readFileSync(MEDIA_BRAIN_FILE, 'utf8'));
+  } catch (_) {}
+}
+
+const saveMediaBrain = () => {
+  try {
+    fs.writeFileSync(MEDIA_BRAIN_FILE, JSON.stringify(mediaBrain, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[Media Brain Cache Save Error]:', e.message);
+  }
+};
+
+
 const getCachedMetadata = async (title, mediaType) => {
   const key = `${mediaType.toLowerCase().replace(/[^a-z0-9]/g, '')}:${title.toLowerCase().trim()}`;
   if (metadataCache[key]) {
@@ -394,6 +429,18 @@ const buildSlimRoutingPayload = (payload) => {
 const runRecommendationPipeline = async (payload) => {
   console.log('\n[Recommend] ═══════════════════════════════════════════════════');
   console.log('[Recommend] Starting recommendation pipeline for media type:', payload.requested_media_type);
+
+  // Compile/Update the User Soul Graph using flat core_identity
+  if (payload.core_identity) {
+    try {
+      console.log('[Recommend] Syncing User Soul Graph...');
+      userSoulGraph = await llmService.generateUserSoulGraph(payload.core_identity, userSoulGraph);
+      saveSoulGraph();
+      console.log('[Recommend] ✅ User Soul Graph synced successfully.');
+    } catch (err) {
+      console.error('[Recommend] Failed to sync User Soul Graph:', err.message);
+    }
+  }
   
   const limit = typeof payload.limit === 'number' ? payload.limit : 1;
   const seenList = Array.isArray(payload.seen) ? payload.seen : [];
@@ -731,6 +778,62 @@ const runRecommendationPipeline = async (payload) => {
           // Deterministic content pre-filter: removes guardrail violations before LLM scoring
           cleanCandidates = filterByContentGuardrails(seenFiltered, payload.guardrails);
         }
+      }
+
+      if (cleanCandidates.length > 0 && !isDirectWatchlistRecommend) {
+        console.log(`[Recommend] Running Semantic Resonance Scorer on ${cleanCandidates.length} candidate(s) in parallel...`);
+        const sessionContext = {
+          time: payload.local_context || 'evening',
+          weather: 'any',
+          mood: payload.recent_context || 'reflective'
+        };
+
+        const evaluateSingle = async (candidate) => {
+          try {
+            const brainKey = `${media_type}:${candidate.title.toLowerCase().trim()}`;
+            let mediaDNA = mediaBrain[brainKey];
+            if (!mediaDNA) {
+              console.log(`[Media Brain Miss] Extracting DNA for: "${candidate.title}"`);
+              let reviewsContext = '';
+              if (media_type === 'movie' || media_type === 'tv') {
+                const reviews = await searchService.scrapeLetterboxdReviews(candidate.title, 3);
+                if (reviews && reviews.length > 0) {
+                  reviewsContext = reviews.map(r => r.snippet).join('\n');
+                }
+              }
+              const rawContentForDNA = `Synopsis: ${candidate.description || ''}\nGenres/Tags: ${(candidate.genres || []).concat(candidate.tags || []).join(', ')}\nUser Reviews:\n${reviewsContext}`;
+              mediaDNA = await llmService.extractMediaDNA(candidate.title, media_type, rawContentForDNA);
+              if (mediaDNA) {
+                mediaBrain[brainKey] = mediaDNA;
+              }
+            } else {
+              console.log(`[Media Brain Hit] Loaded DNA for: "${candidate.title}"`);
+            }
+
+            if (mediaDNA) {
+              const resonance = await llmService.evaluateCandidateResonance(userSoulGraph, mediaDNA, sessionContext);
+              console.log(`[Resonance Scorer] 🔍 "${candidate.title}" resonance score: ${resonance.score}/100 - Verdict: ${resonance.verdict}`);
+              return { candidate, score: resonance.score || 0 };
+            }
+          } catch (err) {
+            console.error(`[Resonance Scorer Error] Failed for "${candidate.title}":`, err.message);
+          }
+          return { candidate, score: 50 }; // fallback default
+        };
+
+        const scoredResults = await Promise.all(cleanCandidates.map(evaluateSingle));
+        
+        // Save the updated Media Brain database
+        saveMediaBrain();
+
+        // Sort by score descending and take the top 3 (Layer 2 - Arch C filter)
+        scoredResults.sort((a, b) => b.score - a.score);
+        cleanCandidates = scoredResults
+          .filter(sc => sc.score > 40) // must be at least moderately compatible
+          .slice(0, 3)
+          .map(sc => sc.candidate);
+
+        console.log(`[Recommend] Semantic filter complete. Top candidates selected: ${cleanCandidates.map(c => c.title).join(', ')}`);
       }
 
       if (cleanCandidates.length > 0) {

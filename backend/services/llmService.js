@@ -1137,6 +1137,204 @@ Respond with ONLY a JSON object:
   }
 };
 
+const generateUserSoulGraph = async (rawProfileText, currentSoulGraph = null) => {
+  const systemPrompt = `
+You are the Coda User Soul Graph compiler.
+Your job is to analyze the user's flat text profile data (which contains onboarding details, loved works, and specific tastes) and compile it into a structured User Soul Graph.
+
+The User Soul Graph JSON schema is:
+{
+  "demographics": {
+    "stage_in_life": "guess their age, occupation, or stage in life (e.g. college student, young professional, middle-aged parent) if implied",
+    "struggles": ["implicit or explicit current struggles, emotional challenges, or psychological needs (e.g. loneliness, academic burnout, coping with grief, seeking nostalgic comfort) deduced from their taste and words"]
+  },
+  "emotional_resonances": {
+    "term": 0.0-1.0  // e.g. "comfort": 0.8, "existential-reflection": 0.9, "melancholy": 0.8, "thrill-seeking": 0.3
+  },
+  "aesthetic_affinities": {
+    "term": 0.0-1.0  // e.g. "gritty-realism": 0.9, "surrealism": 0.6, "retro-warmth": 0.5, "cel-animation": 0.8
+  },
+  "creative_anchors": {
+    "directors": { "name": 0.0-1.0 },  // e.g. "Naoki Urasawa": 1.0, "Shunji Iwai": 1.0
+    "studios": { "name": 0.0-1.0 },     // e.g. "Studio Shaft": 0.9, "Madhouse": 0.8
+    "authors": { "name": 0.0-1.0 },
+    "actresses": { "name": 0.0-1.0 }
+  },
+  "themes": {
+    "theme_name": 0.0-1.0  // e.g. "moral-ambiguity": 0.9, "coming-of-age-isolation": 0.8, "cat-and-mouse": 0.9
+  },
+  "tropes": {
+    "trope_name": 0.0-1.0  // e.g. "serial-killer": 0.8, "time-travel": 0.7, "unreliable-narrator": 0.9
+  },
+  "pacing_preference": {
+    "slow-burn": 0.0-1.0,
+    "moderate": 0.0-1.0,
+    "fast-paced": 0.0-1.0
+  },
+  "guardrails": ["any negative constraints, must-haves, or dealbreaker tags (e.g. 'no generic isekai', 'no BL', 'clean content only')"]
+}
+
+Important Guidelines:
+- Go deep! Analyze the themes, styles, and mood of the works they love. If they love Steins;Gate and Madoka Magica, they aren't just anime fans; they are drawn to high-stakes psychological tragedy, time-manipulation, and high emotional consequences.
+- If they love sad Japanese movies, deduce that they seek emotional catharsis/reflection and might be going through a stage of life where quiet sadness is a comforting state of mind.
+- Merge the new info with the current soul graph if provided, updating weights and appending new tags organically.
+
+Respond with ONLY a valid JSON object matching the schema.
+`;
+
+  const userPrompt = JSON.stringify({
+    raw_profile_text: rawProfileText,
+    current_soul_graph: currentSoulGraph || {}
+  }, null, 2);
+
+  try {
+    const responseJson = await callOpenAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ], { type: 'json_object' });
+    return JSON.parse(responseJson);
+  } catch (e) {
+    console.error("[llmService] generateUserSoulGraph failed:", e.message);
+    return currentSoulGraph || {};
+  }
+};
+
+const extractMediaDNA = async (title, mediaType, rawScrapedContent) => {
+  const systemPrompt = `
+You are the Coda Media DNA Extractor.
+Analyze the provided raw reviews, synopsis, and forum discussions for the media "${title}" (${mediaType}) and extract its structured semantic DNA.
+
+The Media DNA JSON schema is:
+{
+  "title": "${title}",
+  "media_type": "${mediaType}",
+  "pacing": "slow-burn" | "moderate" | "fast-paced",
+  "moods": {
+    "mood_term": 0.0-1.0  // e.g. "bleak": 0.9, "tense": 0.8, "melancholic": 0.7, "nostalgic": 0.5
+  },
+  "themes": {
+    "theme_term": 0.0-1.0 // e.g. "moral-ambiguity": 0.9, "obsession": 0.8
+  },
+  "tropes": {
+    "trope_term": 0.0-1.0 // e.g. "serial-killer": 0.9, "detective-procedural": 0.8
+  },
+  "ideal_watch_context": {
+    "weather": ["rainy", "snowy", "cloudy", "sunny", "any"],
+    "time_of_day": ["morning", "afternoon", "evening", "late-night", "any"],
+    "state_of_mind": ["reflective", "seeking-comfort", "bored-seeking-thrills", "exhausted", "any"],
+    "viewing_mode": ["solitary", "social", "any"]
+  },
+  "aesthetic_markers": ["gritty realism", "low key lighting", "late 90s aesthetic"],
+  "creative_credits": {
+    "directors": [],
+    "studios": [],
+    "authors": [],
+    "cast": []
+  }
+}
+
+Respond with ONLY a valid JSON object matching the schema.
+`;
+
+  const userPrompt = JSON.stringify({
+    title,
+    media_type: mediaType,
+    scraped_content: typeof rawScrapedContent === 'string' ? rawScrapedContent.slice(0, 15000) : JSON.stringify(rawScrapedContent).slice(0, 15000)
+  }, null, 2);
+
+  try {
+    const responseJson = await callOpenAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ], { type: 'json_object' });
+    return JSON.parse(responseJson);
+  } catch (e) {
+    console.error(`[llmService] extractMediaDNA failed for "${title}":`, e.message);
+    return null;
+  }
+};
+
+const evaluateCandidateResonance = async (soulGraph, mediaDNA, sessionContext) => {
+  const systemPrompt = `
+You are the Coda Resonance Scorer.
+Your job is to mathematically and contextually evaluate how well a candidate media matches the user's User Soul Graph and the active Session Context.
+
+Calculate the match score out of 100 based on:
+1. **Aesthetic & Thematic Alignment (40%)**: How well the candidate's themes, moods, and aesthetic markers overlap with the user's affinities/anchors.
+2. **Creative & Creative Affinities (20%)**: Match on directors, authors, studios, and actors.
+3. **Pacing & Tone Compatibility (20%)**: Checks if pacing (slow-burn vs fast-paced) matches pacing preferences and guardrails.
+4. **Ideal Watch Context Resonance (20%)**: Matches the candidate's ideal watch context (weather, time_of_day, state_of_mind) with the active session context.
+
+**GUARDRAIL AND SEEN CHECK (CRITICAL)**:
+- If the candidate contains any themes/tropes explicitly banned in the guardrails, set the final score to 0.
+
+Respond with ONLY a JSON object:
+{
+  "score": 0-100,
+  "alignment_breakdown": {
+    "thematic_alignment": "brief notes",
+    "creative_alignment": "brief notes",
+    "context_alignment": "brief notes"
+  },
+  "verdict": "detailed explanation of why this matches or does not match their soul media ID"
+}
+`;
+
+  const userPrompt = JSON.stringify({
+    soul_graph: soulGraph,
+    media_dna: mediaDNA,
+    session_context: sessionContext
+  }, null, 2);
+
+  try {
+    const responseJson = await callOpenAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ], { type: 'json_object' });
+    return JSON.parse(responseJson);
+  } catch (e) {
+    console.error(`[llmService] evaluateCandidateResonance failed:`, e.message);
+    return { score: 0, verdict: "Failed to evaluate" };
+  }
+};
+
+const synthesizeTargetSessionDNA = async (soulGraph, localContext, activeCraving) => {
+  const systemPrompt = `
+You are the Coda Session DNA Synthesizer.
+Analyze the user's User Soul Graph, active local context (time, weather, mood), and immediate craving to generate a specific "Target DNA Profile" for this session's recommendation.
+
+Respond with ONLY a JSON object:
+{
+  "target_moods": ["mood1", "mood2"],
+  "target_themes": ["theme1", "theme2"],
+  "target_pacing": "slow-burn" | "moderate" | "fast-paced",
+  "ideal_context": {
+    "weather": "weather condition",
+    "time_of_day": "time condition",
+    "state_of_mind": "state of mind condition"
+  },
+  "session_directive": "A 2-sentence summary of the exact vibe we are hunting for right now."
+}
+`;
+
+  const userPrompt = JSON.stringify({
+    soul_graph: soulGraph,
+    local_context: localContext,
+    active_craving: activeCraving
+  }, null, 2);
+
+  try {
+    const responseJson = await callOpenAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ], { type: 'json_object' });
+    return JSON.parse(responseJson);
+  } catch (e) {
+    console.error("[llmService] synthesizeTargetSessionDNA failed:", e.message);
+    return null;
+  }
+};
+
 module.exports = {
   callOpenAI,
   synthesizeAndRoute,
@@ -1152,5 +1350,9 @@ module.exports = {
   fetchMetadataViaLLM,
   extractTitlesFromText,
   researchMediaThemes,
-  generateDirectCandidates
+  generateDirectCandidates,
+  generateUserSoulGraph,
+  extractMediaDNA,
+  evaluateCandidateResonance,
+  synthesizeTargetSessionDNA
 };
