@@ -982,12 +982,109 @@ const runRecommendationPipeline = async (payload) => {
     studio: resolvedPicks[0]?.studio || '',
     recommendations: resolvedPicks
   };
+const populateMediaBrainBackground = (payload, result) => {
+  setImmediate(async () => {
+    try {
+      console.log('[BG Media Brain Ingestion] Starting background ingestion task...');
+      const media_type = (payload.requested_media_type || '').toLowerCase();
+      const resolvedSeeds = [...(payload.loved_titles || [])];
+      if (payload.watchlist_seed_title) resolvedSeeds.push(payload.watchlist_seed_title);
+      if (payload.loved_seed_title) resolvedSeeds.push(payload.loved_seed_title);
+
+      const cleanSeeds = Array.from(new Set(resolvedSeeds.filter(Boolean)));
+      if (cleanSeeds.length === 0) {
+        console.log('[BG Media Brain Ingestion] No seed titles to expand. Aborting.');
+        return;
+      }
+
+      // Fetch related candidates
+      let candidateTitles = [];
+      const limitToProcess = 3;
+
+      if (media_type === 'anime') {
+        const results = await cachedFetchAniListRecs(cleanSeeds.slice(0, 3)).catch(() => []);
+        if (results && results.length > 0) {
+          candidateTitles = results.map(r => r.title).filter(Boolean);
+        }
+      } else if (media_type === 'visual novel' || media_type === 'visualnovel') {
+        const results = await cachedFetchVNDBRecs(cleanSeeds.slice(0, 3)).catch(() => []);
+        if (results && results.length > 0) {
+          candidateTitles = results.map(r => r.title).filter(Boolean);
+        }
+      } else if (media_type === 'movie' || media_type === 'tv') {
+        const seed = cleanSeeds[0];
+        const reviews = await searchService.scrapeLetterboxdReviews(seed).catch(() => []);
+        if (reviews && reviews.length > 0) {
+          const extracted = await llmService.extractCandidateTitles(reviews, media_type).catch(() => []);
+          candidateTitles = extracted;
+        }
+      }
+
+      // Filter to only titles NOT already in the media brain
+      const toIngest = candidateTitles.filter(title => {
+        const brainKey = `${media_type}:${title.toLowerCase().trim()}`;
+        return !mediaBrain[brainKey];
+      }).slice(0, limitToProcess);
+
+      if (toIngest.length === 0) {
+        console.log('[BG Media Brain Ingestion] All related candidate titles are already cached in Media Brain.');
+        return;
+      }
+
+      console.log(`[BG Media Brain Ingestion] Found ${toIngest.length} new related title(s) to pre-hydrate: ${JSON.stringify(toIngest)}`);
+
+      for (const title of toIngest) {
+        try {
+          console.log(`[BG Media Brain Ingestion] Pre-hydrating DNA for: "${title}" (${media_type})`);
+          
+          // 1. Fetch metadata
+          const meta = await getCachedMetadata(title, media_type);
+          
+          // 2. Scrape reviews/details
+          let reviewsContext = '';
+          if (media_type === 'movie' || media_type === 'tv') {
+            const reviews = await searchService.scrapeLetterboxdReviews(title, 3).catch(() => []);
+            if (reviews && reviews.length > 0) {
+              reviewsContext = reviews.map(r => r.snippet).join('\n');
+            }
+          } else {
+            const query = `"${title}" ${media_type} review site:reddit.com`;
+            const reviews = await cachedScrapeForums(query).catch(() => []);
+            if (reviews && reviews.length > 0) {
+              reviewsContext = reviews.map(r => r.snippet).join('\n');
+            }
+          }
+
+          // 3. Generate and cache tags
+          const rawContentForDNA = `Synopsis: ${meta.description || ''}\nGenres/Tags: ${(meta.genres || []).concat(meta.tags || []).join(', ')}\nUser Reviews:\n${reviewsContext}`;
+          const mediaDNA = await llmService.extractMediaDNA(title, media_type, rawContentForDNA);
+          if (mediaDNA) {
+            const brainKey = `${media_type}:${title.toLowerCase().trim()}`;
+            mediaBrain[brainKey] = mediaDNA;
+            saveMediaBrain();
+            console.log(`[BG Media Brain Ingestion] ✅ Successfully ingested: "${title}"`);
+          }
+
+          // Stagger to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        } catch (err) {
+          console.error(`[BG Media Brain Ingestion] Failed for "${title}":`, err.message);
+        }
+      }
+
+      console.log('[BG Media Brain Ingestion] Background ingestion task finished.');
+    } catch (err) {
+      console.error('[BG Media Brain Ingestion Error]:', err.message);
+    }
+  });
 };
 
 router.post('/', async (req, res) => {
   try {
     const result = await runRecommendationPipeline(req.body);
     res.json(result);
+    // Background ingest related works
+    populateMediaBrainBackground(req.body, result);
   } catch (error) {
     console.error('[Recommend Route Error]:', error);
     res.status(500).json({ error: 'Recommendation pipeline failed', details: error.message });
@@ -1102,11 +1199,15 @@ router.post('/ask', async (req, res) => {
 
       const rec = await runRecommendationPipeline(payload);
       
-      return res.json({
+      res.json({
         status: 'success',
         message: parsed.message,
         recommendation: rec
       });
+
+      // Background ingest related works using the ask payload
+      populateMediaBrainBackground(payload, rec);
+      return;
     }
 
     res.json({

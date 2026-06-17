@@ -349,6 +349,122 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
 
   // ── Tab 0: Identity ──────────────────────────────────────────────
   Widget _buildIdentityTab(bool isKnockoutLayer, ScrollController scrollController, LivingMemory memory) {
+    final soulGraph = memory.soulGraph;
+    if (soulGraph != null) {
+      final demographics = soulGraph['demographics'] as Map<String, dynamic>? ?? {};
+      final emotionalResonances = soulGraph['emotional_resonances'] as Map<String, dynamic>? ?? {};
+      final aestheticAffinities = soulGraph['aesthetic_affinities'] as Map<String, dynamic>? ?? {};
+      final creativeAnchors = soulGraph['creative_anchors'] as Map<String, dynamic>? ?? {};
+      final themes = soulGraph['themes'] as Map<String, dynamic>? ?? {};
+      final tropes = soulGraph['tropes'] as Map<String, dynamic>? ?? {};
+      final guardrails = List<String>.from(soulGraph['guardrails'] ?? []);
+
+      final sortedResonances = emotionalResonances.keys.toList()
+        ..sort((a, b) => ((emotionalResonances[b] as num? ?? 0.0).toDouble())
+            .compareTo((emotionalResonances[a] as num? ?? 0.0).toDouble()));
+
+      final sortedAesthetic = aestheticAffinities.keys.toList()
+        ..sort((a, b) => ((aestheticAffinities[b] as num? ?? 0.0).toDouble())
+            .compareTo((aestheticAffinities[a] as num? ?? 0.0).toDouble()));
+
+      final manualTraits = memory.globalIdentity
+          .where((t) => !(t.trim().startsWith('{') && t.trim().endsWith('}')))
+          .toList();
+
+      return ListView(
+        controller: scrollController,
+        physics: isKnockoutLayer ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 64),
+        children: [
+          _buildAddBar(
+            isKnockoutLayer: isKnockoutLayer,
+            controller: _identityController,
+            focusNode: _identityFocusNode,
+            hintText: 'Add an identity trait...',
+            onAdd: _addIdentityTrait,
+          ),
+          const SizedBox(height: 16),
+          
+          // Section 1: Demographics & Struggles
+          _buildCategoryHeader(isKnockoutLayer, 'Identity & Life Stage'),
+          _buildProfileCard(isKnockoutLayer, demographics),
+          const SizedBox(height: 24),
+
+          // Section 2: Emotional Resonances
+          if (emotionalResonances.isNotEmpty) ...[
+            _buildCategoryHeader(isKnockoutLayer, 'Emotional Resonances'),
+            const SizedBox(height: 8),
+            ...sortedResonances.map((k) {
+              final val = (emotionalResonances[k] as num? ?? 0.0).toDouble();
+              return _buildProgressBar(isKnockoutLayer, k, val);
+            }),
+            const SizedBox(height: 24),
+          ],
+
+          // Section 3: Aesthetic Affinities
+          if (aestheticAffinities.isNotEmpty) ...[
+            _buildCategoryHeader(isKnockoutLayer, 'Aesthetic Affinities'),
+            const SizedBox(height: 8),
+            ...sortedAesthetic.map((k) {
+              final val = (aestheticAffinities[k] as num? ?? 0.0).toDouble();
+              return _buildProgressBar(isKnockoutLayer, k, val);
+            }),
+            const SizedBox(height: 24),
+          ],
+
+          // Section 4: Creative Anchors
+          if (creativeAnchors.values.any((val) => val is Map && val.isNotEmpty)) ...[
+            _buildCategoryHeader(isKnockoutLayer, 'Creative Anchors'),
+            _buildCreativeAnchors(isKnockoutLayer, creativeAnchors),
+            const SizedBox(height: 24),
+          ],
+
+          // Section 5: Themes & Tropes
+          if (themes.isNotEmpty || tropes.isNotEmpty) ...[
+            _buildCategoryHeader(isKnockoutLayer, 'Themes & Tropes'),
+            const SizedBox(height: 12),
+            if (themes.isNotEmpty) ...[
+              _buildWeightMapChips(isKnockoutLayer, themes),
+            ],
+            if (tropes.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _buildWeightMapChips(isKnockoutLayer, tropes),
+            ],
+            const SizedBox(height: 24),
+          ],
+
+          // Section 6: Guardrails
+          if (guardrails.isNotEmpty) ...[
+            _buildCategoryHeader(isKnockoutLayer, 'Negative Guardrails'),
+            const SizedBox(height: 12),
+            _buildGuardrailsChips(isKnockoutLayer, guardrails),
+            const SizedBox(height: 24),
+          ],
+
+          // Section 7: Manual Traits / Custom Traits
+          if (manualTraits.isNotEmpty) ...[
+            _buildCategoryHeader(isKnockoutLayer, 'Manual Traits'),
+            const SizedBox(height: 16),
+            ...manualTraits.asMap().entries.map((entry) {
+              final idx = entry.key;
+              final trait = entry.value;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (idx > 0) const SizedBox(height: 16) else const SizedBox(height: 8),
+                  _buildMemoryRow(
+                    isKnockoutLayer,
+                    trait,
+                    onDelete: () => _deleteIdentityTrait(trait),
+                  ),
+                ],
+              );
+            }),
+          ],
+        ],
+      );
+    }
+
     return ListView(
       controller: scrollController,
       physics: isKnockoutLayer ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
@@ -381,6 +497,420 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
             );
           }),
       ],
+    );
+  }
+
+  Widget _buildProgressBar(bool isKnockoutLayer, String label, double value) {
+    final percent = (value * 100).toInt();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              isKnockoutLayer
+                  ? Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
+                    )
+                  : Opacity(
+                      opacity: 0,
+                      child: Text(
+                        label,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+              isKnockoutLayer
+                  ? Text(
+                      '$percent%',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black,
+                      ),
+                    )
+                  : Opacity(
+                      opacity: 0,
+                      child: Text(
+                        '$percent%',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: SizedBox(
+              height: 6,
+              width: double.infinity,
+              child: Stack(
+                children: [
+                  Container(
+                    color: isKnockoutLayer
+                        ? Colors.transparent
+                        : Colors.white.withValues(alpha: 0.08),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: value.clamp(0.0, 1.0),
+                    child: Container(
+                      color: isKnockoutLayer
+                          ? Colors.black
+                          : Colors.transparent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileCard(bool isKnockoutLayer, Map<String, dynamic> demographics) {
+    final stage = demographics['stage_in_life'] as String? ?? 'Not specified';
+    final struggles = List<String>.from(demographics['struggles'] ?? []);
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isKnockoutLayer ? Colors.transparent : Colors.white.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(16),
+          border: isKnockoutLayer
+              ? null
+              : Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.person_outline_rounded,
+                  color: isKnockoutLayer ? Colors.transparent : Colors.white60,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                isKnockoutLayer
+                    ? Text(
+                        'LIFE STAGE',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                          letterSpacing: 1.0,
+                        ),
+                      )
+                    : Opacity(
+                        opacity: 0,
+                        child: Text(
+                          'LIFE STAGE',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            isKnockoutLayer
+                ? Text(
+                    stage,
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black,
+                    ),
+                  )
+                : Opacity(
+                    opacity: 0,
+                    child: Text(
+                      stage,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+            if (struggles.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Icon(
+                    Icons.sentiment_dissatisfied_rounded,
+                    color: isKnockoutLayer ? Colors.transparent : Colors.white60,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  isKnockoutLayer
+                      ? Text(
+                          'CORE STRUGGLES / RESONANCE',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.black,
+                            letterSpacing: 1.0,
+                          ),
+                        )
+                      : Opacity(
+                          opacity: 0,
+                          child: Text(
+                            'CORE STRUGGLES / RESONANCE',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: struggles.map((s) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isKnockoutLayer ? Colors.transparent : Colors.white.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(20),
+                      border: isKnockoutLayer
+                          ? null
+                          : Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                    ),
+                    child: isKnockoutLayer
+                        ? Text(
+                            s,
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black,
+                            ),
+                          )
+                        : Opacity(
+                            opacity: 0,
+                            child: Text(
+                              s,
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreativeAnchors(bool isKnockoutLayer, Map<String, dynamic> anchors) {
+    final List<Widget> sections = [];
+    
+    anchors.forEach((type, items) {
+      if (items is Map<String, dynamic> && items.isNotEmpty) {
+        final sortedKeys = items.keys.toList()
+          ..sort((a, b) => ((items[b] as num? ?? 0.0).toDouble())
+              .compareTo((items[a] as num? ?? 0.0).toDouble()));
+              
+        sections.add(
+          Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 4),
+            child: Row(
+              children: [
+                isKnockoutLayer
+                    ? Text(
+                        type.toUpperCase(),
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                          letterSpacing: 1.0,
+                        ),
+                      )
+                    : Opacity(
+                        opacity: 0,
+                        child: Text(
+                          type.toUpperCase(),
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ),
+              ],
+            ),
+          )
+        );
+        
+        sections.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: sortedKeys.map((name) {
+                final weight = (items[name] as num? ?? 0.0).toDouble();
+                final label = '$name (${(weight * 10).toStringAsFixed(0)})';
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isKnockoutLayer ? Colors.transparent : Colors.white.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(20),
+                    border: isKnockoutLayer
+                        ? null
+                        : Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                  ),
+                  child: isKnockoutLayer
+                      ? Text(
+                          label,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                          ),
+                        )
+                      : Opacity(
+                          opacity: 0,
+                          child: Text(
+                            label,
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                );
+              }).toList(),
+            ),
+          )
+        );
+      }
+    });
+    
+    if (sections.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: sections,
+    );
+  }
+
+  Widget _buildWeightMapChips(bool isKnockoutLayer, Map<String, dynamic> weightMap) {
+    if (weightMap.isEmpty) return const SizedBox.shrink();
+    
+    final sortedKeys = weightMap.keys.toList()
+      ..sort((a, b) => ((weightMap[b] as num? ?? 0.0).toDouble())
+          .compareTo((weightMap[a] as num? ?? 0.0).toDouble()));
+          
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: sortedKeys.map((name) {
+          final weight = (weightMap[name] as num? ?? 0.0).toDouble();
+          final label = '$name (${(weight * 10).toStringAsFixed(0)})';
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: isKnockoutLayer ? Colors.transparent : Colors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(20),
+              border: isKnockoutLayer
+                  ? null
+                  : Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            ),
+            child: isKnockoutLayer
+                ? Text(
+                    label,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  )
+                : Opacity(
+                    opacity: 0,
+                    child: Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildGuardrailsChips(bool isKnockoutLayer, List<String> guardrails) {
+    if (guardrails.isEmpty) return const SizedBox.shrink();
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: guardrails.map((g) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: isKnockoutLayer
+                  ? Colors.transparent
+                  : Colors.red.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: isKnockoutLayer
+                  ? null
+                  : Border.all(color: Colors.red.withValues(alpha: 0.3)),
+            ),
+            child: isKnockoutLayer
+                ? Text(
+                    g,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  )
+                : Opacity(
+                    opacity: 0,
+                    child: Text(
+                      g,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+          );
+        }).toList(),
+      ),
     );
   }
 

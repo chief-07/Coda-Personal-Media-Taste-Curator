@@ -63,6 +63,18 @@ class LivingMemory {
   final List<String> notForMe;
   final List<WatchlistItem> watchlist;
 
+  Map<String, dynamic>? get soulGraph {
+    for (final trait in globalIdentity) {
+      final trimmed = trait.trim();
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        try {
+          return jsonDecode(trimmed) as Map<String, dynamic>;
+        } catch (_) {}
+      }
+    }
+    return null;
+  }
+
   LivingMemory({
     required this.globalIdentity,
     required this.categoryProfiles,

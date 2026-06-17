@@ -577,42 +577,61 @@ const getCategoryKey = (tab) => {
 
 const harmonizeMemory = async (chatHistory, currentMemory, tabName) => {
   const categoryKey = getCategoryKey(tabName);
+  const isYouTab = !categoryKey;
+
+  const cleanedMemory = { ...currentMemory };
+  let parsedSoulGraph = null;
+  if (cleanedMemory && Array.isArray(cleanedMemory.globalIdentity) && cleanedMemory.globalIdentity.length === 1) {
+    try {
+      parsedSoulGraph = JSON.parse(cleanedMemory.globalIdentity[0]);
+      cleanedMemory.globalIdentity = []; // Clear escaped string for the LLM
+    } catch (_) {}
+  }
+
   const categoryInstruction = categoryKey
-    ? `5. In "category_profiles_overwrite", output a completely cleaned, compressed, and deduplicated list of tastes ONLY for the category "${categoryKey}". Combine similar statements (e.g. merge "Loves Steins;Gate" and "Loves Steins;Gate for romance" into "Loves Steins;Gate for its romance and psychological depth") and remove all redundancy.`
-    : `5. Do NOT output a "category_profiles_overwrite" object since this is the global "You" tab.`;
+    ? `3. In "category_profiles_overwrite", output a completely cleaned, compressed, and deduplicated list of tastes ONLY for the category "${categoryKey}". Combine similar statements and remove all redundancy.`
+    : `3. Do NOT output a "category_profiles_overwrite" object since this is the global "You" tab. Instead, compile/update the user's core identity into the "soul_graph" object.`;
 
   const categoryExample = categoryKey
-    ? `"category_profiles_overwrite": { "${categoryKey}": ["Clean, compressed preference statement 1", "Clean, compressed preference statement 2"] },`
-    : ``;
+    ? `"category_profiles_overwrite": { "${categoryKey}": ["Clean, compressed preference statement 1"] },`
+    : `"soul_graph": {
+        "demographics": { "stage_in_life": "young adult", "struggles": ["loneliness", "burnout"] },
+        "emotional_resonances": { "comfort": 0.8, "melancholy": 0.9 },
+        "aesthetic_affinities": { "slow-burn": 0.9, "character-driven": 1.0 },
+        "creative_anchors": { "directors": { "Makoto Shinkai": 0.8 }, "studios": { "Shaft": 0.7 }, "authors": {}, "actresses": {} },
+        "themes": { "love-and-loss": 0.9 },
+        "tropes": { "time-travel": 0.8 },
+        "pacing_preference": { "slow-burn": 0.9, "moderate": 0.5, "fast-paced": 0.2 },
+        "guardrails": ["no BL", "no generic isekai"]
+      },`;
 
   const systemPrompt = `
-You are the Coda Memory Synthesizer.
-Your job is to read the user's latest conversation in the "${tabName}" category and their current 'Living Memory', then produce a CLEAN, OVERWRITTEN, deduplicated profile.
+You are the Coda Profile Harmonizer.
+Your job is to read the user's latest conversation in the "${tabName}" category, their current 'Living Memory', and their existing User Soul Graph, then produce a CLEAN, OVERWRITTEN, deduplicated profile.
 
-CURRENT MEMORY (may be bloated/repetitive):
-${JSON.stringify(currentMemory)}
+CURRENT LIVING MEMORY (excluding global identity text):
+${JSON.stringify(cleanedMemory, null, 2)}
 
-RULES — CRITICALLY IMPORTANT:
-1. OUTPUT is an OVERWRITE, not an append. You are REPLACING the old profile with a better one.
-2. Consolidate ALL repetitive points. If a favorite title or preference appears multiple times, write it ONCE in a clean, precise form. Do this for BOTH the global identity list and the category-specific profiles.
-3. Connect the dots. From the media they love, deduce:
-   - What type of person are they? (e.g. "An introspective thinker seeking cathartic resolution through character-driven dramas.")
-   - What do they value? (e.g. "Values narrative stakes, deep characters with trauma, and stories that leave a lasting emotional impact.")
-   - Cross-media and cultural/geographic connections (CRITICAL): Analyze their favorite works across categories (e.g., if they like Anime and also mention Visual Novels like Tsukihime or Katawa Shoujo, explicitly identify their strong preference for Japanese media aesthetics, character tropes, sub-genres like nakige/utsuge, and visual novel/light novel storytelling styles).
-   - Cross-media connections: "Bridges their love of Steins;Gate, Tsukihime, and Katawa Shoujo through a fascination with Japanese media aesthetics, school-life/sci-fi settings, and characters dealing with trauma."
-4. The "global_identity_overwrite" should be 2-4 clean, deeply insightful sentences — no bullet soup.
+EXISTING USER SOUL GRAPH (if any):
+${parsedSoulGraph ? JSON.stringify(parsedSoulGraph, null, 2) : "None (this is a new profile or migration)"}
+
+RULES:
+1. OUTPUT is an OVERWRITE, not an append.
+2. Consolidate ALL repetitive points.
 ${categoryInstruction}
-6. Keep "recent_context_overwrite" tightly focused on what they want RIGHT NOW.
+4. When building/updating the "soul_graph", analyze the user's demographics, age, stage in life, and implicit emotional struggles. Set emotional resonances and aesthetic affinities with weights from 0.0 to 1.0. Appoint preferred directors, studios, and themes. Append guardrails as negative constraints.
+5. If there is an existing soul graph, merge the new details into it, updating weights or adding new anchor keys organically, preserving their established profile.
 
 Respond ONLY with a JSON object:
 {
-  "global_identity_overwrite": ["Clean unified 2-4 sentence portrait of who this person is."],
-  ${categoryExample}
+  ${categoryKey ? '' : '"soul_graph": { ... },'}
+  ${categoryKey ? '' : categoryExample}
+  ${categoryKey ? categoryExample : ''}
   "recent_context_overwrite": "What they are actively looking for right now.",
   "guardrails_appends": ["Only new guardrails not already listed."],
   "thematic_connections_appends": ["Only new cross-media connections discovered this session."]
 }
-  `;
+`;
 
   const messagesPayload = [
     { role: 'system', content: systemPrompt }
@@ -628,7 +647,15 @@ Respond ONLY with a JSON object:
   }
 
   const response = await callOpenAI(messagesPayload, { type: "json_object" });
-  return JSON.parse(response);
+  const parsedResponse = JSON.parse(response);
+
+  // If we generated a soul graph, serialize it into global_identity_overwrite as expected by the client
+  if (!categoryKey && parsedResponse.soul_graph) {
+    parsedResponse.global_identity_overwrite = [JSON.stringify(parsedResponse.soul_graph)];
+    delete parsedResponse.soul_graph;
+  }
+
+  return parsedResponse;
 };
 
 const extractTitlesFromMemory = async (currentMemory) => {
@@ -710,10 +737,12 @@ const harmonizeAllMemory = async (currentMemory) => {
   const seenTitles = Array.isArray(currentMemory.seen) ? currentMemory.seen : [];
   
   let watchlistTitles = [];
-  if (Array.isArray(currentMemory.watchlist)) {
-    watchlistTitles = currentMemory.watchlist.map(item => item.title || item.Title).filter(Boolean);
-  } else if (Array.isArray(currentMemory.watchlist_items)) {
-    watchlistTitles = currentMemory.watchlist_items.map(item => item.title || item.Title).filter(Boolean);
+  if (currentMemory) {
+    if (Array.isArray(currentMemory.watchlist)) {
+      watchlistTitles = currentMemory.watchlist.map(item => item.title || item.Title).filter(Boolean);
+    } else if (Array.isArray(currentMemory.watchlist_items)) {
+      watchlistTitles = currentMemory.watchlist_items.map(item => item.title || item.Title).filter(Boolean);
+    }
   }
 
   // Deduplicate and prioritize: Loved > Seen > Watchlist
@@ -735,7 +764,7 @@ const harmonizeAllMemory = async (currentMemory) => {
   let titlesToResearch = prioritizedTitles.slice(0, 5);
   
   // Fallback to LLM parser if empty
-  if (titlesToResearch.length === 0) {
+  if (titlesToResearch.length === 0 && currentMemory) {
     console.log("Prioritized list empty, falling back to LLM title extraction...");
     const fallbackTitles = await extractTitlesFromMemory(currentMemory);
     titlesToResearch = fallbackTitles.slice(0, 5);
@@ -757,43 +786,74 @@ const harmonizeAllMemory = async (currentMemory) => {
     researchContext = "No specific favorite titles mentioned yet.";
   }
 
+  const cleanedMemory = { ...currentMemory };
+  let parsedSoulGraph = null;
+  if (cleanedMemory && Array.isArray(cleanedMemory.globalIdentity) && cleanedMemory.globalIdentity.length === 1) {
+    try {
+      parsedSoulGraph = JSON.parse(cleanedMemory.globalIdentity[0]);
+      cleanedMemory.globalIdentity = []; // Clear escaped string for LLM input
+    } catch (_) {}
+  }
+
   const systemPrompt = `
 You are the Coda Profile Harmonizer.
-Your job is to read the user's entire 'Living Memory' containing their global identity preferences and category-specific taste profiles, along with the background research on the specific media titles they enjoy (which include their specifically marked LOVED works, seen works, and watchlist items).
+Your job is to read the user's entire 'Living Memory', their existing User Soul Graph, and background research on their favorite media titles (which include their specifically marked LOVED works, seen works, and watchlist items).
 You will perform a global harmonization pass:
-1. Decode the person: Who are they as a person? What are the common threads across all the media categories they enjoy? Deduce their likely age group/demographic (e.g. late teens, mid-20s, 30s) and temperament based on their choices and how they talk about them.
-2. Analyze Emotional Reaction Patterns (CRITICAL):
-   - Pay special attention to harvested emotional triggers, reactions, and psychological needs (e.g. "made me cry", "existential dread", "felt lonely", "gave me chills", "comfort show").
-   - Analyze how these emotional states connect across works and categories. Deduce the psychological drivers: is the user seeking emotional wreckage/catharsis, existential reassurance, nostalgia, high-stakes comfort, or a distraction from loneliness?
-3. Connect the dots & cross-media style patterns:
-   - Look at the themes, emotional cores, and styles of the specific works they love across all categories.
-   - Find cross-media and cultural/geographic correlations: for example, if they like Anime (e.g., Steins;Gate, Monogatari) and also mention Visual Novels (e.g., Tsukihime, Katawa Shoujo), explicitly deduce and record their strong preference for Japanese media aesthetics, character tropes, sub-genres like nakige/utsuge, and visual novel/light novel storytelling styles.
-   - Trace the psychological relationships between these likes (e.g., how their love of a painter protagonist or a tragic romance in one format maps onto their overall preference for stories about the beauty and cruelty of life).
-   - Prioritize their specifically marked "loved" works (highly valued items) as the absolute core of their identity.
-4. Synthesize a clean, multi-paragraph core identity:
-   - Generate a list of paragraphs (typically 2 to 4 paragraphs, depending on the complexity and variety of their tastes).
-   - Do not artificially restrict it to a fixed length if they have diverse or detailed tastes. Let it grow organically to capture separate aspects of their identity, temperament, narrative interests, or cross-media stylistic preferences (e.g. one paragraph for core temperament and psychological drivers, one for Japanese/anime aesthetics, one for space/sci-fi tactical RPG preferences if they have distinct separate tastes).
-   - Make it beautiful, cohesive prose per paragraph (no bullet points or lists).
-5. Clean and consolidate the category-specific profiles, outputting them in "category_profiles_overwrite". 
-   CRITICAL: Remove all redundancies, word soup, and exact duplicates. Cleanly rewrite each category's list to compress and merge similar-meaning points (e.g., if there are multiple entries like "Loves Steins;Gate" and "Loves Steins;Gate for romance", consolidate them into a single clean statement like "Loves Steins;Gate for its romance and psychological depth"). Keep specifically marked loved works preserved clearly.
-
+1. Decode the person: What are their demographics (life stage, age group), temperament, and core struggles?
+2. Analyze Emotional Reaction Patterns: Analyze how their emotional states, triggers, and psychological needs (e.g. catharsis, loneliness, comfort) connect across categories.
+3. Connect the dots & cross-media style patterns: Identify affinities for specific studios (e.g. Shaft), directors (e.g. Makoto Shinkai), aesthetics, era preferences (e.g. 2000s), and geographic contexts (e.g. Japanese).
+4. Compile/update the User Soul Graph JSON representation. If there is an existing soul graph, merge the new details into it organically, preserving weights and tags.
 
 BACKGROUND RESEARCH ON USER'S FAVORITE MEDIA WORKS:
 ${researchContext}
 
-INPUT MEMORY:
-${JSON.stringify(currentMemory)}
+INPUT LIVING MEMORY (excluding global identity text):
+${JSON.stringify(cleanedMemory, null, 2)}
 
-Respond ONLY with a JSON object in this format:
+EXISTING USER SOUL GRAPH (if any):
+${parsedSoulGraph ? JSON.stringify(parsedSoulGraph, null, 2) : "None (this is a new profile or migration)"}
+
+Respond ONLY with a JSON object:
 {
-  "global_identity_overwrite": [
-    "Paragraph 1 describing who they are, their general vibe, personality, likely age group, and underlying psychological traits.",
-    "Paragraph 2 describing a cohesive facet of their tastes (e.g. love for melancholy, tragic romance, and Japanese visual novel aesthetics).",
-    "Paragraph 3 describing another distinct facet of their tastes if applicable (e.g. space operas and tactical RPG gaming), or more detailed traits."
-  ],
+  "soul_graph": {
+    "demographics": {
+      "stage_in_life": "guess life stage (e.g. college student, young professional, 18-year-old introspective)",
+      "struggles": ["implicit/explicit struggles, e.g. navigating relationships, academic burnout, coping with grief"]
+    },
+    "emotional_resonances": {
+      "comfort": 0.0-1.0,
+      "existential-reflection": 0.0-1.0,
+      "melancholy": 0.0-1.0,
+      "romantic-tension": 0.0-1.0
+    },
+    "aesthetic_affinities": {
+      "character-driven": 0.0-1.0,
+      "slice-of-life": 0.0-1.0,
+      "slow-burn": 0.0-1.0,
+      "gritty-realism": 0.0-1.0
+    },
+    "creative_anchors": {
+      "directors": { "Name": 0.0-1.0 },
+      "studios": { "Name": 0.0-1.0 },
+      "authors": { "Name": 0.0-1.0 },
+      "actresses": { "Name": 0.0-1.0 }
+    },
+    "themes": {
+      "love-and-loss": 0.0-1.0,
+      "coming-of-age": 0.0-1.0
+    },
+    "tropes": {
+      "unreliable-narrator": 0.0-1.0
+    },
+    "pacing_preference": {
+      "slow-burn": 0.0-1.0,
+      "moderate": 0.0-1.0,
+      "fast-paced": 0.0-1.0
+    },
+    "guardrails": ["negative dealbreakers, e.g. 'no BL', 'no generic isekai'"]
+  },
   "category_profiles_overwrite": {
-    "category_name_1": ["Clean, refined preference statement 1", "Clean, refined preference statement 2"],
-    "category_name_2": ["Clean, refined preference statement 1"]
+    "category_name": ["Clean, refined preference statement 1"]
   }
 }
 `;
@@ -803,6 +863,12 @@ Respond ONLY with a JSON object in this format:
   ], { type: "json_object" });
 
   const parsedResponse = JSON.parse(response);
+
+  // Serialize soul graph to global_identity_overwrite
+  if (parsedResponse.soul_graph) {
+    parsedResponse.global_identity_overwrite = [JSON.stringify(parsedResponse.soul_graph)];
+    delete parsedResponse.soul_graph;
+  }
 
   // Log the global harmonization pass
   loggerService.logHarmonization({
@@ -1138,6 +1204,17 @@ Respond with ONLY a JSON object:
 };
 
 const generateUserSoulGraph = async (rawProfileText, currentSoulGraph = null) => {
+  // If rawProfileText is a serialized JSON object, parse it directly (backward compatibility & speed)
+  if (typeof rawProfileText === 'string') {
+    try {
+      const parsed = JSON.parse(rawProfileText);
+      if (parsed && typeof parsed === 'object' && parsed.demographics) {
+        console.log('[llmService] Core identity is already a valid Soul Graph JSON. Using it directly.');
+        return parsed;
+      }
+    } catch (_) {}
+  }
+
   const systemPrompt = `
 You are the Coda User Soul Graph compiler.
 Your job is to analyze the user's flat text profile data (which contains onboarding details, loved works, and specific tastes) and compile it into a structured User Soul Graph.
@@ -1254,36 +1331,138 @@ Respond with ONLY a valid JSON object matching the schema.
   }
 };
 
-const evaluateCandidateResonance = async (soulGraph, mediaDNA, sessionContext) => {
+const generateUserSemanticTags = async (soulGraph, activeCraving, sessionContext) => {
   const systemPrompt = `
-You are the Coda Resonance Scorer.
-Your job is to mathematically and contextually evaluate how well a candidate media matches the user's User Soul Graph and the active Session Context.
+You are the Coda User Tag Generator.
+Your job is to read the user's persistent User Soul Graph and their active session craving/context, and generate a list of Fluid User Semantic Tags for this recommendation session.
 
-Calculate the match score out of 100 based on:
-1. **Aesthetic & Thematic Alignment (40%)**: How well the candidate's themes, moods, and aesthetic markers overlap with the user's affinities/anchors.
-2. **Creative & Creative Affinities (20%)**: Match on directors, authors, studios, and actors.
-3. **Pacing & Tone Compatibility (20%)**: Checks if pacing (slow-burn vs fast-paced) matches pacing preferences and guardrails.
-4. **Ideal Watch Context Resonance (20%)**: Matches the candidate's ideal watch context (weather, time_of_day, state_of_mind) with the active session context.
+These tags should NOT be strict keywords (like "action" or "slice-of-life"). They MUST be fluid, natural-language phrases, metadata details, or descriptive statements that capture the user's taste across:
+- Core theme setups (e.g., "story where the protagonist is isolated and seeks connection")
+- Specific creator anchors (e.g., "Makoto Shinkai", "Studio Shaft style")
+- Era and origin (e.g., "2000s anime", "translated Japanese mystery novel")
+- Aesthetic vibes (e.g., "rainy melancholic atmosphere", "highly stylized visual edits")
+- Pacing preference (e.g., "slow burn character exploration")
 
-**GUARDRAIL AND SEEN CHECK (CRITICAL)**:
-- If the candidate contains any themes/tropes explicitly banned in the guardrails, set the final score to 0.
+Include exactly 8 to 12 distinct fluid tags. Some should be static core tags from the Soul Graph (demographics, struggles, creative anchors, themes), and some should be dynamic tags reflecting the active session craving and context (mood, time of day).
 
 Respond with ONLY a JSON object:
 {
-  "score": 0-100,
-  "alignment_breakdown": {
-    "thematic_alignment": "brief notes",
-    "creative_alignment": "brief notes",
-    "context_alignment": "brief notes"
-  },
-  "verdict": "detailed explanation of why this matches or does not match their soul media ID"
+  "user_tags": [
+    "movie where the mc is down on his luck and then a perfect girl comes and saves him",
+    "Makoto Shinkai",
+    "2000s",
+    "Japanese",
+    "melancholic rain-slicked atmosphere",
+    ...
+  ]
 }
 `;
 
   const userPrompt = JSON.stringify({
     soul_graph: soulGraph,
-    media_dna: mediaDNA,
+    active_craving: activeCraving,
     session_context: sessionContext
+  }, null, 2);
+
+  try {
+    const responseJson = await callOpenAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ], { type: 'json_object' });
+    const parsed = JSON.parse(responseJson);
+    return parsed.user_tags || [];
+  } catch (e) {
+    console.error("[llmService] generateUserSemanticTags failed:", e.message);
+    return [];
+  }
+};
+
+const compileMediaTags = (mediaDNA) => {
+  const tags = new Set();
+  
+  if (!mediaDNA) return [];
+
+  // Pacing
+  if (mediaDNA.pacing) {
+    tags.add(`${mediaDNA.pacing} pacing`);
+  }
+
+  // Moods
+  if (mediaDNA.moods && typeof mediaDNA.moods === 'object') {
+    Object.keys(mediaDNA.moods).forEach(mood => {
+      tags.add(mood);
+    });
+  }
+
+  // Themes
+  if (mediaDNA.themes && typeof mediaDNA.themes === 'object') {
+    Object.keys(mediaDNA.themes).forEach(theme => {
+      tags.add(theme);
+    });
+  }
+
+  // Tropes
+  if (mediaDNA.tropes && typeof mediaDNA.tropes === 'object') {
+    Object.keys(mediaDNA.tropes).forEach(trope => {
+      tags.add(trope);
+    });
+  }
+
+  // Aesthetic Markers
+  if (Array.isArray(mediaDNA.aesthetic_markers)) {
+    mediaDNA.aesthetic_markers.forEach(marker => {
+      tags.add(marker);
+    });
+  }
+
+  // Creative Credits
+  if (mediaDNA.creative_credits && typeof mediaDNA.creative_credits === 'object') {
+    const cc = mediaDNA.creative_credits;
+    if (Array.isArray(cc.directors)) cc.directors.forEach(d => tags.add(d));
+    if (Array.isArray(cc.studios)) cc.studios.forEach(s => tags.add(s));
+    if (Array.isArray(cc.authors)) cc.authors.forEach(a => tags.add(a));
+    if (Array.isArray(cc.cast)) cc.cast.forEach(c => tags.add(c));
+  }
+
+  // Format and country origin
+  if (mediaDNA.media_type) {
+    tags.add(mediaDNA.media_type);
+  }
+  
+  return Array.from(tags);
+};
+
+const computeSemanticOverlap = async (userTags, mediaTags, guardrails) => {
+  const systemPrompt = `
+You are the Coda Tag Overlap Scorer.
+Your job is to evaluate the semantic and conceptual compatibility between a user's taste tags/cravings (User Semantic Tags) and a candidate media's tags (Media Semantic Tags).
+
+Both sets of tags contain fluid, natural-language phrases, metadata, and descriptions (e.g. plot details, aesthetic vibes, directors, years).
+You must analyze the two lists and compute a compatibility score out of 100 based on:
+1. **Thematic & Plot Alignment (40%)**: Conceptual overlap between plot setups, tropes, themes, and moods. Do not require exact word matches; recognize semantic sibling concepts (e.g., "tragic romance" and "sad parting" overlap).
+2. **Creative & Style Alignment (30%)**: Matches on directors, studios, and visual/pacing style descriptions.
+3. **Era & Origin Fit (30%)**: Alignment on country of origin, year/decade, and format.
+
+**GUARDRAILS (CRITICAL)**:
+- Scan the guardrails array: ${JSON.stringify(guardrails)}.
+- If the candidate's tags explicitly violate any of the negative guardrails (e.g. contains "BL" when guardrails say "no BL", or contains "isekai" when guardrails say "no generic isekai"), you MUST set the final score to 0.
+
+Respond with ONLY a JSON object:
+{
+  "score": 0-100,
+  "overlapping_concepts": ["matching concept 1", "matching concept 2"],
+  "alignment_breakdown": {
+    "thematic_alignment": "brief notes on plot/mood alignment",
+    "creative_alignment": "brief notes on style/director/studio alignment",
+    "context_alignment": "brief notes on era/origin alignment"
+  },
+  "verdict": "A brief explanation of why this matches or does not match their taste profile."
+}
+`;
+
+  const userPrompt = JSON.stringify({
+    user_tags: userTags,
+    media_tags: mediaTags
   }, null, 2);
 
   try {
@@ -1293,8 +1472,39 @@ Respond with ONLY a JSON object:
     ], { type: 'json_object' });
     return JSON.parse(responseJson);
   } catch (e) {
-    console.error(`[llmService] evaluateCandidateResonance failed:`, e.message);
-    return { score: 0, verdict: "Failed to evaluate" };
+    console.error("[llmService] computeSemanticOverlap failed:", e.message);
+    return {
+      score: 50,
+      alignment_breakdown: { thematic_alignment: "Error", creative_alignment: "Error", context_alignment: "Error" },
+      verdict: "Failed to compute overlap due to API error."
+    };
+  }
+};
+
+const evaluateCandidateResonance = async (soulGraph, mediaDNA, sessionContext) => {
+  try {
+    // 1. Generate User Session Tags
+    const activeCraving = sessionContext.mood || "reflective";
+    const userTags = await generateUserSemanticTags(soulGraph, activeCraving, sessionContext);
+    console.log(`[Resonance Scorer] Generated user session tags: ${JSON.stringify(userTags)}`);
+
+    // 2. Compile Media Tags
+    const mediaTags = compileMediaTags(mediaDNA);
+    console.log(`[Resonance Scorer] Compiled media tags for "${mediaDNA.title}": ${JSON.stringify(mediaTags)}`);
+
+    // 3. Compute Semantic Overlap
+    const guardrails = soulGraph.guardrails || [];
+    const overlap = await computeSemanticOverlap(userTags, mediaTags, guardrails);
+    console.log(`[Resonance Scorer] 🔍 "${mediaDNA.title}" resonance score: ${overlap.score}/100 - Verdict: ${overlap.verdict}`);
+    
+    return {
+      score: overlap.score,
+      alignment_breakdown: overlap.alignment_breakdown,
+      verdict: overlap.verdict
+    };
+  } catch (err) {
+    console.error(`[llmService] evaluateCandidateResonance failed:`, err.message);
+    return { score: 50, verdict: "Error evaluating resonance." };
   }
 };
 
