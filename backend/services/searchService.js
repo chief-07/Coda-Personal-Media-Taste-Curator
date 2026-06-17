@@ -125,7 +125,7 @@ const scrapeBing = async (query) => {
 };
 
 // ─────────────────────────────────────────────────
-// REDDIT OAUTH — reliable forum search
+// REDDIT OAUTH — reliable forum search + comment fetching
 // Requires REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET in .env
 // Set up free at: https://www.reddit.com/prefs/apps (script type app)
 // ─────────────────────────────────────────────────
@@ -162,6 +162,57 @@ const getRedditToken = async () => {
     return null;
   }
 };
+
+/**
+ * Fetch top-scoring comments for a Reddit post using OAuth.
+ * Reddit blocks unauthenticated .json requests from server IPs (403),
+ * so we use the OAuth API which works reliably.
+ * Falls back silently (returns '') if OAuth isn't configured.
+ * @param {string} permalink - Full Reddit post URL
+ * @param {number} maxComments - Max top-level comments to include
+ * @returns {string} - Joined comment bodies or '' on failure/no-auth
+ */
+const scrapeRedditComments = async (permalink, maxComments = 6) => {
+  try {
+    if (!permalink || !permalink.includes('reddit.com/r/')) return '';
+
+    const token = await getRedditToken();
+    if (!token) return ''; // No OAuth credentials — skip silently
+
+    // Extract post ID and subreddit from permalink
+    // e.g. https://www.reddit.com/r/MovieSuggestions/comments/ga5k1i/movies_like_your_name/
+    const match = permalink.match(/reddit\.com\/r\/([^/]+)\/comments\/([a-z0-9]+)/i);
+    if (!match) return '';
+    const [, subreddit, postId] = match;
+
+    const res = await axios.get(
+      `https://oauth.reddit.com/r/${subreddit}/comments/${postId}?sort=top&limit=${maxComments + 2}&depth=1`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'User-Agent': 'CodaRecommendations/1.0'
+        },
+        timeout: 4000
+      }
+    );
+
+    // Reddit OAuth response: [postListing, commentListing]
+    const commentListing = Array.isArray(res.data) ? res.data[1] : null;
+    if (!commentListing) return '';
+
+    const comments = commentListing?.data?.children || [];
+    const topComments = comments
+      .filter(c => c.kind === 't1' && c.data?.body && c.data.body.length > 20 && c.data.body !== '[deleted]' && c.data.body !== '[removed]')
+      .sort((a, b) => (b.data.score || 0) - (a.data.score || 0))
+      .slice(0, maxComments)
+      .map(c => c.data.body.substring(0, 300).replace(/\n+/g, ' ').trim());
+
+    return topComments.join(' | ');
+  } catch (e) {
+    return ''; // Silent fail — don't block the pipeline
+  }
+};
+
 
 /**
  * Search Reddit via OAuth API (reliable) or fall back to MAL reviews (human voice fallback).
@@ -205,7 +256,8 @@ const searchRedditDirect = async (subreddit, searchTerms, limit = 5) => {
 
 const expandListResults = async (results) => {
   if (!results || !Array.isArray(results)) return [];
-  
+
+  // ── Letterboxd list expansion (sequential, already fast) ──────────────
   for (const res of results) {
     if (res.link && res.link.includes('letterboxd.com/') && res.link.includes('/list/')) {
       try {
@@ -237,6 +289,31 @@ const expandListResults = async (results) => {
       }
     }
   }
+
+  // ── Reddit comment enrichment (parallel, capped at 3 posts) ───────────
+  // Yahoo/DDG return snippets showing only the OP's question.
+  // We follow the post URL → .json to get the actual top-level replies
+  // (i.e. the real recommendations), then replace the weak snippet.
+  const redditResults = results
+    .filter(r => r.link && r.link.includes('reddit.com/r/') && r.link.includes('/comments/'))
+    .slice(0, 3); // cap at 3 to keep latency bounded
+
+  if (redditResults.length > 0) {
+    console.log(`[SearchService] Fetching Reddit comments for ${redditResults.length} post(s) in parallel...`);
+    const commentFetches = redditResults.map(r => scrapeRedditComments(r.link));
+    const commentResults = await Promise.allSettled(commentFetches);
+
+    for (let i = 0; i < redditResults.length; i++) {
+      const outcome = commentResults[i];
+      if (outcome.status === 'fulfilled' && outcome.value && outcome.value.length > 30) {
+        const comments = outcome.value;
+        // Replace the weak OP-question snippet with the actual community replies
+        redditResults[i].snippet = `[Reddit Top Replies] ${comments}`;
+        console.log(`[SearchService] ✅ Reddit comments fetched for: ${redditResults[i].title}`);
+      }
+    }
+  }
+
   return results;
 };
 

@@ -592,37 +592,35 @@ const runRecommendationPipeline = async (payload) => {
           const staggeredResults = await runSequentialTasksWithCacheDelay(sequentialTasks);
           sourceResults.push(...staggeredResults);
         } else {
-          // Sequential execution of web scraping tasks to pool snippets from all queries
-          let consecutiveFailures = 0;
-          for (let i = 0; i < search_queries.length; i++) {
-            const query = search_queries[i];
-            const t0 = Date.now();
-            const results = await cachedScrapeForums(query);
-            const elapsed = Date.now() - t0;
+          // Parallel execution of web scraping tasks — all queries fire simultaneously.
+          // Promise.allSettled ensures a single slow/blocked query doesn't stall the others.
+          console.log(`[Recommend] Running ${search_queries.length} search queries in parallel...`);
+          const settledResults = await Promise.allSettled(
+            search_queries.map(query => cachedScrapeForums(query).then(r => ({ query, results: r || [] })))
+          );
 
-            if (results && results.length > 0) {
-              consecutiveFailures = 0;
-              const filtered = results.filter(snippet => {
-                return !isExcluded(snippet.title, seenList) && !isExcluded(snippet.title, notForMeList);
-              });
-
+          let totalFailures = 0;
+          for (const outcome of settledResults) {
+            if (outcome.status === 'rejected') {
+              totalFailures++;
+              continue;
+            }
+            const { query, results } = outcome.value;
+            if (results.length > 0) {
+              const filtered = results.filter(snippet =>
+                !isExcluded(snippet.title, seenList) && !isExcluded(snippet.title, notForMeList)
+              );
               if (filtered.length > 0) {
                 console.log(`[Recommend] Query "${query}" returned ${filtered.length} matching snippets.`);
                 scrapedSnippets = scrapedSnippets.concat(filtered);
               }
             } else {
-              consecutiveFailures++;
+              totalFailures++;
             }
+          }
 
-            // Early exit on 2 consecutive failures/timeouts (likely blocked or offline)
-            if (consecutiveFailures >= 2) {
-              console.log(`[Recommend] Encountered 2 consecutive search failures/timeouts. Aborting search loop early.`);
-              break;
-            }
-
-            if (elapsed > 100 && i < search_queries.length - 1) {
-              await new Promise(resolve => setTimeout(resolve, 500));
-            }
+          if (totalFailures >= search_queries.length) {
+            console.log(`[Recommend] All search queries failed/returned 0. Likely blocked or offline.`);
           }
         }
 
@@ -666,16 +664,14 @@ const runRecommendationPipeline = async (payload) => {
         }
 
         if (candidateTitles.length > 0) {
-          const candidatesWithMetadata = [];
-          for (const title of candidateTitles) {
-            const key = `${media_type.toLowerCase().replace(/[^a-z0-9]/g, '')}:${title.toLowerCase().trim()}`;
-            const isMiss = !metadataCache[key];
-            const meta = await getCachedMetadata(title, media_type);
-            candidatesWithMetadata.push(meta);
-            if (isMiss) {
-              await new Promise(resolve => setTimeout(resolve, 150));
-            }
-          }
+          // Parallel metadata fetch — all candidates resolved simultaneously.
+          // Cache misses are fetched concurrently; 150ms stagger only needed for sequential APIs.
+          const metaSettled = await Promise.allSettled(
+            candidateTitles.map(title => getCachedMetadata(title, media_type))
+          );
+          const candidatesWithMetadata = metaSettled
+            .filter(o => o.status === 'fulfilled' && o.value)
+            .map(o => o.value);
 
           const seenFiltered = candidatesWithMetadata.filter(candidate => {
             return !isExcluded(candidate.title, seenList) && !isExcluded(candidate.title, notForMeList);

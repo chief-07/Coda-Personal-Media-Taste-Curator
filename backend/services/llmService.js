@@ -179,13 +179,30 @@ Your job is to:
 - You MUST generate exactly 5 search queries.
 - All 5 queries MUST be phrased in a natural, highly conversational, and human-like manner, simulating a real person asking for recommendations on a community forum (like Reddit, Letterboxd, etc.).
 - **DO NOT** use dry, clinical, or academic search terms (e.g., instead of "psychological thriller with complex relationships", use "movies where the girl is crazy in love" or "movies similar to Gone Girl with obsessive love").
+
+- **ANTI-ABSTRACTION RULE (CRITICAL — READ CAREFULLY):**
+  - Queries 3 and 4 are general listicle/vibe queries WITHOUT site: constraints. These MUST be concrete and title-bearing.
+  - **Q3 and Q4 MUST include at least one of**: a named media title, a named director, a named character type, or a very specific well-known trope/emotion (e.g. "second-hand embarrassment", "gut-punch ending", "unreliable narrator").
+  - **FORBIDDEN patterns for Q3 and Q4** (too abstract — these match blog category pages with no titles in the snippet):
+    - "introspective films about love and loss recommendations"
+    - "emotional character-driven dramas exploring human connections"
+    - "movies that explore existential themes and character development"
+    - "character-driven dramas exploring existential themes list"
+  - **REQUIRED pattern** — Q3 and Q4 MUST look like one of these:
+    - "movies that will make you sob like Your Name or A Silent Voice listicle"
+    - "films where you fall in love with the wrong person like Blue Is The Warmest Colour ranked list"
+    - "anime with a gut-punch ending similar to Clannad After Story list"
+    - "best slow-burn psychological thrillers ranked Collider"
+    - "10 best tearjerker anime movies list"
+
 - Structure and templates for the 5 queries (if seed titles are available from "watchlist_seed_title", "loved_seed_title", or the "loved_titles" array):
   1. Query 1 (Direct Similar - Seed-based & Site-Constrained): A conversational search for recommendations similar to the seed title (e.g., 'movies similar to Gone Girl site:reddit.com/r/MovieSuggestions' or 'anime like Steins Gate site:reddit.com/r/animesuggest').
   2. Query 2 (Conversational Post-Watch/Play/Read - Seed-based & Site-Constrained): Simulating a user who just finished the seed title (e.g., 'just finished Gone Girl what next site:reddit.com/r/MovieSuggestions' or 'finished Steins Gate what should I watch next site:reddit.com/r/animesuggest').
-  3. Query 3 (Conversational Trope/Theme - Craving-based & GENERAL): A search WITHOUT site constraints targeting listicles or recommendations for the specific trope (e.g., 'movies where the girl is crazy in love listicle', 'books with academic rivals to lovers recommendations', 'games similar to Resident Evil with psychological horror list').
-  4. Query 4 (Descriptive Vibe & Atmospheric Craving - Craving-based & GENERAL): A search WITHOUT site constraints describing the atmosphere, tone, and character dynamics (e.g., 'dark unsettling movies about obsessive romance recommendations', 'intense psychological games about obsession list').
-  5. Query 5 (Alternative Community / Platform - Site-Constrained): Simulating a recommendation request targeting an alternative community platform (e.g., 'movies like Gone Girl with obsessive romance site:letterboxd.com', 'anime similar to Steins Gate recommendations site:anime-planet.com/anime').
-- If NO seed titles are available (pure discovery mode), replace the seed-based templates with conversational variations of the user's active craving, keeping exactly 3 site-constrained queries and exactly 2 general web queries (e.g., Query 1: 'looking for movies with a crazy obsessed lover site:reddit.com/r/MovieSuggestions', Query 2: 'movies about obsessive toxic relationships recommendations site:reddit.com/r/MovieSuggestions', Query 3: 'movies with a psycho crazy obsessed girlfriend listicle').
+  3. Query 3 (Concrete Trope/Emotion Listicle - GENERAL, no site:): A search WITHOUT site constraints targeting listicles or ranked lists that MUST name a title or a very specific concrete trope (e.g., 'movies that will make you cry like Your Name listicle', 'films with obsessive love like Gone Girl ranked list', '10 best gut-punch anime movies list'). NEVER use abstract academic phrasing here.
+  4. Query 4 (Concrete Vibe + Named Reference - GENERAL, no site:): A search WITHOUT site constraints describing a specific atmosphere TIED to a named reference point or specific trope (e.g., 'dark unsettling movies about obsessive romance like Fatal Attraction recommendations', 'intense psychological thrillers with unreliable narrator list', 'anime movies that destroyed me emotionally ranked'). NEVER use abstract phrasing with no concrete anchor.
+  5. Query 5 (Alternative Community / Platform - Site-Constrained): Simulating a recommendation request targeting an alternative community platform. For Letterboxd, prefer the slug format: 'site:letterboxd.com/films/similar/to/[seed-title-slug]' (e.g. 'site:letterboxd.com/films/similar/to/your-name') OR a user list query (e.g., 'movies like Gone Girl with obsessive romance site:letterboxd.com'). For anime: 'site:anime-planet.com/anime/[title-slug]/recommendations'.
+- If NO seed titles are available (pure discovery mode), replace the seed-based templates with conversational variations of the user's active craving, keeping exactly 3 site-constrained queries and exactly 2 general web queries that are concrete and title-adjacent (e.g., Query 1: 'looking for movies with a crazy obsessed lover site:reddit.com/r/MovieSuggestions', Query 3: 'movies with a psycho obsessed girlfriend like You or Fatal Attraction listicle').
+
 - Adjust the community subreddits/sites in the queries based on the media type (e.g. 'site:reddit.com/r/animesuggest' or 'site:anime-planet.com/anime' for anime, 'site:reddit.com/r/MovieSuggestions' or 'site:letterboxd.com' for movies, 'site:reddit.com/r/suggestmeabook' or 'site:goodreads.com' for books, 'site:reddit.com/r/gamingsuggestions' for games).
 - For anime, you MUST target Anime-Planet for at least 1 or 2 of the 5 queries using the constraint 'site:anime-planet.com/anime'. These queries MUST be strictly seed-based (e.g., 'anime similar to [Title] site:anime-planet.com/anime' or 'site:anime-planet.com/anime/[title-slug]/recommendations') using titles the user likes/loves, rather than general discovery queries, because Anime-Planet's most valuable user-voted recommendations are tied to specific starting titles.
 
