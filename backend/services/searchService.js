@@ -125,6 +125,85 @@ const scrapeBing = async (query) => {
 };
 
 // ─────────────────────────────────────────────────
+// LETTERBOXD REVIEW SCRAPER
+// Scrapes the popular reviews page for a film on Letterboxd.
+// Reviews are rich human text that naturally mention comparable films,
+// making them useful both for candidate discovery and pitch generation.
+// No auth required. Letterboxd does not block server-side scraping.
+// ─────────────────────────────────────────────────
+
+/**
+ * Convert a film title to a Letterboxd URL slug.
+ * e.g. "Your Name" → "your-name"
+ *      "Howl's Moving Castle" → "howls-moving-castle"
+ *      "5 Centimeters Per Second" → "5-centimeters-per-second"
+ */
+const toLetterboxdSlug = (title) => {
+  return (title || '')
+    .toLowerCase()
+    .replace(/[''`]/g, '')           // drop apostrophes: Howl's → howls
+    .replace(/[^a-z0-9\s-]/g, ' ')  // other punctuation → space
+    .replace(/\s+/g, '-')            // spaces → hyphens
+    .replace(/-+/g, '-')             // collapse multiple hyphens
+    .replace(/^-|-$/g, '')           // trim leading/trailing hyphens
+    .trim();
+};
+
+/**
+ * Scrape popular Letterboxd reviews for a film.
+ * Returns an array of snippet objects compatible with the existing pipeline.
+ * Each review snippet is tagged [Letterboxd Review] so the LLM knows the source.
+ * @param {string} title - Film title (will be slug-ified)
+ * @param {number} maxReviews - Max reviews to return (default 5)
+ * @returns {Array<{title, snippet, link}>}
+ */
+const scrapeLetterboxdReviews = async (title, maxReviews = 5) => {
+  try {
+    const slug = toLetterboxdSlug(title);
+    if (!slug) return [];
+
+    const url = `https://letterboxd.com/film/${slug}/`;
+    console.log(`[Letterboxd Reviews] Scraping reviews for: "${title}" (slug: ${slug}) from main page`);
+
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9'
+      },
+      timeout: 5000
+    });
+
+    const $ = cheerio.load(response.data);
+    const reviews = [];
+
+    // Popular reviews on the main film page use .js-review-body
+    $('.js-review-body').each((i, el) => {
+      if (reviews.length >= maxReviews) return false;
+      const bodyText = $(el).find('p').text().trim() || $(el).text().trim();
+      if (bodyText && bodyText.length > 30) {
+        reviews.push(bodyText.substring(0, 600).replace(/\s+/g, ' ').trim());
+      }
+    });
+
+    if (reviews.length === 0) {
+      console.log(`[Letterboxd Reviews] No reviews found for "${title}" at ${url}`);
+      return [];
+    }
+
+    console.log(`[Letterboxd Reviews] ✅ Got ${reviews.length} reviews for "${title}"`);
+    return reviews.map((reviewText, i) => ({
+      title: `Letterboxd review of ${title}`,
+      snippet: `[Letterboxd Review of "${title}"] ${reviewText}`,
+      link: url
+    }));
+  } catch (e) {
+    console.warn(`[Letterboxd Reviews] Failed for "${title}":`, e.message);
+    return [];
+  }
+};
+
+// ─────────────────────────────────────────────────
 // REDDIT OAUTH — reliable forum search + comment fetching
 // Requires REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET in .env
 // Set up free at: https://www.reddit.com/prefs/apps (script type app)
@@ -257,58 +336,126 @@ const searchRedditDirect = async (subreddit, searchTerms, limit = 5) => {
 const expandListResults = async (results) => {
   if (!results || !Array.isArray(results)) return [];
 
-  // ── Letterboxd list expansion (sequential, already fast) ──────────────
-  for (const res of results) {
-    if (res.link && res.link.includes('letterboxd.com/') && res.link.includes('/list/')) {
+  // ── Letterboxd expansion (parallel, ALL URL types) ─────────────────────────
+  // ANY Letterboxd page uses .film-poster img[alt] for titles.
+  // This covers: /list/, /films/similar/to/, /films/, member watchlists.
+  // We scrape ALL Letterboxd results simultaneously — no sequential bottleneck.
+  const letterboxdResults = results.filter(r =>
+    r.link && r.link.includes('letterboxd.com/')
+  );
+
+  if (letterboxdResults.length > 0) {
+    const scrapeOneLetterboxd = async (res) => {
       try {
         let url = res.link.trim();
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
           url = 'https://' + url;
         }
-        console.log(`[SearchService] Scraping Letterboxd list: ${url}`);
+        const pageType = url.includes('/list/') ? 'list'
+          : url.includes('/similar/') ? 'similar-films'
+          : url.includes('/films/') ? 'films-browse'
+          : 'member-page';
+
+        console.log(`[SearchService] Scraping Letterboxd (${pageType}): ${url}`);
         const response = await axios.get(url, {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9'
           },
-          timeout: 4000
+          timeout: 5000
         });
         const $ = cheerio.load(response.data);
         const films = [];
+
+        // Primary: .film-poster img[alt] — works on all Letterboxd page types
         $('.film-poster').each((i, el) => {
-          const filmName = $(el).find('img').attr('alt');
-          if (filmName && !films.includes(filmName)) {
-            films.push(filmName);
+          const filmName = $(el).find('img').attr('alt') || $(el).attr('data-film-name');
+          if (filmName && filmName.trim() && !films.includes(filmName.trim())) {
+            films.push(filmName.trim());
           }
         });
+
+        // Secondary fallback: some list layouts use headline links
+        if (films.length === 0) {
+          $('.linked-film-detail h2, .headline-2 a').each((i, el) => {
+            const name = $(el).text().trim();
+            if (name && !films.includes(name)) films.push(name);
+          });
+        }
+
         if (films.length > 0) {
-          res.snippet += ` (Letterboxd List Films: ${films.slice(0, 15).join(', ')})`;
-          console.log(`[SearchService] Expanded Letterboxd list with ${Math.min(films.length, 15)} films.`);
+          res.snippet += ` (Letterboxd Films: ${films.slice(0, 15).join(', ')})`;
+          console.log(`[SearchService] ✅ Letterboxd ${pageType} → ${Math.min(films.length, 15)} films`);
+        } else {
+          console.log(`[SearchService] ⚠️  Letterboxd ${pageType} found 0 posters: ${url}`);
         }
       } catch (err) {
-        console.warn(`[SearchService] Letterboxd list scrape failed:`, err.message);
+        console.warn(`[SearchService] Letterboxd scrape failed for ${res.link}:`, err.message);
       }
-    }
+    };
+
+    await Promise.allSettled(letterboxdResults.map(scrapeOneLetterboxd));
   }
 
-  // ── Reddit comment enrichment (parallel, capped at 3 posts) ───────────
-  // Yahoo/DDG return snippets showing only the OP's question.
-  // We follow the post URL → .json to get the actual top-level replies
-  // (i.e. the real recommendations), then replace the weak snippet.
+  // ── Goodreads list expansion (parallel) ─────────────────────────────────────
+  const goodreadsResults = results.filter(r =>
+    r.link && r.link.includes('goodreads.com/list/show/')
+  );
+
+  if (goodreadsResults.length > 0) {
+    const scrapeOneGoodreads = async (res) => {
+      try {
+        let url = res.link.trim();
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+        console.log(`[SearchService] Scraping Goodreads List: ${url}`);
+        const response = await axios.get(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9'
+          },
+          timeout: 6000
+        });
+        const $ = cheerio.load(response.data);
+        const books = [];
+
+        $('a.bookTitle').each((i, el) => {
+          const bookName = $(el).find('span').text().trim() || $(el).text().trim();
+          if (bookName && !books.includes(bookName)) {
+            books.push(bookName);
+          }
+        });
+
+        if (books.length > 0) {
+          res.snippet += ` (Goodreads Books: ${books.slice(0, 15).join(', ')})`;
+          console.log(`[SearchService] ✅ Goodreads List → ${Math.min(books.length, 15)} books`);
+        }
+      } catch (err) {
+        console.warn(`[SearchService] Goodreads scrape failed for ${res.link}:`, err.message);
+      }
+    };
+
+    await Promise.allSettled(goodreadsResults.map(scrapeOneGoodreads));
+  }
+
+
+  // ── Reddit comment enrichment (via OAuth, silent no-op if not configured) ─
   const redditResults = results
     .filter(r => r.link && r.link.includes('reddit.com/r/') && r.link.includes('/comments/'))
-    .slice(0, 3); // cap at 3 to keep latency bounded
+    .slice(0, 3);
 
   if (redditResults.length > 0) {
     console.log(`[SearchService] Fetching Reddit comments for ${redditResults.length} post(s) in parallel...`);
-    const commentFetches = redditResults.map(r => scrapeRedditComments(r.link));
-    const commentResults = await Promise.allSettled(commentFetches);
-
+    const commentResults = await Promise.allSettled(
+      redditResults.map(r => scrapeRedditComments(r.link))
+    );
     for (let i = 0; i < redditResults.length; i++) {
       const outcome = commentResults[i];
       if (outcome.status === 'fulfilled' && outcome.value && outcome.value.length > 30) {
-        const comments = outcome.value;
-        // Replace the weak OP-question snippet with the actual community replies
-        redditResults[i].snippet = `[Reddit Top Replies] ${comments}`;
+        redditResults[i].snippet = `[Reddit Top Replies] ${outcome.value}`;
         console.log(`[SearchService] ✅ Reddit comments fetched for: ${redditResults[i].title}`);
       }
     }
@@ -316,6 +463,7 @@ const expandListResults = async (results) => {
 
   return results;
 };
+
 
 const scrapeForums = async (query) => {
   // Sanitize query to prevent search engine brand-name pollution
@@ -1176,6 +1324,8 @@ const fetchMetadataForCandidate = async (title, mediaType) => {
 
 module.exports = {
   scrapeForums,
+  scrapeLetterboxdReviews,
+  toLetterboxdSlug,
   fetchMALRecommendations,
   fetchMALReviews,
   fetchKitsuAnimeSnippets,

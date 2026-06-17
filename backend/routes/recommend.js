@@ -138,6 +138,7 @@ const cachedFetchVNDBSnippets = (query, limit, platformHint = null) => {
   const platKey = Array.isArray(platformHint) ? platformHint.join(',') : (platformHint || '');
   return getCachedSnippetData(`vndb_search:${query}:${limit}:${platKey}`, () => searchService.fetchVNDBSnippets(query, limit, platformHint));
 };
+const cachedFetchLetterboxdReviews = (title) => getCachedSnippetData(`letterboxd_reviews:${title}`, () => searchService.scrapeLetterboxdReviews(title));
 
 const runSequentialTasksWithCacheDelay = async (tasks) => {
   const results = [];
@@ -591,6 +592,56 @@ const runRecommendationPipeline = async (payload) => {
           // Sequential execution of rate-limited tasks with conditional cache delay
           const staggeredResults = await runSequentialTasksWithCacheDelay(sequentialTasks);
           sourceResults.push(...staggeredResults);
+        } else if (media_type === 'movie' || media_type === 'tv') {
+          // Parallel execution of movie searches and Letterboxd review scraping for seeds
+          console.log(`[Recommend] Running movie pipeline with Letterboxd reviews for seeds: ${resolvedSeeds.join(', ')}`);
+          const parallelPromises = [];
+
+          // 1. Fetch Letterboxd reviews for the seeds in parallel
+          for (const seed of resolvedSeeds) {
+            parallelPromises.push(
+              cachedFetchLetterboxdReviews(seed).then(r => ({
+                source: `Letterboxd reviews for seed: "${seed}"`,
+                results: r || []
+              }))
+            );
+          }
+
+          // 2. Fetch search queries in parallel
+          for (const query of search_queries) {
+            parallelPromises.push(
+              cachedScrapeForums(query).then(r => ({
+                source: `Web query: "${query}"`,
+                results: r || []
+              }))
+            );
+          }
+
+          const settledResults = await Promise.allSettled(parallelPromises);
+
+          let totalFailures = 0;
+          for (const outcome of settledResults) {
+            if (outcome.status === 'rejected') {
+              totalFailures++;
+              continue;
+            }
+            const { source, results } = outcome.value;
+            if (results && results.length > 0) {
+              const filtered = results.filter(snippet =>
+                !isExcluded(snippet.title, seenList) && !isExcluded(snippet.title, notForMeList)
+              );
+              if (filtered.length > 0) {
+                console.log(`[Recommend] ${source} returned ${filtered.length} matching snippets.`);
+                scrapedSnippets = scrapedSnippets.concat(filtered);
+              }
+            } else {
+              totalFailures++;
+            }
+          }
+
+          if (totalFailures >= parallelPromises.length) {
+            console.log(`[Recommend] All movie search/review queries failed/returned 0.`);
+          }
         } else {
           // Parallel execution of web scraping tasks — all queries fire simultaneously.
           // Promise.allSettled ensures a single slow/blocked query doesn't stall the others.
@@ -989,8 +1040,23 @@ router.post('/pitch', async (req, res) => {
     );
     const pitchSubreddit = pitchSubredditMap[subredditKey] || 'all';
     const query = `"${title}" ${requested_media_type} review site:reddit.com/r/${pitchSubreddit}`;
-    console.log(`[Pitch] Scraping human discussions for query: "${query}"`);
-    const scrapedSnippets = await searchService.scrapeForums(query);
+
+    let scrapedSnippets = [];
+    const mediaTypeLower = (requested_media_type || '').toLowerCase();
+    if (mediaTypeLower === 'movie' || mediaTypeLower === 'tv') {
+      console.log(`[Pitch] Scraping Letterboxd reviews for: "${title}"`);
+      scrapedSnippets = await getCachedSnippetData(
+        `letterboxd_reviews:${title}`,
+        () => searchService.scrapeLetterboxdReviews(title)
+      );
+      if (!scrapedSnippets || scrapedSnippets.length === 0) {
+        console.log(`[Pitch] Letterboxd reviews empty. Falling back to forum scraping for: "${query}"`);
+        scrapedSnippets = await searchService.scrapeForums(query);
+      }
+    } else {
+      console.log(`[Pitch] Scraping human discussions for query: "${query}"`);
+      scrapedSnippets = await searchService.scrapeForums(query);
+    }
 
     const { pitch_paragraphs } = await llmService.generatePitch(
       directive,
