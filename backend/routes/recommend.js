@@ -982,6 +982,8 @@ const runRecommendationPipeline = async (payload) => {
     studio: resolvedPicks[0]?.studio || '',
     recommendations: resolvedPicks
   };
+};
+
 const populateMediaBrainBackground = (payload, result) => {
   setImmediate(async () => {
     try {
