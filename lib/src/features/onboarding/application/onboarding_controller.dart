@@ -37,7 +37,7 @@ class OnboardingState {
 }
 
 class OnboardingController extends Notifier<OnboardingState> {
-  final _aiService = CodaAiService();
+  CodaAiService get _aiService => ref.read(codaAiServiceProvider);
 
   @override
   OnboardingState build() {

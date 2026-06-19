@@ -95,7 +95,19 @@ class RecommendationResult {
   }
 }
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coda/src/core/providers/user_id_provider.dart';
+
+final recommendationServiceProvider = Provider<RecommendationService>((ref) {
+  final userId = ref.watch(userIdProvider);
+  return RecommendationService(userId: userId);
+});
+
 class RecommendationService {
+  final String userId;
+
+  RecommendationService({required this.userId});
+
   static String get _baseUrl => '${getApiBaseUrl()}/api/recommend';
 
   /// Fetches recommendations using the user's Living Memory and current environmental context
@@ -174,6 +186,7 @@ class RecommendationService {
     }
 
     final payload = {
+      'userId': userId,
       'core_identity': fullCoreIdentity,
       'recent_context': memory.recentContext,
       'guardrails': guardrails,
@@ -220,6 +233,7 @@ class RecommendationService {
     required String reason,
   }) async {
     final payload = {
+      'userId': userId,
       'current_memory': memory.toJson(),
       'recommendation_title': title,
       'media_type': mediaType,
@@ -272,6 +286,7 @@ class RecommendationService {
     final guardrails = memory.guardrails.join(', ');
 
     final payload = {
+      'userId': userId,
       'core_identity': fullCoreIdentity,
       'recent_context': memory.recentContext,
       'guardrails': guardrails,
@@ -310,6 +325,7 @@ class RecommendationService {
     required String userMessage,
   }) async {
     final payload = {
+      'userId': userId,
       'current_memory': memory.toJson(),
       'chat_history': chatHistory,
       'user_message': userMessage,
@@ -350,6 +366,7 @@ class RecommendationService {
     required String userMessage,
   }) async {
     final payload = {
+      'userId': userId,
       'current_memory': memory.toJson(),
       'title': title,
       'media_type': mediaType,
@@ -391,6 +408,7 @@ class RecommendationService {
     required String userMessage,
   }) async {
     final payload = {
+      'userId': userId,
       'current_memory': memory.toJson(),
       'title': title,
       'media_type': mediaType,

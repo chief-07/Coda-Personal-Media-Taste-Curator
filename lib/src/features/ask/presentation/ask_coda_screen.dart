@@ -411,7 +411,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
 
     try {
       final memory = ref.read(livingMemoryProvider);
-      final response = await RecommendationService().sendAskChatMessage(
+      final response = await ref.read(recommendationServiceProvider).sendAskChatMessage(
         memory: memory,
         chatHistory: chatHistory,
         userMessage: text,

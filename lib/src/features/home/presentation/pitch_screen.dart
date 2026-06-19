@@ -109,7 +109,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
     }).toList();
 
     try {
-      final response = await RecommendationService().discussRecommendation(
+      final response = await ref.read(recommendationServiceProvider).discussRecommendationWithRefinements(
         memory: ref.read(livingMemoryProvider),
         title: widget.recommendation.title,
         mediaType: widget.recommendation.mediaType.name,
@@ -119,9 +119,14 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
         userMessage: text,
       );
 
+      // If there are memory updates (like they loved a new aspect), apply them locally
+      if (response.memoryUpdates != null) {
+        ref.read(livingMemoryProvider.notifier).applyUpdates(response.memoryUpdates!);
+      }
+
       if (mounted) {
         setState(() {
-          _messages.add(_PitchChatMessage(text: response, isUser: false));
+          _messages.add(_PitchChatMessage(text: response.message, isUser: false));
           _isLoading = false;
         });
         _scrollToBottom();

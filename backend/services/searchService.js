@@ -203,6 +203,50 @@ const scrapeLetterboxdReviews = async (title, maxReviews = 5) => {
   }
 };
 
+/**
+ * Scrape the top 5 "Similar Films" from Letterboxd for a given title.
+ * @param {string} title 
+ * @returns {Array<{title, link}>}
+ */
+const scrapeLetterboxdSimilar = async (title) => {
+  try {
+    const slug = toLetterboxdSlug(title);
+    if (!slug) return [];
+
+    const url = `https://letterboxd.com/film/${slug}/similar/`;
+    console.log(`[Letterboxd Similar] Scraping similar films for: "${title}"`);
+
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': getRandomUserAgent(),
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      timeout: 5000
+    });
+
+    const $ = cheerio.load(response.data);
+    const similarFilms = [];
+
+    $('.film-poster').each((i, el) => {
+      if (similarFilms.length >= 5) return false;
+      const filmName = $(el).find('img').attr('alt') || $(el).attr('data-film-name');
+      const filmLink = $(el).attr('data-film-slug');
+      if (filmName && filmName.trim() && !similarFilms.find(f => f.title === filmName.trim())) {
+        similarFilms.push({
+          title: filmName.trim(),
+          link: filmLink ? `https://letterboxd.com/film/${filmLink}/` : url
+        });
+      }
+    });
+
+    console.log(`[Letterboxd Similar] ✅ Found ${similarFilms.length} similar films for "${title}"`);
+    return similarFilms;
+  } catch (e) {
+    console.warn(`[Letterboxd Similar] Failed for "${title}":`, e.message);
+    return [];
+  }
+};
+
 // ─────────────────────────────────────────────────
 // REDDIT OAUTH — reliable forum search + comment fetching
 // Requires REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET in .env
@@ -1124,6 +1168,7 @@ const fetchVNDBRecommendations = async (titles) => {
 
 const fetchAnimeMetadata = async (title) => {
   try {
+    // Full AniList query — score, year, studio, director, episodes, everything
     const gql = `
       query ($search: String) {
         Page(page: 1, perPage: 1) {
@@ -1134,6 +1179,19 @@ const fetchAnimeMetadata = async (title) => {
             genres
             tags { name rank }
             coverImage { large }
+            averageScore
+            popularity
+            episodes
+            duration
+            status
+            startDate { year }
+            studios(isMain: true) { nodes { name } }
+            staff(perPage: 5) {
+              edges {
+                role
+                node { name { full } }
+              }
+            }
           }
         }
       }
@@ -1147,13 +1205,30 @@ const fetchAnimeMetadata = async (title) => {
       const tags = (media.tags || [])
         .filter(t => t.rank > 60)
         .map(t => t.name)
-        .slice(0, 8);
+        .slice(0, 10);
+
+      // Extract director from staff
+      const directorEdge = (media.staff?.edges || []).find(e =>
+        e.role && (e.role.toLowerCase().includes('director') || e.role === 'Director')
+      );
+      const director = directorEdge?.node?.name?.full || null;
+
+      const studio = media.studios?.nodes?.[0]?.name || null;
+      const score = media.averageScore ? `${media.averageScore}/100 (AniList)` : null;
+
       return {
         title: media.title.english || media.title.romaji || title,
         genres: media.genres || [],
         tags: tags,
         description: (media.description || '').replace(/<[^>]*>/g, ''),
-        image: media.coverImage?.large || ''
+        image: media.coverImage?.large || '',
+        release_year: media.startDate?.year ? String(media.startDate.year) : '',
+        studio: studio || '',
+        director: director || '',
+        episodes: media.episodes || null,
+        score: score || '',
+        popularity: media.popularity || null,
+        status: media.status || ''
       };
     }
   } catch (err) {
@@ -1166,7 +1241,7 @@ const fetchVNMetadata = async (title) => {
   try {
     const body = {
       filters: ['search', '=', title],
-      fields: 'title, alttitle, rating, description, tags.name, tags.rating, platforms',
+      fields: 'title, alttitle, rating, votecount, description, tags.name, tags.rating, tags.category, platforms, released, developers.name, length_minutes',
       sort: 'searchrank',
       results: 1
     };
@@ -1182,14 +1257,24 @@ const fetchVNMetadata = async (title) => {
       const tags = (vn.tags || [])
         .filter(t => t.rating >= 1.5)
         .sort((a, b) => b.rating - a.rating)
-        .slice(0, 8)
+        .slice(0, 12)
         .map(t => t.name);
+
+      // VNDB rating is out of 100, votecount is number of community votes
+      const score = vn.rating ? `${(vn.rating / 10).toFixed(1)}/10 (VNDB, ${vn.votecount || 0} votes)` : null;
+      const developer = vn.developers?.[0]?.name || null;
+      const releaseYear = vn.released ? String(vn.released).substring(0, 4) : null;
+
       return {
         title: vn.title || vn.alttitle || title,
         genres: vn.platforms || [],
         tags: tags,
-        description: vn.description || '',
-        image: ''
+        description: (vn.description || '').replace(/\[url=.*?\]|\[\/url\]/g, '').replace(/\[.*?\]/g, ''),
+        image: '',
+        release_year: releaseYear || '',
+        studio: developer || '',
+        score: score || '',
+        length_minutes: vn.length_minutes || null
       };
     }
   } catch (err) {
@@ -1201,16 +1286,39 @@ const fetchVNMetadata = async (title) => {
 const fetchMovieMetadata = async (title) => {
   try {
     const apiKey = process.env.OMDB_API_KEY;
-    if (!apiKey) return null;
-    const res = await axios.get(`http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`, { timeout: 30000 });
+    if (!apiKey) {
+      console.warn(`[OMDb] No OMDB_API_KEY set. Get a free key at https://www.omdbapi.com/apikey.aspx and add OMDB_API_KEY=yourkey to assets/env.txt`);
+      return null;
+    }
+    const res = await axios.get(`http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}&plot=full`, { timeout: 30000 });
     if (res.data && res.data.Response === 'True') {
-      const genres = res.data.Genre ? res.data.Genre.split(',').map(g => g.trim()) : [];
+      const d = res.data;
+      const genres = d.Genre ? d.Genre.split(',').map(g => g.trim()) : [];
+
+      // Extract all ratings — IMDb, Rotten Tomatoes, Metacritic
+      const ratingsArr = d.Ratings || [];
+      const imdbRating = d.imdbRating && d.imdbRating !== 'N/A' ? `${d.imdbRating}/10 IMDb (${d.imdbVotes || '?'} votes)` : null;
+      const rtRating = ratingsArr.find(r => r.Source === 'Rotten Tomatoes');
+      const metacritic = ratingsArr.find(r => r.Source === 'Metacritic');
+
+      const scoresArr = [imdbRating, rtRating ? `${rtRating.Value} Rotten Tomatoes` : null, metacritic ? `${metacritic.Value} Metacritic` : null].filter(Boolean);
+
+      // Cast: first 5 names
+      const cast = d.Actors && d.Actors !== 'N/A' ? d.Actors.split(',').map(a => a.trim()).slice(0, 5) : [];
+
       return {
-        title: res.data.Title || title,
+        title: d.Title || title,
         genres: genres,
-        tags: res.data.Type ? [res.data.Type] : [],
-        description: res.data.Plot || '',
-        image: res.data.Poster && res.data.Poster !== 'N/A' ? res.data.Poster : ''
+        tags: [d.Type, d.Rated].filter(t => t && t !== 'N/A'),
+        description: d.Plot && d.Plot !== 'N/A' ? d.Plot : '',
+        image: d.Poster && d.Poster !== 'N/A' ? d.Poster : '',
+        release_year: d.Year && d.Year !== 'N/A' ? d.Year.substring(0, 4) : '',
+        director: d.Director && d.Director !== 'N/A' ? d.Director : '',
+        writer: d.Writer && d.Writer !== 'N/A' ? d.Writer : '',
+        cast: cast,
+        runtime: d.Runtime && d.Runtime !== 'N/A' ? d.Runtime : '',
+        score: scoresArr.join(' | '),
+        awards: d.Awards && d.Awards !== 'N/A' ? d.Awards : ''
       };
     }
   } catch (err) {
@@ -1220,39 +1328,48 @@ const fetchMovieMetadata = async (title) => {
 };
 
 const fetchBookMetadata = async (title) => {
-  // Try iTunes first (fast and unblocked)
+  // Primary: Google Books — has author, year, rating, description, page count
   try {
-    const res = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(title)}&media=ebook&limit=1`, { timeout: 15000 });
-    const book = res.data?.results?.[0];
-    if (book) {
-      const genres = book.genres ? book.genres.filter(g => g !== 'Books') : [];
-      return {
-        title: book.trackName || title,
-        genres: genres,
-        tags: [],
-        description: book.description || '',
-        image: book.artworkUrl100?.replace('100x100bb', '600x900bb') || ''
-      };
-    }
-  } catch (err) {
-    console.warn(`[iTunes Book Metadata Lookup failed for "${title}"]:`, err.message);
-  }
-
-  // Fallback to Google Books
-  try {
-    const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(title)}&maxResults=1`, { timeout: 15000 });
+    const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(title)}&maxResults=1&printType=books`, { timeout: 15000 });
     const book = res.data?.items?.[0]?.volumeInfo;
     if (book) {
+      const authors = book.authors || [];
+      const rating = book.averageRating ? `${book.averageRating}/5 (${book.ratingsCount || 0} Google Books ratings)` : null;
       return {
         title: book.title || title,
         genres: book.categories || [],
         tags: [],
         description: book.description || '',
-        image: book.imageLinks?.thumbnail || ''
+        image: book.imageLinks?.thumbnail?.replace('http://', 'https://') || '',
+        release_year: book.publishedDate ? book.publishedDate.substring(0, 4) : '',
+        studio: authors.join(', '),   // 'studio' field reused for author
+        director: authors[0] || '',   // primary author
+        cast: authors,
+        score: rating || '',
+        page_count: book.pageCount || null
       };
     }
   } catch (err) {
     console.warn(`[Google Books Metadata Lookup failed for "${title}"]:`, err.message);
+  }
+
+  // Fallback: iTunes ebooks
+  try {
+    const res = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(title)}&media=ebook&limit=1`, { timeout: 15000 });
+    const book = res.data?.results?.[0];
+    if (book) {
+      return {
+        title: book.trackName || title,
+        genres: (book.genres || []).filter(g => g !== 'Books'),
+        tags: [],
+        description: book.description || '',
+        image: book.artworkUrl100?.replace('100x100bb', '600x900bb') || '',
+        studio: book.artistName || '',
+        director: book.artistName || ''
+      };
+    }
+  } catch (err) {
+    console.warn(`[iTunes Book Metadata Lookup failed for "${title}"]:`, err.message);
   }
   return null;
 };
@@ -1282,20 +1399,47 @@ const fetchGameMetadata = async (title) => {
 
 const fetchMangaMetadata = async (title) => {
   try {
-    const res = await axios.get(`https://api.mangadex.org/manga?title=${encodeURIComponent(title)}&limit=1&includes[]=cover_art`, { timeout: 30000 });
+    const res = await axios.get(
+      `https://api.mangadex.org/manga?title=${encodeURIComponent(title)}&limit=1&includes[]=cover_art&includes[]=author&includes[]=artist`,
+      { timeout: 30000 }
+    );
     const manga = res.data?.data?.[0];
     if (manga) {
-      const titleName = manga.attributes.title.en || Object.values(manga.attributes.title)[0] || title;
-      const tags = manga.attributes.tags.map(t => t.attributes.name.en);
-      const coverRel = manga.relationships.find(r => r.type === 'cover_art');
-      const coverFileName = coverRel?.attributes?.fileName;
-      const coverUrl = coverFileName ? `https://uploads.mangadex.org/covers/${manga.id}/${coverFileName}` : '';
+      const attr = manga.attributes;
+      const titleName = attr.title.en || Object.values(attr.title)[0] || title;
+
+      // Content/theme tags
+      const tags = attr.tags.map(t => t.attributes.name.en).filter(Boolean);
+
+      // Content ratings & status
+      const status = attr.status || '';
+      const year = attr.year ? String(attr.year) : '';
+
+      // MangaDex Bayesian rating (0-10 scale)
+      const ratingVal = attr.rating?.bayesian ? `${attr.rating.bayesian.toFixed(2)}/10 (MangaDex)` : null;
+
+      // Relationships: author, artist, cover
+      const rels = manga.relationships || [];
+      const authors = rels
+        .filter(r => r.type === 'author' && r.attributes?.name)
+        .map(r => r.attributes.name);
+      const coverRel = rels.find(r => r.type === 'cover_art');
+      const coverUrl = coverRel?.attributes?.fileName
+        ? `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}`
+        : '';
+
       return {
         title: titleName,
-        genres: [],
+        genres: attr.publicationDemographic ? [attr.publicationDemographic] : [],
         tags: tags,
-        description: manga.attributes.description?.en || '',
-        image: coverUrl
+        description: attr.description?.en || '',
+        image: coverUrl,
+        release_year: year,
+        studio: authors.join(', '),   // 'studio' reused for author
+        director: authors[0] || '',   // primary author
+        cast: authors,
+        score: ratingVal || '',
+        status: status
       };
     }
   } catch (err) {
@@ -1304,10 +1448,77 @@ const fetchMangaMetadata = async (title) => {
   return null;
 };
 
+const fetchMALMetadata = async (title) => {
+  try {
+    const searchRes = await axios.get(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}&limit=1`, { timeout: 30000 });
+    const anime = searchRes.data?.data?.[0];
+    if (anime) {
+      return {
+        title: anime.title_english || anime.title || title,
+        genres: anime.genres ? anime.genres.map(g => g.name) : [],
+        tags: anime.themes ? anime.themes.map(t => t.name) : [],
+        description: anime.synopsis || '',
+        image: anime.images?.jpg?.large_image_url || '',
+        release_year: anime.year ? String(anime.year) : (anime.aired?.prop?.from?.year ? String(anime.aired.prop.from.year) : ''),
+        studio: anime.studios && anime.studios.length > 0 ? anime.studios[0].name : '',
+        score: anime.score ? `${anime.score}/10 (MAL)` : '',
+        episodes: anime.episodes || null,
+        status: anime.status || ''
+      };
+    }
+  } catch (err) {
+    console.warn(`[MAL Metadata Lookup failed for "${title}"]:`, err.message);
+  }
+  return null;
+};
+
+const fetchWikipediaData = async (title, mediaType) => {
+  try {
+    let searchType = '';
+    if (mediaType === 'movie' || mediaType === 'tv') searchType = ' film';
+    else if (mediaType === 'anime') searchType = ' anime';
+    else if (mediaType === 'visual novel') searchType = ' visual novel';
+    else if (mediaType === 'book') searchType = ' novel';
+    else if (mediaType === 'game') searchType = ' game';
+
+    const searchQuery = `${title}${searchType}`;
+    console.log(`[Wikipedia] Searching for: "${searchQuery}"`);
+    
+    const searchRes = await axios.get(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&utf8=&format=json`, { 
+      timeout: 15000,
+      headers: { 'User-Agent': 'CodaRecommendationsBot/1.0 (contact@example.com)' }
+    });
+    const pages = searchRes.data?.query?.search;
+    if (!pages || pages.length === 0) return [];
+
+    const pageTitle = pages[0].title;
+    
+    const contentRes = await axios.get(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(pageTitle)}&format=json`, { 
+      timeout: 15000,
+      headers: { 'User-Agent': 'CodaRecommendationsBot/1.0 (contact@example.com)' }
+    });
+    const pagesData = contentRes.data?.query?.pages;
+    const pageId = Object.keys(pagesData)[0];
+    const extract = pagesData[pageId]?.extract || '';
+
+    if (extract.length > 50) {
+      console.log(`[Wikipedia] ✅ Got synopsis for "${pageTitle}"`);
+      return [{
+        title: `Wikipedia: ${pageTitle}`,
+        snippet: `[Wikipedia Synopsis] ${extract.substring(0, 1500).trim()}`,
+        link: `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`
+      }];
+    }
+  } catch (err) {
+    console.warn(`[Wikipedia Fetch failed for "${title}"]:`, err.message);
+  }
+  return [];
+};
+
 const fetchMetadataForCandidate = async (title, mediaType) => {
   const normType = (mediaType || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
   if (normType === 'anime') {
-    return await fetchAnimeMetadata(title);
+    return await fetchMALMetadata(title);
   } else if (normType === 'visual novel' || normType === 'visualnovel') {
     return await fetchVNMetadata(title);
   } else if (normType === 'movie' || normType === 'tv') {
@@ -1325,6 +1536,7 @@ const fetchMetadataForCandidate = async (title, mediaType) => {
 module.exports = {
   scrapeForums,
   scrapeLetterboxdReviews,
+  scrapeLetterboxdSimilar,
   toLetterboxdSlug,
   fetchMALRecommendations,
   fetchMALReviews,
@@ -1333,5 +1545,7 @@ module.exports = {
   fetchAniListRecommendations,
   fetchVNDBSnippets,
   fetchVNDBRecommendations,
-  fetchMetadataForCandidate
+  fetchMetadataForCandidate,
+  fetchWikipediaData,
+  fetchMALMetadata
 };

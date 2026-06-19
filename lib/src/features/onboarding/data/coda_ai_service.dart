@@ -28,7 +28,19 @@ class GroqResponse {
   }
 }
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coda/src/core/providers/user_id_provider.dart';
+
+final codaAiServiceProvider = Provider<CodaAiService>((ref) {
+  final userId = ref.watch(userIdProvider);
+  return CodaAiService(userId: userId);
+});
+
 class CodaAiService {
+  final String userId;
+
+  CodaAiService({required this.userId});
+
   static const String _baseUrl = 'https://api.openai.com/v1/chat/completions';
 
   String _buildSystemPrompt(List<String> currentChips) {
@@ -149,6 +161,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
     };
 
     final body = jsonEncode({
+      'userId': userId,
       'userMessage': userMessage,
       'tabName': tabName,
       'isLastTab': isLastTab,
@@ -190,6 +203,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
     };
 
     final body = jsonEncode({
+      'userId': userId,
       'chatHistory': chatHistory.map((msg) => {
         'isUser': msg.isUser,
         'text': msg.text ?? "",
@@ -222,6 +236,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
     };
 
     final body = jsonEncode({
+      'userId': userId,
       'currentMemory': currentMemory.toJson(),
     });
 

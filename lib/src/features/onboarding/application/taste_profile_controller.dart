@@ -41,7 +41,7 @@ class TasteProfileState {
 }
 
 class TasteProfileController extends Notifier<TasteProfileState> {
-  final _aiService = CodaAiService();
+  CodaAiService get _aiService => ref.read(codaAiServiceProvider);
 
   @override
   TasteProfileState build() {

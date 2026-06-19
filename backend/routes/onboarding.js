@@ -3,6 +3,7 @@ const router = express.Router();
 const { runOnboardingAgent, runFormatsExtraction } = require('../services/onboardingAgent');
 const { harmonizeMemory, harmonizeAllMemory } = require('../services/llmService');
 const loggerService = require('../services/loggerService');
+const userSoulService = require('../services/userSoulService');
 
 
 const buildTasteProfileSystemPrompt = (tabName, isLastTab, selectedCategories = []) => {
@@ -152,6 +153,11 @@ router.post('/harmonize', async (req, res) => {
       outputMemory: harmonized
     });
 
+    const userId = req.body.userId;
+    if (userId) {
+      await userSoulService.syncLivingMemory(userId, harmonized);
+    }
+
     res.json(harmonized);
   } catch (e) {
     console.error("[Harmonize Route Error]:", e);
@@ -162,13 +168,48 @@ router.post('/harmonize', async (req, res) => {
 
 router.post('/harmonize_all', async (req, res) => {
   try {
-    const { currentMemory } = req.body;
+    const { currentMemory, userId } = req.body;
     const harmonized = await harmonizeAllMemory(currentMemory);
+    
+    // ── FAIL 1+2 FIX: Properly merge delta into full memory so soul_graph is carried through ──
+    const mergedMemory = {
+      ...currentMemory,
+      // Apply overwrite fields from harmonizer
+      globalIdentity: harmonized.global_identity_overwrite || currentMemory?.globalIdentity || [],
+      categoryProfiles: harmonized.category_profiles_overwrite || currentMemory?.categoryProfiles || {},
+      // Carry structured soul_graph — NOT stringified
+      soul_graph: harmonized.soul_graph || currentMemory?.soul_graph || null,
+      // Preserve all other existing fields
+      guardrails: currentMemory?.guardrails || [],
+      media_reflections: currentMemory?.media_reflections || [],
+      seen: currentMemory?.seen || [],
+      notForMe: currentMemory?.notForMe || [],
+      watchlist: currentMemory?.watchlist || [],
+      recentContext: currentMemory?.recentContext || '',
+    };
+
+    if (userId) {
+      await userSoulService.syncLivingMemory(userId, mergedMemory);
+      
+      // Dynamic Vibe Crawling (Fire & Forget)
+      const { extractLovedTitles } = require('../services/llmService');
+      const mediaEnrichmentService = require('../services/mediaEnrichmentService');
+      
+      const lovedTitles = extractLovedTitles(mergedMemory);
+      if (lovedTitles.length > 0) {
+        console.log(`[Onboarding] Triggering background enrichment for Loved Titles:`, lovedTitles);
+        Promise.all(lovedTitles.map(title => {
+          return mediaEnrichmentService.enrichTitleAndNeighbors(title, 'movie');
+        })).catch(e => console.error("Background enrichment failed:", e));
+      }
+    }
+
     res.json(harmonized);
   } catch (e) {
     console.error("[Harmonize All Route Error]:", e);
     res.json({});
   }
 });
+
 
 module.exports = router;

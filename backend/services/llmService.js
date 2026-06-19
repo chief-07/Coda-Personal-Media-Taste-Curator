@@ -864,10 +864,52 @@ Respond ONLY with a JSON object:
 
   const parsedResponse = JSON.parse(response);
 
-  // Serialize soul graph to global_identity_overwrite
+  // ── FAIL 1 FIX: Keep Soul Graph as structured data, derive readable identity lines ──
   if (parsedResponse.soul_graph) {
-    parsedResponse.global_identity_overwrite = [JSON.stringify(parsedResponse.soul_graph)];
-    delete parsedResponse.soul_graph;
+    const sg = parsedResponse.soul_graph;
+    const identityLines = [];
+
+    if (sg.demographics?.stage_in_life) {
+      identityLines.push(`Life stage: ${sg.demographics.stage_in_life}`);
+    }
+    if (sg.demographics?.struggles?.length > 0) {
+      identityLines.push(`Core struggles: ${sg.demographics.struggles.join(', ')}`);
+    }
+    if (sg.emotional_resonances) {
+      const sorted = Object.entries(sg.emotional_resonances)
+        .sort((a, b) => b[1] - a[1]);
+      identityLines.push(`Emotional resonances: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+    }
+    if (sg.aesthetic_affinities) {
+      const sorted = Object.entries(sg.aesthetic_affinities)
+        .sort((a, b) => b[1] - a[1]);
+      identityLines.push(`Aesthetic affinities: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+    }
+    if (sg.creative_anchors) {
+      for (const [type, anchors] of Object.entries(sg.creative_anchors)) {
+        if (anchors && typeof anchors === 'object') {
+          const sorted = Object.entries(anchors).sort((a, b) => b[1] - a[1]);
+          if (sorted.length > 0) {
+            identityLines.push(`${type}: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+          }
+        }
+      }
+    }
+    if (sg.themes) {
+      const sorted = Object.entries(sg.themes).sort((a, b) => b[1] - a[1]);
+      identityLines.push(`Themes: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+    }
+    if (sg.pacing_preference) {
+      const sorted = Object.entries(sg.pacing_preference).sort((a, b) => b[1] - a[1]);
+      identityLines.push(`Pacing preference: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+    }
+    if (sg.guardrails?.length > 0) {
+      identityLines.push(`Guardrails: ${sg.guardrails.join(', ')}`);
+    }
+
+    // Store readable lines for globalIdentity AND keep raw soul_graph as structured field
+    parsedResponse.global_identity_overwrite = identityLines;
+    // soul_graph stays as a structured object — NOT deleted
   }
 
   // Log the global harmonization pass
@@ -881,6 +923,8 @@ Respond ONLY with a JSON object:
 
   return parsedResponse;
 };
+
+
 
 const refineTasteFromFeedback = async (currentMemory, title, mediaType, reason) => {
   const systemPrompt = `
@@ -993,6 +1037,7 @@ Your job is to talk with the user about "${title}":
 5. Analyze the conversation history and the user's new message to identify if they express new tastes, likes/dislikes, or dealbreakers/guardrails:
    - Extract these new preference statements into the "memory_updates" JSON object.
    - For example: if they say "I hate visual novels with bad endings", add "No visual novels with bad endings" to "guardrails_appends".
+   - CRITICAL: If the user explicitly states they loved or hated this media and provides a reason, summarize their subjective review into ONE sentence and add it to "media_reflections_appends" (e.g. "[Media Name]: Loved the dark aesthetic but hated the slow pacing").
    - Valid category keys in "category_appends" are: "anime", "movies", "tv_shows", "visual_novels", "books", "games", "manga", "youtube", "music".
 6. Generate or update a "one_line_summary" summarizing their overall experience with this media so far based on their chat responses (e.g. "Loved the characters but felt the pacing dragged in the middle", or "Cried for three days straight at the ending").
 
@@ -1006,7 +1051,10 @@ Respond ONLY with a JSON object:
       "media_type_key": ["Any new media type specific preferences if applicable"]
     },
     "recent_context_overwrite": "Any new active direction if applicable",
-    "guardrails_appends": ["Any new negative dealbreakers if applicable"]
+    "guardrails_appends": ["Any new negative dealbreakers if applicable"],
+    "media_reflections_appends": ["One-sentence subjective review of this media if provided"],
+    "seen_appends": ["Title of this media if they indicated they finished or saw it"],
+    "not_for_me_appends": ["Title of this media if they explicitly hated or dropped it"]
   }
 }
 `;
@@ -1545,6 +1593,212 @@ Respond with ONLY a JSON object:
   }
 };
 
+const generateMediaDescription = async (mediaData) => {
+  const systemPrompt = `
+You are the Coda Media Librarian. Your job is to perform a deep, exhaustive psychological and aesthetic extraction of a piece of media to power our "Media Brain" vector database.
+
+You will receive a JSON object with:
+- title + media_type: what the work is
+- structured_data: genre tags, synopsis, studio/director/author info, ratings, release year, cast, and country of origin.
+- community_snippets: real text from reviews and forum discussions by actual fans
+
+Your job is to synthesize this into a highly structured JSON object capturing every "face" of the media.
+Do NOT just use single words. Write dense, descriptive, emotionally honest sentences that truly capture the atmosphere and soul of the work. You MUST capture the deep lore, setting, subculture, and pacing dynamics.
+
+Extract these exact 12 fields (as detailed string values):
+1. "metadata_synthesis": The country/region (Japanese, Korean, etc.), release year, director/author, and studio, woven into a short cultural context.
+2. "setting_and_subculture": The physical and cultural setting of the media. BE EXPLICIT. (e.g., "Early 2010s Akihabara otaku culture", "Late 1960s Tokyo student protests", "A dystopian cyberpunk slum").
+3. "visual_tone_and_feel": Deeply describe the aesthetic, visual tone, and feel (e.g., gritty, neon-drenched, cozy, muted, surreal). Capture the actual atmosphere and vibe, not just a single word.
+4. "media_era_tone": The cultural footprint and era (e.g., gritty 90s detective, early 2000s cyber-angst).
+5. "pacing_and_structure": How the pacing structurally functions. Be specific about pacing shifts! (e.g., "A slow slice-of-life start designed to build deep character attachment before rapidly escalating into a high-stakes psychological thriller").
+6. "atmosphere_and_mood": The overarching mood and emotional weather (e.g., suffocating tension, dreamlike and melancholic, fast-paced and chaotic).
+7. "themes_and_messages": What the media actually conveys, the underlying psychological or philosophical messages.
+8. "character_relationships": The interpersonal dynamics. Romantic dynamics, toxic vs healing, found-family, supporting cast dynamics.
+9. "lead_character_type": Who is the protagonist? (e.g., an unreliable narrator, burnt-out detective, overly optimistic dreamer).
+10. "story_and_plot_type": The narrative structure (e.g., non-linear mystery, character-study, epic sprawling journey).
+11. "who_and_when": The Viewing Context. Do not be too direct (don't say "Watch this when..."). Instead, describe "the type of soul this should be for" and the specific life situation or emotional state (e.g., "For a soul feeling completely lost in their early 20s," or "For someone mourning a missed connection late at night.").
+12. "emotional_evocation": A raw, visceral description of what this media actually does to a person emotionally, drawn directly from the human consensus in the community snippets. Not an academic description, but the actual feeling it provokes (e.g., "Leaves you feeling utterly hollow and staring at the ceiling for an hour," or "A warm, healing blanket of a story that makes you appreciate the little things in life.").
+
+Return ONLY a JSON object with these 12 exact keys.
+`;
+
+  const userPrompt = JSON.stringify(mediaData, null, 2);
+
+  const responseJson = await callOpenAI([
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt }
+  ], { type: 'json_object' });
+
+  let parsed;
+  try {
+    parsed = JSON.parse(responseJson);
+  } catch(e) {
+    parsed = { error: "Failed to parse JSON" };
+  }
+
+  const stockGenres = mediaData.structured_data?.genres ? mediaData.structured_data.genres.join(', ') : 'None';
+  const stockTags = mediaData.structured_data?.tags ? mediaData.structured_data.tags.join(', ') : 'None';
+  const stockRelease = mediaData.structured_data?.release_year || 'Unknown';
+
+  // Flatten the rich JSON into a dense string payload for the embedding
+  const semanticDescription = `
+[Stock Metadata]: Genres: ${stockGenres} | Tags: ${stockTags} | Release: ${stockRelease}
+[Metadata & Cultural Context]: ${parsed.metadata_synthesis || ''}
+[Setting & Subculture]: ${parsed.setting_and_subculture || ''}
+[Visual Tone & Feel]: ${parsed.visual_tone_and_feel || ''}
+[Media Era Tone]: ${parsed.media_era_tone || ''}
+[Pacing & Structure]: ${parsed.pacing_and_structure || ''}
+[Atmosphere & Mood]: ${parsed.atmosphere_and_mood || ''}
+[Themes & Messages]: ${parsed.themes_and_messages || ''}
+[Character Relationships]: ${parsed.character_relationships || ''}
+[Lead Character Type]: ${parsed.lead_character_type || ''}
+[Story & Plot Type]: ${parsed.story_and_plot_type || ''}
+[Who & When (The Soul Match)]: ${parsed.who_and_when || ''}
+[Emotional Evocation (Consensus)]: ${parsed.emotional_evocation || ''}
+  `.trim();
+
+  return semanticDescription;
+};
+
+const synthesizeSearchBrief = async (soul, requestedMediaType) => {
+  // Extract the structured Soul Graph if available — surface float weights explicitly
+  const soulGraph = soul.permanent_soul?.soul_graph || null;
+  const soulGraphSection = soulGraph ? `
+SOUL GRAPH (structured weighted dimensions — higher score = stronger affinity):
+${JSON.stringify(soulGraph, null, 2)}
+
+Use these weights directly. The highest-scoring emotional resonances and aesthetic affinities should dominate your facet choice and search brief.
+` : '';
+
+  // ── FAIL 11 FIX: Surface recently targeted vibes so the LLM drifts away from them ──
+  const recentVibes = soul.transient_memory?.recentVibes || [];
+  const rotationSection = recentVibes.length > 0 ? `
+RECENTLY TARGETED FACETS (avoid repeating these same zones — drift to different corners of the user's profile):
+${recentVibes.map((v, i) => `${i + 1}. ${v}`).join('\n')}
+` : '';
+
+  const systemPrompt = `
+You are the Coda Recommendation Brain.
+The user is asking for a recommendation in the category: "${requestedMediaType}".
+
+Review their Permanent Soul Identity, their Transient Session Memory (recent context/cravings), and their Soul Graph weighted dimensions.
+
+Your job has TWO distinct steps:
+
+STEP 1 — DECLARE a selected_vibe_focus:
+Choose ONE specific facet, feeling, or atmosphere to consciously target from this user's totality. Be specific and evocative. Examples of good declarations:
+- "A dreamy existential thriller from 2000s Japan with beautiful emotional underpinning and a psychologically fractured protagonist"
+- "A warm found-family slice-of-life with a bittersweet ending that quietly guts you"
+- "A gritty French satire with dark humour and moral ambiguity baked into every scene"
+This declared facet must be authentic to the user's soul. It can draw from:
+- Their highest-scoring soul graph dimensions (emotional_resonances, aesthetic_affinities, creative_anchors, themes)
+- Their current transient recentContext if active (PRIORITY — honour this first if present)
+- An underserved facet of their profile to add variety
+${rotationSection}
+DO NOT always target the same cluster — deliberately drift across the full totality of the user's profile.
+
+STEP 2 — WRITE the search_brief:
+A single, potent paragraph describing the EXACT emotional, aesthetic, and thematic vibe of the media they need RIGHT NOW, written entirely from the perspective of your declared vibe focus.
+This paragraph will be embedded as a vector to search the Media Brain — make it dense, evocative, and specific.
+Do NOT mention the user. Describe the media itself.
+${soulGraphSection}
+
+Return ONLY a JSON object:
+{ "selected_vibe_focus": "The declared facet", "search_brief": "The dense paragraph here" }
+`;
+
+  const userPrompt = JSON.stringify(soul, null, 2);
+
+  const responseJson = await callOpenAI([
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt }
+  ], { type: 'json_object' });
+
+  const parsed = JSON.parse(responseJson);
+  return {
+    selected_vibe_focus: parsed.selected_vibe_focus || '',
+    search_brief: parsed.search_brief || ''
+  };
+};
+
+
+const evaluateCandidates = async (candidates, soul, selectedVibeFocus = '') => {
+  const vibeFocusSection = selectedVibeFocus
+    ? `\nDECLARED VIBE FOCUS FOR THIS RUN: "${selectedVibeFocus}"\nThis is the specific facet you are targeting today. All candidates must be judged primarily against this declared focus. Your top pick MUST honour this focus. Ground the pitch in how this title delivers this exact feeling.`
+    : '';
+
+  // Pull the user's loved works from the soul for comparison logic
+  const lovedWorks = [];
+  try {
+    const llmSvc = require('./llmService');
+    if (llmSvc.extractLovedTitles) {
+      const merged = { ...(soul.permanent_soul || {}), ...(soul.transient_memory || {}) };
+      lovedWorks.push(...llmSvc.extractLovedTitles(merged));
+    }
+  } catch(e) {}
+  const lovedWorksSection = lovedWorks.length > 0
+    ? `\nUSER'S KNOWN LOVED WORKS: ${lovedWorks.join(', ')}`
+    : '';
+
+  const systemPrompt = `
+You are the Coda Editorial Director.
+You have ${candidates.length} media candidates from the vector database, the user's Soul Identity, and their current Active State.
+${vibeFocusSection}
+${lovedWorksSection}
+
+PRIORITY ORDER for evaluation:
+1. FIRST: Honour the user's Transient recentContext if active — this overrides permanent preferences
+2. SECOND: Target the declared vibe focus for this run
+3. THIRD: Use the permanent soul as background and personality grounding
+4. FOURTH: Apply guardrails as hard disqualifiers
+
+Each candidate's "semantic_description" contains these labelled sections — use them to ground your evaluation:
+- [Emotional Evocation]: the raw emotional truth of how this work actually makes people feel
+- [Who & When]: the life situation and emotional state it's best suited for
+- [Atmosphere & Mood], [Visual Tone & Feel], [Pacing & Structure]: the aesthetic fingerprint
+
+── PITCH RULES (for top_pick pitch_paragraphs) ──
+- Write 2-3 paragraphs as a passionate friend who has personally consumed this work
+- Use [Emotional Evocation] and [Who & When] from the candidate data to ground the pitch in real emotional truth — not generic praise
+- COMPARISON RULE: If the top pick is a genuine, undeniable stylistic sibling to one of the user's Loved Works, explicitly name that loved work and draw the comparison. If it is NOT a genuine sibling, do NOT force a comparison.
+- BANNED WORDS (any variation): "resonate", "narrative", "themes", "vibe", "explore", "element", "aspect", "profound", "delve", "aligns", "complexity", "emotional depth", "character-driven", "thematic"
+- No critic jargon. Talk about specific characters, moments, and feelings — not abstract qualities.
+
+Also write a "coda_blurb" for the top pick: one punchy, conversational sentence (max 12 words) as a personal conviction — e.g. "I promise you'll be staring at the ceiling after this one."
+
+Return ONLY a JSON object:
+{
+  "top_pick": {
+    "id": "uuid of the selected candidate",
+    "coda_blurb": "One punchy sentence max 12 words",
+    "pitch_paragraphs": ["Paragraph 1", "Paragraph 2"]
+  },
+  "runner_ups": [
+    "uuid of runner up 1",
+    "uuid of runner up 2"
+  ]
+}
+`;
+
+  const userPrompt = JSON.stringify({
+    user_soul: soul,
+    candidates: candidates.map(c => ({
+      id: c.id,
+      title: c.payload.title,
+      media_type: c.payload.media_type,
+      genres: c.payload.genres,
+      semantic_description: c.payload.semantic_description
+    }))
+  }, null, 2);
+
+  const responseJson = await callOpenAI([
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt }
+  ], { type: 'json_object' });
+
+  return JSON.parse(responseJson);
+};
+
 module.exports = {
   callOpenAI,
   synthesizeAndRoute,
@@ -1564,5 +1818,9 @@ module.exports = {
   generateUserSoulGraph,
   extractMediaDNA,
   evaluateCandidateResonance,
-  synthesizeTargetSessionDNA
+  synthesizeTargetSessionDNA,
+  generateMediaDescription,
+  synthesizeSearchBrief,
+  evaluateCandidates,
+  extractLovedTitles
 };

@@ -64,9 +64,7 @@ final activeMediaTypesProvider = Provider<List<MediaType>>((ref) {
   }).toSet().toList();
 });
 
-final recommendationServiceProvider = Provider<RecommendationService>((ref) {
-  return RecommendationService();
-});
+
 
 class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
   final Map<MediaType, Recommendation?> _activePicks = {};

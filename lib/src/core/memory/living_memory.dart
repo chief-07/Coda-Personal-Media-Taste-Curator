@@ -59,6 +59,7 @@ class LivingMemory {
   final Map<String, List<String>> categoryProfiles;
   final String recentContext;
   final List<String> guardrails;
+  final List<String> mediaReflections;
   final List<String> seen;
   final List<String> notForMe;
   final List<WatchlistItem> watchlist;
@@ -80,6 +81,7 @@ class LivingMemory {
     required this.categoryProfiles,
     required this.recentContext,
     required this.guardrails,
+    required this.mediaReflections,
     required this.seen,
     required this.notForMe,
     required this.watchlist,
@@ -91,6 +93,7 @@ class LivingMemory {
       categoryProfiles: {},
       recentContext: '',
       guardrails: [],
+      mediaReflections: [],
       seen: [],
       notForMe: [],
       watchlist: [],
@@ -102,6 +105,7 @@ class LivingMemory {
         'categoryProfiles': categoryProfiles,
         'recentContext': recentContext,
         'guardrails': guardrails,
+        'media_reflections': mediaReflections,
         'seen': seen,
         'notForMe': notForMe,
         'watchlist': watchlist.map((e) => e.toJson()).toList(),
@@ -116,6 +120,7 @@ class LivingMemory {
           {},
       recentContext: json['recentContext'] as String? ?? '',
       guardrails: List<String>.from(json['guardrails'] ?? []),
+      mediaReflections: List<String>.from(json['media_reflections'] ?? []),
       seen: List<String>.from(json['seen'] ?? []),
       notForMe: List<String>.from(json['notForMe'] ?? json['not_for_me'] ?? []),
       watchlist: (json['watchlist'] as List<dynamic>?)
@@ -131,6 +136,7 @@ class MemoryUpdates {
   final Map<String, List<String>> categoryAppends;
   final String? recentContextOverwrite;
   final List<String> guardrailsAppends;
+  final List<String> mediaReflectionsAppends;
   final List<String>? globalIdentityOverwrite;
   final Map<String, List<String>>? categoryProfilesOverwrite;
   final List<String> seenAppends;
@@ -143,6 +149,7 @@ class MemoryUpdates {
     this.categoryAppends = const {},
     this.recentContextOverwrite,
     this.guardrailsAppends = const [],
+    this.mediaReflectionsAppends = const [],
     this.globalIdentityOverwrite,
     this.categoryProfilesOverwrite,
     this.seenAppends = const [],
@@ -153,12 +160,14 @@ class MemoryUpdates {
 
   factory MemoryUpdates.fromJson(Map<String, dynamic> json) {
     return MemoryUpdates(
-      globalIdentityAppends: List<String>.from(json['global_identity_appends'] ?? []),
-      categoryAppends: (json['category_appends'] as Map<String, dynamic>?)?.map(
+      globalIdentityAppends: List<String>.from(json['globalIdentityAppends'] ?? json['global_identity_appends'] ?? []),
+      categoryAppends: (json['categoryAppends'] ?? json['category_appends'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry(k, List<String>.from(e)),
-          ) ?? {},
-      recentContextOverwrite: json['recent_context_overwrite'] as String?,
-      guardrailsAppends: List<String>.from(json['guardrails_appends'] ?? []),
+          ) ??
+          {},
+      recentContextOverwrite: json['recentContextOverwrite'] as String? ?? json['recent_context_overwrite'] as String?,
+      guardrailsAppends: List<String>.from(json['guardrailsAppends'] ?? json['guardrails_appends'] ?? []),
+      mediaReflectionsAppends: List<String>.from(json['mediaReflectionsAppends'] ?? json['media_reflections_appends'] ?? []),
       globalIdentityOverwrite: json['global_identity_overwrite'] != null
           ? List<String>.from(json['global_identity_overwrite'])
           : null,
@@ -244,6 +253,12 @@ class LivingMemoryRepository {
       if (!newGuardrails.contains(u)) newGuardrails.add(u);
     }
 
+    // 4.5. Append Media Reflections
+    final newMediaReflections = List<String>.from(current.mediaReflections);
+    for (var u in updates.mediaReflectionsAppends) {
+      if (!newMediaReflections.contains(u)) newMediaReflections.add(u);
+    }
+
     // 5. Append Seen Items
     final newSeen = List<String>.from(current.seen);
     for (var u in updates.seenAppends) {
@@ -272,6 +287,7 @@ class LivingMemoryRepository {
       categoryProfiles: newCategory,
       recentContext: newRecent,
       guardrails: newGuardrails,
+      mediaReflections: newMediaReflections,
       seen: newSeen,
       notForMe: newNotForMe,
       watchlist: newWatchlist,

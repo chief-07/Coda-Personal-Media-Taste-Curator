@@ -17,6 +17,10 @@ const projectRoot = path.join(__dirname, '..');
 const envPath = path.join(projectRoot, 'assets', '.env');
 dotenv.config({ path: envPath });
 
+// Initialize database connections
+const qdrantService = require('./services/qdrantService');
+qdrantService.init();
+
 const app = express();
 
 // Middleware
@@ -28,10 +32,12 @@ const chatRoute = require('./routes/chat');
 const recommendRoute = require('./routes/recommend');
 const onboardingRoute = require('./routes/onboarding');
 const detectRoute = require('./routes/detect');
+const visualizeRoute = require('./routes/visualize');
 app.use('/api/openai', chatRoute);
 app.use('/api/recommend', recommendRoute);
 app.use('/api/onboarding', onboardingRoute);
 app.use('/api/detect', detectRoute);
+app.use('/api/visualize', visualizeRoute);
 app.use('/share', detectRoute); // Mount PWA share target at root /share
 
 // Serve static Flutter web files
