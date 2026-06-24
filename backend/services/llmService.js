@@ -1725,8 +1725,11 @@ Use these weights directly. The highest-scoring dimensions across emotional_reso
   // ── Surface recently targeted vibes so the LLM drifts away from them ──
   const recentVibes = soul.transient_memory?.recentVibes || [];
   const rotationSection = recentVibes.length > 0 ? `
-RECENTLY TARGETED FACETS (avoid repeating these same zones — drift to different corners of the user's profile):
+CRITICAL INSTRUCTION FOR VARIETY:
+The user feels they are getting the SAME recommendations over and over. You MUST radically depart from the genres, eras, and cultural origins you recently targeted.
+RECENTLY TARGETED FACETS (AVOID THESE ENTIRELY):
 ${recentVibes.map((v, i) => `${i + 1}. ${v}`).join('\n')}
+Choose an entirely different era, a completely different genre footprint, or a totally different cultural origin from the user's Soul Graph to ensure fresh recommendations.
 ` : '';
 
   // ── "THE NOW" CONTEXT (DJ Logic) ──
@@ -1810,10 +1813,21 @@ Return ONLY a JSON object:
   ], { type: 'json_object' });
 
   const parsed = JSON.parse(responseJson);
+  const anchors = parsed.aesthetic_anchors || {};
+  
+  const anchorParts = [];
+  if (anchors.era) anchorParts.push(`[Era: ${anchors.era}]`);
+  if (anchors.cultural_origin) anchorParts.push(`[Origin: ${anchors.cultural_origin}]`);
+  if (anchors.visual_style) anchorParts.push(`[Style: ${anchors.visual_style}]`);
+  if (anchors.genre_footprint) anchorParts.push(`[Genre: ${anchors.genre_footprint}]`);
+  
+  const anchorString = anchorParts.length > 0 ? anchorParts.join(' ') + ' ' : '';
+  const injectedBrief = `${anchorString}${parsed.search_brief || ''}`.trim();
+
   return {
     selected_vibe_focus: parsed.selected_vibe_focus || '',
-    aesthetic_anchors: parsed.aesthetic_anchors || {},
-    search_brief: parsed.search_brief || ''
+    aesthetic_anchors: anchors,
+    search_brief: injectedBrief
   };
 };
 
@@ -1869,7 +1883,7 @@ Each candidate's "semantic_description" contains these labelled sections — use
 - BANNED WORDS (any variation): "resonate", "narrative", "themes", "vibe", "explore", "element", "aspect", "profound", "delve", "aligns", "complexity", "emotional depth", "character-driven", "thematic"
 - No critic jargon. Talk about specific characters, moments, and feelings — not abstract qualities.
 
-Also write a "coda_blurb" for the top pick: one punchy, conversational sentence (max 12 words) as a personal conviction.
+Also write a "coda_blurb" for the top pick: one punchy, conversational sentence (max 8 words) as a personal conviction.
 CRITICAL: YOU ABSOLUTELY MUST INCLUDE the "coda_blurb" string in your JSON output. Failing to include it will break the application.
 CRITICAL: If there is an active Transient recentContext, this blurb MUST serve as a direct, contextual answer to their request while pitching the show (e.g. "Since you wanted something to make you cry, I promise you'll be staring at the ceiling after this one.").
 
@@ -1877,7 +1891,7 @@ Return ONLY a JSON object:
 {
   "top_pick": {
     "id": "uuid of the selected candidate",
-    "coda_blurb": "One punchy sentence max 12 words",
+    "coda_blurb": "One punchy sentence max 8 words",
     "pitch_paragraphs": ["Paragraph 1", "Paragraph 2"]
   },
   "runner_ups": [
@@ -1901,7 +1915,34 @@ Return ONLY a JSON object:
   const responseJson = await callOpenAI([
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt }
-  ], { type: 'json_object' });
+  ], {
+    type: "json_schema",
+    json_schema: {
+      name: "evaluate_candidates_schema",
+      schema: {
+        type: "object",
+        properties: {
+          top_pick: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              coda_blurb: { type: "string" },
+              pitch_paragraphs: { type: "array", items: { type: "string" } }
+            },
+            required: ["id", "coda_blurb", "pitch_paragraphs"],
+            additionalProperties: false
+          },
+          runner_ups: {
+            type: "array",
+            items: { type: "string" }
+          }
+        },
+        required: ["top_pick", "runner_ups"],
+        additionalProperties: false
+      },
+      strict: true
+    }
+  });
 
   return JSON.parse(responseJson);
 };

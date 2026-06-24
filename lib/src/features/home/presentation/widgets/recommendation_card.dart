@@ -227,25 +227,22 @@ class _CardLayout extends ConsumerWidget {
               left: 24,
               right: 55,
             ),
-            child: SizedBox(
-              height: 108, // Lock height to exactly 3 lines of 36px line height
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: SizedBox(
-                  width: 330, // Force wrap at a standard readable width
-                  child: isKnockoutLayer
-                      ? _buildHeroText(Colors.black)
-                      : GestureDetector(
-                          onTap: () {
-                            context.push('/pitch/${recommendation.id}', extra: recommendation);
-                          },
-                          child: Opacity(
-                            opacity: 0,
-                            child: _buildHeroText(Colors.white),
-                          ),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                width: 330, // Force wrap at a standard readable width
+                child: isKnockoutLayer
+                    ? _buildHeroText(Colors.black)
+                    : GestureDetector(
+                        onTap: () {
+                          context.push('/pitch/${recommendation.id}', extra: recommendation);
+                        },
+                        child: Opacity(
+                          opacity: 0,
+                          child: _buildHeroText(Colors.white),
                         ),
-                ),
+                      ),
               ),
             ),
           ),
