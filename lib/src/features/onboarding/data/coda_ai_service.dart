@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/api_config.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coda/src/core/providers/user_id_provider.dart';
 
 class GroqResponse {
   final String status;
@@ -28,8 +30,6 @@ class GroqResponse {
   }
 }
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:coda/src/core/providers/user_id_provider.dart';
 
 final codaAiServiceProvider = Provider<CodaAiService>((ref) {
   final userId = ref.watch(userIdProvider);

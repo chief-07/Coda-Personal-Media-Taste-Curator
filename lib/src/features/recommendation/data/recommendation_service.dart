@@ -429,7 +429,7 @@ extension RecommendationServiceMatch on RecommendationService {
     }
   }
 
-  Future<Recommendation?> promoteMedia({
+  Future<coda_domain.Recommendation?> promoteMedia({
     required String title,
     required LivingMemory memory,
   }) async {
