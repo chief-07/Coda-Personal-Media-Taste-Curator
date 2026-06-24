@@ -1187,6 +1187,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
         categoryProfiles: memory.categoryProfiles,
         recentContext: memory.recentContext,
         guardrails: memory.guardrails,
+        mediaReflections: memory.mediaReflections,
         seen: _selectedHistoryType == 'seen'
             ? (List<String>.from(memory.seen)..add(text))
             : memory.seen,
@@ -1208,6 +1209,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
       categoryProfiles: memory.categoryProfiles,
       recentContext: memory.recentContext,
       guardrails: memory.guardrails,
+      mediaReflections: memory.mediaReflections,
       seen: List<String>.from(memory.seen)..remove(title),
       notForMe: memory.notForMe,
       watchlist: memory.watchlist,
@@ -1222,6 +1224,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
       categoryProfiles: memory.categoryProfiles,
       recentContext: memory.recentContext,
       guardrails: memory.guardrails,
+      mediaReflections: memory.mediaReflections,
       seen: memory.seen,
       notForMe: List<String>.from(memory.notForMe)..remove(title),
       watchlist: memory.watchlist,
