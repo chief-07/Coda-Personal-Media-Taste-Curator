@@ -447,7 +447,8 @@ extension RecommendationServiceMatch on RecommendationService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data['status'] == 'success' && data['recommendation'] != null) {
+        // Accept 'success' and 'promoted_synthetic' (and any future status) as long as recommendation is present
+        if (data['recommendation'] != null) {
           final result = RecommendationResult.fromJson(data['recommendation']);
           return result.toDomain();
         }

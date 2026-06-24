@@ -238,8 +238,7 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
       // Resolve titles to actual Qdrant UUIDs by scanning the collection
       const watchlistIds = await qdrantService.findIdsByTitles('media_brain', watchlistTitles);
       if (watchlistIds.length > 0) {
-        // Remove media_type filter in watchlist mode — the user's list may contain mixed types
-        filter.must = [];
+        // Keep the media_type filter so we only show watchlist items for the currently selected tab
         filter.must.push({ has_id: watchlistIds });
         console.log(`[Recommend] Watchlist mode: resolved ${watchlistTitles.length} titles -> ${watchlistIds.length} Qdrant IDs.`);
       } else {
