@@ -37,9 +37,17 @@ router.get('/proxy-image', async (req, res) => {
       return fs.createReadStream(cachedFilePath).pipe(res);
     }
     
+    const isMangaDex = url.includes('mangadex.org') || url.includes('uploads.mangadex.org');
     const response = await axios({
       method: 'get', url, responseType: 'arraybuffer',
-      headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'image/*' }, timeout: 10000
+      headers: {
+        'User-Agent': isMangaDex
+          ? 'CodaApp/2.0 (contact@mycodaapp.net)'
+          : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'image/*,*/*;q=0.8',
+        ...(isMangaDex ? { 'Referer': 'https://mangadex.org/' } : {}),
+      },
+      timeout: 15000
     });
     
     const contentType = response.headers['content-type'] || 'image/jpeg';

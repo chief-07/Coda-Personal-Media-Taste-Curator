@@ -54,9 +54,13 @@ class _FallbackImageState extends State<FallbackImage> {
     }
 
     if (_useFallback) {
-      if (widget.url!.contains('/api/recommend/proxy-image?url=')) {
+      // Always fully resolve the URL before parsing so query params are accessible
+      final fullUrl = widget.url!.startsWith('/')
+          ? '${getApiBaseUrl()}${widget.url!}'
+          : widget.url!;
+      if (fullUrl.contains('/api/recommend/proxy-image?url=')) {
         try {
-          final uri = Uri.parse(widget.url!.startsWith('/') ? '${getApiBaseUrl()}${widget.url!}' : widget.url!);
+          final uri = Uri.parse(fullUrl);
           final original = uri.queryParameters['url'];
           if (original != null && original.isNotEmpty) {
             currentUrl = original;

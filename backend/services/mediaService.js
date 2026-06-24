@@ -10,10 +10,17 @@ let assetCache = {};
 if (fs.existsSync(ASSET_CACHE_FILE)) {
   try {
     assetCache = JSON.parse(fs.readFileSync(ASSET_CACHE_FILE, 'utf8'));
-    // Clean up empty trailer_urls so they can be re-resolved with the new direct scraper
+    // Clean up empty trailer_urls so they can be re-resolved
     for (const key in assetCache) {
       if (assetCache[key] && assetCache[key].trailer_url === '') {
         delete assetCache[key].trailer_url;
+      }
+      // Evict manga entries with missing/placeholder poster so MangaDex is re-queried
+      if (key.endsWith(':manga')) {
+        const p = assetCache[key]?.poster_url;
+        if (!p || p === '' || p.startsWith('holder:')) {
+          delete assetCache[key];
+        }
       }
     }
   } catch (_) {}
