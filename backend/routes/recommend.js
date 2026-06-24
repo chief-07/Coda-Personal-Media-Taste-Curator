@@ -56,6 +56,77 @@ router.get('/proxy-image', async (req, res) => {
   }
 });
 
+// ── 6. Format Output Helper ───────────────────────────────────────────────────
+const mapCandidateToResponse = async (candidate, pitch = null, blurb = null) => {
+  const meta = await mediaService.fetchAssets(candidate.payload.title, candidate.payload.media_type);
+  
+  // Attempt to fetch runtime/length tags dynamically
+  let runtimeTag = null;
+  let fetchedMeta = null;
+  try {
+    fetchedMeta = await searchService.fetchMetadataForCandidate(candidate.payload.title, candidate.payload.media_type);
+    if (fetchedMeta) {
+      if (fetchedMeta.runtime) runtimeTag = fetchedMeta.runtime;
+      else if (fetchedMeta.length_minutes) runtimeTag = `${fetchedMeta.length_minutes}m`;
+      else if (fetchedMeta.episodes) runtimeTag = `${fetchedMeta.episodes} eps`;
+      else if (fetchedMeta.pageCount) runtimeTag = `${fetchedMeta.pageCount} pages`;
+    }
+  } catch (e) {
+    console.warn(`[Recommend] Failed to fetch detailed meta for candidate:`, e.message);
+  }
+  
+  let finalTags = [...(candidate.payload.tags || [])];
+  if (fetchedMeta && fetchedMeta.tags) {
+    finalTags = [...new Set([...finalTags, ...fetchedMeta.tags])];
+  }
+  if (runtimeTag) finalTags.unshift(runtimeTag);
+
+  const synopsisRaw = candidate.payload.semantic_description || '';
+  const metaMatch = synopsisRaw.match(/\[Metadata & Cultural Context\]:\s*(.*?)(?=\n\[|$)/s);
+  const plotMatch = synopsisRaw.match(/\[Story & Plot Type\]:\s*(.*?)(?=\n\[|$)/s);
+  
+  const cleanDesc = [];
+  if (metaMatch && metaMatch[1]) cleanDesc.push(metaMatch[1].trim());
+  if (plotMatch && plotMatch[1]) cleanDesc.push(plotMatch[1].trim());
+  const description = cleanDesc.length > 0 ? cleanDesc.join('\n\n') : synopsisRaw;
+
+  let payloadGenres = candidate.payload.genres || [];
+  if (payloadGenres.length === 0 || payloadGenres[0] === 'Unknown') {
+    payloadGenres = (fetchedMeta && fetchedMeta.genres) ? fetchedMeta.genres : payloadGenres;
+  }
+
+  let payloadRelease = candidate.payload.release_year || '';
+  if (!payloadRelease || payloadRelease === 'Unknown') {
+    payloadRelease = (fetchedMeta && fetchedMeta.release_year && fetchedMeta.release_year !== 'Unknown') 
+      ? fetchedMeta.release_year 
+      : '';
+  }
+
+  let payloadStudio = candidate.payload.studio || '';
+  if (!payloadStudio || payloadStudio === 'Unknown') {
+    if (fetchedMeta) {
+      payloadStudio = fetchedMeta.studio || fetchedMeta.developer || fetchedMeta.director || fetchedMeta.author || payloadStudio;
+    }
+  }
+
+  return {
+    id: candidate.id,
+    title: candidate.payload.title,
+    media_type: candidate.payload.media_type,
+    coda_blurb: blurb || null,
+    pitch_paragraphs: pitch || [],
+    poster_url: meta.poster_url || '',
+    ost_url: meta.ost_url || '',
+    trailer_url: meta.trailer_url || '',
+    description: description,
+    genres: payloadGenres,
+    tags: finalTags.slice(0, 10),
+    release_year: payloadRelease,
+    studio: payloadStudio
+  };
+};
+
+
 // ── Core Recommendation Pipeline (Phase 3) ───────────────────────────────────
 // specificAsk: optional string from /ask route — the user's explicit request text
 // contextualState: optional object representing "The Now" (time, mood, etc)
@@ -174,76 +245,7 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     .map(id => candidates.find(c => c.id === id))
     .filter(Boolean);
 
-  // 6. Format Output
-  const mapCandidateToResponse = async (candidate, pitch = null, blurb = null) => {
-    const meta = await mediaService.fetchAssets(candidate.payload.title, candidate.payload.media_type);
-    
-    // Attempt to fetch runtime/length tags dynamically
-    let runtimeTag = null;
-    let fetchedMeta = null;
-    try {
-      fetchedMeta = await searchService.fetchMetadataForCandidate(candidate.payload.title, candidate.payload.media_type);
-      if (fetchedMeta) {
-        if (fetchedMeta.runtime) runtimeTag = fetchedMeta.runtime;
-        else if (fetchedMeta.length_minutes) runtimeTag = `${fetchedMeta.length_minutes}m`;
-        else if (fetchedMeta.episodes) runtimeTag = `${fetchedMeta.episodes} eps`;
-        else if (fetchedMeta.pageCount) runtimeTag = `${fetchedMeta.pageCount} pages`;
-      }
-    } catch (e) {
-      console.warn(`[Recommend] Failed to fetch detailed meta for candidate:`, e.message);
-    }
-    
-    let finalTags = [...(candidate.payload.tags || [])];
-    if (fetchedMeta && fetchedMeta.tags) {
-      finalTags = [...new Set([...finalTags, ...fetchedMeta.tags])];
-    }
-    if (runtimeTag) finalTags.unshift(runtimeTag);
-
-    const synopsisRaw = candidate.payload.semantic_description || '';
-    const metaMatch = synopsisRaw.match(/\[Metadata & Cultural Context\]:\s*(.*?)(?=\n\[|$)/s);
-    const plotMatch = synopsisRaw.match(/\[Story & Plot Type\]:\s*(.*?)(?=\n\[|$)/s);
-    
-    const cleanDesc = [];
-    if (metaMatch && metaMatch[1]) cleanDesc.push(metaMatch[1].trim());
-    if (plotMatch && plotMatch[1]) cleanDesc.push(plotMatch[1].trim());
-    const description = cleanDesc.length > 0 ? cleanDesc.join('\n\n') : synopsisRaw;
-
-    let payloadGenres = candidate.payload.genres || [];
-    if (payloadGenres.length === 0 || payloadGenres[0] === 'Unknown') {
-      payloadGenres = (fetchedMeta && fetchedMeta.genres) ? fetchedMeta.genres : payloadGenres;
-    }
-
-    let payloadRelease = candidate.payload.release_year || '';
-    if (!payloadRelease || payloadRelease === 'Unknown') {
-      payloadRelease = (fetchedMeta && fetchedMeta.release_year && fetchedMeta.release_year !== 'Unknown') 
-        ? fetchedMeta.release_year 
-        : '';
-    }
-
-    let payloadStudio = candidate.payload.studio || '';
-    if (!payloadStudio || payloadStudio === 'Unknown') {
-      if (fetchedMeta) {
-        payloadStudio = fetchedMeta.studio || fetchedMeta.developer || fetchedMeta.director || fetchedMeta.author || payloadStudio;
-      }
-    }
-
-    return {
-      id: candidate.id,
-      title: candidate.payload.title,
-      media_type: candidate.payload.media_type,
-      coda_blurb: blurb || null,
-      pitch_paragraphs: pitch || [],
-      poster_url: meta.poster_url || '',
-      ost_url: meta.ost_url || '',
-      trailer_url: meta.trailer_url || '',
-      description: description,
-      genres: payloadGenres,
-      tags: finalTags.slice(0, 10),
-      release_year: payloadRelease,
-      studio: payloadStudio
-    };
-  };
-
+  // Formatting helper moved to module level
   const topResponse = await mapCandidateToResponse(
     topCandidate,
     editorialDecision.top_pick.pitch_paragraphs,
@@ -558,12 +560,18 @@ router.post('/ask', async (req, res) => {
       const candidates = [hit];
       const recommendationResponse = await llmService.evaluateCandidates(candidates, current_memory || {}, "Checking if this is for you...");
       
+      const finalRecommendation = await mapCandidateToResponse(
+        hit,
+        recommendationResponse.top_pick.pitch_paragraphs,
+        recommendationResponse.top_pick.coda_blurb
+      );
+
       // Merge the match conviction into the response
       res.json({
         status: 'match',
         message: evaluation.conviction_statement,
         is_match: evaluation.is_match,
-        recommendation: recommendationResponse.top_pick
+        recommendation: finalRecommendation
       });
       return;
     }
@@ -635,9 +643,15 @@ router.post('/promote', async (req, res) => {
       "Promoted to Home Screen"
     );
 
+    const finalRecommendation = await mapCandidateToResponse(
+      hit,
+      recommendationResponse.top_pick.pitch_paragraphs,
+      recommendationResponse.top_pick.coda_blurb
+    );
+
     res.json({
       status: 'success',
-      recommendation: recommendationResponse.top_pick
+      recommendation: finalRecommendation
     });
   } catch (error) {
     console.error('[Promote Error]:', error);
