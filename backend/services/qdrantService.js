@@ -81,6 +81,15 @@ class QdrantService {
       } catch (e) {
         // Ignore if already exists
       }
+      
+      try {
+        await this.client.createPayloadIndex('media_brain', {
+          field_name: 'title',
+          field_schema: 'keyword',
+        });
+      } catch (e) {
+        // Ignore if already exists
+      }
 
       console.log('[QdrantService] All required collections and indices are present.');
     } catch (e) {
@@ -194,8 +203,8 @@ class QdrantService {
    */
   async pushToQueue(title, media_type, tier = 2) {
     if (!this.isInitialized || !this.client) return;
-    const { v4: uuidv4 } = require('uuid');
-    const id = uuidv4();
+    const crypto = require('crypto');
+    const id = crypto.randomUUID();
     try {
       await this.client.upsert('media_queue', {
         wait: true,

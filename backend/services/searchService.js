@@ -1417,7 +1417,7 @@ const fetchMangaMetadata = async (title) => {
         .map(r => r.attributes.name);
       const coverRel = rels.find(r => r.type === 'cover_art');
       const coverUrl = coverRel?.attributes?.fileName
-        ? `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}`
+        ? `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName.replace(/\.(jpg|png|jpeg)$/i, '')}.512.jpg`)}`
         : '';
 
       return {

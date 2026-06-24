@@ -196,37 +196,35 @@ class RecommendationService {
     }
   }
 
-  /// Fetches the lazy pitch paragraphs for a recommendation
-  Future<List<String>> fetchPitch({
+  Future<Map<String, dynamic>> fetchPitch({
     required LivingMemory memory,
     required String title,
     required String mediaType,
   }) async {
-    final payload = {
-      'userId': userId,
-      'title': title,
-      'requested_media_type': mediaType,
-      'current_memory': memory.toJson(),
-    };
-
-    final targetUrl = '${getApiBaseUrl()}/api/recommend/pitch';
-
     try {
       final response = await http.post(
-        Uri.parse(targetUrl),
+        Uri.parse('${getApiBaseUrl()}/api/recommend/pitch'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(payload),
+        body: jsonEncode({
+          'title': title,
+          'requested_media_type': mediaType,
+          'userId': memory.globalIdentity.isNotEmpty ? 'coda_user' : null,
+        }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return List<String>.from(data['pitch_paragraphs'] ?? []);
-      } else {
-        throw Exception('Failed to fetch pitch: ${response.statusCode}');
+        final paragraphs = (data['pitch_paragraphs'] as List?)?.map((e) => e.toString()).toList() ?? [];
+        final blurb = data['coda_blurb'] as String? ?? '';
+        return {
+          'pitch_paragraphs': paragraphs,
+          'coda_blurb': blurb
+        };
       }
+      return {'pitch_paragraphs': <String>[], 'coda_blurb': ''};
     } catch (e) {
-      print("Pitch fetch network error: $e");
-      return [];
+      print("Pitch generation error: $e");
+      return {'pitch_paragraphs': <String>[], 'coda_blurb': ''};
     }
   }
 

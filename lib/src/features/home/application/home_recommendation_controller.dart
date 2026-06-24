@@ -293,18 +293,21 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     try {
       final memory = ref.read(livingMemoryProvider);
       final service = ref.read(recommendationServiceProvider);
-      final pitchParagraphs = await service.fetchPitch(
+      final pitchData = await service.fetchPitch(
         memory: memory,
         title: active.title,
         mediaType: type.name,
       );
+
+      final pitchParagraphs = pitchData['pitch_paragraphs'] as List<String>? ?? [];
+      final codaBlurb = pitchData['coda_blurb'] as String? ?? '';
 
       if (pitchParagraphs.isNotEmpty && _activePicks[type]?.title == active.title) {
         final updated = Recommendation(
           id: active.id,
           title: active.title,
           mediaType: active.mediaType,
-          codaBlurb: active.codaBlurb,
+          codaBlurb: codaBlurb.isNotEmpty ? codaBlurb : active.codaBlurb,
           pitch: pitchParagraphs,
           posterUrl: active.posterUrl,
           codaNote: active.codaNote,

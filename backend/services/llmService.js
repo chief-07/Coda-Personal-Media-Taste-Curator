@@ -1937,10 +1937,8 @@ Return ONLY a JSON object:
             items: { type: "string" }
           }
         },
-        required: ["top_pick", "runner_ups"],
-        additionalProperties: false
-      },
-      strict: true
+        required: ["top_pick", "runner_ups"]
+      }
     }
   });
 

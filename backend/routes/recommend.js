@@ -137,11 +137,12 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
   if (watchlistOnly) {
     const watchlist = soul.transient_memory?.watchlist || [];
     if (watchlist.length > 0) {
+      const watchlistTitles = watchlist.map(w => w.title);
       filter.must.push({
         key: "title",
-        match: { any: watchlist }
+        match: { any: watchlistTitles }
       });
-      console.log(`[Recommend] Watchlist mode enabled. Restricting Qdrant search to ${watchlist.length} titles.`);
+      console.log(`[Recommend] Watchlist mode enabled. Restricting Qdrant search to ${watchlistTitles.length} titles.`);
     } else {
       console.warn(`[Recommend] Watchlist mode enabled, but user's watchlist is empty.`);
     }
@@ -318,9 +319,10 @@ router.post('/pitch', async (req, res) => {
        const candidates = [candidatePoint];
        const editorialDecision = await llmService.evaluateCandidates(candidates, soul);
        const pitch = editorialDecision.top_pick.pitch_paragraphs || [];
-       res.json({ pitch_paragraphs: pitch });
+       const blurb = editorialDecision.top_pick.coda_blurb || '';
+       res.json({ pitch_paragraphs: pitch, coda_blurb: blurb });
     } else {
-       res.json({ pitch_paragraphs: [] });
+       res.json({ pitch_paragraphs: [], coda_blurb: '' });
     }
   } catch (error) {
     console.error('[Pitch Route Error]:', error);
