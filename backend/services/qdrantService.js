@@ -200,15 +200,16 @@ class QdrantService {
         
         for (const point of result.points) {
           const ptTitle = point.payload?.title || '';
-          // Strip everything after first '(' to handle things like "Title (2022)"
+          // Strip year/parentheticals for comparison (e.g. "Title (2022)" -> "Title")
           const ptBase = ptTitle.split('(')[0].trim();
           const targetBase = title.split('(')[0].trim();
           
           const cleanPt = ptBase.toLowerCase().replace(/[^a-z0-9]/g, '');
           const cleanTargetBase = targetBase.toLowerCase().replace(/[^a-z0-9]/g, '');
           
-          if (cleanPt === cleanTargetBase || cleanPt.includes(cleanTargetBase) || cleanTargetBase.includes(cleanPt)) {
-            // Check if it's a reasonable match (length difference isn't huge unless one is a subtitle)
+          // Only match if the cleaned strings are equal after stripping parentheticals.
+          // Never use substring includes — too aggressive, causes wrong matches (e.g. "O" matching everything).
+          if (cleanPt === cleanTargetBase) {
             return point.payload;
           }
         }
@@ -220,6 +221,46 @@ class QdrantService {
     } catch (e) {
       console.warn('[QdrantService] searchByTitle error:', e.message);
       return null;
+    }
+  }
+
+  /**
+   * Searches the entire collection for points whose title matches any entry in a list.
+   * Used for watchlist mode — returns matched point IDs (UUIDs).
+   * @param {string} collectionName
+   * @param {string[]} titles - List of watchlist titles to find
+   * @returns {string[]} - List of Qdrant point UUIDs whose titles matched
+   */
+  async findIdsByTitles(collectionName, titles) {
+    if (!this.isInitialized || !this.client) return [];
+    try {
+      const cleanTargets = titles.map(t => t.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
+      const matchedIds = [];
+      let offset = null;
+
+      while (true) {
+        const result = await this.client.scroll(collectionName, {
+          limit: 1000,
+          offset: offset,
+          with_payload: true,
+          with_vector: false,
+        });
+
+        for (const point of result.points) {
+          const ptTitle = point.payload?.title || '';
+          const cleanPt = ptTitle.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (cleanTargets.includes(cleanPt)) {
+            matchedIds.push(point.id);
+          }
+        }
+
+        offset = result.next_page_offset;
+        if (!offset) break;
+      }
+      return matchedIds;
+    } catch (e) {
+      console.warn('[QdrantService] findIdsByTitles error:', e.message);
+      return [];
     }
   }
 

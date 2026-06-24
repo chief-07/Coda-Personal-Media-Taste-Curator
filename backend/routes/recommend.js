@@ -234,14 +234,25 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
   if (watchlistOnly) {
     const watchlist = soul.transient_memory?.watchlist || [];
     if (watchlist.length > 0) {
-      const watchlistIds = watchlist.map(w => w.title.toLowerCase().replace(/[^a-z0-9]/g, ''));
-      filter.must.push({
-        has_id: watchlistIds
-      });
-      console.log(`[Recommend] Watchlist mode enabled. Restricting Qdrant search to ${watchlistIds.length} titles.`);
+      const watchlistTitles = watchlist.map(w => typeof w === 'string' ? w : w.title).filter(Boolean);
+      // Resolve titles to actual Qdrant UUIDs by scanning the collection
+      const watchlistIds = await qdrantService.findIdsByTitles('media_brain', watchlistTitles);
+      if (watchlistIds.length > 0) {
+        // Remove media_type filter in watchlist mode — the user's list may contain mixed types
+        filter.must = [];
+        filter.must.push({ has_id: watchlistIds });
+        console.log(`[Recommend] Watchlist mode: resolved ${watchlistTitles.length} titles -> ${watchlistIds.length} Qdrant IDs.`);
+      } else {
+        // None of the watchlist items are in the brain yet — queue them all and return empty
+        console.warn(`[Recommend] Watchlist mode: none of the ${watchlistTitles.length} watchlist items found in media_brain.`);
+        for (const t of watchlistTitles) {
+          await qdrantService.pushToQueue(t, 'unknown', 1);
+        }
+        throw new Error('EMPTY_WATCHLIST');
+      }
     } else {
       console.warn(`[Recommend] Watchlist mode enabled, but user's watchlist is empty.`);
-      throw new Error("EMPTY_WATCHLIST");
+      throw new Error('EMPTY_WATCHLIST');
     }
   }
 
