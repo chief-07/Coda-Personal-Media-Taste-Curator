@@ -90,6 +90,15 @@ class QdrantService {
       } catch (e) {
         // Ignore if already exists
       }
+      
+      try {
+        await this.client.createPayloadIndex('media_queue', {
+          field_name: 'tier',
+          field_schema: 'integer',
+        });
+      } catch (e) {
+        // Ignore if already exists
+      }
 
       console.log('[QdrantService] All required collections and indices are present.');
     } catch (e) {
