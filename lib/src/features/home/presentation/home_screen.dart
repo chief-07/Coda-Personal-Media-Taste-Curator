@@ -477,11 +477,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           return StaticCardFrame(
                             key: ValueKey('${selectedType.name}_empty'),
                             child: Center(
-                              child: Text(
-                                'No recommendation for ${selectedType.label} yet.',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.4),
-                                ),
+                              child: Consumer(
+                                builder: (context, ref, child) {
+                                  final isWatchlistMode = ref.watch(watchlistModeProvider);
+                                  return Text(
+                                    isWatchlistMode
+                                        ? 'Nothing in your list'
+                                        : 'No recommendation for ${selectedType.label} yet.',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.4),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           );

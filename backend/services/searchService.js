@@ -1356,6 +1356,7 @@ const fetchBookMetadata = async (title) => {
         tags: [],
         description: book.description || '',
         image: book.artworkUrl100?.replace('100x100bb', '600x900bb') || '',
+        release_year: book.releaseDate ? book.releaseDate.substring(0, 4) : '',
         studio: book.artistName || '',
         director: book.artistName || ''
       };
@@ -1416,9 +1417,9 @@ const fetchMangaMetadata = async (title) => {
         .filter(r => r.type === 'author' && r.attributes?.name)
         .map(r => r.attributes.name);
       const coverRel = rels.find(r => r.type === 'cover_art');
-      const coverUrl = coverRel?.attributes?.fileName
-        ? `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName.replace(/\.(jpg|png|jpeg)$/i, '')}.512.jpg`)}`
-        : '';
+      const coverUrl = coverRel
+        ? `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.512.jpg`)}`
+        : null;
 
       return {
         title: titleName,

@@ -35,7 +35,7 @@ class MediaEnrichmentService {
       const existing = await qdrantService.getPoint('media_brain', uuid);
       if (existing) {
         console.log(`  -> Already exists in Qdrant. Skipping.`);
-        return true;
+        return 'ALREADY_EXISTS';
       }
     } catch (e) {
       // Not found is expected

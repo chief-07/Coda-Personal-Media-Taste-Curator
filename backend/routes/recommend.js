@@ -145,6 +145,7 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
       console.log(`[Recommend] Watchlist mode enabled. Restricting Qdrant search to ${watchlistTitles.length} titles.`);
     } else {
       console.warn(`[Recommend] Watchlist mode enabled, but user's watchlist is empty.`);
+      throw new Error("EMPTY_WATCHLIST");
     }
   }
 
@@ -214,7 +215,9 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
 
     let payloadRelease = candidate.payload.release_year || '';
     if (!payloadRelease || payloadRelease === 'Unknown') {
-      payloadRelease = (fetchedMeta && fetchedMeta.release_year) ? fetchedMeta.release_year : payloadRelease;
+      payloadRelease = (fetchedMeta && fetchedMeta.release_year && fetchedMeta.release_year !== 'Unknown') 
+        ? fetchedMeta.release_year 
+        : '';
     }
 
     let payloadStudio = candidate.payload.studio || '';
@@ -246,7 +249,10 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     editorialDecision.top_pick.pitch_paragraphs,
     editorialDecision.top_pick.coda_blurb
   );
-  const runnerUpResponses = await Promise.all(runnerUps.map(c => mapCandidateToResponse(c)));
+  const runnerUpResponses = await Promise.all(editorialDecision.runner_ups.map(async ru => {
+    const candidate = candidates.find(c => c.id === ru.id);
+    return await mapCandidateToResponse(candidate, null, ru.coda_blurb);
+  }));
 
   // ── FAIL 11 FIX: Persist selected_vibe_focus to recentVibes[] so next run drifts ──
   if (userId && selected_vibe_focus) {
@@ -529,14 +535,16 @@ router.post('/ask', async (req, res) => {
       // Direct Match Request: "Is Severance for me?"
       const qdrantService = require('../services/qdrantService');
       
-      // 1. Fetch exact match from Qdrant
-      const exactHits = await qdrantService.searchByTitle('media_brain', parsed.match_target);
-      const hit = exactHits && exactHits.length > 0 ? exactHits[0] : null;
+      const exactPayload = await qdrantService.searchByTitle('media_brain', parsed.match_target);
+      const hit = exactPayload ? { id: parsed.match_target.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: exactPayload } : null;
 
       if (!hit) {
+        // Fallback: Queue it for enrichment!
+        await qdrantService.pushToQueue(parsed.match_target, "unknown", 1); // Tier 1 (Highest priority)
+        
         res.json({
           status: 'chatting',
-          message: `I actually don't have ${parsed.match_target} in my core database yet, so I can't give you a true vibe check on it! Let me know if you want something else.`,
+          message: `I actually don't have ${parsed.match_target} in my core database yet! I've just added it to my immediate study queue, so check back in a couple of minutes!`,
           recommendation: null
         });
         return;
@@ -575,13 +583,15 @@ router.post('/vibe-check', async (req, res) => {
     }
 
     const qdrantService = require('../services/qdrantService');
-    const exactHits = await qdrantService.searchByTitle('media_brain', title);
-    const hit = exactHits ? { id: title.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: exactHits } : null;
+    const exactPayload = await qdrantService.searchByTitle('media_brain', title);
+    const hit = exactPayload ? { id: title.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: exactPayload } : null;
 
     if (!hit) {
+      await qdrantService.pushToQueue(title, req.body.media_type || "unknown", 1); // Tier 1
+
       return res.json({
         is_match: null,
-        conviction_statement: `I don't have enough data on ${title} yet to give you a true vibe check!`
+        conviction_statement: `I don't have enough data on ${title} yet! I've added it to my immediate study queue, so check back in a few minutes.`
       });
     }
 

@@ -187,22 +187,31 @@ class QdrantService {
   async searchByTitle(collectionName, title) {
     if (!this.isInitialized || !this.client) return null;
     try {
-      const result = await this.client.scroll(collectionName, {
-        filter: {
-          must: [
-            {
-              key: 'title',
-              match: { value: title }
-            }
-          ]
-        },
-        limit: 1,
-        with_payload: true,
-        with_vector: false,
-      });
-      return result.points?.length > 0 ? result.points[0].payload : null;
+      const cleanTarget = title.toLowerCase().replace(/[^a-z0-9]/g, '');
+      let offset = null;
+      
+      while (true) {
+        const result = await this.client.scroll(collectionName, {
+          limit: 1000,
+          offset: offset,
+          with_payload: true,
+          with_vector: false,
+        });
+        
+        for (const point of result.points) {
+          const ptTitle = point.payload?.title || '';
+          const cleanPt = ptTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (cleanPt === cleanTarget) {
+            return point.payload;
+          }
+        }
+        
+        offset = result.next_page_offset;
+        if (!offset) break;
+      }
+      return null;
     } catch (e) {
-      // Silent fail — title just isn't in the Brain yet
+      console.warn('[QdrantService] searchByTitle error:', e.message);
       return null;
     }
   }

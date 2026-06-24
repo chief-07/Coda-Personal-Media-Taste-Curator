@@ -36,7 +36,7 @@ async function runWorkerLoop() {
 
       const success = await mediaEnrichmentService.enrichSingleTitle(title, media_type);
 
-      if (success) {
+      if (success === true) {
         console.log(`[Worker] Successfully processed ${title}`);
         // If it was a Tier 1 or Tier 2 item, let's autonomously trigger Mycelium Crawl to populate Tier 2!
         if (tier === 1 || tier === 2) {
@@ -44,6 +44,8 @@ async function runWorkerLoop() {
           // Mycelium logic handles injecting neighbors into Qdrant Tier 2.
           await mediaEnrichmentService.enrichTitleAndNeighbors(title, media_type);
         }
+      } else if (success === 'ALREADY_EXISTS') {
+        console.log(`[Worker] Skipped ${title} (already enriched)`);
       } else {
         console.log(`[Worker] Enrichment returned false for ${title}`);
       }

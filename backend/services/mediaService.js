@@ -398,7 +398,7 @@ const fetchVNDBPoster = async (title) => {
     ));
     if (exactMatch) {
       console.log(`[VNDB Poster] ✅ Exact match: "${cleanedTitle}" → ${exactMatch.image.url}`);
-      return exactMatch.image.url;
+      return `/api/recommend/proxy-image?url=${encodeURIComponent(exactMatch.image.url)}`;
     }
 
     // 2. Partial match (contains)
@@ -410,14 +410,14 @@ const fetchVNDBPoster = async (title) => {
     ));
     if (partialMatch) {
       console.log(`[VNDB Poster] ✅ Partial match: "${cleanedTitle}" → ${partialMatch.image.url} (Title: ${partialMatch.title})`);
-      return partialMatch.image.url;
+      return `/api/recommend/proxy-image?url=${encodeURIComponent(partialMatch.image.url)}`;
     }
 
     // 3. Fallback to first result with image
     const firstWithImg = results.find(r => r.image?.url);
     if (firstWithImg) {
       console.log(`[VNDB Poster] ⚠️ Fallback first image: "${cleanedTitle}" → ${firstWithImg.image.url} (Title: ${firstWithImg.title})`);
-      return firstWithImg.image.url;
+      return `/api/recommend/proxy-image?url=${encodeURIComponent(firstWithImg.image.url)}`;
     }
   } catch (e) {
     console.warn(`[VNDB Poster] Failed for "${title}":`, e.message);
@@ -455,14 +455,12 @@ const fetchMangaDexPoster = async (title) => {
       });
       const coverFile = coverRes.data?.data?.[0]?.attributes?.fileName;
       if (coverFile) {
-        const cleanFile = coverFile.replace(/\.(jpg|png|jpeg)$/i, '');
-        const img = `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${mangaId}/${cleanFile}.512.jpg`)}`;
+        const img = `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${mangaId}/${coverFile}.512.jpg`)}`;
         console.log(`[MangaDex] ✅ "${title}": ${img}`);
         return img;
       }
     } else {
-      const cleanFile = coverRel.attributes.fileName.replace(/\.(jpg|png|jpeg)$/i, '');
-      const img = `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${mangaId}/${cleanFile}.512.jpg`)}`;
+      const img = `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${mangaId}/${coverRel.attributes.fileName}.512.jpg`)}`;
       console.log(`[MangaDex] ✅ "${title}": ${img}`);
       return img;
     }

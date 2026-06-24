@@ -491,9 +491,10 @@ Write a highly personalized, warm, and subjective "pitch_paragraphs" array (2-3 
 1. FRIENDLY, PERSONAL TONE (Speak in 1st person: I, my, me):
    Speak as a close friend sharing your own impressions and telling them why they will love it. Do not analyze the media like a critic. Talk about the actual characters, plot points, and feelings directly.
 
-2. MATCHED TITLE COMPARISON RULE:
-   - If the picked title ("${title}") is an undeniable, direct, and significant thematic/stylistic sibling to a work they explicitly love (e.g., Ergo Proxy is extremely similar to Ghost in the Shell), you MUST mention that loved work by name and draw the comparison (e.g., "Since you loved Ghost in the Shell, you'll feel right at home with the cyberpunk questions this raises"). Use your own comprehensive knowledge of both works to determine this similarity, even if the scraped snippets do not mention it.
-   - If there is no undeniable similarity, do NOT mention any previously watched/loved works at all. No forced, weak comparisons (e.g. comparing Psycho-Pass to K-On! just because they have "music" or "characters" is strictly forbidden).
+2. MATCHED TITLE COMPARISON RULE (DEFAULT TO NO COMPARISON):
+   - By default, do NOT mention any previously watched/loved works at all.
+   - ONLY IF the picked title ("${title}") is an undeniable, direct, and significant thematic/stylistic sibling to a work they explicitly love (e.g., Ergo Proxy is extremely similar to Ghost in the Shell), then you MAY mention that loved work by name and draw the comparison.
+   - No forced, weak comparisons (e.g. comparing Psycho-Pass to K-On! just because they have "music" or "characters" is strictly forbidden). If it's a stretch, stay silent.
 
 3. NO COPYING PROFILE DESCRIPTORS:
    Do not repeat broad profile descriptors or cravings back to them (e.g. do not say "Since you like character-driven dramas" or "Because you crave emotional depth"). Instead, show it through the specific details you highlight. Only mention title names as permitted in Rule 2.
@@ -1856,12 +1857,24 @@ CURRENT AMBIENT CONTEXT ("THE NOW"):
 - ${contextualState}
 ` : '';
 
+  const recentContext = soul.transient_memory?.recentContext || null;
+  const blurbRule = recentContext
+    ? `CRITICAL: Since the user specifically asked for "${recentContext}", the coda_blurb MUST serve as a direct, contextual answer to their request (e.g. "Since you wanted something to make you cry, I promise you'll be staring at the ceiling after this one.").`
+    : `CRITICAL: Since the user DID NOT ask for a specific prompt, DO NOT hallucinate one. Do NOT say things like "Since you wanted..." or "I know you asked for...". Just give a confident, personal hook.`;
+
+  const guardrails = soul.permanent_soul?.guardrails || [];
+  const safetyInstructions = typeof buildDynamicGuardrailInstructions === 'function' ? buildDynamicGuardrailInstructions(guardrails) : '';
+  const guardrailsSection = guardrails.length > 0
+    ? `\nSTRICT USER GUARDRAILS (DO NOT VIOLATE THESE): ${JSON.stringify(guardrails)}${safetyInstructions}\nCRITICAL: Any candidate that violates these guardrails MUST be instantly disqualified. You MUST NOT select it as a top pick or runner up.`
+    : '';
+
   const systemPrompt = `
 You are the Coda Editorial Director.
 You have ${candidates.length} media candidates from the vector database, the user's Soul Identity, and their current Active State.
 ${vibeFocusSection}
 ${lovedWorksSection}
 ${nowContextSection}
+${guardrailsSection}
 
 PRIORITY ORDER for evaluation:
 1. FIRST: Honour the user's Transient recentContext if active — this overrides permanent preferences
@@ -1883,9 +1896,9 @@ Each candidate's "semantic_description" contains these labelled sections — use
 - BANNED WORDS (any variation): "resonate", "narrative", "themes", "vibe", "explore", "element", "aspect", "profound", "delve", "aligns", "complexity", "emotional depth", "character-driven", "thematic"
 - No critic jargon. Talk about specific characters, moments, and feelings — not abstract qualities.
 
-Also write a "coda_blurb" for the top pick: one punchy, conversational sentence (max 8 words) as a personal conviction.
-CRITICAL: YOU ABSOLUTELY MUST INCLUDE the "coda_blurb" string in your JSON output. Failing to include it will break the application.
-CRITICAL: If there is an active Transient recentContext, this blurb MUST serve as a direct, contextual answer to their request while pitching the show (e.g. "Since you wanted something to make you cry, I promise you'll be staring at the ceiling after this one.").
+Also write a "coda_blurb" for the top_pick AND each runner_up: one punchy, conversational sentence (max 8 words) as a personal conviction.
+CRITICAL: YOU ABSOLUTELY MUST INCLUDE the "coda_blurb" string in your JSON output for both the top pick and runner ups.
+${blurbRule}
 
 Return ONLY a JSON object:
 {
@@ -1895,8 +1908,14 @@ Return ONLY a JSON object:
     "pitch_paragraphs": ["Paragraph 1", "Paragraph 2"]
   },
   "runner_ups": [
-    "uuid of runner up 1",
-    "uuid of runner up 2"
+    {
+      "id": "uuid of runner up 1",
+      "coda_blurb": "One punchy sentence max 8 words"
+    },
+    {
+      "id": "uuid of runner up 2",
+      "coda_blurb": "One punchy sentence max 8 words"
+    }
   ]
 }
 `;
@@ -1934,7 +1953,15 @@ Return ONLY a JSON object:
           },
           runner_ups: {
             type: "array",
-            items: { type: "string" }
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "string" },
+                coda_blurb: { type: "string" }
+              },
+              required: ["id", "coda_blurb"],
+              additionalProperties: false
+            }
           }
         },
         required: ["top_pick", "runner_ups"]
