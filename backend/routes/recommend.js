@@ -89,14 +89,23 @@ const mapCandidateToResponse = async (candidate, pitch = null, blurb = null) => 
   }
   if (runtimeTag) finalTags.unshift(runtimeTag);
 
-  const synopsisRaw = candidate.payload.semantic_description || '';
-  const metaMatch = synopsisRaw.match(/\[Metadata & Cultural Context\]:\s*(.*?)(?=\n\[|$)/s);
-  const plotMatch = synopsisRaw.match(/\[Story & Plot Type\]:\s*(.*?)(?=\n\[|$)/s);
-  
-  const cleanDesc = [];
-  if (metaMatch && metaMatch[1]) cleanDesc.push(metaMatch[1].trim());
-  if (plotMatch && plotMatch[1]) cleanDesc.push(plotMatch[1].trim());
-  const description = cleanDesc.length > 0 ? cleanDesc.join('\n\n') : synopsisRaw;
+  let description = '';
+  if (fetchedMeta && fetchedMeta.description && fetchedMeta.description.length > 30) {
+    description = fetchedMeta.description.split('\n').map(s => s.trim()).filter(s => s.length > 0)[0].replace(/<[^>]*>?/gm, '').trim();
+  } else if (fetchedMeta && fetchedMeta.synopsis && fetchedMeta.synopsis.length > 30) {
+    description = fetchedMeta.synopsis.split('\n').map(s => s.trim()).filter(s => s.length > 0)[0].replace(/<[^>]*>?/gm, '').trim();
+  }
+
+  if (!description) {
+    const synopsisRaw = candidate.payload.semantic_description || '';
+    const plotMatch = synopsisRaw.match(/\[Story & Plot Type\]:\s*(.*?)(?=\n\[|$)/s);
+    if (plotMatch && plotMatch[1]) {
+      // Just take the first paragraph of the plot match to keep it concise
+      description = plotMatch[1].trim().split('\n')[0];
+    } else {
+      description = synopsisRaw.split('\n')[0];
+    }
+  }
 
   let payloadGenres = candidate.payload.genres || [];
   if (payloadGenres.length === 0 || payloadGenres[0] === 'Unknown') {
@@ -641,7 +650,32 @@ router.post('/promote', async (req, res) => {
 
     if (!hit) {
       await qdrantService.pushToQueue(title, "unknown", 1);
-      return res.status(404).json({ error: `I don't have "${title}" in my database yet, but I've added it to my immediate study queue. Check back in a few minutes!` });
+      
+      const syntheticHit = {
+        id: title.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        payload: {
+          title: title,
+          media_type: "unknown",
+          genres: [],
+          description: "I don't have this in my brain yet, but I've added it to my immediate study queue. Once I finish analyzing it, it will have a full personalized profile. For now, you can still add it to your loved media, and I'll make sure to learn from it!",
+          semantic_description: ""
+        }
+      };
+
+      const finalRecommendation = await mapCandidateToResponse(
+        syntheticHit,
+        [
+          "I'm still studying this one! I've added it to my immediate study queue and will have a full breakdown ready shortly.",
+          "Even though I don't know much about it yet, you can still add it to your loved media so I can learn from your tastes."
+        ],
+        "Currently studying this..."
+      );
+
+      return res.json({
+        status: 'promoted_synthetic',
+        message: 'Promoted as a synthetic placeholder.',
+        recommendation: finalRecommendation
+      });
     }
 
     const candidates = [hit];
