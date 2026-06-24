@@ -1892,7 +1892,7 @@ Each candidate's "semantic_description" contains these labelled sections — use
 - CONTEXTUALIZATION RULE: If there is an active Transient recentContext (i.e. the user just asked for something specific), you MUST explicitly connect the pitch to their exact request. Bridge the gap between their craving and why this media fulfills it.
 - "SHOW, DON'T TELL" AMBIENT CONTEXT RULE: If "THE NOW" context is provided (e.g. "Late Night"), use it to silently shape the tone and words of your pitch. Do NOT explicitly mention the time or weather (e.g. do not say "Since it is night time..."). Instead, select vocabulary and highlight themes that naturally match that ambient atmosphere.
 - Use [Emotional Evocation] and [Who & When] from the candidate data to ground the pitch in real emotional truth — not generic praise
-- COMPARISON RULE: If the top pick is a genuine, undeniable stylistic sibling to one of the user's Loved Works, explicitly name that loved work and draw the comparison. If it is NOT a genuine sibling, do NOT force a comparison.
+- COMPARISON RULE: DO NOT mention any of the user's loved works unless there is an overwhelming, undeniable link (e.g. same creator, direct spiritual successor, or exact same very niche subgenre). If the connection is merely "they both have great worldbuilding" or "they are both sad", REMAIN COMPLETELY SILENT about the loved works. Pitch the work on its own standalone merits. Forced connections ruin the magic.
 - BANNED WORDS (any variation): "resonate", "narrative", "themes", "vibe", "explore", "element", "aspect", "profound", "delve", "aligns", "complexity", "emotional depth", "character-driven", "thematic"
 - No critic jargon. Talk about specific characters, moments, and feelings — not abstract qualities.
 
