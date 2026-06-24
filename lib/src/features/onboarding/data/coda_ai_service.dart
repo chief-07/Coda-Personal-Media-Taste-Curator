@@ -125,7 +125,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
       'response_format': {'type': 'json_object'},
     });
 
-    final targetUrl = '${getApiBaseUrl()}/api/openai';
+    final targetUrl = '${getApiBaseUrl()}/api/chat';
 
     try {
       final response = await http.post(Uri.parse(targetUrl), headers: headers, body: body);

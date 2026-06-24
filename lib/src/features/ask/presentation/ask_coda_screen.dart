@@ -339,7 +339,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
       final baseUrl = getApiBaseUrl();
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('$baseUrl/api/openai/transcribe'),
+        Uri.parse('$baseUrl/api/chat/transcribe'),
       );
 
       final filename = kIsWeb ? 'audio.webm' : 'audio.m4a';
