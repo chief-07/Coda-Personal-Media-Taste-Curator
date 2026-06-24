@@ -11,9 +11,6 @@ import 'package:coda/src/features/library/presentation/widgets/library_tab_bar.d
 import 'package:coda/src/features/library/presentation/library_screen.dart';
 import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
-import 'package:coda/src/features/home/data/recommendation_provider.dart';
-import 'package:coda/src/features/home/presentation/home_screen.dart';
-
 class DetectedMediaItem {
   final String title;
   final String mediaType;
