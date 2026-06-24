@@ -16,7 +16,9 @@
             "files": [
                 {
                     "name": "media_files",
-                    "accept": ["image/*"]
+                    "accept": [
+                        "image/*"
+                    ]
                 }
             ]
         }

@@ -110,3 +110,10 @@ flutter:
     - assets/app_icon_foreground.png
     - assets/interstellar.jpg
     - assets/lain.jpg
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/app_icon.png"
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/app_icon_foreground.png"
