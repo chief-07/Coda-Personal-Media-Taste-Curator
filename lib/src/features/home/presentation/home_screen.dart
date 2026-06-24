@@ -130,12 +130,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final prefs = ref.read(sharedPreferencesProvider);
     final currentChips = prefs.getStringList('coda_onboarding_chips') ?? [];
     
-    final normalizedTarget = (type == MediaType.visualNovel ? 'Visual Novel' : type.label).replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
+    final normalizedLabelTarget = (type == MediaType.visualNovel ? 'Visual Novel' : type.label).replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
+    final normalizedNameTarget = type.name.replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
     
     final updatedChips = currentChips.where((chip) {
       final normalizedChip = chip.replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
-      return normalizedChip != normalizedTarget;
+      return normalizedChip != normalizedLabelTarget && normalizedChip != normalizedNameTarget;
     }).toList();
+
+    if (updatedChips.length == currentChips.length) {
+      // Nothing was removed (shouldn't happen, but just in case)
+      return;
+    }
 
     if (updatedChips.isEmpty) {
       if (mounted) {
@@ -414,6 +420,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     return Scaffold(
       backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           SafeArea(

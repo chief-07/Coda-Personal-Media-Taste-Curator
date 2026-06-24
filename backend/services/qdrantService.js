@@ -200,8 +200,15 @@ class QdrantService {
         
         for (const point of result.points) {
           const ptTitle = point.payload?.title || '';
-          const cleanPt = ptTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
-          if (cleanPt === cleanTarget) {
+          // Strip everything after first '(' to handle things like "Title (2022)"
+          const ptBase = ptTitle.split('(')[0].trim();
+          const targetBase = title.split('(')[0].trim();
+          
+          const cleanPt = ptBase.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const cleanTargetBase = targetBase.toLowerCase().replace(/[^a-z0-9]/g, '');
+          
+          if (cleanPt === cleanTargetBase || cleanPt.includes(cleanTargetBase) || cleanTargetBase.includes(cleanPt)) {
+            // Check if it's a reasonable match (length difference isn't huge unless one is a subtitle)
             return point.payload;
           }
         }

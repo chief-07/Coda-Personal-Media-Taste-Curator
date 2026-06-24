@@ -640,7 +640,8 @@ router.post('/promote', async (req, res) => {
     const hit = exactHits ? { id: title.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: exactHits } : null;
 
     if (!hit) {
-      return res.status(404).json({ error: `Could not find ${title} in the database to promote.` });
+      await qdrantService.pushToQueue(title, "unknown", 1);
+      return res.status(404).json({ error: `I don't have "${title}" in my database yet, but I've added it to my immediate study queue. Check back in a few minutes!` });
     }
 
     const candidates = [hit];
