@@ -51,6 +51,11 @@ app.use('/share', detectRouter); // Mount PWA share target at root /share
 const webBuildPath = path.join(projectRoot, 'build', 'web');
 app.use(express.static(webBuildPath));
 
+// UptimeRobot endpoint to keep Render Web Service awake
+app.get('/ping', (req, res) => {
+  res.status(200).json({ status: "awake" });
+});
+
 // Fallback to index.html for SPA routing (or JSON status if files don't exist)
 app.use((req, res) => {
   const indexPath = path.join(webBuildPath, 'index.html');
@@ -65,10 +70,15 @@ app.use((req, res) => {
   }
 });
 
-// ── HTTP server (localhost dev) ───────────────────────────────────────────────
+// ── HTTP server (localhost dev / Render Web Service) ────────────────────────
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Coda Backend (HTTP)  → http://0.0.0.0:${PORT}`);
+  
+  // ── Launch Background Worker ──
+  // Boot up the infinite queue polling loop in the background.
+  // It runs concurrently without blocking HTTP requests.
+  require('./worker');
 });
 
 // ── HTTPS server (LAN microphone access) ─────────────────────────────────────
