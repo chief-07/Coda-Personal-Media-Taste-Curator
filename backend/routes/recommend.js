@@ -234,12 +234,11 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
   if (watchlistOnly) {
     const watchlist = soul.transient_memory?.watchlist || [];
     if (watchlist.length > 0) {
-      const watchlistTitles = watchlist.map(w => w.title);
+      const watchlistIds = watchlist.map(w => w.title.toLowerCase().replace(/[^a-z0-9]/g, ''));
       filter.must.push({
-        key: "title",
-        match: { any: watchlistTitles }
+        has_id: watchlistIds
       });
-      console.log(`[Recommend] Watchlist mode enabled. Restricting Qdrant search to ${watchlistTitles.length} titles.`);
+      console.log(`[Recommend] Watchlist mode enabled. Restricting Qdrant search to ${watchlistIds.length} titles.`);
     } else {
       console.warn(`[Recommend] Watchlist mode enabled, but user's watchlist is empty.`);
       throw new Error("EMPTY_WATCHLIST");
