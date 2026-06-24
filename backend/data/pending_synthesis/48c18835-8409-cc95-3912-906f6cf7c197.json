@@ -1,0 +1,82 @@
+{
+  "title": "The Usual Suspects",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Usual Suspects",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Mystery"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Following a truck hijack in New York, five criminals are arrested and brought together for questioning. As none of them are guilty, they plan a revenge operation against the police. The operation goes well, but then the influence of a legendary mastermind criminal called Keyser Söze is felt. It becomes clear that each one of them has wronged Söze at some point and must pay back now. The payback job leaves 27 men dead in a boat explosion, but the real question arises now: Who actually is Keyser Söze?",
+    "image": "https://m.media-amazon.com/images/M/MV5BOTE5MDUxZDUtZWZmZC00NDVmLWFhOGQtNWI2YTc4NzY3MGQ0XkEyXkFqcGc@._V1_QL75_UX380_CR0,2,380,562_.jpg",
+    "release_year": "1995",
+    "director": "Bryan Singer",
+    "writer": "Christopher McQuarrie",
+    "cast": [
+      "Kevin Spacey",
+      "Gabriel Byrne",
+      "Chazz Palminteri"
+    ],
+    "runtime": "106 min",
+    "score": "8.5/10 IMDb (1,236,455 votes) | 87% Rotten Tomatoes | 76/100 Metacritic",
+    "awards": "Won 2 Oscars. 37 wins & 17 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Usual Suspects",
+      "snippet": "[Letterboxd Review of \"The Usual Suspects\"] this is the most “with dad” movie to ever exist",
+      "link": "https://letterboxd.com/film/the-usual-suspects/"
+    },
+    {
+      "title": "Letterboxd review of The Usual Suspects",
+      "snippet": "[Letterboxd Review of \"The Usual Suspects\"] I don’t know, would’ve been better if Hockney, McManus, Fenster, Keaton and Kint just sung I Want It That Way in the police lineup.",
+      "link": "https://letterboxd.com/film/the-usual-suspects/"
+    },
+    {
+      "title": "Letterboxd review of The Usual Suspects",
+      "snippet": "[Letterboxd Review of \"The Usual Suspects\"] The real twist was Kevin Spacey is a villain in real life.",
+      "link": "https://letterboxd.com/film/the-usual-suspects/"
+    },
+    {
+      "title": "Letterboxd review of The Usual Suspects",
+      "snippet": "[Letterboxd Review of \"The Usual Suspects\"] it was a lot of men talking but i locked in at the end",
+      "link": "https://letterboxd.com/film/the-usual-suspects/"
+    },
+    {
+      "title": "Letterboxd review of The Usual Suspects",
+      "snippet": "[Letterboxd Review of \"The Usual Suspects\"] i want to change my name to keyser söze",
+      "link": "https://letterboxd.com/film/the-usual-suspects/"
+    },
+    {
+      "title": "The usual suspects, discussion/opinion : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/1bock59/the_usual_suspects_discussionopinion/"
+    },
+    {
+      "title": "SPOILERS: Can somebody please explain The Usual Suspects (1995 ... - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/15ey59r/spoilers_can_somebody_please_explain_the_usual/"
+    },
+    {
+      "title": "Does The Usual Suspects still hold up as a classic for you?",
+      "snippet": "Some movies work well even if they're spoiled for you (for example, Seven, another Spacey movie from the same year still works if you know the twists). With the Usual Suspects, the rewatchability after you know the twist comes from seeing all the clues you missed on the first viewing.",
+      "link": "www.reddit.com/r/movies/comments/v8u8ll/does_the_usual_suspects_still_hold_up_as_a/"
+    },
+    {
+      "title": "Movie Review : The Usual Suspects (1995) : r/moviereviews - Reddit",
+      "snippet": "A great, gritty script, beautifully-acted characters, and what many have called the greatest movie ending of all time, are some of the shining qualities that make the Usual Suspects an object worthy of praise above its humble-looking shell. The casting is very unusual but somehow fits perfectly.",
+      "link": "www.reddit.com/r/moviereviews/comments/ibej7a/movie_review_the_usual_suspects1995/"
+    },
+    {
+      "title": "The Usual Suspects : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions ...",
+      "link": "www.reddit.com/r/movies/comments/p226k/the_usual_suspects/"
+    }
+  ],
+  "uuid": "48c18835-8409-cc95-3912-906f6cf7c197"
+}

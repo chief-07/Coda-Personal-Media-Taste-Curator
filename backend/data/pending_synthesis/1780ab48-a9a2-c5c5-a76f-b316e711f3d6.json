@@ -1,0 +1,56 @@
+{
+  "title": "A Clockwork Orange",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "A Clockwork Orange",
+    "genres": [
+      "Crime",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Protagonist Alex DeLarge is an \"ultraviolent\" youth in futuristic Britain. As with all luck, his eventually runs out and he's arrested and convicted of murder. While in prison, Alex learns of an experimental program in which convicts are programmed to detest violence. If he goes through the program, his sentence will be reduced and he will be back on the streets sooner than expected. But Alex's ordeals are far from over once he hits the streets of Britain..",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTY3MjM1Mzc4N15BMl5BanBnXkFtZTgwODM0NzAxMDE@._V1_SX300.jpg",
+    "release_year": "1971",
+    "director": "Stanley Kubrick",
+    "writer": "Stanley Kubrick, Anthony Burgess",
+    "cast": [
+      "Malcolm McDowell",
+      "Patrick Magee",
+      "Michael Bates"
+    ],
+    "runtime": "136 min",
+    "score": "8.2/10 IMDb (930,482 votes) | 86% Rotten Tomatoes | 77/100 Metacritic",
+    "awards": "Nominated for 4 Oscars. 12 wins & 26 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of A Clockwork Orange",
+      "snippet": "[Letterboxd Review of \"A Clockwork Orange\"] moral of the story: use a different song when singin' in the bathroom",
+      "link": "https://letterboxd.com/film/a-clockwork-orange/"
+    },
+    {
+      "title": "Letterboxd review of A Clockwork Orange",
+      "snippet": "[Letterboxd Review of \"A Clockwork Orange\"] I want Stanley Kubrick to come back from the dead and explain this to me.",
+      "link": "https://letterboxd.com/film/a-clockwork-orange/"
+    },
+    {
+      "title": "Letterboxd review of A Clockwork Orange",
+      "snippet": "[Letterboxd Review of \"A Clockwork Orange\"] how wild that evan peters hasn’t aged a day in fifty years. drop the skincare routine buddy.",
+      "link": "https://letterboxd.com/film/a-clockwork-orange/"
+    },
+    {
+      "title": "Letterboxd review of A Clockwork Orange",
+      "snippet": "[Letterboxd Review of \"A Clockwork Orange\"] I am going to keep this short and sweet. I know that this is a \"film school\" film. I know that as someone who is a fan of film, I should view this as a classic, and talk about it at length. \"Oh mise-en-scene blahbudeeblu\"... but I just can't.I don't like rape, and I don't like watching people drink milk.",
+      "link": "https://letterboxd.com/film/a-clockwork-orange/"
+    },
+    {
+      "title": "Letterboxd review of A Clockwork Orange",
+      "snippet": "[Letterboxd Review of \"A Clockwork Orange\"] if any man tells you this is their favorite movie just like, run away as fast as possible",
+      "link": "https://letterboxd.com/film/a-clockwork-orange/"
+    }
+  ],
+  "uuid": "1780ab48-a9a2-c5c5-a76f-b316e711f3d6"
+}

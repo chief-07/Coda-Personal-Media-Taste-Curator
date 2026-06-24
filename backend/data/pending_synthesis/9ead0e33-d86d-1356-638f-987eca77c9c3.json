@@ -1,0 +1,24 @@
+{
+  "title": "The Housekeeper and the Professor",
+  "media_type": "book",
+  "structured_data": {
+    "title": "The Housekeeper and the Professor",
+    "genres": [
+      "Literary Fiction",
+      "Fiction & Literature"
+    ],
+    "tags": [],
+    "description": "<b>Yoko Ogawa's <i>The Housekeeper and the Professor</i> is an enchanting story about what it means to live in the present, and about the curious equations that can create a family.</b><br /><br /> He is a brilliant math Professor with a peculiar problem—ever since a traumatic head injury, he has lived with only eighty minutes of short-term memory.  <br /><br />She is an astute young Housekeeper—with a ten-year-old son—who is hired to care for the Professor.  And every morning, as the Professor and the Housekeeper are introduced to each other anew, a strange and beautiful relationship blossoms between them. Though he cannot hold memories for long (his brain is like a tape that begins to erase itself every eighty minutes), the Professor's mind is still alive with elegant equations from the past. And the numbers, in all of their articulate order, reveal a sheltering and poetic world to both the Housekeeper and her young son. The Professor is capable of discovering connections between the simplest of quantities—like the Housekeeper's shoe size—and the universe at large, drawing their lives ever closer and more profoundly together, even as his memory slips away.",
+    "image": "https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/59/4b/1d/594b1d6b-85a8-88ea-a25a-1ceb1874c45c/9781429952507.jpg/600x900bb.jpg",
+    "studio": "Yôko Ogawa & Stephen Snyder",
+    "director": "Yôko Ogawa & Stephen Snyder"
+  },
+  "community_snippets": [
+    {
+      "title": "Wikipedia: The Housekeeper and the Professor",
+      "snippet": "[Wikipedia Synopsis] The Housekeeper and the Professor (博士の愛した数式, hakase no ai shita suushiki) (literally \"The Professor's Beloved Equation\") is a novel by Yōko Ogawa set in modern-day Japan. It was published in Japan in August 2003, by Shinchosha. In 2009, the English translation by Stephen Snyder was published.",
+      "link": "https://en.wikipedia.org/wiki/The%20Housekeeper%20and%20the%20Professor"
+    }
+  ],
+  "uuid": "9ead0e33-d86d-1356-638f-987eca77c9c3"
+}

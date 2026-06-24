@@ -1,0 +1,57 @@
+{
+  "title": "The Lego Movie",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Lego Movie",
+    "genres": [
+      "Animation",
+      "Action",
+      "Adventure"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "The LEGO Movie is a 3D animated film which follows lead character, Emmet a completely ordinary LEGO mini-figure who is identified as the most \"extraordinary person\" and the key to saving the Lego universe. Emmet and his friends go on an epic journey to stop the evil tyrant, Lord Business.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTg4MDk1ODExN15BMl5BanBnXkFtZTgwNzIyNjg3MDE@._V1_SX300.jpg",
+    "release_year": "2014",
+    "director": "Phil Lord, Christopher Miller",
+    "writer": "Phil Lord, Christopher Miller, Dan Hageman",
+    "cast": [
+      "Chris Pratt",
+      "Will Ferrell",
+      "Elizabeth Banks"
+    ],
+    "runtime": "100 min",
+    "score": "7.7/10 IMDb (411,857 votes) | 96% Rotten Tomatoes | 83/100 Metacritic",
+    "awards": "Nominated for 1 Oscar. 72 wins & 67 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Lego Movie",
+      "snippet": "[Letterboxd Review of \"The Lego Movie\"] r.i.p. karl marx you would have loved the lego movie",
+      "link": "https://letterboxd.com/film/the-lego-movie/"
+    },
+    {
+      "title": "Letterboxd review of The Lego Movie",
+      "snippet": "[Letterboxd Review of \"The Lego Movie\"] \"Emmet, you didn't let me finish earlier, because I died.\"how do you think James Cameron would react if I told him I cried during The Lego Movie but not Titanic",
+      "link": "https://letterboxd.com/film/the-lego-movie/"
+    },
+    {
+      "title": "Letterboxd review of The Lego Movie",
+      "snippet": "[Letterboxd Review of \"The Lego Movie\"] 83\"President Business is going to end the world? But he's such a good guy! And Octan, they make good stuff: music, dairy products, coffee, TV shows, surveillance systems, all history books, voting machines...\"",
+      "link": "https://letterboxd.com/film/the-lego-movie/"
+    },
+    {
+      "title": "Letterboxd review of The Lego Movie",
+      "snippet": "[Letterboxd Review of \"The Lego Movie\"] me: :(benny: ✷ . ✵ · spaceship! · · ✷ ✧ ⊹ · ✵ spaceship! * ✫ ˚ · . ✫ * · .* ˚ . · ˚ 🚀 . ˚ ⋆ ✺ ˚ .* ✺ ˚ . · ⊹ ˚spaceship! ✵· ✷˚ · ✧me: :)",
+      "link": "https://letterboxd.com/film/the-lego-movie/"
+    },
+    {
+      "title": "Letterboxd review of The Lego Movie",
+      "snippet": "[Letterboxd Review of \"The Lego Movie\"] the lego movie (2014) is actually an extremely relevant anti-capitalist social satire in which president business runs a surveillance state and controls an oppressive police force led by good cop/bad cop, reflecting the political climate in america today. in this essay i will-",
+      "link": "https://letterboxd.com/film/the-lego-movie/"
+    }
+  ],
+  "uuid": "6efd2805-ac11-744d-88c9-f48eb6e316f9"
+}

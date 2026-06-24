@@ -1,0 +1,578 @@
+[
+  {
+    "title": "Love Letter",
+    "media_type": "movie"
+  },
+  {
+    "title": "All About Lily Chou-Chou",
+    "media_type": "movie"
+  },
+  {
+    "title": "Swallowtail Butterfly",
+    "media_type": "movie"
+  },
+  {
+    "title": "Picnic",
+    "media_type": "movie"
+  },
+  {
+    "title": "April Story",
+    "media_type": "movie"
+  },
+  {
+    "title": "Hana and Alice",
+    "media_type": "movie"
+  },
+  {
+    "title": "A Bride for Rip Van Winkle",
+    "media_type": "movie"
+  },
+  {
+    "title": "Vampire",
+    "media_type": "movie"
+  },
+  {
+    "title": "Nobody Knows",
+    "media_type": "movie"
+  },
+  {
+    "title": "Shoplifters",
+    "media_type": "movie"
+  },
+  {
+    "title": "Still Walking",
+    "media_type": "movie"
+  },
+  {
+    "title": "Like Father Like Son",
+    "media_type": "movie"
+  },
+  {
+    "title": "Our Little Sister",
+    "media_type": "movie"
+  },
+  {
+    "title": "After Life",
+    "media_type": "movie"
+  },
+  {
+    "title": "Broker",
+    "media_type": "movie"
+  },
+  {
+    "title": "A Scene at the Sea",
+    "media_type": "movie"
+  },
+  {
+    "title": "Kids Return",
+    "media_type": "movie"
+  },
+  {
+    "title": "Sonatine",
+    "media_type": "movie"
+  },
+  {
+    "title": "Dolls",
+    "media_type": "movie"
+  },
+  {
+    "title": "Kikujiro",
+    "media_type": "movie"
+  },
+  {
+    "title": "Blue Spring",
+    "media_type": "movie"
+  },
+  {
+    "title": "9 Souls",
+    "media_type": "movie"
+  },
+  {
+    "title": "Drive My Car",
+    "media_type": "movie"
+  },
+  {
+    "title": "Asako I & II",
+    "media_type": "movie"
+  },
+  {
+    "title": "Happy Hour",
+    "media_type": "movie"
+  },
+  {
+    "title": "Love & Pop",
+    "media_type": "movie"
+  },
+  {
+    "title": "Ritual",
+    "media_type": "movie"
+  },
+  {
+    "title": "Himizu",
+    "media_type": "movie"
+  },
+  {
+    "title": "Love Exposure",
+    "media_type": "movie"
+  },
+  {
+    "title": "Heavenly Forest",
+    "media_type": "movie"
+  },
+  {
+    "title": "Be With You",
+    "media_type": "movie"
+  },
+  {
+    "title": "Crying Out Love in the Center of the World",
+    "media_type": "movie"
+  },
+  {
+    "title": "Linda Linda Linda",
+    "media_type": "movie"
+  },
+  {
+    "title": "Confessions",
+    "media_type": "movie"
+  },
+  {
+    "title": "Tokyo Sonata",
+    "media_type": "movie"
+  },
+  {
+    "title": "Eureka",
+    "media_type": "movie"
+  },
+  {
+    "title": "Pulse",
+    "media_type": "movie"
+  },
+  {
+    "title": "Cure",
+    "media_type": "movie"
+  },
+  {
+    "title": "The Taste of Tea",
+    "media_type": "movie"
+  },
+  {
+    "title": "August in the Water",
+    "media_type": "movie"
+  },
+  {
+    "title": "Josee the Tiger and the Fish",
+    "media_type": "movie"
+  },
+  {
+    "title": "Nana",
+    "media_type": "movie"
+  },
+  {
+    "title": "We Are Little Zombies",
+    "media_type": "movie"
+  },
+  {
+    "title": "The Forest of Love",
+    "media_type": "movie"
+  },
+  {
+    "title": "Waterboys",
+    "media_type": "movie"
+  },
+  {
+    "title": "Swing Girls",
+    "media_type": "movie"
+  },
+  {
+    "title": "Shark Skin Man and Peach Hip Girl",
+    "media_type": "movie"
+  },
+  {
+    "title": "Kamikaze Girls",
+    "media_type": "movie"
+  },
+  {
+    "title": "Memories of Matsuko",
+    "media_type": "movie"
+  },
+  {
+    "title": "Norwegian Wood",
+    "media_type": "book"
+  },
+  {
+    "title": "Kafka on the Shore",
+    "media_type": "book"
+  },
+  {
+    "title": "The Wind-Up Bird Chronicle",
+    "media_type": "book"
+  },
+  {
+    "title": "1Q84",
+    "media_type": "book"
+  },
+  {
+    "title": "Sputnik Sweetheart",
+    "media_type": "book"
+  },
+  {
+    "title": "After Dark",
+    "media_type": "book"
+  },
+  {
+    "title": "Hard-Boiled Wonderland",
+    "media_type": "book"
+  },
+  {
+    "title": "South of the Border West of the Sun",
+    "media_type": "book"
+  },
+  {
+    "title": "Colorless Tsukuru Tazaki",
+    "media_type": "book"
+  },
+  {
+    "title": "Kitchen",
+    "media_type": "book"
+  },
+  {
+    "title": "Goodbye Tsugumi",
+    "media_type": "book"
+  },
+  {
+    "title": "Moshi Moshi",
+    "media_type": "book"
+  },
+  {
+    "title": "Amrita",
+    "media_type": "book"
+  },
+  {
+    "title": "Lizard",
+    "media_type": "book"
+  },
+  {
+    "title": "Heaven",
+    "media_type": "book"
+  },
+  {
+    "title": "Breasts and Eggs",
+    "media_type": "book"
+  },
+  {
+    "title": "All the Lovers in the Night",
+    "media_type": "book"
+  },
+  {
+    "title": "Convenience Store Woman",
+    "media_type": "book"
+  },
+  {
+    "title": "Earthlings",
+    "media_type": "book"
+  },
+  {
+    "title": "The Memory Police",
+    "media_type": "book"
+  },
+  {
+    "title": "The Housekeeper and the Professor",
+    "media_type": "book"
+  },
+  {
+    "title": "Revenge",
+    "media_type": "book"
+  },
+  {
+    "title": "Strange Weather in Tokyo",
+    "media_type": "book"
+  },
+  {
+    "title": "The Nakano Thrift Shop",
+    "media_type": "book"
+  },
+  {
+    "title": "Record of a Night Too Brief",
+    "media_type": "book"
+  },
+  {
+    "title": "No Longer Human",
+    "media_type": "book"
+  },
+  {
+    "title": "The Setting Sun",
+    "media_type": "book"
+  },
+  {
+    "title": "Snow Country",
+    "media_type": "book"
+  },
+  {
+    "title": "The Temple of the Golden Pavilion",
+    "media_type": "book"
+  },
+  {
+    "title": "Confessions of a Mask",
+    "media_type": "book"
+  },
+  {
+    "title": "Kokoro",
+    "media_type": "book"
+  },
+  {
+    "title": "I Am a Cat",
+    "media_type": "book"
+  },
+  {
+    "title": "Before the Coffee Gets Cold",
+    "media_type": "book"
+  },
+  {
+    "title": "Tales from the Cafe",
+    "media_type": "book"
+  },
+  {
+    "title": "Sweet Bean Paste",
+    "media_type": "book"
+  },
+  {
+    "title": "The Guest Cat",
+    "media_type": "book"
+  },
+  {
+    "title": "Tokyo Ueno Station",
+    "media_type": "book"
+  },
+  {
+    "title": "The Factory",
+    "media_type": "book"
+  },
+  {
+    "title": "The Hole",
+    "media_type": "book"
+  },
+  {
+    "title": "Out",
+    "media_type": "book"
+  },
+  {
+    "title": "Grotesque",
+    "media_type": "book"
+  },
+  {
+    "title": "The Devotion of Suspect X",
+    "media_type": "book"
+  },
+  {
+    "title": "Journey Under the Midnight Sun",
+    "media_type": "book"
+  },
+  {
+    "title": "Malice",
+    "media_type": "book"
+  },
+  {
+    "title": "The Honjin Murders",
+    "media_type": "book"
+  },
+  {
+    "title": "The Inugami Curse",
+    "media_type": "book"
+  },
+  {
+    "title": "Oyasumi Punpun",
+    "media_type": "manga"
+  },
+  {
+    "title": "Solanin",
+    "media_type": "manga"
+  },
+  {
+    "title": "A Girl on the Shore",
+    "media_type": "manga"
+  },
+  {
+    "title": "Downfall",
+    "media_type": "manga"
+  },
+  {
+    "title": "The Flowers of Evil",
+    "media_type": "manga"
+  },
+  {
+    "title": "Blood on the Tracks",
+    "media_type": "manga"
+  },
+  {
+    "title": "Inside Mari",
+    "media_type": "manga"
+  },
+  {
+    "title": "Monster",
+    "media_type": "manga"
+  },
+  {
+    "title": "20th Century Boys",
+    "media_type": "manga"
+  },
+  {
+    "title": "Pluto",
+    "media_type": "manga"
+  },
+  {
+    "title": "5 Centimeters per Second",
+    "media_type": "anime"
+  },
+  {
+    "title": "The Garden of Words",
+    "media_type": "anime"
+  },
+  {
+    "title": "Your Name",
+    "media_type": "anime"
+  },
+  {
+    "title": "Weathering With You",
+    "media_type": "anime"
+  },
+  {
+    "title": "Perfect Blue",
+    "media_type": "anime"
+  },
+  {
+    "title": "Millennium Actress",
+    "media_type": "anime"
+  },
+  {
+    "title": "Tokyo Godfathers",
+    "media_type": "anime"
+  },
+  {
+    "title": "Paranoia Agent",
+    "media_type": "anime"
+  },
+  {
+    "title": "Paprika",
+    "media_type": "anime"
+  },
+  {
+    "title": "Serial Experiments Lain",
+    "media_type": "anime"
+  },
+  {
+    "title": "Haibane Renmei",
+    "media_type": "anime"
+  },
+  {
+    "title": "Texhnolyze",
+    "media_type": "anime"
+  },
+  {
+    "title": "A Silent Voice",
+    "media_type": "anime"
+  },
+  {
+    "title": "Liz and the Blue Bird",
+    "media_type": "anime"
+  },
+  {
+    "title": "The Melancholy of Haruhi Suzumiya",
+    "media_type": "anime"
+  },
+  {
+    "title": "The Wind Rises",
+    "media_type": "anime"
+  },
+  {
+    "title": "Only Yesterday",
+    "media_type": "anime"
+  },
+  {
+    "title": "Whisper of the Heart",
+    "media_type": "anime"
+  },
+  {
+    "title": "Ocean Waves",
+    "media_type": "anime"
+  },
+  {
+    "title": "Neon Genesis Evangelion",
+    "media_type": "anime"
+  },
+  {
+    "title": "The End of Evangelion",
+    "media_type": "anime"
+  },
+  {
+    "title": "Ergo Proxy",
+    "media_type": "anime"
+  },
+  {
+    "title": "The Tatami Galaxy",
+    "media_type": "anime"
+  },
+  {
+    "title": "Ping Pong the Animation",
+    "media_type": "anime"
+  },
+  {
+    "title": "FLCL",
+    "media_type": "anime"
+  },
+  {
+    "title": "March Comes In Like A Lion",
+    "media_type": "anime"
+  },
+  {
+    "title": "Mushishi",
+    "media_type": "anime"
+  },
+  {
+    "title": "Kino's Journey",
+    "media_type": "anime"
+  },
+  {
+    "title": "Girls' Last Tour",
+    "media_type": "anime"
+  },
+  {
+    "title": "Land of the Lustrous",
+    "media_type": "anime"
+  },
+  {
+    "title": "Sonny Boy",
+    "media_type": "anime"
+  },
+  {
+    "title": "Wonder Egg Priority",
+    "media_type": "anime"
+  },
+  {
+    "title": "Revolutionary Girl Utena",
+    "media_type": "anime"
+  },
+  {
+    "title": "Princess Tutu",
+    "media_type": "anime"
+  },
+  {
+    "title": "Monogatari Series",
+    "media_type": "anime"
+  },
+  {
+    "title": "Homunculus",
+    "media_type": "manga"
+  },
+  {
+    "title": "Vagabond",
+    "media_type": "manga"
+  },
+  {
+    "title": "Yokohama Kaidashi Kikou",
+    "media_type": "manga"
+  },
+  {
+    "title": "Yotsuba&!",
+    "media_type": "manga"
+  }
+]

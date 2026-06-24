@@ -1,0 +1,82 @@
+{
+  "title": "Charlie and the Chocolate Factory",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Charlie and the Chocolate Factory",
+    "genres": [
+      "Adventure",
+      "Comedy",
+      "Family"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "When Willy Wonka decides to let five children into his chocolate factory, he decides to release five golden tickets in five separate chocolate bars, causing complete mayhem. The tickets start to be found, with the fifth going to a very special boy, called Charlie Bucket. With his Grandpa, Charlie joins the rest of the children to experience the most amazing factory ever. But not everything goes to plan within the factory.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNjcxMjg1Njg2NF5BMl5BanBnXkFtZTcwMjQ4NzMzMw@@._V1_SX300.jpg",
+    "release_year": "2005",
+    "director": "Tim Burton",
+    "writer": "Roald Dahl, John August",
+    "cast": [
+      "Johnny Depp",
+      "Freddie Highmore",
+      "David Kelly"
+    ],
+    "runtime": "115 min",
+    "score": "6.7/10 IMDb (566,515 votes) | 83% Rotten Tomatoes | 72/100 Metacritic",
+    "awards": "Nominated for 1 Oscar. 15 wins & 52 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Charlie and the Chocolate Factory",
+      "snippet": "[Letterboxd Review of \"Charlie and the Chocolate Factory\"] Mike Teavee definitely grew up to be a Twitch streamer",
+      "link": "https://letterboxd.com/film/charlie-and-the-chocolate-factory/"
+    },
+    {
+      "title": "Letterboxd review of Charlie and the Chocolate Factory",
+      "snippet": "[Letterboxd Review of \"Charlie and the Chocolate Factory\"] I do not trust people who don’t like this movie",
+      "link": "https://letterboxd.com/film/charlie-and-the-chocolate-factory/"
+    },
+    {
+      "title": "Letterboxd review of Charlie and the Chocolate Factory",
+      "snippet": "[Letterboxd Review of \"Charlie and the Chocolate Factory\"] someone on twitter pointed out that this is literally just Saw but with no blood to make it a kids movie and ever since i read that my life has not known peace",
+      "link": "https://letterboxd.com/film/charlie-and-the-chocolate-factory/"
+    },
+    {
+      "title": "Letterboxd review of Charlie and the Chocolate Factory",
+      "snippet": "[Letterboxd Review of \"Charlie and the Chocolate Factory\"] willy wonka made not one (1) but two (2) cannibalism jokes",
+      "link": "https://letterboxd.com/film/charlie-and-the-chocolate-factory/"
+    },
+    {
+      "title": "Letterboxd review of Charlie and the Chocolate Factory",
+      "snippet": "[Letterboxd Review of \"Charlie and the Chocolate Factory\"] Five golden tickets are distributed all over the world........for 5 white kids to win",
+      "link": "https://letterboxd.com/film/charlie-and-the-chocolate-factory/"
+    },
+    {
+      "title": "Tim Burton's Charlie and the Chocolate Factory is a great ... - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/18e3abo/tim_burtons_charlie_and_the_chocolate_factory_is/"
+    },
+    {
+      "title": "GOOD or BAD: Charlie and the Chocolate Factory (2005) : r/movies - Reddit",
+      "snippet": "Directed by Tim Burton, Charlie and the Chocolate Factory has always been a movie I've enjoyed. I actually watched this movie before seeing the Gene Wilder version. I liked the look of the movie, it being a Burton production and all, just different parts of the factory and different gadgets made it visually interesting.",
+      "link": "www.reddit.com/r/movies/comments/kmr0bi/good_or_bad_charlie_and_the_chocolate_factory_2005/"
+    },
+    {
+      "title": "Charlie and the Chocolate Factory is the best adaptation of ... - Reddit",
+      "snippet": "The first movie only uses 5% of the book and got the title wrong. Literally the only things in this movie that are in the book is the plot, 3 of the 4 factory rooms and the dramatic boat ride. Everything else was entirely made up and did not exist in the book. And instead of a room of squirrels with bad nuts, it was a room of geese with bad eggs.",
+      "link": "www.reddit.com/r/movies/comments/zn8hzb/charlie_and_the_chocolate_factory_is_the_best/"
+    },
+    {
+      "title": "How did Charlie and the Chocolate Factory (2005) do so well? - Reddit",
+      "snippet": "Ok, but then you have to acknowledge majority of people enjoyed the Depp Chocolate Factory movie and the Star Wars prequels (especially Revenge of the Sith, the others are at least arguable but I draw the line at pretending everyone hated that movie in 2005).",
+      "link": "www.reddit.com/r/boxoffice/comments/183qqle/how_did_charlie_and_the_chocolate_factory_2005_do/"
+    },
+    {
+      "title": "I think Tim Burton's Charlie and the Chocolate factory is ... - Reddit",
+      "snippet": "I think if you could put Gene Wilder's Wonka in Tim Burton's one (because the factory was much better in his movie IMO) it would be perfect. And also keep the thing of Charlie stealing that fizzy drink since Tim Burton's one made him too perfect.",
+      "link": "www.reddit.com/r/unpopularopinion/comments/1azlx3v/i_think_tim_burtons_charlie_and_the_chocolate/"
+    }
+  ],
+  "uuid": "8574d7d4-4db9-b67d-27e9-f678b28a2a76"
+}

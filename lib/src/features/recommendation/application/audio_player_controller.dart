@@ -31,7 +31,7 @@ class AudioPlayerState {
 
 class AudioPlayerController extends Notifier<AudioPlayerState> {
   final _audioPlayer = AudioPlayer();
-  static const _mutePrefsKey = 'coda_soundtracks_muted';
+  static const _autoplayPrefsKey = 'coda_autoplay_audio';
 
   final Map<String, BytesSource> _cachedSources = {};
 
@@ -56,7 +56,8 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
   @override
   AudioPlayerState build() {
     final prefs = ref.watch(sharedPreferencesProvider);
-    final isMuted = prefs.getBool(_mutePrefsKey) ?? true; // Default to muted for auto-play compliance
+    final autoplay = prefs.getBool(_autoplayPrefsKey) ?? false;
+    final isMuted = !autoplay; // If autoplay is off, we start muted (silent)
 
     ref.listen(homeRecommendationProvider, (previous, next) {
       final rec = next.value;
@@ -158,15 +159,8 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
       isPlaying: newMute ? false : (state.currentUrl != null),
     );
 
-    // Save to SharedPreferences safely
-    try {
-      final prefs = ref.read(sharedPreferencesProvider);
-      await prefs.setBool(_mutePrefsKey, newMute);
-    } catch (e) {
-      print('[AudioPlayer Error] Failed to save mute preference: $e');
-    }
-
-    // Control audio player safely
+    // Session override only - we no longer save to SharedPreferences here.
+    // The settings menu 'coda_autoplay_audio' governs the default launch state.    // Control audio player safely
     try {
       if (newMute) {
         await _audioPlayer.setVolume(0.0);

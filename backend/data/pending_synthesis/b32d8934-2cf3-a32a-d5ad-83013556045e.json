@@ -1,0 +1,57 @@
+{
+  "title": "Click",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Click",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Fantasy"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Michael Newman (Sandler) is a hard-working family man who must please his boss (Hasselhoff) in order to get promoted. This gives him less time with his family, and he wishes for a remote with which to control his life. This soon comes true when he meets Morty (Walken), a crazy sales clerk who has the ultimate remote: a remote in which he can do anything, including muting, skipping, and dubbing his life. Michael finds this to be the opportunity in which he can not only skip every argument, but also skip to his promotion. He sees this as a good idea--until the remote goes horribly wrong.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTA1MTUxNDY4NzReQTJeQWpwZ15BbWU2MDE3ODAxNw@@._V1_QL75_UX380_CR0,1,380,562_.jpg",
+    "release_year": "2006",
+    "director": "Frank Coraci",
+    "writer": "Steve Koren, Mark O'Keefe",
+    "cast": [
+      "Adam Sandler",
+      "Kate Beckinsale",
+      "Christopher Walken"
+    ],
+    "runtime": "107 min",
+    "score": "6.4/10 IMDb (386,574 votes) | 34% Rotten Tomatoes | 45/100 Metacritic",
+    "awards": "Nominated for 1 Oscar. 3 wins & 12 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Click",
+      "snippet": "[Letterboxd Review of \"Click\"] I came into this world in a hospital that no longer stands. The unfortunate truth about our awesome and terrible existence as a species is that the institutions we create will not last forever. Doors will be shuttered, and as the generations march on, so too will our life's work be lost to the cold, unfeeling annals of History. However, this sentiment need not apply to art. Indeed, our creations meant to challenge and entertain audiences may endure long after we and everything we have ever stood for crumble into dust. Artistic expression is among the most beautiful and everlasting Concepts hum",
+      "link": "https://letterboxd.com/film/click/"
+    },
+    {
+      "title": "Letterboxd review of Click",
+      "snippet": "[Letterboxd Review of \"Click\"] I didn't expect to cry, but I did.",
+      "link": "https://letterboxd.com/film/click/"
+    },
+    {
+      "title": "Letterboxd review of Click",
+      "snippet": "[Letterboxd Review of \"Click\"] a little too similar to the way i play sims 4",
+      "link": "https://letterboxd.com/film/click/"
+    },
+    {
+      "title": "Letterboxd review of Click",
+      "snippet": "[Letterboxd Review of \"Click\"] the premise is that capitalism makes balancing work and home life impossible and that to get ahead, you have to put your brain on auto-pilot and neglect your own happiness, damnbasically it’s a wonderful life 2 once the initial happy madison production type antics stop",
+      "link": "https://letterboxd.com/film/click/"
+    },
+    {
+      "title": "Letterboxd review of Click",
+      "snippet": "[Letterboxd Review of \"Click\"] When I was a kid, I cried at the scene where his dad dies.This time, I cried when Adam Sandler paused time to fart in someone's face.",
+      "link": "https://letterboxd.com/film/click/"
+    }
+  ],
+  "uuid": "b32d8934-2cf3-a32a-d5ad-83013556045e"
+}

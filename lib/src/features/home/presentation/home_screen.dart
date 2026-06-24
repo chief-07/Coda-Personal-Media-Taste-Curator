@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:coda/src/core/memory/living_memory.dart';
@@ -15,6 +16,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
+import 'package:coda/src/core/providers/watchlist_mode_provider.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -303,6 +306,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         seenAppends: [rec.title],
       );
       await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
+      
+      // Async submit to backend to update permanent soul & trigger enrichment if needed
+      unawaited(ref.read(recommendationServiceProvider).submitSwipe(
+        title: rec.title,
+        action: 'loved',
+      ));
     } catch (e) {
       debugPrint('Error updating loved taste memory: $e');
     }
@@ -642,7 +651,7 @@ class StaticCardFrame extends StatelessWidget {
 // Swipeable Card Wrapper
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _SwipeableCard extends StatelessWidget {
+class _SwipeableCard extends ConsumerWidget {
   const _SwipeableCard({
     required this.recommendation,
     required this.dragOffset,
@@ -663,9 +672,10 @@ class _SwipeableCard extends StatelessWidget {
   final VoidCallback onDragEnd;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final double gapWidth = dragOffset.abs() * 0.85;
     final isRightSwipe = dragOffset > 0;
+    final isWatchlistMode = ref.watch(watchlistModeProvider);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -685,7 +695,53 @@ class _SwipeableCard extends StatelessWidget {
                 curve: isAnimatingOut ? Curves.easeIn : Curves.easeOut,
                 transform: Matrix4.translationValues(dragOffset * 0.85, 0, 0)
                   ..rotateZ(dragOffset * 0.0004),
-                child: RecommendationCard(recommendation: recommendation),
+                child: Stack(
+                  children: [
+                    RecommendationCard(recommendation: recommendation),
+                    if (isWatchlistMode)
+                      Positioned(
+                        top: 24,
+                        right: 24,
+                        child: GestureDetector(
+                          onTap: () {
+                            ref.read(watchlistModeProvider.notifier).toggle();
+                            ref.read(homeRecommendationProvider.notifier).reload();
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(PhosphorIconsBold.bookmarkSimple, size: 14, color: Colors.white),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Watchlist Mode',
+                                      style: GoogleFonts.inter(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(PhosphorIconsBold.x, size: 12, color: Colors.white70),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
 

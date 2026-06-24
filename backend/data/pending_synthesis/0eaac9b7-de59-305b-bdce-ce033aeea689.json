@@ -1,0 +1,81 @@
+{
+  "title": "The Da Vinci Code",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Da Vinci Code",
+    "genres": [
+      "Mystery",
+      "Thriller"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Dan Brown's controversial best-selling novel about a powerful secret that's been kept under wraps for thousands of years comes to the screen in this suspense thriller from Director Ron Howard. The stately silence of Paris' Louvre museum is broken when one of the gallery's leading curators is found dead on the grounds, with strange symbols carved into his body and left around the spot where he died. Hoping to learn the significance of the symbols, police bring in Sophie Neveu (Audrey Tautou), a gifted cryptographer who is also the victim's granddaughter. Needing help, Sophie calls on Robert Langdon (Tom Hanks), a leading symbologist from the United States. As Sophie and Robert dig deeper into the case, they discover the victim's involvement in the Priory of Sion, a secret society whose members have been privy to forbidden knowledge dating back to the birth of Christianity. In their search, Sophie and Robert happen upon evidence that could lead to the final resting place of the Holy Grail, while members of the priory and an underground Catholic society known as Opus Dei give chase, determined to prevent them from sharing their greatest secrets with the world.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMjIxMjQyMTc3Nl5BMl5BanBnXkFtZTcwMTA1MDUzMw@@._V1_SX300.jpg",
+    "release_year": "2006",
+    "director": "Ron Howard",
+    "writer": "Akiva Goldsman, Dan Brown",
+    "cast": [
+      "Tom Hanks",
+      "Audrey Tautou",
+      "Jean Reno"
+    ],
+    "runtime": "149 min",
+    "score": "6.6/10 IMDb (480,857 votes) | 25% Rotten Tomatoes | 46/100 Metacritic",
+    "awards": "8 wins & 21 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Da Vinci Code",
+      "snippet": "[Letterboxd Review of \"The Da Vinci Code\"] me: hey rob what's uprobert langdon: rob has three letters. three points make up a triangle. there is a triangle on the floor of the sistine chapel. michelangelo painted a symbol in the northwest corner. the retainer you lost in the 4th grade is behind your bookshelf.me: wtf",
+      "link": "https://letterboxd.com/film/the-da-vinci-code/"
+    },
+    {
+      "title": "Letterboxd review of The Da Vinci Code",
+      "snippet": "[Letterboxd Review of \"The Da Vinci Code\"] was about to say \"maybe the real Holy Grail was the friend he made along the way\" as a joke but that's literally just a plot summary",
+      "link": "https://letterboxd.com/film/the-da-vinci-code/"
+    },
+    {
+      "title": "Letterboxd review of The Da Vinci Code",
+      "snippet": "[Letterboxd Review of \"The Da Vinci Code\"] i fucking love historical conspiracy theories ugh i'm such a hoe for this movie i even cried at the end",
+      "link": "https://letterboxd.com/film/the-da-vinci-code/"
+    },
+    {
+      "title": "Letterboxd review of The Da Vinci Code",
+      "snippet": "[Letterboxd Review of \"The Da Vinci Code\"] National Treasure for people that think they're cultured, a 2h30m exposition dump masquerading as scholarly literature, hundreds of years of art and history broadly packaged into aggressively artless and subtext-free conspiratorial tedium. No bigger indication of exactly what this is than how Hanks' Langdon is a harvard professor of \"symbology\"—and opens the film by explaining to a bunch of normies that this is, of course, the study of signs and symbols and their meaning or interpretation throughout history—despite the fact that 1) \"symbol\" is in the goddamn name and 2) this is not an existing",
+      "link": "https://letterboxd.com/film/the-da-vinci-code/"
+    },
+    {
+      "title": "Letterboxd review of The Da Vinci Code",
+      "snippet": "[Letterboxd Review of \"The Da Vinci Code\"] I’m convinced this shit is legit.",
+      "link": "https://letterboxd.com/film/the-da-vinci-code/"
+    },
+    {
+      "title": "The Da Vinci Code - Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Da Vinci Code on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/da_vinci_code"
+    },
+    {
+      "title": "Critical Consensus: \"The Da Vinci Code\" Is Dull | Rotten Tomatoes",
+      "snippet": "The big screen adaptation of Dan Brown's novel \"The Da Vinci Code\" is a major disappointment, with only 16% of the nation's critics recommending the movie as of this writing. One of the problems, critics say, is that the movie is too slavishly faithful to the book, making it a poorly paced, dull, and only occasionally thrilling experience.",
+      "link": "editorial.rottentomatoes.com/article/Critical-Consensus-The-Da-Vinci-Code-Is-Dull/"
+    },
+    {
+      "title": "Veni, Vidi, Da Vinci movie review - Roger Ebert",
+      "snippet": "They say The Da Vinci Code has sold more copies than any book since the Bible. Good thing it has a different ending. Dan Brown's novel is utterly preposterous; Ron Howard's movie is preposterously entertaining. Both contain accusations against the Catholic Church and its order of Opus Dei that ...",
+      "link": "www.rogerebert.com/reviews/the-da-vinci-code-2006"
+    },
+    {
+      "title": "The Da Vinci Code (2006) - Rotten Tomatoes",
+      "snippet": "Critics Consensus: What makes Dan Brown's novel a best seller is evidently not present in this dull and bloated movie adaptation of The Da Vinci Code.",
+      "link": "pages.cs.wisc.edu/~rasiga/CS784_project/HTML_data/rottentomatoes/The Da Vinci Code.html"
+    },
+    {
+      "title": "The Da Vinci Code (2006) - User reviews - IMDb",
+      "snippet": "The Da Vinci Code (2006) - Movies, TV, Celebs, and more...",
+      "link": "www.imdb.com/title/tt0382625/reviews/"
+    }
+  ],
+  "uuid": "0eaac9b7-de59-305b-bdce-ce033aeea689"
+}

@@ -1,0 +1,30 @@
+{
+  "title": "Asako I & II",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Asako I & II",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "tags": [
+      "movie",
+      "Not Rated"
+    ],
+    "description": "Asako is a 21-year-old woman, living in Osaka. She falls in love with Baku who has a free spirit. One day, Baku suddenly disappears. Two years later, Asako now lives in Tokyo and she meets Ryohei. He looks just like her ex-boyfriend Baku, but he has a completely different personality. Ryohei is a salaryman, with a sincere personality. Asako falls in love with Ryohei.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNzdhOWRkMjQtZThlZi00MmQ3LTg3OGMtZDhlZDNhMjBjNDZmXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2018",
+    "director": "Ryûsuke Hamaguchi",
+    "writer": "Tomoka Shibasaki, Sachiko Tanaka, Ryûsuke Hamaguchi",
+    "cast": [
+      "Masahiro Higashide",
+      "Erika Karata",
+      "Sairi Itô"
+    ],
+    "runtime": "119 min",
+    "score": "7.0/10 IMDb (5,717 votes) | 77% Rotten Tomatoes | 69/100 Metacritic",
+    "awards": "3 wins & 10 nominations total"
+  },
+  "community_snippets": [],
+  "uuid": "b05a4673-c7af-9fa0-87e1-3f9328b0f417"
+}

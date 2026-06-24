@@ -4,6 +4,7 @@ import 'dart:io' show File;
 import 'dart:math' as math;
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/api_config.dart';
+import 'package:coda/src/core/providers/watchlist_mode_provider.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
@@ -366,7 +367,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
       }
     } catch (e) {
       debugPrint('Transcription error: $e');
-      _showErrorSnackBar('Failed to transcribe audio: $e');
+      _showErrorSnackBar('Audio unclear, please tap to try again.');
     } finally {
       if (mounted) {
         setState(() {
@@ -380,8 +381,11 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFFE03E3E),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: Colors.white.withValues(alpha: 0.15),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -411,10 +415,12 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
 
     try {
       final memory = ref.read(livingMemoryProvider);
+      final isWatchlistMode = ref.read(watchlistModeProvider);
       final response = await ref.read(recommendationServiceProvider).sendAskChatMessage(
         memory: memory,
         chatHistory: chatHistory,
         userMessage: text,
+        watchlistOnly: isWatchlistMode,
       );
 
       if (!mounted) return;
@@ -423,7 +429,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
       final message = response['message'] as String? ?? '';
       Recommendation? recommendation;
 
-      if (status == 'success' && response['recommendation'] != null) {
+      if ((status == 'success' || status == 'match') && response['recommendation'] != null) {
         final recData = response['recommendation'] as Map<String, dynamic>;
         try {
           final result = RecommendationResult.fromJson(recData);

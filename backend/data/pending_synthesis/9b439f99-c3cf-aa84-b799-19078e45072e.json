@@ -1,0 +1,57 @@
+{
+  "title": "Sonatine",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Sonatine",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Crime"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Several yakuza from Tokyo are sent to Okinawa to help end a gang war. The war then escalates and the Tokyo drifters decide to lay low at the beach.",
+    "image": "https://m.media-amazon.com/images/M/MV5BYjk2NGRhZDUtNjVmNy00NmFiLTk3MWQtMzIyZjc1ZmExYzAzXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1993",
+    "director": "Takeshi Kitano",
+    "writer": "Takeshi Kitano",
+    "cast": [
+      "Takeshi Kitano",
+      "Aya Kokumai",
+      "Tetsu Watanabe"
+    ],
+    "runtime": "94 min",
+    "score": "7.4/10 IMDb (24,947 votes) | 93% Rotten Tomatoes | 73/100 Metacritic",
+    "awards": "4 wins & 2 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Sonatine (1993) - IMDb",
+      "snippet": "Sonatine: Directed by Takeshi Kitano. With Takeshi Kitano, Aya Kokumai, Tetsu Watanabe, Masanobu Katsumura. Several yakuza from Tokyo are sent to Okinawa to help end a gang war. The war then escalates and the Tokyo drifters decide to lie low at the beach.",
+      "link": "www.imdb.com/title/tt0108188/"
+    },
+    {
+      "title": "Sonatine (1993) is the greatest Yakuza / gangster movie I've ... - Reddit",
+      "snippet": "Out of every gangster movie I've ever seen this is the only one that's actually effective at communicating the absolute tragedy of this loss of compassion, the loss of connection and caring for others, of what actually makes life worth living, all for the sake of being a \"tough guy\".",
+      "link": "www.reddit.com/r/movies/comments/17ds53q/sonatine_1993_is_the_greatest_yakuza_gangster/"
+    },
+    {
+      "title": "Sonatine movie review & film summary - Roger Ebert",
+      "snippet": "\"Sonatine\" is the latest film to be released in this country by Takeshi Kitano, who wrote, directed and edited it-and stars in it under his acting name, Beat Takeshi. It arrives here only a month after \"Fireworks,\" his 1997 Venice Film Festival winner, but was made in 1993, the fourth of his seven films. He is the biggest star in Japan right now, and as a filmmaker one of the most ...",
+      "link": "www.rogerebert.com/reviews/sonatine-1998"
+    },
+    {
+      "title": "Sonatine | Audience Reviews | Rotten Tomatoes",
+      "snippet": "See what audiences are saying about Sonatine. Read user reviews, reactions, and ratings on Rotten Tomatoes. Join the conversation today.",
+      "link": "www.rottentomatoes.com/m/sonatine/reviews?type=user"
+    },
+    {
+      "title": "Sonatine (1993) Review",
+      "snippet": "'Sonatine' features the work of another frequent collaborator of Kitano's: composer Joe Hisaishi. His score is beautiful, mournful and melodic; drifting through the film like a euphonious wind. There are few partnerships between composer and director as fruitful in cinema, perhaps only that of David Lynch and Angelo Badalamenti comes close.",
+      "link": "www.reelreviewsandrecommendations.com/post/sonatine-1993-review-1"
+    }
+  ],
+  "uuid": "9b439f99-c3cf-aa84-b799-19078e45072e"
+}

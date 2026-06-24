@@ -1,0 +1,56 @@
+{
+  "title": "Due Date",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Due Date",
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Businessman and first time father (to-be), Peter Highman, is in Atlanta heading home to LA, where his wife is about to give birth, but after getting kicked off a plane, due to his seat mate, the pair end up trying to hitch a ride to the west coast.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTU5MTgxODM3Nl5BMl5BanBnXkFtZTcwMjMxNDEwNA@@._V1_SX300.jpg",
+    "release_year": "2010",
+    "director": "Todd Phillips",
+    "writer": "Alan R. Cohen, Alan Freedland, Adam Sztykiel",
+    "cast": [
+      "Robert Downey Jr.",
+      "Zach Galifianakis",
+      "Michelle Monaghan"
+    ],
+    "runtime": "95 min",
+    "score": "6.5/10 IMDb (370,607 votes) | 39% Rotten Tomatoes | 51/100 Metacritic",
+    "awards": "7 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Due Date",
+      "snippet": "[Letterboxd Review of \"Due Date\"] Robert Downey Jr.'s character goes from being way too mean to being way too forgiving.",
+      "link": "https://letterboxd.com/film/due-date/"
+    },
+    {
+      "title": "Letterboxd review of Due Date",
+      "snippet": "[Letterboxd Review of \"Due Date\"] dad, you were like a father to me.",
+      "link": "https://letterboxd.com/film/due-date/"
+    },
+    {
+      "title": "Letterboxd review of Due Date",
+      "snippet": "[Letterboxd Review of \"Due Date\"] I wish Robert Downey Jr would do more comedies",
+      "link": "https://letterboxd.com/film/due-date/"
+    },
+    {
+      "title": "Letterboxd review of Due Date",
+      "snippet": "[Letterboxd Review of \"Due Date\"] I'm not sure how to assess this film; all I am certain of is that its main character, Peter, is one of the few protagonists in cinema history with which I am able to empathize a grand total of 0.00%",
+      "link": "https://letterboxd.com/film/due-date/"
+    },
+    {
+      "title": "Letterboxd review of Due Date",
+      "snippet": "[Letterboxd Review of \"Due Date\"] I had a lot more fun with this than I expected. The whole movie is just one disaster after another, and somehow it keeps getting funnier every time things fall apart. Robert Downey Jr. plays the straight man perfectly while Zach Galifianakis steals almost every scene with his awkward charm. It’s not trying to be anything more than a ridiculous road trip comedy, and it nails that from start to finish.",
+      "link": "https://letterboxd.com/film/due-date/"
+    }
+  ],
+  "uuid": "6cf0d5c6-75c1-6ca9-3477-12e7c8640e2d"
+}

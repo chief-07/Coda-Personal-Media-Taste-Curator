@@ -244,6 +244,7 @@ class UserSoulService {
     await qdrantService.upsert('user_memory', uuid, vector, {
       userId,
       recentContext: recentContext,
+      contextualState: livingMemoryJson.contextualState || null,
       seen: livingMemoryJson.seen || [],
       notForMe: livingMemoryJson.notForMe || [],
       watchlist: livingMemoryJson.watchlist || [],

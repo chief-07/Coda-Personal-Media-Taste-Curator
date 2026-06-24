@@ -212,6 +212,10 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) {
           if (widget.sessionId == null) {
+            // Trigger a home screen refresh for this media type so the user sees a new pick next
+            if (activeRec != null) {
+              ref.read(homeRecommendationProvider.notifier).clearActivePickQueue(activeRec.mediaType);
+            }
             ref.read(activeSessionProvider.notifier).clear();
           }
           return;

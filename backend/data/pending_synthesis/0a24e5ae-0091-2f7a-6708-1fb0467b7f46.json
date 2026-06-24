@@ -1,0 +1,82 @@
+{
+  "title": "The Fighter",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Fighter",
+    "genres": [
+      "Action",
+      "Biography",
+      "Drama"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "The Fighter is a drama about boxer \"Irish\" Micky Ward's unlikely road to the world light welterweight title. His Rocky-like rise was shepherded by half-brother Dicky, a boxer-turned-trainer on the verge of being KO'd by drugs and crime.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTM0ODk3MjM1MV5BMl5BanBnXkFtZTcwNzc1MDIwNA@@._V1_SX300.jpg",
+    "release_year": "2010",
+    "director": "David O. Russell",
+    "writer": "Keith Dorrington, Paul Tamasy, Eric Johnson",
+    "cast": [
+      "Mark Wahlberg",
+      "Christian Bale",
+      "Amy Adams"
+    ],
+    "runtime": "116 min",
+    "score": "7.8/10 IMDb (405,736 votes) | 91% Rotten Tomatoes | 79/100 Metacritic",
+    "awards": "Won 2 Oscars. 74 wins & 123 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "The Fighter | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Fighter on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/the_fighter_2011"
+    },
+    {
+      "title": "The Fighter | Critic Reviews | Rotten Tomatoes",
+      "snippet": "Read what top critics are saying about The Fighter. See ratings, reviews, and more on Rotten Tomatoes. Click to explore full critic breakdown.",
+      "link": "www.rottentomatoes.com/m/fighter-2009/reviews?type=top_critics"
+    },
+    {
+      "title": "I shoulda been the contender movie review - Roger Ebert",
+      "snippet": "When Micky gets a chance to train seriously in Vegas, Charlene more or less forces him to take it. When Dicky and Alice follow him out there, it's showdown time, and Charlene threatens to leave. But the movie is imprecise about how this plays out, and they're all at ringside at the end. The weakness of the film is the weakness of the leading role. That's not a criticism of Mark Wahlberg ...",
+      "link": "www.rogerebert.com/reviews/the-fighter-2010"
+    },
+    {
+      "title": "The Independent Critic - \"The Fighter\" Review",
+      "snippet": "Based upon a true story, The Fighter is a conventional boxing flick where boxing isn't so much a plot device as it is the world in which these people live. The film possesses your stereotypical underdog, a hilariously and frighteningly inept family system, the muse who inspires change and, of course, the winner takes all climax.",
+      "link": "theindependentcritic.com/fighter"
+    },
+    {
+      "title": "The Fighter - Wikipedia",
+      "snippet": "Review aggregation website Rotten Tomatoes gives The Fighter a rating of 91% based on reviews from 256 critics, with an average rating of 7.8/10. The site's critical consensus reads: \"Led by a trio of captivating performances from Mark Wahlberg, Christian Bale, and Amy Adams, The Fighter is a solidly entertaining, albeit predictable, entry in ...",
+      "link": "en.wikipedia.org/wiki/The_Fighter"
+    },
+    {
+      "title": "The Fighter (2010) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review.",
+      "link": "www.imdb.com/title/tt0964517/reviews/"
+    },
+    {
+      "title": "The Fighter (2010) - IMDb",
+      "snippet": "The Fighter: Directed by David O. Russell. With Mark Wahlberg, Christian Bale, Amy Adams, Melissa Leo. Based on the story of Micky Ward, a fledgling boxer who tries to escape the shadow of his more famous but troubled older boxing brother and get his own shot at greatness.",
+      "link": "www.imdb.com/title/tt0964517/"
+    },
+    {
+      "title": "The Fighter | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Fighter on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/the_fighter_2011"
+    },
+    {
+      "title": "I shoulda been the contender movie review - Roger Ebert",
+      "snippet": "Crackheads sometimes get the two confused. As the movie opens, Micky doggedly begins a series of defeats in bad matchups. Then his life changes when he meets a sweet-faced, tough-talking barmaid named Charlene (Amy Adams). She knows the neighborhood, knows the story and knows that Micky's problem is his family.",
+      "link": "www.rogerebert.com/reviews/the-fighter-2010"
+    },
+    {
+      "title": "The Fighter - Wikipedia",
+      "snippet": "The Fighter is a 2010 American biographical sports drama film directed by David O. Russell, and stars Mark Wahlberg (who also produced), Christian Bale, Amy Adams, and Melissa Leo.",
+      "link": "en.wikipedia.org/wiki/The_Fighter"
+    }
+  ],
+  "uuid": "0a24e5ae-0091-2f7a-6708-1fb0467b7f46"
+}

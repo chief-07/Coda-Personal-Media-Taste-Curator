@@ -1,0 +1,82 @@
+{
+  "title": "The Incredible Hulk",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Incredible Hulk",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "The story of Dr. Bruce Banner, who seeks a cure to his unique condition, which causes him to turn into a giant green monster under emotional stress, is depicted. Whilst on the run from military, which seeks his capture, Banner comes close to a cure. But he must contend with a new creature that emerges: The Abomination.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTUyNzk3MjA1OF5BMl5BanBnXkFtZTcwMTE1Njg2MQ@@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+    "release_year": "2008",
+    "director": "Louis Leterrier",
+    "writer": "Zak Penn, Stan Lee, Jack Kirby",
+    "cast": [
+      "Edward Norton",
+      "Liv Tyler",
+      "Tim Roth"
+    ],
+    "runtime": "112 min",
+    "score": "6.6/10 IMDb (563,613 votes) | 68% Rotten Tomatoes | 61/100 Metacritic",
+    "awards": "4 wins & 10 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Incredible Hulk",
+      "snippet": "[Letterboxd Review of \"The Incredible Hulk\"] i hate marvel for making me look up \"average heart rate during sex\" but suffice it to say that bruce banner SHOULD be able to fuck",
+      "link": "https://letterboxd.com/film/the-incredible-hulk/"
+    },
+    {
+      "title": "Letterboxd review of The Incredible Hulk",
+      "snippet": "[Letterboxd Review of \"The Incredible Hulk\"] You ever notice how Bruce Banner here is almost a Neil Breen protagonist?",
+      "link": "https://letterboxd.com/film/the-incredible-hulk/"
+    },
+    {
+      "title": "Letterboxd review of The Incredible Hulk",
+      "snippet": "[Letterboxd Review of \"The Incredible Hulk\"] Don't make me hungry, you wont like me when i'm hungry.",
+      "link": "https://letterboxd.com/film/the-incredible-hulk/"
+    },
+    {
+      "title": "Letterboxd review of The Incredible Hulk",
+      "snippet": "[Letterboxd Review of \"The Incredible Hulk\"] Iron Man came out the same year...",
+      "link": "https://letterboxd.com/film/the-incredible-hulk/"
+    },
+    {
+      "title": "Letterboxd review of The Incredible Hulk",
+      "snippet": "[Letterboxd Review of \"The Incredible Hulk\"] My hot take here is that I think Ed Norton is actually pretty good as Bruce Banner? The big miss here is not making the movie an actual origin story. Hard to buy into the character and his relationships without knowing more about who he was prior to the big accident. Despite this, kind of wish The Incredible Hulk wasn’t shoved into a drawer by the MCU because another movie could have been good?Ep. 2- Journey into the MCU: The Incredible Hulk (Patreon Exclusive)",
+      "link": "https://letterboxd.com/film/the-incredible-hulk/"
+    },
+    {
+      "title": "The Incredible Hulk (2008) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review. This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt0800080/reviews/"
+    },
+    {
+      "title": "The Incredible Hulk (2008) - IMDb",
+      "snippet": "The Incredible Hulk: Directed by Louis Leterrier. With Edward Norton, Liv Tyler, Tim Roth, William Hurt. Bruce Banner, a scientist on the run from the U.S. Government, must find a cure for the monster he turns into whenever he loses his temper.",
+      "link": "www.imdb.com/title/tt0800080/"
+    },
+    {
+      "title": "The Incredible Hulk | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Incredible Hulk on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/the_incredible_hulk"
+    },
+    {
+      "title": "The Incredible Hulk user reviews - Metacritic",
+      "snippet": "Watching this film today is an alienating experience. It's a work that attempts to be serious, somber, and physical in a universe that, only a few years later, would become a parade of quips and saturated colors. Norton plays a Banner who seems to be in a constant state of a panic attack—which ...",
+      "link": "www.metacritic.com/movie/the-incredible-hulk/user-reviews/"
+    },
+    {
+      "title": "The Incredible Hulk (film) - Wikipedia",
+      "snippet": "The Incredible Hulk is a 2008 American superhero film based on the Marvel Comics character the Hulk. Produced by Marvel Studios and Valhalla Motion Pictures, and distributed by Universal Pictures, [a] it is the second film in the Marvel Cinematic Universe (MCU). It was directed by Louis Leterrier from a screenplay by Zak Penn, and stars Edward Norton as Bruce Banner alongside Liv Tyler, Tim ...",
+      "link": "en.wikipedia.org/wiki/The_Incredible_Hulk_(film)"
+    }
+  ],
+  "uuid": "0630b633-5efa-29e2-f43d-d1ec594eff93"
+}

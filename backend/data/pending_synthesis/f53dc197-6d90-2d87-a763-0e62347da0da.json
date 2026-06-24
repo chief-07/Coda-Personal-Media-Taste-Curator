@@ -1,0 +1,57 @@
+{
+  "title": "Sleepy Hollow",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Sleepy Hollow",
+    "genres": [
+      "Fantasy",
+      "Horror",
+      "Mystery"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "The curse of The Headless Horseman (Christopher Walken) is the legacy of the small town of Sleepy Hollow. Spearheaded by the eager Constable Ichabod Crane (Johnny Depp) and his new world ways into the quagmire of secrets and murder, secrets once laid to rest, best forgotten and now reawakened, and he too, holding a dark secret of a past once gone.",
+    "image": "https://m.media-amazon.com/images/M/MV5BYWIwMTIxZTQtNDZhNS00ZDZlLTg5MTEtOTNkMmNjOGUzMTA1XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1999",
+    "director": "Tim Burton",
+    "writer": "Washington Irving, Kevin Yagher, Andrew Kevin Walker",
+    "cast": [
+      "Johnny Depp",
+      "Christina Ricci",
+      "Miranda Richardson"
+    ],
+    "runtime": "105 min",
+    "score": "7.3/10 IMDb (406,254 votes) | 71% Rotten Tomatoes | 65/100 Metacritic",
+    "awards": "Won 1 Oscar. 28 wins & 44 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Sleepy Hollow",
+      "snippet": "[Letterboxd Review of \"Sleepy Hollow\"] i relate to johnny depp's character because i, too, am a dramatic little bitch",
+      "link": "https://letterboxd.com/film/sleepy-hollow/"
+    },
+    {
+      "title": "Letterboxd review of Sleepy Hollow",
+      "snippet": "[Letterboxd Review of \"Sleepy Hollow\"] Christopher Walken has literally 3 lines in this film...1. NAAAAHH!2. WAAAAHH!and who could forget...3. RAAAAHH!Would you believe as crazy as he is in this film, he's been crazier on and off film?",
+      "link": "https://letterboxd.com/film/sleepy-hollow/"
+    },
+    {
+      "title": "Letterboxd review of Sleepy Hollow",
+      "snippet": "[Letterboxd Review of \"Sleepy Hollow\"] [insert “so no head?” vine reference joke here]",
+      "link": "https://letterboxd.com/film/sleepy-hollow/"
+    },
+    {
+      "title": "Letterboxd review of Sleepy Hollow",
+      "snippet": "[Letterboxd Review of \"Sleepy Hollow\"] watched for tim burton, stayed for johnny depp's cheekbones",
+      "link": "https://letterboxd.com/film/sleepy-hollow/"
+    },
+    {
+      "title": "Letterboxd review of Sleepy Hollow",
+      "snippet": "[Letterboxd Review of \"Sleepy Hollow\"] the big fat spooky gothic masterpiece of it all!!!!!",
+      "link": "https://letterboxd.com/film/sleepy-hollow/"
+    }
+  ],
+  "uuid": "f53dc197-6d90-2d87-a763-0e62347da0da"
+}

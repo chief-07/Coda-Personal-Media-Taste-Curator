@@ -1,0 +1,82 @@
+{
+  "title": "Les Misérables",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Les Misérables",
+    "genres": [
+      "Drama",
+      "Musical",
+      "Romance"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Jean Valjean, known as Prisoner 24601, is released from prison and breaks parole to create a new life for himself while evading the grip of the persistent Inspector Javert. Set in post-revolutionary France, the story reaches resolution against the background of the June Rebellion.",
+    "image": "https://m.media-amazon.com/images/M/MV5BY2Q1YjIxZTAtZTU0YS00ZmE5LWEwODEtY2IyYWM2ZTJlOWE1XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2012",
+    "director": "Tom Hooper",
+    "writer": "William Nicholson, Alain Boublil, Claude-Michel Schönberg",
+    "cast": [
+      "Hugh Jackman",
+      "Russell Crowe",
+      "Anne Hathaway"
+    ],
+    "runtime": "158 min",
+    "score": "7.5/10 IMDb (360,640 votes) | 70% Rotten Tomatoes | 63/100 Metacritic",
+    "awards": "Won 3 Oscars. 85 wins & 177 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Thoughts on the Les Mis movie? : r/Broadway - Reddit",
+      "snippet": "Les Mis is my all time favorite musical. I was super critical of the movie when it came out. The last time I saw it was at the movie theater. Finally rewatching it for the first time since. Going into it with an open mind and I'm being reminded why I wasn't too crazy about it. Firstly, all of the random spoken parts are driving me crazy. What do y'all think about it?",
+      "link": "www.reddit.com/r/Broadway/comments/18jggjj/thoughts_on_the_les_mis_movie/"
+    },
+    {
+      "title": "Les Miserables (2012) opinions : r/musicals - Reddit",
+      "snippet": "Is the Les Miserables movie from 2012 any good I've heard it's good from critics, but what do the theatere people of reddit think?",
+      "link": "www.reddit.com/r/musicals/comments/14qzrjs/les_miserables_2012_opinions/"
+    },
+    {
+      "title": "News on the stage show and film - Reddit",
+      "snippet": "The ticket cost is £12 and every year the profits are donated to a charity whose work deals with issues that are presented in Les Misérables. This year that charity is Black and Pink, a US based organization supporting incarcerated and formerly incarcerated people. If the cost of a ticket is prohibitive, there are scholarship tickets available.",
+      "link": "www.reddit.com/r/lesmiserables/"
+    },
+    {
+      "title": "IJW: Les Misérables (2012) : r/Ijustwatched - Reddit",
+      "snippet": "IJW: Les Misérables (2012) \"Les Misérables takes you though all of these different landmarks of your heart, and does so with ease.\" Recently, discussions with a friend have reignited my love for musicals which really started with the film adaptation of Les Misérables in 2012.",
+      "link": "www.reddit.com/r/Ijustwatched/comments/7pd94s/ijw_les_misérables_2012/"
+    },
+    {
+      "title": "Is the Le Misérables movie musical actually good? - Reddit",
+      "snippet": "The best way to watch Les Mis at home is the 10th anniversary concert. It's on YouTube and is fantastic. It's a concert, so for the most part the actors aren't doing anything but standing there singing, but there is still so much more emotion and chemistry than in the movie. Reply reply Kinofhera •",
+      "link": "www.reddit.com/r/musicals/comments/vo061t/is_the_le_misérables_movie_musical_actually_good/"
+    },
+    {
+      "title": "Les Misérables | Audience Reviews | Rotten Tomatoes",
+      "snippet": "See what audiences are saying about Les Misérables. Read user reviews, reactions, and ratings on Rotten Tomatoes. Join the conversation today.",
+      "link": "www.rottentomatoes.com/m/les_miserables_2012/reviews"
+    },
+    {
+      "title": "The Independent Critic - \"Les Miserables\" is Occasionally Sublime ...",
+      "snippet": "Les Miserables is a good film, an emotionally resonant and satisfying film that should please a good majority of the stage production's fans while also pleasing the fans of virtually anyone in the cast (except Crowe).",
+      "link": "theindependentcritic.com/les_miserables"
+    },
+    {
+      "title": "Movie Review: Les Misérables (2012) - The Critical Movie Critics",
+      "snippet": "Movie review of Les Misérables (2012) by The Critical Movie Critics | Hugh Jackman is a parolee who starts a new life in post-revolutionary France.",
+      "link": "thecriticalcritics.com/reviews/movie_review-les_miserables/"
+    },
+    {
+      "title": "Les Misérables (2012) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review. This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt1707386/reviews/"
+    },
+    {
+      "title": "Les Misérables (2012) - IMDb",
+      "snippet": "Les Misérables: Directed by Tom Hooper. With Hugh Jackman, Russell Crowe, Anne Hathaway, Amanda Seyfried. In 19th-century France, Jean Valjean, who, for decades, has been hunted by the ruthless policeman Javert after breaking parole, agrees to care for a factory worker's daughter. The decision changes their lives forever.",
+      "link": "www.imdb.com/title/tt1707386/"
+    }
+  ],
+  "uuid": "cc48c2ba-c806-05d9-0e83-92fc99ca19f9"
+}

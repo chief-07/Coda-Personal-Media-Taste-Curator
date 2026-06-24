@@ -1,0 +1,82 @@
+{
+  "title": "E.T. the Extra-Terrestrial",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "E.T. the Extra-Terrestrial",
+    "genres": [
+      "Adventure",
+      "Family",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "After a gentle alien becomes stranded on Earth, the being is discovered and befriended by a young boy named Elliott. Bringing the extraterrestrial into his suburban California house, Elliott introduces E.T., as the alien is dubbed, to his brother and his little sister, Gertie, and the children decide to keep its existence a secret. Soon, however, E.T. falls ill, resulting in government intervention and a dire situation for both Elliott and the alien.",
+    "image": "https://m.media-amazon.com/images/M/MV5BYTNhNmY0YWMtMTczYi00MTA0LThhMmUtMTIxYzE0Y2QwMzRlXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1982",
+    "director": "Steven Spielberg",
+    "writer": "Melissa Mathison",
+    "cast": [
+      "Henry Thomas",
+      "Drew Barrymore",
+      "Peter Coyote"
+    ],
+    "runtime": "115 min",
+    "score": "7.9/10 IMDb (468,998 votes) | 99% Rotten Tomatoes | 92/100 Metacritic",
+    "awards": "Won 4 Oscars. 52 wins & 39 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "E.T. the Extra-Terrestrial | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for E.T. the Extra-Terrestrial on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/et_the_extraterrestrial"
+    },
+    {
+      "title": "Steven Spielberg's Best Movie Has A Near-Perfect Rotten ... - /Film",
+      "snippet": "E.T. the Extra Terrestrial is one of Steven Spielberg's most beloved movies, but it somehow doesn't have a perfect Rotten Tomatoes score thanks to two reviews.",
+      "link": "www.slashfilm.com/1638568/steven-spielberg-best-movie-rotten-tomatoes/"
+    },
+    {
+      "title": "E.T. The Extra-Terrestrial movie review - Roger Ebert",
+      "snippet": "Dear Raven and Emil: Sunday we sat on the big green couch and watched \"E.T. The Extra-Terrestrial\" together with your mommy and daddy. It was the first time either of you had seen it, although you knew a little of what to expect because we took the \"E.T.\" ride together at the Universal tour. I had seen the movie lots of times since it came out in 1982, so I kept one eye on the screen ...",
+      "link": "www.rogerebert.com/reviews/great-movie-et-the-extra-terrestrial-1982"
+    },
+    {
+      "title": "Let's Be Real, Steven Spielberg's Best Movie Is Still This 43 ... - CBR",
+      "snippet": "E.T. the Extra-Terrestrial, a movie that brilliantly combined science fiction with childhood angst, remains Spielberg's best, most personal film.",
+      "link": "www.cbr.com/et-the-extra-terrestrial-retro-review/"
+    },
+    {
+      "title": "E.T. the Extra-Terrestrial (1982) - User reviews - IMDb",
+      "snippet": "This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt0083866/reviews/"
+    },
+    {
+      "title": "E.T. the Extra-Terrestrial (1982) - User reviews - IMDb",
+      "snippet": "This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt0083866/reviews/"
+    },
+    {
+      "title": "E.T. the Extra-Terrestrial (1982) - IMDb",
+      "snippet": "E.T. the Extra-Terrestrial: Directed by Steven Spielberg. With Henry Thomas, Drew Barrymore, Peter Coyote, Dee Wallace. A troubled child summons the courage to help a friendly alien escape from Earth and return to his home planet.",
+      "link": "www.imdb.com/title/tt0083866/"
+    },
+    {
+      "title": "E.T. the Extra-Terrestrial - Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for E.T. the Extra-Terrestrial on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/et_the_extraterrestrial"
+    },
+    {
+      "title": "E.T. The Extra-Terrestrial movie review - Roger Ebert",
+      "snippet": "Dear Raven and Emil: Sunday we sat on the big green couch and watched \"E.T. The Extra-Terrestrial\" together with your mommy and daddy. It was the first time either of you had seen it, although you knew a little of what to expect because we took the \"E.T.\" ride together at the Universal tour. I had seen the movie lots of times since it came out in 1982, so I kept one eye on the screen ...",
+      "link": "www.rogerebert.com/reviews/great-movie-et-the-extra-terrestrial-1982"
+    },
+    {
+      "title": "E.T. The Extra-Terrestrial user reviews - Metacritic",
+      "snippet": "Greetings from Lithuania. \"E.T. the Extra-Terrestrial\" (1982) is a film that i do not feel any nostalgia towards, as it wasn't my childhood's film or anything. I watched it for the first time when i was in my 30's, and now rewatched it on 4K UHD in my early 40's. This movie is a pure love letter to ...",
+      "link": "www.metacritic.com/movie/et-the-extra-terrestrial/user-reviews/"
+    }
+  ],
+  "uuid": "e273297a-d1e6-403e-d62b-409ce4467158"
+}

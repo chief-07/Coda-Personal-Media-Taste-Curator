@@ -1,0 +1,82 @@
+{
+  "title": "La La Land",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "La La Land",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Music"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Aspiring actress serves lattes to movie stars in between auditions and jazz musician Sebastian scrapes by playing cocktail-party gigs in dingy bars. But as success mounts, they are faced with decisions that fray the fragile fabric of their love affair, and the dreams they worked so hard to maintain in each other threaten to rip them apart.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMzUzNDM2NzM2MV5BMl5BanBnXkFtZTgwNTM3NTg4OTE@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+    "release_year": "2016",
+    "director": "Damien Chazelle",
+    "writer": "Damien Chazelle",
+    "cast": [
+      "Ryan Gosling",
+      "Emma Stone",
+      "Rosemarie DeWitt"
+    ],
+    "runtime": "128 min",
+    "score": "8.0/10 IMDb (759,966 votes) | 91% Rotten Tomatoes | 94/100 Metacritic",
+    "awards": "Won 6 Oscars. 246 wins & 313 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of La La Land",
+      "snippet": "[Letterboxd Review of \"La La Land\"] this cured my depression and brought it back full force in the span of 2 hours",
+      "link": "https://letterboxd.com/film/la-la-land/"
+    },
+    {
+      "title": "Letterboxd review of La La Land",
+      "snippet": "[Letterboxd Review of \"La La Land\"] Love this movie more than I love myself",
+      "link": "https://letterboxd.com/film/la-la-land/"
+    },
+    {
+      "title": "Letterboxd review of La La Land",
+      "snippet": "[Letterboxd Review of \"La La Land\"] I've taken all of your criticisms into account and have determined that you're all wrong.",
+      "link": "https://letterboxd.com/film/la-la-land/"
+    },
+    {
+      "title": "Letterboxd review of La La Land",
+      "snippet": "[Letterboxd Review of \"La La Land\"] la la land makes me want to be alive for one hour and fifty minutes then sebastian says welcome to seb's and it makes me want to be dead",
+      "link": "https://letterboxd.com/film/la-la-land/"
+    },
+    {
+      "title": "Letterboxd review of La La Land",
+      "snippet": "[Letterboxd Review of \"La La Land\"] the whole ‘what could've been’ sequence continues to be the reason for my death.",
+      "link": "https://letterboxd.com/film/la-la-land/"
+    },
+    {
+      "title": "La La Land is one of the most beautiful films I've watched",
+      "snippet": "La La Land is my guilty pleasure, I've seen it three times (so far) and each viewing makes me emotional. The soundtrack is one of the all-time best as well, it's incredible how eachs song is better than the last, and how well everything flows together in the final montage - that bit always gives me chills!",
+      "link": "www.reddit.com/r/movies/comments/viliy9/la_la_land_is_one_of_the_most_beautiful_films_ive/"
+    },
+    {
+      "title": "Just re-watched La La Land : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers.",
+      "link": "www.reddit.com/r/movies/comments/155tj8p/just_rewatched_la_la_land/"
+    },
+    {
+      "title": "La La Land's ending is TRAUMATIC : r/romancemovies - Reddit",
+      "snippet": "178 votes, 116 comments. The La La Land ending is one of the most devastating things I've ever seen. How do you guys feel about it?",
+      "link": "www.reddit.com/r/romancemovies/comments/1brki3a/la_la_lands_ending_is_traumatic/"
+    },
+    {
+      "title": "I saw La-La Land tonight (ending) : r/movies - Reddit",
+      "snippet": "I saw La La Land in theaters with my SO, and my friend and their SO. After the movie the friend's SO said, \"well at least it was a happy ending\" with the utmost sincerity.",
+      "link": "www.reddit.com/r/movies/comments/17vlso0/i_saw_lala_land_tonight_ending/"
+    },
+    {
+      "title": "Why do people really like La La Land? : r/movies - Reddit",
+      "snippet": "The movie may be misbilled as a grand Broadway production -- Chazelle said he wanted to cast real people so that the song and dance would come from a place of authentic emotion rather than impressive but over-produced showmanship.",
+      "link": "www.reddit.com/r/movies/comments/5mv154/why_do_people_really_like_la_la_land/"
+    }
+  ],
+  "uuid": "80dca598-21a1-02e4-b6c1-d724c777c878"
+}

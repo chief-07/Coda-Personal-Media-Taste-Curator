@@ -1,0 +1,62 @@
+{
+  "title": "The Expendables",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Expendables",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Thriller"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Barney Ross leads the \"Expendables\", a band of highly skilled mercenaries including knife enthusiast Lee Christmas, martial arts expert Yin Yang, heavy weapons specialist Hale Caesar, demolitionist Toll Road and loose-cannon sniper Gunner Jensen. When the group is commissioned by the mysterious Mr. Church to assassinate the merciless dictator of a small South American island, Barney and Lee head to the remote locale to scout out their opposition. Once there, they meet with local rebel Sandra and discover the true nature of the conflict engulfing the city. When they escape the island and Sandra stays behind, Ross must choose to either walk away and save his own life - or attempt a suicidal rescue mission that might just save his soul.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNTUwODQyNjM0NF5BMl5BanBnXkFtZTcwNDMwMTU1Mw@@._V1_QL75_UX380_CR0,1,380,562_.jpg",
+    "release_year": "2010",
+    "director": "Sylvester Stallone",
+    "writer": "Dave Callaham, Sylvester Stallone",
+    "cast": [
+      "Sylvester Stallone",
+      "Jason Statham",
+      "Jet Li"
+    ],
+    "runtime": "103 min",
+    "score": "6.4/10 IMDb (380,153 votes) | 41% Rotten Tomatoes | 45/100 Metacritic",
+    "awards": "3 wins & 5 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Expendables",
+      "snippet": "[Letterboxd Review of \"The Expendables\"] Testosterone porn made for people living in the past by people living in the past.",
+      "link": "https://letterboxd.com/film/the-expendables/"
+    },
+    {
+      "title": "Letterboxd review of The Expendables",
+      "snippet": "[Letterboxd Review of \"The Expendables\"] There’s one scene where Bruce Willis and Sylvester Stallone are talking for about five minutes and Bruce tells Sylvester exactly what he needs from him and then Sylvester ends the conversation by saying “let’s talk” and I think that’s brilliant writing.Mickey Rourke had absolutely no business going so hard with that emotional monologue.",
+      "link": "https://letterboxd.com/film/the-expendables/"
+    },
+    {
+      "title": "Letterboxd review of The Expendables",
+      "snippet": "[Letterboxd Review of \"The Expendables\"] I just know it smelled so bad on set",
+      "link": "https://letterboxd.com/film/the-expendables/"
+    },
+    {
+      "title": "Letterboxd review of The Expendables",
+      "snippet": "[Letterboxd Review of \"The Expendables\"] The dadest dad movie to ever dad movie",
+      "link": "https://letterboxd.com/film/the-expendables/"
+    },
+    {
+      "title": "Letterboxd review of The Expendables",
+      "snippet": "[Letterboxd Review of \"The Expendables\"] Insane how much of this is underlit, cut to shit and digital looking. The only possible explanation is that somewhere between Rambo 4 (which is still one of the stickiest, most effectively sadistic films of his career) and this Stallone hit himself on the head very hard and forgot the basic building blocks of action directing. I do like briefly hanging out with my boys Dolph and Mickey though.",
+      "link": "https://letterboxd.com/film/the-expendables/"
+    },
+    {
+      "title": "Wikipedia: The Expendables (2010 film)",
+      "snippet": "[Wikipedia Synopsis] The Expendables is a 2010 American action film directed by and starring Sylvester Stallone, who co-wrote the screenplay with David Callaham. The first installment in The Expendables franchise, the film co-stars an ensemble cast of mostly action film actors, including Jason Statham, Jet Li, Dolph Lundgren, Randy Couture, Terry Crews, Steve Austin, Mickey Rourke, and Bruce Willis. The film is about a team of elite mercenaries tasked with a mission to overthrow a Latin American dictator whom they soon discover to be a mere puppet controlled by a corrupt ex-CIA agent. It pays tribute to the blockbuster action films of the late 1980s and early 1990s.\nThe Expendables was released in the United States on August 13, 2010 by Lionsgate. It received mixed reviews from critics, with some praise for the action sequences, and grossed $274 million. It was followed by three sequels: The Expendables 2 (2012), The Expendables 3 (2014), and Expend4bles (2023).",
+      "link": "https://en.wikipedia.org/wiki/The%20Expendables%20(2010%20film)"
+    }
+  ],
+  "uuid": "713a3fa7-061d-598c-6d7e-9954a17e9873"
+}

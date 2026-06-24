@@ -1,0 +1,57 @@
+{
+  "title": "Ford v Ferrari",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Ford v Ferrari",
+    "genres": [
+      "Action",
+      "Biography",
+      "Drama"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "As Enzo Ferrari's fast Rosso-Corsa racing cars dominate the mid-1960s motorsport world, the American car designer, Carroll Shelby, is forced to retire after winning the demanding 1959 '24 Hours of Le Mans' endurance race. But, before long, an unexpected proposition by the Vice President of Henry Ford's motor company, Lee Iacocca, will offer an opportunity to beat the Italians at their own game. Now, under those pressing circumstances, the British sports car driver and racing engineer, Ken Miles, reluctantly agrees to lend a hand and improve the firm's image, as Ford's race team has less than ninety days to rewrite history. As a result, the non-conformist duo comes up with the mighty Ford GT40 Mk I high-performance racing car. Can Shelby and Miles break Ferrari's streak?",
+    "image": "https://m.media-amazon.com/images/M/MV5BOTBjNTEyNjYtYjdkNi00YzE5LTljYzUtZjVlYmYwZmJmZWYxXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2019",
+    "director": "James Mangold",
+    "writer": "Jez Butterworth, John-Henry Butterworth, Jason Keller",
+    "cast": [
+      "Matt Damon",
+      "Christian Bale",
+      "Jon Bernthal"
+    ],
+    "runtime": "152 min",
+    "score": "8.1/10 IMDb (553,839 votes) | 92% Rotten Tomatoes | 81/100 Metacritic",
+    "awards": "Won 2 Oscars. 26 wins & 86 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Ford v Ferrari",
+      "snippet": "[Letterboxd Review of \"Ford v Ferrari\"] before i watched this i thought matt damon played \"ford\" and christian bale played \"ferrari\". the rumors are true i have 2 braincells",
+      "link": "https://letterboxd.com/film/ford-v-ferrari/"
+    },
+    {
+      "title": "Letterboxd review of Ford v Ferrari",
+      "snippet": "[Letterboxd Review of \"Ford v Ferrari\"] I loved this movie, I love watching movie stars play people who are very good at their jobs, and I guess I love cars now. In related news, I am now a 55-year-old suburban dad.",
+      "link": "https://letterboxd.com/film/ford-v-ferrari/"
+    },
+    {
+      "title": "Letterboxd review of Ford v Ferrari",
+      "snippet": "[Letterboxd Review of \"Ford v Ferrari\"] i hate to say i hope i dont sound ridiculous i dont know who Le Mans is. he could be walking down the street, i wouldnt know a thing. sorry to Le Mans.",
+      "link": "https://letterboxd.com/film/ford-v-ferrari/"
+    },
+    {
+      "title": "Letterboxd review of Ford v Ferrari",
+      "snippet": "[Letterboxd Review of \"Ford v Ferrari\"] brad pitt and leonardo dicaprio want what christian bale and matt damon have",
+      "link": "https://letterboxd.com/film/ford-v-ferrari/"
+    },
+    {
+      "title": "Letterboxd review of Ford v Ferrari",
+      "snippet": "[Letterboxd Review of \"Ford v Ferrari\"] broom broom I’m in me mum’s car",
+      "link": "https://letterboxd.com/film/ford-v-ferrari/"
+    }
+  ],
+  "uuid": "2a846d00-fec4-1fa6-d4e6-fc0c26ad1962"
+}

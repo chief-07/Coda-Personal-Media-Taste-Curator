@@ -1,0 +1,81 @@
+{
+  "title": "Citizen Kane",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Citizen Kane",
+    "genres": [
+      "Drama",
+      "Mystery"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "A group of reporters are trying to decipher the last word ever spoken by Charles Foster Kane, the millionaire newspaper tycoon: \"Rosebud\". The film begins with a news reel detailing Kane's life for the masses, and then from there, we are shown flashbacks from Kane's life. As the reporters investigate further, the viewers see a display of a fascinating man's rise to fame, and how he eventually fell off the top of the world.",
+    "image": "https://m.media-amazon.com/images/M/MV5BYjk1ZDJlMmUtOWQ0Zi00MDM5LTk1OGYtODczNjFmMGYwZGVkXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1941",
+    "director": "Orson Welles",
+    "writer": "Herman J. Mankiewicz, Orson Welles, Roger Q. Denny",
+    "cast": [
+      "Orson Welles",
+      "Joseph Cotten",
+      "Dorothy Comingore"
+    ],
+    "runtime": "119 min",
+    "score": "8.2/10 IMDb (491,492 votes) | 99% Rotten Tomatoes | 100/100 Metacritic",
+    "awards": "Won 1 Oscar. 16 wins & 13 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Citizen Kane",
+      "snippet": "[Letterboxd Review of \"Citizen Kane\"] i mean... it wasn't as good as shrek 2 (2004) but it was ok",
+      "link": "https://letterboxd.com/film/citizen-kane/"
+    },
+    {
+      "title": "Letterboxd review of Citizen Kane",
+      "snippet": "[Letterboxd Review of \"Citizen Kane\"] One might call it the Citizen Kane of movies.",
+      "link": "https://letterboxd.com/film/citizen-kane/"
+    },
+    {
+      "title": "Letterboxd review of Citizen Kane",
+      "snippet": "[Letterboxd Review of \"Citizen Kane\"] have you guys ever heard of this movie? citizen kane? directed by orson welles? ever heard of it? citizen kane? probably not, it's pretty indie",
+      "link": "https://letterboxd.com/film/citizen-kane/"
+    },
+    {
+      "title": "Letterboxd review of Citizen Kane",
+      "snippet": "[Letterboxd Review of \"Citizen Kane\"] watching an almost universally loved work of art and not connecting with it in any way whatsoever has got to be one of my least favorite film-related experiences",
+      "link": "https://letterboxd.com/film/citizen-kane/"
+    },
+    {
+      "title": "Letterboxd review of Citizen Kane",
+      "snippet": "[Letterboxd Review of \"Citizen Kane\"] What a terrible name for a sled",
+      "link": "https://letterboxd.com/film/citizen-kane/"
+    },
+    {
+      "title": "Citizen Kane - Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Citizen Kane on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/citizen_kane"
+    },
+    {
+      "title": "What Is the Rotten Tomatoes Score for Citizen Kane",
+      "snippet": "How Citizen Kane Lost Its Perfect Rating The story of Citizen Kane's score change is rooted in rotten Tomatoes' commitment to comprehensiveness and historical accuracy. For many years, the platform maintained a perfect 100% Fresh rating for the film, a score that reflected the overwhelming critical consensus about its artistic achievement.",
+      "link": "findthismovie.com/what-is-the-rotten-tomatoes-score-for-citizen-kane/"
+    },
+    {
+      "title": "Citizen Kane | Audience Reviews | Rotten Tomatoes",
+      "snippet": "See what audiences are saying about Citizen Kane. Read user reviews, reactions, and ratings on Rotten Tomatoes. Join the conversation today.",
+      "link": "www.rottentomatoes.com/m/citizen_kane/reviews?type=my_critics"
+    },
+    {
+      "title": "Citizen Kane movie review & film summary - Roger Ebert",
+      "snippet": "The movie is filled with bravura visual moments: the towers of Xanadu; candidate Kane addressing a political rally; the doorway of his mistress dissolving into a front-page photo in a rival newspaper; the camera swooping down through a skylight toward the pathetic Susan in a nightclub; the many Kanes reflected through parallel mirrors; the boy ...",
+      "link": "www.rogerebert.com/reviews/great-movie-citizen-kane-1941"
+    },
+    {
+      "title": "Citizen Kane (1941) - Metacritic reviews - IMDb",
+      "snippet": "In spite of some disconcerting lapses and strange ambiguities in the creation of the principal character, Citizen Kane is far and away the most surprising and cinematically exciting motion picture to be seen here in many a moon. As a matter of fact, it comes close to being the most sensational film ever made in Hollywood.",
+      "link": "www.imdb.com/title/tt0033467/criticreviews/"
+    }
+  ],
+  "uuid": "16466a31-e6e0-b478-b3bc-a6b3441e018f"
+}

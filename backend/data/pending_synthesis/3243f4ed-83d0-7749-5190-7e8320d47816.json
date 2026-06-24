@@ -1,0 +1,80 @@
+{
+  "title": "The Hangover",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Hangover",
+    "genres": [
+      "Comedy"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Angelenos Doug Billings and Tracy Garner are about to get married. Two days before the wedding, the four men in the wedding party - Doug, Doug's two best buddies Phil Wenneck and Stu Price, and Tracy's brother Alan Garner - hop into Tracy's father's beloved Mercedes convertible for a 24-hour stag party to Las Vegas. Phil, a married high school teacher, has the same maturity level as his students when he's with his pals. Stu, a dentist, is worried about everything, especially what his controlling girlfriend Melissa thinks. Because she disapproves of traditional male bonding rituals, Stu has to lie to her about the stag, he telling her that they are going on a wine tasting tour in the Napa Valley. Regardless, he intends on eventually marrying her, against the advice and wishes of his friends. And Alan seems to be unaware of what are considered the social graces of the western world. The morning after their arrival in Las Vegas, they awaken in their hotel suite each with the worst hangover. None remembers what happened in the past twelve or so hours. The suite is in shambles. And certain things are in the suite that shouldn't be, and certain things that should be in the suite are missing. Probably the most important in the latter category is Doug. As Phil, Stu and Alan try to find Doug using only what little pieces of information they have at hand, they go on a journey of discovery of how certain things got into the suite and what happened to the missing items. However they are on a race for time as if they can't find Doug in the next few hours, they are going to have to explain to Tracy why they are not yet back in Los Angeles. And even worse, they may not find Doug at all before the wedding.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNDI2MzBhNzgtOWYyOS00NDM2LWE0OGYtOGQ0M2FjMTI2NTllXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2009",
+    "director": "Todd Phillips",
+    "writer": "Jon Lucas, Scott Moore",
+    "cast": [
+      "Zach Galifianakis",
+      "Bradley Cooper",
+      "Justin Bartha"
+    ],
+    "runtime": "100 min",
+    "score": "7.7/10 IMDb (922,266 votes) | 79% Rotten Tomatoes | 73/100 Metacritic",
+    "awards": "Nominated for 1 BAFTA Award13 wins & 25 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Hangover",
+      "snippet": "[Letterboxd Review of \"The Hangover\"] listen i’m not sure if a whole movie about how hot bradley cooper is needed to be made but i’m glad it was",
+      "link": "https://letterboxd.com/film/the-hangover/"
+    },
+    {
+      "title": "Letterboxd review of The Hangover",
+      "snippet": "[Letterboxd Review of \"The Hangover\"] this movie is a classic and sometimes you need to take a break and watch movies you don't need to use your brain for thanks for coming to my ted talk",
+      "link": "https://letterboxd.com/film/the-hangover/"
+    },
+    {
+      "title": "Letterboxd review of The Hangover",
+      "snippet": "[Letterboxd Review of \"The Hangover\"] next week’s no good for me the jonas brothers are in town",
+      "link": "https://letterboxd.com/film/the-hangover/"
+    },
+    {
+      "title": "Letterboxd review of The Hangover",
+      "snippet": "[Letterboxd Review of \"The Hangover\"] i want a whole movie on just bradley cooper’s character’s life as a middle school teacher",
+      "link": "https://letterboxd.com/film/the-hangover/"
+    },
+    {
+      "title": "Letterboxd review of The Hangover",
+      "snippet": "[Letterboxd Review of \"The Hangover\"] bradley cooper in an all black suit?zoo wee MAMA!",
+      "link": "https://letterboxd.com/film/the-hangover/"
+    },
+    {
+      "title": "The Hangover (2009) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review. This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt1119646/usercomments"
+    },
+    {
+      "title": "The Hangover (2009) - IMDb",
+      "snippet": "The Hangover: Directed by Todd Phillips. With Zach Galifianakis, Bradley Cooper, Justin Bartha, Ed Helms. Three buddies wake up from a bachelor party in Las Vegas with no memory of the previous night and the bachelor missing. They must make their way around the city in order to find their friend in time for his wedding.",
+      "link": "www.imdb.com/title/tt1119646/"
+    },
+    {
+      "title": "The Hangover | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Hangover on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/10010667-hangover"
+    },
+    {
+      "title": "The tiger, the baby and the missing tooth, okay. But the chicken? movie ...",
+      "snippet": "\"The Hangover\" is a funny movie, flat out, all the way through. Its setup is funny. Every situation is funny. Most of the dialogue is funny almost line by line. At some point we actually find ourselves caring a little about what happened to the missing bridegroom — and the fact that we almost care is funny, too.",
+      "link": "www.rogerebert.com/reviews/the-hangover-2009"
+    },
+    {
+      "title": "The Hangover - Wikipedia",
+      "snippet": "The Hangover is a 2009 American comedy film directed by Todd Phillips, and written by Jon Lucas and Scott Moore. It is the first installment in The Hangover trilogy. The film stars Bradley Cooper, Ed Helms, Zach Galifianakis, Heather Graham, Justin Bartha, and Jeffrey Tambor. It tells the story of Phil Wenneck (Cooper), Stu Price (Helms), Alan Garner (Galifianakis), and Doug Billings (Bartha ...",
+      "link": "en.wikipedia.org/wiki/The_Hangover"
+    }
+  ],
+  "uuid": "3243f4ed-83d0-7749-5190-7e8320d47816"
+}

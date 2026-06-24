@@ -1,0 +1,81 @@
+{
+  "title": "The Great Gatsby",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Great Gatsby",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "An adaptation of F. Scott Fitzgerald's Long Island-set novel, where Midwesterner Nick Carraway is lured into the lavish world of his neighbor, Jay Gatsby. Soon enough, however, Carraway sees through the cracks of Gatsby's nouveau riche existence, where obsession, madness, and tragedy await.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTkxNTk1ODcxNl5BMl5BanBnXkFtZTcwMDI1OTMzOQ@@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+    "release_year": "2013",
+    "director": "Baz Luhrmann",
+    "writer": "Baz Luhrmann, Craig Pearce, F. Scott Fitzgerald",
+    "cast": [
+      "Leonardo DiCaprio",
+      "Carey Mulligan",
+      "Joel Edgerton"
+    ],
+    "runtime": "143 min",
+    "score": "7.2/10 IMDb (641,730 votes) | 49% Rotten Tomatoes | 55/100 Metacritic",
+    "awards": "Won 2 Oscars. 51 wins & 86 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Great Gatsby",
+      "snippet": "[Letterboxd Review of \"The Great Gatsby\"] during the interminable runtime of this adaptation, I kept thinking about the Ellipsis Scene™, and how it's in neither this adaptation, Truman Capote's draft of a script, nor Luhrmann's 2013 version. I would go so far as to assume it's never been in any of the adaptations of the book, because it would be impossible to film without addressing the fact that Nick Carraway has sex with a man. here's the scene:Then Mr McKee turned and continued on out the door. Taking my hat from the chandelier, I followed.'Come to lunch some day,' he suggested, as we groaned down in the elevator.'Where?''Anywhere.",
+      "link": "https://letterboxd.com/film/the-great-gatsby/"
+    },
+    {
+      "title": "Letterboxd review of The Great Gatsby",
+      "snippet": "[Letterboxd Review of \"The Great Gatsby\"] “mia farrow writes that the main reason she was unable to create on-screen chemistry with co-star robert redford was because of redford’s total absorption in the Watergate scandals that were rocking washington dc at the time of filming. farrow says redford spent all his free time locked in his trailer, watching the political scandal unfold on television” (blonde episodes) we sure stan a man who knows his politics",
+      "link": "https://letterboxd.com/film/the-great-gatsby/"
+    },
+    {
+      "title": "Letterboxd review of The Great Gatsby",
+      "snippet": "[Letterboxd Review of \"The Great Gatsby\"] robert redford: *sweating profusely* old...sportmia farrow: *hysterically* i’ve never SEEN such beautiful shirts before",
+      "link": "https://letterboxd.com/film/the-great-gatsby/"
+    },
+    {
+      "title": "Letterboxd review of The Great Gatsby",
+      "snippet": "[Letterboxd Review of \"The Great Gatsby\"] Everyone is so fucking sweaty and gay. I think it would be cool if this movie featured the song vroom vroom by charli xcx.",
+      "link": "https://letterboxd.com/film/the-great-gatsby/"
+    },
+    {
+      "title": "Letterboxd review of The Great Gatsby",
+      "snippet": "[Letterboxd Review of \"The Great Gatsby\"] Shows the barrenness of greed and wealth.",
+      "link": "https://letterboxd.com/film/the-great-gatsby/"
+    },
+    {
+      "title": "The Great Gatsby (2013) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review. This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt1343092/reviews/"
+    },
+    {
+      "title": "The Great Gatsby (1974) - IMDb",
+      "snippet": "The Great Gatsby: Directed by Jack Clayton. With Robert Redford, Mia Farrow, Bruce Dern, Karen Black. A Midwesterner becomes fascinated with his nouveau riche neighbor, who obsesses over his lost love.",
+      "link": "www.imdb.com/title/tt0071577"
+    },
+    {
+      "title": "The Great Gatsby (2013) - Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Great Gatsby (2013) on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/the_great_gatsby_2013"
+    },
+    {
+      "title": "The Great Gatsby movie review - Roger Ebert",
+      "snippet": "The movie wants to be a \"kaleidoscopic carnival,\" to quote a phrase from the book's description of a Jay Gatsby party, but Luhrmann's instincts seem more traditional, even square, and the two impulses cancel each out. Once you've spent time with his cast, you understand why he was torn.",
+      "link": "www.rogerebert.com/reviews/the-great-gatsby-2013"
+    },
+    {
+      "title": "The Great Gatsby Movie Review | Common Sense Media",
+      "snippet": "Fitzgerald classic gets a decadent, gorgeous, tricky update. Read Common Sense Media's The Great Gatsby review, age rating, and parents guide.",
+      "link": "www.commonsensemedia.org/movie-reviews/the-great-gatsby"
+    }
+  ],
+  "uuid": "0b154355-848e-f54b-1703-333535f69dc7"
+}

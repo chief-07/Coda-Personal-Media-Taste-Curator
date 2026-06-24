@@ -1,0 +1,110 @@
+
+
+--- FILE: ad4519b1-e38e-f11c-3d49-acf707c0de1a.json ---
+UUID: ad4519b1-e38e-f11c-3d49-acf707c0de1a
+Title: Metropolis
+title: Metropolis
+genres: Drama,Sci-Fi
+tags: movie,Passed
+description: Sometime in the future, the city of Metropolis is home to a Utopian society where its wealthy residents live a carefree life. One of those is Freder Fredersen. One day, he spots a beautiful woman with a group of children, she and the children quickly disappear. Trying to follow her, he is horrified to find an underground world of workers who apparently run the machinery that keeps the Utopian world above ground functioning. One of the few people above ground who knows about the world below is Freder's father, John Fredersen, who is the founder and master of Metropolis. Freder learns that the woman is called Maria, who espouses the need to join the "hands" - the workers - to the "head" - those in power above - by a mediator who will act as the "heart". Freder wants to help the plight of the workers in their struggle for a better life. But when John learns of what Maria is advocating and that Freder has joined their cause, with the assistance of an old colleague. an inventor called Rotwang, who turns out to be But their nemesis goes to works towards quashing a proposed uprising, with Maria at the centre of their plan. John, unaware that Rotwang has his own agenda., makes plans that include shutting down the machines, with the prospect of unleashing total anarchy both above and below ground.
+release_year: 1927
+director: Fritz Lang
+writer: Thea von Harbou, Fritz Lang
+cast: Brigitte Helm,Alfred Abel,Gustav Fröhlich
+runtime: 153 min
+score: 8.2/10 IMDb (199,601 votes) | 97% Rotten Tomatoes | 98/100 Metacritic
+awards: 7 wins & 6 nominations total
+Snippets:
+- [Letterboxd Review of "Metropolis"] Reportedly one of Adolf Hitler's favourite films. A part of me thinks he didn't quite get it...
+- [Letterboxd Review of "Metropolis"] for a silent film, it sure had a lot to say
+- [Letterboxd Review of "Metropolis"] they hate to see a devilish girlbossified robot winning
+- [Letterboxd Review of "Metropolis"] Just me or could you cut the sexual tension between Freder and Josaphat with a KNIFE
+- [Letterboxd Review of "Metropolis"] Bro was down so bad he gained class consciousness. Anyways I will literally never look at movies the same again
+
+
+--- FILE: ae5d54a9-68f9-700d-dfa6-eaed8b5baf88.json ---
+UUID: ae5d54a9-68f9-700d-dfa6-eaed8b5baf88
+Title: Kill!
+title: Akame ga Kill!
+genres: Animation,Action,Comedy
+tags: series,TV-MA
+description: A young countryside boy sets to the capital with the dream to become part of the country army. Unsuccessful he encounters a women who promises him a chance to enter the army if he pays her enough, the young boy unaware gives all his money and then finds out the he was tricked. Not having any money decides to sleep in the streets, the same night a young and beautiful women picks him op from the street and takes him home. Tatsumi stays a night since they promise him a position in the army as well. One night the house is visited by a group of assassins called night raid but who are the real bad guys of this story. Tatsumi ends up joining night raid and finds out that he identifies his self in this group more then in the army.
+release_year: 2014
+director: 
+writer: Takahiro
+cast: Sôma Saitô,Corey Hartzog,Sora Amamiya
+runtime: 24 min
+score: 7.7/10 IMDb (36,931 votes)
+awards: 4 wins & 8 nominations total
+Snippets:
+- [Letterboxd Review of "Kill!"] I only watched the Mamoru Oshii segments. Assault Girl 2 is what it would be like if you tried to make a Jean Rollin movie using only Final Fantasy XIV gameplay footage
+- [Letterboxd Review of "Kill!"] You’ve heard of ASSAULT GIRLS....now get ready for....ASSAULT GIRL 2....!!A full third of this short’s 15 minutes are occupied by a Japanese nu-metal music video montage (in which the red-eyed Special Armed Garrison and their Protect Gears can be glimpsed, a hitherto-unarticulated link between the Avalon/Assault Girls Extended Universe and Oshii’s sprawling multi-media Kerberos Saga). The middle “third” — less, really — reprises the Kikuchi Rinko character of Lucifer from ASSAULT GIRLS for a duel against a white-clad foe in fields of grain. The last third or so is a brief recap of their battle
+- [Letterboxd Review of "Kill!"] Honestly I think the best one was Kenta Fukasaku's short, very loving tribute to an era of Japanese cinema while also having a cutesy anti-bullying quality to it. The others were alright, funny how Sans Undertale and swords were the common theme.Mamoru Oshii Live Action #7Oshii's short Assault Girl 2 def was more a vibes piece than anything, didn't really like how abrupt it ended in an unsatisfactory way.
+- [Letterboxd Review of "Kill!"] Worth it just for Kenta Fukusaku's The Children's Samurai.Takanori Tsujimoto's Kiriko was a neat little revenge thriller that I think could've warranted its own full-length feature. As for Fukusaku's short, I cannot praise it enough for how it blends classic jidaigeki and yakuza flicks in a children's setting that perfectly captures youthful imagination and quarrels. Makoto Tahara's Firing Range was pleasantly over-the-top with an interesting conflict. Unfortunately, Mamoru Oshii's Assault Girl 2, is a bit lacking, as it comes off more as a mood piece. Perhaps it's simply test footage for Assa
+- [Letterboxd Review of "Kill!"] Bought this so I could watch Assault Girl 2, but it was the last of 4 short movies as an anthology (or "omnibus" as the movie itself puts it, to sound cool, probably). The Japanese word "kiru" (斬る) means to kill someone with a sword, and so that was the main theme of these movies.The first movie is a silly but fun little showcase for action choreographer Kensuke Sonomura, who I'm sure Oshii Mamoru stole for his later projects, Next Generation Patlabor and Nowhere Girl. The second movie is in the style of Japanese silent films (apparently they had voice actors dubbing the lines in old Japanese
+
+
+--- FILE: ae8f3d76-223c-6866-ab76-b500a044f153.json ---
+UUID: ae8f3d76-223c-6866-ab76-b500a044f153
+Title: Marooned in Iraq
+title: Marooned in Iraq
+genres: Drama,War
+tags: movie
+description: During the war between Iran and Iraq, a group of Iranian Kurd musicians set off on an almost impossible mission. They will try to find Hanareh, a singer with a magic voice who crossed the border and may now be in danger in the Iraqi Kurdistan. As in his previous films, this Kurdish director is again focusing on the oppression of his people.
+release_year: 2002
+director: Bahman Ghobadi
+writer: Bahman Ghobadi
+cast: Shahab Ebrahimi,Faegh Mohamadi,Allah-Morad Rashtian
+runtime: 100 min
+score: 7.4/10 IMDb (1,600 votes) | 93% Rotten Tomatoes | 88/100 Metacritic
+awards: 5 wins & 5 nominations
+Snippets:
+- [Letterboxd Review of "Marooned in Iraq"] ‎يقول رولان بارت ‎(العالم سيصدق الصورة ويكذبك أنت)فعلاً الصورة السينمائية عند باهمان جوبادي أصدق من كل الكلمات، أتذكر اللحظة التي شاهدت فيها سلاحف تستطيع الطيران للمرة الأولى، قبل أكثر من عشر سنوات، وأتذكر الأثر النفسي العميق الذي أحدثته اللقطة الإفتتاحية للفيلم، وكان الفيلم اشبه بالوثائقي من نمط افلام الطريق... على انقاض الغزو الأمريكي السافر ابان إحتلال العراق...وهنا على نمط أفلام الطريق، وبكوميديا سوداء، وبلغة شاعرية، مغني عجوز مع إبنيه يسافرون في رحلة للبحث عن زوجته، كل شخصية تبحث عن شيء آخر أكثر عمقاً وغموضاً، وفي الطريق نشاهد أثار الحرب الايرانية/العراقية، وما خلفه صدام من ضرر على الأكر
+- [Letterboxd Review of "Marooned in Iraq"] saddamın sonu kendini başkalarından üstün sanan bütün milletlere bütün diktatörlere ibret olmalı.. 1 milyon askeri vardı, dönemin en modern sovyet silahlarına sahipti, kimyasal silahları vardı. ürdün de mısır da suriye de arap milliyetçiliğini yeniden canlandıran kahraman olarak görülüyordu. yüzbinlerce kürdü sistematik olarak katleti. sonra ne oldu? bir fare gibi lağım çukurunda yakalanıp ipe götürüldü. orduları dağıldı milyarlarca dolar serveti ve halkı onu kurtaramadı. bir zamanlar arkasında olan ıraklılar perişan oldu. ıraklı arap kadınların namussu amerikan askerlerinin postalları altında
+- [Letterboxd Review of "Marooned in Iraq"] کەس وەکو بەهمەن قوبادی لە سینەمایا گوزارشتی لە نەهامەتییەکانی کورد نەکردووە.هەرچەن بە هێندەی کارەکانی تری بەهمەن نایاب نییە بەڵام وەکو پریکوەڵێک بۆ نیوەمانگ بینینی گرنگیی خۆی هەیە.
+- [Letterboxd Review of "Marooned in Iraq"] Bahman Ghobadi’s Marooned in Iraq is a sprawling, tragicomic odyssey that serves as both a vibrant celebration of Kurdish traditions and a haunting, snow-blind memorial for them. Operating in a completely different register than the frantic, urban guerrilla rebellion of No One Knows About Persian Cats, this film drops the viewer into a desperate pursuit across a deeply scarred landscape. Yet, its most brilliant, disarming weapon is its humor. Ghobadi catches the viewer completely off guard by framing this harrowing journey through the bickering, fumbling dynamic of a father and his two sons. T
+- [Letterboxd Review of "Marooned in Iraq"] "ماهو القصف؟""القصف هو ذلك..هل تسمعه؟! هو من يدمّر منازلنا ومدارسنا استمع إليه، الآن ثَمَّ منزل تدمّر"هذا الألم معقّد، والمعاناة عصية، كم يُرهقني جداً حينما أتفكر بينما أنا أعيش بشكل طبيعي تحدث المعاناة التي جسدها باهمان قوبادي في طرف آخر من العالم
+
+
+--- FILE: b17b9dd4-4868-d10b-1284-b1596960d26a.json ---
+UUID: b17b9dd4-4868-d10b-1284-b1596960d26a
+Title: The Apple
+title: The Apple
+genres: Drama
+tags: movie
+description: After twelve years of imprisonment by their own parents, two sisters are finally released by social workers to face the outside world for the first time.
+release_year: 1998
+director: Samira Makhmalbaf
+writer: Mohsen Makhmalbaf
+cast: Massoumeh Naderi,Zahra Naderi,Ghorban Ali Naderi
+runtime: 86 min
+score: 7.2/10 IMDb (2,794 votes) | 85% Rotten Tomatoes
+awards: 7 wins & 7 nominations
+Snippets:
+- [Letterboxd Review of "The Apple"] it totally makes sense that A. G. gave this 5 stars
+- [Letterboxd Review of "The Apple"] Dune meets Phantom of the Paradise meets Tommy meets A Star Is Born meets the Bible
+- [Letterboxd Review of "The Apple"] Catherine Mary Stewart’s eyebrows are true star are of this film. “1984 but with music” is the best description. Fascism, Faust, 60s fetish, Eurovision, drag, drugs, and genesis all rolled into a tight 90 minute blunt. Look…the music in Phantom of the Paradise, Jesus Christ Superstar, and Shock Treatment are better than what The Apple offers…Rocky Horror and Phantom have more bang for the buck when it comes to art direction and camera work…but out of all the perfectly imperfect rock musicals, The Apple has always worked for me best as a capital F Film. It’s brisk, silly, sexy, and fun. Speeeee
+- [Letterboxd Review of "The Apple"] One extra star because of that big ass apple...I don't even know...I mean this is basically a Eurovision Song Contest documentary and how it ultimately becomes a part of all of our lives as Europeans. Because the music industry dictates the world of this film and its rhythm as well. This is a bad movie but with its dancing and singing it balances right on the edge of camp. But I have to say it goes a little(a lot) overboard with its glittery grandiosity in a bad way which makes it a slightly heavier viewing experience for me.Because it never stops singing and it doesn’t help that the songs in
+- [Letterboxd Review of "The Apple"] i think about this movie every day of my fucking life!!!!!!!!!!
+
+
+--- FILE: b339e7c0-4548-574b-e3e8-08ce908cb552.json ---
+UUID: b339e7c0-4548-574b-e3e8-08ce908cb552
+Title: The Isle
+title: The Isle
+genres: Drama,Thriller
+tags: movie,Not Rated
+description: Mute Hee-Jin is working as a clerk in a fishing resort in the Korean wilderness; selling baits, food and occasionally her body to the fishing tourists. One day she falls in love to Hyun-Shik, who is on the run for the police and rescues him with a fish hook, when he tries to commit suicide.
+release_year: 2000
+director: Kim Ki-duk
+writer: Kim Ki-duk
+cast: Jung Suh,Kim Yu-seok,Cho Jae-hyun
+runtime: 90 min
+score: 6.9/10 IMDb (15,532 votes) | 76% Rotten Tomatoes | 61/100 Metacritic
+awards: 6 wins & 7 nominations total
+Snippets:
+- [Letterboxd Review of "The Isle"] “Theme and idea are the most important facts of film production, I think.” – Director Kim Ki-DukThis is a longer review than usual and it is full of SPOILERS from start to finish. I decided to include everything because not only am I analyzing The Isle I feel I am analyzing the most provocative themes and ideas of Kim Ki-Duk's best films at large; the review touches on the metaphors of his other works. I hadn't seen the film in years. I still think it's great but am sure now it is an ACQUIRED TASTE! It's the right film for you only if you love abstract symbolism and have a desire to be weirded
+- [Letterboxd Review of "The Isle"] some quietly diabolical stuff going on here. my first dance with this director and honestly i love to hate this. it's repugnant and upsetting in a way i don't think i've ever experienced with korean cinema? it's the type of thing that makes old boy look like a fucking pixar movie.that one shot of the dude making a shid in the water with the camera looking up at his bare ass really set the tone for the film fr. 🤕the cinematic equivalent of treading water helplessly while trying to dodge shids plopping. 🫥
+- [Letterboxd Review of "The Isle"] Muteness is an interesting decision to apply to a character, because it forces said character to contemplate (him)herself despite the notoriety of the surrounding circumstances and the natural poetry of the environment. This becomes all the more cathartic when present traumas, ghosts of the past and broken psychology identify the main character, and that is the case of Hee-Jin. With this piece, the South Korean auteur has evolved his graphic transgression into something more existentially meaningful: the nearly perfect balance between self-contemplation and external mutilation of the circumsta
+- [Letterboxd Review of "The Isle"] A fish is maimed by a ravening man. The man eats of the fish’s flesh, feeds some to his mistress, then throws it back into the water. The fish, half-flayed, swims off to presumably do whatever the ichthyic equivalent of licking one’s wounds would be. But, despite knowing and indeed having experienced first-hand the dangers of those tempting lures we sometimes dangle before it, the fish, wounds and all, again takes the bait. This time, however, it isn’t captured by a hungry man, but instead a man not unlike the fish itself—a creature in great pain, with intent to inflict pain on one more helple
+- [Letterboxd Review of "The Isle"] Massively disappointed in this, especially when I had such high hopes for it. Animal cruelty is not necessary for the sake of cinema. I know the director tried to excuse it by saying that the ate the fish after but I still don't think that justifies mutilation.Other than that glaring issue the film just didn't really work for me. I liked the female lead and the cinematography, great soundtrack too. The improper use of fish hooks was crazy.Unsure on rating, may change

@@ -1,0 +1,80 @@
+{
+  "title": "The Exorcist",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Exorcist",
+    "genres": [
+      "Horror"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "A visiting actress in Washington, D.C., notices dramatic and dangerous changes in the behavior and physical make-up of her 12-year-old daughter. Meanwhile, a young priest at nearby Georgetown University begins to doubt his faith while dealing with his mother's terminal sickness. And, book-ending the story, a frail, elderly priest recognizes the necessity for a show-down with an old demonic enemy.",
+    "image": "https://m.media-amazon.com/images/M/MV5BZjg3YjE4ZjAtYTdmYS00ZTBkLWE1ZjgtNzAzODUwNzRiYjlmXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1973",
+    "director": "William Friedkin",
+    "writer": "William Peter Blatty",
+    "cast": [
+      "Ellen Burstyn",
+      "Max von Sydow",
+      "Linda Blair"
+    ],
+    "runtime": "122 min",
+    "score": "8.1/10 IMDb (495,533 votes) | 78% Rotten Tomatoes | 83/100 Metacritic",
+    "awards": "Won 2 Oscars. 18 wins & 21 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Exorcist",
+      "snippet": "[Letterboxd Review of \"The Exorcist\"] I hope when my daughter hits puberty it'll be a tad less eventful.",
+      "link": "https://letterboxd.com/film/the-exorcist/"
+    },
+    {
+      "title": "Letterboxd review of The Exorcist",
+      "snippet": "[Letterboxd Review of \"The Exorcist\"] This review is based on a true story.Last night a human being watched this stoned and almost had a heart attack from fright.",
+      "link": "https://letterboxd.com/film/the-exorcist/"
+    },
+    {
+      "title": "Letterboxd review of The Exorcist",
+      "snippet": "[Letterboxd Review of \"The Exorcist\"] Scary, but less scary than heartbreaking, suffused with grief and guilt and dread, with the sense that there's no system truly prepared to combat madness or pain, there's only trial and error, the compromise of barely surviving them.",
+      "link": "https://letterboxd.com/film/the-exorcist/"
+    },
+    {
+      "title": "Letterboxd review of The Exorcist",
+      "snippet": "[Letterboxd Review of \"The Exorcist\"] 12 year olds are just like that",
+      "link": "https://letterboxd.com/film/the-exorcist/"
+    },
+    {
+      "title": "Letterboxd review of The Exorcist",
+      "snippet": "[Letterboxd Review of \"The Exorcist\"] Someone get this girl some chapstick!",
+      "link": "https://letterboxd.com/film/the-exorcist/"
+    },
+    {
+      "title": "The Exorcist (1973) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review. This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt0070047/reviews/"
+    },
+    {
+      "title": "The Exorcist (1973) - The Exorcist (1973) - User Reviews - IMDb",
+      "snippet": "The Exorcist is a very slow movie that actually features a full blown plot, its characters, and their associated arcs. The original ambition of The Exorcist was to scare the world with imagery and concepts never before seen in cinema.",
+      "link": "www.imdb.com/title/tt00070047/reviews"
+    },
+    {
+      "title": "The Exorcist | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Exorcist on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/exorcist"
+    },
+    {
+      "title": "The Exorcist movie review & film summary - Roger Ebert",
+      "snippet": "The year 1973 began and ended with cries of pain. It began with Ingmar Bergman 's \" Cries and Whispers,\" and it closed with William Friedkin 's \"The Exorcist.\" Both films are about the weather of the human soul, and no two films could be more different. Yet each in its own way forces us to look inside, to experience horror, to confront the reality of human suffering. The Bergman ...",
+      "link": "www.rogerebert.com/reviews/the-exorcist-1973"
+    },
+    {
+      "title": "The Exorcist user reviews - Metacritic",
+      "snippet": "The stagnant echoes of a dated possession: A 2.0-star \"narrative void\" of rhythmic failure.2007 (2.0)I watched \"The Exorcist\" in 2007, and it remains a disappointing 2.0-star record in my archive—a film that failed to provide a visceral \"revelation\" despite its legendary status as a 1973 horror ...",
+      "link": "www.metacritic.com/movie/the-exorcist-1973/user-reviews/"
+    }
+  ],
+  "uuid": "1cbd90b4-b85d-979b-e716-c1eb3122a44c"
+}

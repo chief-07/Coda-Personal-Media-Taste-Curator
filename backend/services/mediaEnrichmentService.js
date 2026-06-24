@@ -81,7 +81,8 @@ class MediaEnrichmentService {
       }
 
       if (communitySnippets.length === 0) {
-        console.log(`  -> WARNING: No community text found for [${title}]`);
+        console.log(`  -> ERROR: No community text found for [${title}]. Aborting enrichment to prevent LLM hallucination.`);
+        return false;
       } else {
         console.log(`  -> Gathered ${communitySnippets.length} snippets`);
       }
@@ -150,42 +151,26 @@ class MediaEnrichmentService {
       console.error(`[Mycelium] Error scraping neighbors for ${title}:`, e.message);
     }
     
-    if (neighbors.length === 0) {
-      console.log(`[Mycelium] No direct neighbors found via primary scrapers.`);
-    }
-
     // Limit to top 5 similar so it doesn't exponentially explode
     const allDiscovered = [title, ...neighbors.slice(0, 5)];
     console.log(`[Mycelium] Discovered ${allDiscovered.length} organically related titles:`, allDiscovered);
 
-    // Inject directly into the massive_seed.json queue for the mass_orchestrator swarm to pick up
+    // Inject directly into the Qdrant Tier 2 Priority Queue
     try {
-      const fs = require('fs');
-      const path = require('path');
-      const SEED_FILE = path.join(__dirname, '..', 'data', 'massive_seed.json');
-      
-      let seedData = [];
-      if (fs.existsSync(SEED_FILE)) {
-        seedData = JSON.parse(fs.readFileSync(SEED_FILE, 'utf8'));
-      }
-      
+      const qdrantService = require('./qdrantService');
       let added = 0;
       for (const t of allDiscovered) {
         if (!t || typeof t !== 'string') continue;
-        if (!seedData.find(item => item.title.toLowerCase() === t.toLowerCase() && item.media_type === media_type)) {
-          seedData.push({ title: t, media_type: media_type });
-          added++;
-        }
+        
+        await qdrantService.pushToQueue(t, media_type, 2);
+        added++;
       }
       
       if (added > 0) {
-        fs.writeFileSync(SEED_FILE, JSON.stringify(seedData, null, 2));
-        console.log(`[Mycelium] Injected ${added} new titles to massive_seed.json! The Swarm will digest them.`);
-      } else {
-        console.log(`[Mycelium] All discovered titles are already in the pipeline queue.`);
+        console.log(`[Mycelium] Injected ${added} new titles to Qdrant Tier 2 (Mycelium Queue)!`);
       }
     } catch (err) {
-      console.error(`[Mycelium] Error injecting to queue:`, err.message);
+      console.error(`[Mycelium] Error injecting to Qdrant queue:`, err.message);
     }
   }
 }

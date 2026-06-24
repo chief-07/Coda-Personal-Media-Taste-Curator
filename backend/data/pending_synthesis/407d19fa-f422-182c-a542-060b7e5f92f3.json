@@ -1,0 +1,62 @@
+{
+  "title": "The Dark Knight Rises",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Dark Knight Rises",
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Despite his tarnished reputation after the events of The Dark Knight (2008), in which he took the rap for Dent's crimes, Batman feels compelled to intervene to assist the city and its Police force, which is struggling to cope with Bane's plans to destroy the city.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTk4ODQzNDY3Ml5BMl5BanBnXkFtZTcwODA0NTM4Nw@@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+    "release_year": "2012",
+    "director": "Christopher Nolan",
+    "writer": "Jonathan Nolan, Christopher Nolan, David S. Goyer",
+    "cast": [
+      "Christian Bale",
+      "Tom Hardy",
+      "Anne Hathaway"
+    ],
+    "runtime": "164 min",
+    "score": "8.4/10 IMDb (1,990,749 votes) | 87% Rotten Tomatoes | 78/100 Metacritic",
+    "awards": "Nominated for 1 BAFTA Award. 45 wins & 103 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Dark Knight Rises",
+      "snippet": "[Letterboxd Review of \"The Dark Knight Rises\"] 5 stars for cillian murphy's lil judge bits",
+      "link": "https://letterboxd.com/film/the-dark-knight-rises/"
+    },
+    {
+      "title": "Letterboxd review of The Dark Knight Rises",
+      "snippet": "[Letterboxd Review of \"The Dark Knight Rises\"] we as a society do not talk about anne hathaway as selina kyle enough",
+      "link": "https://letterboxd.com/film/the-dark-knight-rises/"
+    },
+    {
+      "title": "Letterboxd review of The Dark Knight Rises",
+      "snippet": "[Letterboxd Review of \"The Dark Knight Rises\"] Christopher Nolan Learn How To Mix Sound Challenge",
+      "link": "https://letterboxd.com/film/the-dark-knight-rises/"
+    },
+    {
+      "title": "Letterboxd review of The Dark Knight Rises",
+      "snippet": "[Letterboxd Review of \"The Dark Knight Rises\"] when michael caine says \"i failed you\".... big cry lads",
+      "link": "https://letterboxd.com/film/the-dark-knight-rises/"
+    },
+    {
+      "title": "Letterboxd review of The Dark Knight Rises",
+      "snippet": "[Letterboxd Review of \"The Dark Knight Rises\"] when is cillian murphy gonna sentence me to death",
+      "link": "https://letterboxd.com/film/the-dark-knight-rises/"
+    },
+    {
+      "title": "Wikipedia: The Dark Knight Rises",
+      "snippet": "[Wikipedia Synopsis] The Dark Knight Rises is a 2012 superhero film based on the DC Comics character Batman. Directed by Christopher Nolan, who co-wrote the screenplay with his brother Jonathan, and the story with David S. Goyer, it is the final installment in Nolan's The Dark Knight trilogy, and the sequel to The Dark Knight (2008). The film stars Christian Bale as Bruce Wayne / Batman, alongside Anne Hathaway, Gary Oldman, Tom Hardy, Morgan Freeman, Marion Cotillard, Joseph Gordon-Levitt, and Michael Caine. Set eight years after the events of The Dark Knight, it follows a retired Wayne being forced to resume his role as Batman to save Gotham City from nuclear destruction at the hands of the terrorist Bane (Hardy).\nChristopher Nolan was hesitant about returning to the series for a third film, but agreed after developing a story with his brother and Goyer that he felt would conclude the series on a satisfactory note. Nolan drew inspiration from Bane's comic book debut in the 1993 \"Knightfall\" storyline, the 1986 series The Dark Knight Returns, and the 1999 storyline \"No Man's Land\". Filming took place from May to November 2011 in locations including Jodhpur, London, Nottingham, Glasgow, Los Angeles, New York City, Newark, and Pittsburgh. Nolan used IMAX 70 mm film cameras for much of the filming, including the first six minutes of the film, to optimize the quality of the picture. A vehicle variation of the Batplane and Batcopter termed the \"Bat\", an underground prison set, and a new Batcave set w",
+      "link": "https://en.wikipedia.org/wiki/The%20Dark%20Knight%20Rises"
+    }
+  ],
+  "uuid": "407d19fa-f422-182c-a542-060b7e5f92f3"
+}

@@ -10,6 +10,7 @@ import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/core/providers/api_config.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coda/src/core/providers/watchlist_mode_provider.dart';
 
 final selectedMediaTypeProvider =
     NotifierProvider<SelectedMediaType, MediaType>(SelectedMediaType.new);
@@ -71,6 +72,16 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
   final Map<MediaType, List<Recommendation>> _queues = {};
   final Map<MediaType, bool> _isRefilling = {};
   final Map<MediaType, bool> _isPreWarming = {};
+  final Set<MediaType> _initialBatchComplete = {};
+
+  String _getAmbientContext() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) return "Sunny Morning";
+    if (hour >= 12 && hour < 17) return "Afternoon";
+    if (hour >= 17 && hour < 20) return "Evening";
+    if (hour >= 20 && hour <= 23) return "Late Night";
+    return "Midnight / Very Late";
+  }
 
   void _precachePoster(String? posterUrl) {
     if (posterUrl == null || posterUrl.isEmpty || posterUrl.startsWith('holder:')) {
@@ -442,11 +453,15 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
 
         print('[Queue Refill] Fetching 1 background recommendation for ${type.name} to refill queue...');
         final service = ref.read(recommendationServiceProvider);
+        final isWatchlistMode = ref.read(watchlistModeProvider);
+        final ambientContext = _initialBatchComplete.contains(type) ? null : _getAmbientContext();
         final results = await service.fetchRecommendations(
           memory, 
           type, 
           additionalExclusions: exclusions,
           limit: 1,
+          watchlistOnly: isWatchlistMode,
+          ambientContext: ambientContext,
         );
 
         if (results.isEmpty) {
@@ -498,8 +513,12 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     }
 
     final service = ref.read(recommendationServiceProvider);
+    final isWatchlistMode = ref.read(watchlistModeProvider);
+    final ambientContext = _initialBatchComplete.contains(selectedType) ? null : _getAmbientContext();
+    
     try {
-      final results = await service.fetchRecommendations(memory, selectedType, limit: limit);
+      final results = await service.fetchRecommendations(memory, selectedType, limit: limit, watchlistOnly: isWatchlistMode, ambientContext: ambientContext);
+      _initialBatchComplete.add(selectedType);
       final recs = results
           .map((r) => r.toDomain())
           .where((rec) => !_isExcluded(rec.title, memory))

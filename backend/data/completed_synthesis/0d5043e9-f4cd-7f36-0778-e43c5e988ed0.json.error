@@ -1,0 +1,38 @@
+{
+    "title":  "Record of a Night Too Brief",
+    "media_type":  "book",
+    "structured_data":  {
+                            "title":  "Record of a Night too Brief",
+                            "genres":  [
+                                           "Fiction \u0026 Literature",
+                                           "Short Stories"
+                                       ],
+                            "tags":  [
+
+                                     ],
+                            "description":  "\u003cb\u003eAkutagawa Prize-winning stories about unsettling loss and romance from\u0026#xa0;one of Japan’s most celebrated contemporary writers—for fans of\u0026#xa0;Haruki Murakami and Banana Yoshimoto\u003c/b\u003e\u003cbr /\u003e\u003cbr /\u003eIn a dreamlike adventure, one woman travels through an apparently unending night with a porcelain girlfriend, mist-monsters and villainous monkeys; a sister mourns her invisible brother whom only she can still see, while the rest of her family welcome his would-be wife into their home; and an accident with a snake leads a shop girl to discover the snake-families everyone else seems to be concealing.\u003cbr /\u003e\u003cbr /\u003e Sensual, yearning, and filled with the tricks of memory and grief, \u003ci\u003eRecord of a Night Too Brief\u003c/i\u003e is an atmospheric trio of unforgettable tales.\u003cbr /\u003e\u003cbr /\u003e“Talking animals, transformations into trees and horses, and a melancholic mood of loss and love make it easy to see why Kawakami is one of the more exciting voices in contemporary Japanese literature.\" \u003ci\u003e\u003cb\u003e—Thrillist\u003c/b\u003e\u003c/i\u003e",
+                            "image":  "https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/73/c8/66/73c866c3-8409-27d9-8db4-74944a3f464c/9781782272724.d.jpg/600x900bb.jpg",
+                            "studio":  "Hiromi Kawakami \u0026 Lucy North",
+                            "director":  "Hiromi Kawakami \u0026 Lucy North"
+                        },
+    "community_snippets":  [
+                               {
+                                   "title":  "Wikipedia: Hiromi Kawakami",
+                                   "snippet":  "[Wikipedia Synopsis] Hiromi Kawakami (川上 弘美, Kawakami Hiromi; born April 1958) is a Japanese writer, known for her off-beat fiction, poetry, and literary criticism. She has won numerous Japanese literary awards, including the Akutagawa Prize, the Tanizaki Prize, the Yomiuri Prize, and the Izumi Kyōka Prize for Literature. Her work has been adapted for film and has been translated into more than 15 languages.",
+                                   "link":  "https://en.wikipedia.org/wiki/Hiromi%20Kawakami"
+                               }
+                           ],
+    "uuid":  "0d5043e9-f4cd-7f36-0778-e43c5e988ed0",
+    "metadata_synthesis":  "Unforgiving and sharp. Scorching truth. No apologies. Record of a Night Too Brief",
+    "setting_and_subculture":  "Bleak landscapes. Concrete shadows. Sterile rooms. Cold fluorescent hum.",
+    "visual_tone_and_feel":  "Uncomfortable close-ups. Uncomfortable close-ups.",
+    "media_era_tone":  "Cynical edge. Unfiltered noise. Rejecting the glossy mainstream.",
+    "pacing_and_structure":  "Fragmented memory. Jagged cuts. Relentless. Slow-burn to violent climax.",
+    "atmosphere_and_mood":  "Sweat-stained. Paranoia creeping in. The air is thick with unspoken trauma.",
+    "themes_and_messages":  "Generational scars. Silence as a weapon. The illusion of safety shattered.",
+    "character_relationships":  "Fractured. Toxic codependency. Silent orbits. Collisions of ego.",
+    "lead_character_type":  "Broken. Unreliable. Carrying weight of past sins. Hollow shell. Running on fumes.",
+    "story_and_plot_type":  "Descent into hell. Unraveling human cruelty. Descent into hell. Unraveling human cruelty.",
+    "who_and_when":  "Those who stare into the abyss. Late night consumption.",
+    "emotional_evocation":  "Gut-wrenching. Leaves a metallic taste. Pure dread."
+}

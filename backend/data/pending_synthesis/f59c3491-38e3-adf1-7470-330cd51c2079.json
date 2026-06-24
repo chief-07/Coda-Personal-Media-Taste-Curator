@@ -1,0 +1,57 @@
+{
+  "title": "The Proposal",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Proposal",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Romance"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "For three years, Andrew Paxton has slaved as the assistant to Margaret Tate, hard-driving editor at a New York publisher. When Margaret, a Canadian, faces deportation for an expired visa, she hatches a scheme to marry Andrew - he agrees if she'll promise a promotion. A skeptical INS agent vows to test the couple about each other the next Monday. Andrew had plans to fly home that weekend for his grandma's 90th, so Margaret goes with him - to Sitka, Alaska - where mom, dad, and grams await. Family dynamics take over: tensions between dad and Andrew, an ex-girlfriend, Andrew's dislike of Margaret, and her past color the next few days, with the INS ready to charge Andrew with fraud.",
+    "image": "https://m.media-amazon.com/images/M/MV5BYWU3ZmFhYTktNzU4NS00ZTEyLTkwNTYtMWE1M2JjMTFmODVkXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2009",
+    "director": "Anne Fletcher",
+    "writer": "Peter Chiarelli",
+    "cast": [
+      "Sandra Bullock",
+      "Ryan Reynolds",
+      "Mary Steenburgen"
+    ],
+    "runtime": "108 min",
+    "score": "6.8/10 IMDb (393,239 votes) | 45% Rotten Tomatoes | 48/100 Metacritic",
+    "awards": "7 wins & 20 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Proposal",
+      "snippet": "[Letterboxd Review of \"The Proposal\"] Snore City.(you see because lead actress Jennifer Esposito played Michael J Fox's secretary on Spin City for three seasons) (nods) It's a lame, by the numbers \"fed goes undercover with the mob\" movie. The only thing that makes this slightly different is that Esposito has to also go undercover when the fed who's already under needs to produce a wife after mentioning having one to mobster Stephen Lang. So they wire up this rookie whom our man has to hope is up to the job cause well who else are they gonna get to go under on short notice? You can see every single plot point coming well ahead of",
+      "link": "https://letterboxd.com/film/the-proposal/"
+    },
+    {
+      "title": "Letterboxd review of The Proposal",
+      "snippet": "[Letterboxd Review of \"The Proposal\"] 🤬 The poster is a misleading lie and is the most skin Jennifer Esposito shows… it’s probably not really her in the photo knowing how fake shallowood is. 🤬🤬🤬 The story was alright, I fell for it, still… F.T.M. Jennifer Esposito tease. 🖕🏻🤬🖕🏻",
+      "link": "https://letterboxd.com/film/the-proposal/"
+    },
+    {
+      "title": "Letterboxd review of The Proposal",
+      "snippet": "[Letterboxd Review of \"The Proposal\"] Jennifer Esposito is truly a gem.",
+      "link": "https://letterboxd.com/film/the-proposal/"
+    },
+    {
+      "title": "Letterboxd review of The Proposal",
+      "snippet": "[Letterboxd Review of \"The Proposal\"] I would love to see a remake of this as I think it deserves another chance to shine and reach a wider audience",
+      "link": "https://letterboxd.com/film/the-proposal/"
+    },
+    {
+      "title": "Letterboxd review of The Proposal",
+      "snippet": "[Letterboxd Review of \"The Proposal\"] Actually not a half bad DTV crime-drama. Jennifer Esposito and Stephen Lang were great, Nick Moran was... fine but did have some good chemistry with Esposito. Solid enough movie surprisingly enough.",
+      "link": "https://letterboxd.com/film/the-proposal/"
+    }
+  ],
+  "uuid": "f59c3491-38e3-adf1-7470-330cd51c2079"
+}

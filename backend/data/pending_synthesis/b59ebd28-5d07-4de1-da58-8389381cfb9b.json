@@ -1,0 +1,82 @@
+{
+  "title": "The King's Speech",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The King's Speech",
+    "genres": [
+      "Biography",
+      "Drama",
+      "History"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Britain's Prince Albert must ascend the throne as King George VI, but he has a speech impediment. Knowing that the country needs her husband to be able to communicate effectively, Elizabeth hires Lionel Logue, an Australian actor and speech therapist, to help him overcome his stammer. An extraordinary friendship develops between the two men, as Logue uses unconventional means to teach the monarch how to speak with confidence.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMzU5MjEwMTg2Nl5BMl5BanBnXkFtZTcwNzM3MTYxNA@@._V1_QL75_UY562_CR2,0,380,562_.jpg",
+    "release_year": "2010",
+    "director": "Tom Hooper",
+    "writer": "David Seidler",
+    "cast": [
+      "Colin Firth",
+      "Geoffrey Rush",
+      "Helena Bonham Carter"
+    ],
+    "runtime": "118 min",
+    "score": "8.0/10 IMDb (732,524 votes) | 94% Rotten Tomatoes | 88/100 Metacritic",
+    "awards": "Won 4 Oscars. 109 wins & 206 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The King's Speech",
+      "snippet": "[Letterboxd Review of \"The King's Speech\"] when i told my dad this beat the social network for best picture he said that \"this was the better film\". in other unrelated news, i am now seeking to be legally emancipated from my father.",
+      "link": "https://letterboxd.com/film/the-kings-speech/"
+    },
+    {
+      "title": "Letterboxd review of The King's Speech",
+      "snippet": "[Letterboxd Review of \"The King's Speech\"] Without an ounce of hyperbole, I am telling you that Tom Hooper is one of the very worst directors to ever attain \"professional\" status. This is a nightmarish visual experience. The wanton violations of the 180-degree rule. The bizarre compositions in which characters are pointlessly consigned the extreme right or left of the frame with acres of dead space next to them. The way his camera will arbitrarily shift into Terry Gilliam-vision. His inability to consider what the impact of a space should be, and how to correctly communicate that idea visually. People rightly give Kevin Smith a hard ti",
+      "link": "https://letterboxd.com/film/the-kings-speech/"
+    },
+    {
+      "title": "Letterboxd review of The King's Speech",
+      "snippet": "[Letterboxd Review of \"The King's Speech\"] colin firth invented the chubby bunny challenge",
+      "link": "https://letterboxd.com/film/the-kings-speech/"
+    },
+    {
+      "title": "Letterboxd review of The King's Speech",
+      "snippet": "[Letterboxd Review of \"The King's Speech\"] controversial opinion time: this masterpiece deserved every academy award it won",
+      "link": "https://letterboxd.com/film/the-kings-speech/"
+    },
+    {
+      "title": "Letterboxd review of The King's Speech",
+      "snippet": "[Letterboxd Review of \"The King's Speech\"] colin firth yelling random curse words is considered a form of therapy",
+      "link": "https://letterboxd.com/film/the-kings-speech/"
+    },
+    {
+      "title": "[spoilers] The King's Speech (2010) - just something I noticed",
+      "snippet": "The way speech affects other peoples' perception of you is shown in so many little ways that I had not noticed before, such as: When Elizabeth (George's wife) initally meets Lionel, she doesn't use received pronunciation.",
+      "link": "www.reddit.com/r/movies/comments/luvzlm/spoilers_the_kings_speech_2010_just_something_i/"
+    },
+    {
+      "title": "The King's Speech Review - Reddit",
+      "snippet": "Redditors have mixed opinions about The King's Speech. Some praise the film for its convincing acting performances, realistic sets, and the historical significance of the storyline. They appreciate the film's focus on friendship and acceptance, as well as the main character's struggle with anxiety over his condition.",
+      "link": "www.reddit.com/tldr/the-king-s-speech-review/"
+    },
+    {
+      "title": "The King's Speech is an extraordinary film IMO, any thoughts ... - Reddit",
+      "snippet": "The King's Speech is an extraordinary film IMO, any thoughts from others? [Spoilers] I enjoyed every aspect of this film from the convincing acting performances of Geoffery Rush, Colin Firth, and Helena Bonham Carter, to the flowing dialogue, and realistic sets.",
+      "link": "www.reddit.com/r/movies/comments/dqdonq/the_kings_speech_is_an_extraordinary_film_imo_any/"
+    },
+    {
+      "title": "My thoughts on 'The King's Speech' (2010) : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/44b51b/my_thoughts_on_the_kings_speech_2010/"
+    },
+    {
+      "title": "The King's Speech : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/eutdg/the_kings_speech/"
+    }
+  ],
+  "uuid": "b59ebd28-5d07-4de1-da58-8389381cfb9b"
+}

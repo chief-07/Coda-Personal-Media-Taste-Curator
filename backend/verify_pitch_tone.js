@@ -1,8 +1,7 @@
 const path = require('path');
-const dotenv = require('dotenv');
 
 // Load environment variables
-dotenv.config({ path: path.join(__dirname, '..', 'assets', '.env') });
+require('./loadEnv');
 
 const llmService = require('./services/llmService');
 

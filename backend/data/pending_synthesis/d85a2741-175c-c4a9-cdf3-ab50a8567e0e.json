@@ -1,0 +1,56 @@
+{
+  "title": "The Deer Hunter",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Deer Hunter",
+    "genres": [
+      "Drama",
+      "War"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Michael, Steven, and Nick are three best friends who enjoy going deer hunting quite often. They get enlisted to head to Vietnam to fight for their country and celebrate with a farewell party, as well as Steven marrying a pregnant woman named Angela. After the horrors during the war and edge-grabbing games of Russian Roulette that they are forced to play, Michael returns home and realizes that his deer hunting outings aren't the same as they used to be, because of the war and he eventually finds out that Steven is handicapped and Nick hasn't returned from Vietnam, and in response, he heads back there to rescue him.",
+    "image": "https://m.media-amazon.com/images/M/MV5BZGI4YmVhMzMtMWExMS00MGZiLTg2MmItM2I2MWZjODAyM2U5XkEyXkFqcGc@._V1_QL75_UY562_CR1,0,380,562_.jpg",
+    "release_year": "1979",
+    "director": "Michael Cimino",
+    "writer": "Michael Cimino, Deric Washburn, Louis Garfinkle",
+    "cast": [
+      "Robert De Niro",
+      "Christopher Walken",
+      "John Cazale"
+    ],
+    "runtime": "183 min",
+    "score": "8.1/10 IMDb (386,553 votes) | 86% Rotten Tomatoes | 90/100 Metacritic",
+    "awards": "Won 5 Oscars. 24 wins & 27 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Deer Hunter",
+      "snippet": "[Letterboxd Review of \"The Deer Hunter\"] ME SEEING JOHN CAZALE: Uh, weird guyME READING THAT JOHN CAZALE WAS MERYL'S HUSBAND WHO WAS DYING OF CANCER AND SHE ONLY TOOK THE THANKLESS GIRLFRIEND PART IN THIS MOVIE TO BE BY HIS SIDE 24/7 IN HIS LAST DAYS: Oh 🥺The Deer Hunter ends with Meryl singing and a freeze frame. Four stars!",
+      "link": "https://letterboxd.com/film/the-deer-hunter/"
+    },
+    {
+      "title": "Letterboxd review of The Deer Hunter",
+      "snippet": "[Letterboxd Review of \"The Deer Hunter\"] I baked an entire casserole and when I came back we were still at this fucking wedding",
+      "link": "https://letterboxd.com/film/the-deer-hunter/"
+    },
+    {
+      "title": "Letterboxd review of The Deer Hunter",
+      "snippet": "[Letterboxd Review of \"The Deer Hunter\"] The first half is a bit serious, with the second half a lighthearted trip down easy street. I recommend watching for a time where you need cheering up, and hang on in there till the end.",
+      "link": "https://letterboxd.com/film/the-deer-hunter/"
+    },
+    {
+      "title": "Letterboxd review of The Deer Hunter",
+      "snippet": "[Letterboxd Review of \"The Deer Hunter\"] One of the first films to employ Vietnam War into its premise, The Deer Hunter tells the story of a trio of young factory workers who enlist into the army to fight the ongoing war in Vietnam, only to discover that war isn't a noble venture they imagined it to be but a hellish chaos which ultimately ends up transforming their entire personalities.The film features a three act structure, with the first act introducing its three primary characters, their friendships, the women they are in love with & their perspectives on life. The second act is set in Vietnam and covers the brutality they underg",
+      "link": "https://letterboxd.com/film/the-deer-hunter/"
+    },
+    {
+      "title": "Letterboxd review of The Deer Hunter",
+      "snippet": "[Letterboxd Review of \"The Deer Hunter\"] not enough robert de niro schlong",
+      "link": "https://letterboxd.com/film/the-deer-hunter/"
+    }
+  ],
+  "uuid": "d85a2741-175c-c4a9-cdf3-ab50a8567e0e"
+}

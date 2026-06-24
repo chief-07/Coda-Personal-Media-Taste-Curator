@@ -1,0 +1,62 @@
+{
+  "title": "Hot Fuzz",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Hot Fuzz",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Mystery"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Top London cop PC Nicholas Angel is good. Too good. To stop the rest of his team looking bad, he is reassigned to the quiet town of Sandford. He is paired with Danny Butterman, who endlessly questions him on the action lifestyle. Everything seems quiet for Angel until two actors are found decapitated. It is called an accident, but Angel won't accept that, especially when more and more people turn up dead. Angel and Danny clash with everyone while they try to uncover the truth behind the mystery of the apparent \"accidents\".",
+    "image": "https://m.media-amazon.com/images/M/MV5BYjFkZTkzZTQtNjM1ZS00M2EyLWE3MTAtMmY5Yzk0NTc0NDc3XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2007",
+    "director": "Edgar Wright",
+    "writer": "Edgar Wright, Simon Pegg",
+    "cast": [
+      "Simon Pegg",
+      "Nick Frost",
+      "Martin Freeman"
+    ],
+    "runtime": "121 min",
+    "score": "7.8/10 IMDb (561,398 votes) | 91% Rotten Tomatoes | 81/100 Metacritic",
+    "awards": "2 wins & 9 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Hot Fuzz",
+      "snippet": "[Letterboxd Review of \"Hot Fuzz\"] Line delivery was invented when Olivia Colman went “Nothin’ like a bit of girl on girl!”",
+      "link": "https://letterboxd.com/film/hot-fuzz/"
+    },
+    {
+      "title": "Letterboxd review of Hot Fuzz",
+      "snippet": "[Letterboxd Review of \"Hot Fuzz\"] includes multiple point break references, all of which explicably state how gay the relationship between patrick swayze and keanu reeves was which correlates with the gay undertones between simon pegg and nick frost and if you also consider the pleasant and surprising two second cameo from cate blanchett, you got the gayest poetic cínëmà ever created",
+      "link": "https://letterboxd.com/film/hot-fuzz/"
+    },
+    {
+      "title": "Letterboxd review of Hot Fuzz",
+      "snippet": "[Letterboxd Review of \"Hot Fuzz\"] HE'S NOT JUDGE JUDY AND EXECUTIONER",
+      "link": "https://letterboxd.com/film/hot-fuzz/"
+    },
+    {
+      "title": "Letterboxd review of Hot Fuzz",
+      "snippet": "[Letterboxd Review of \"Hot Fuzz\"] it's like a less furry Zootopia (2016)",
+      "link": "https://letterboxd.com/film/hot-fuzz/"
+    },
+    {
+      "title": "Letterboxd review of Hot Fuzz",
+      "snippet": "[Letterboxd Review of \"Hot Fuzz\"] you: Romeo + Juliet (1996) dir. Baz Luhrmann, starring Leonardo Decaprio and Claire Danesme, an intellectual: Romeo & Juliet (2007) dir. Martin Blower, starring Martin Blower and Eve Draper",
+      "link": "https://letterboxd.com/film/hot-fuzz/"
+    },
+    {
+      "title": "Wikipedia: Hot Fuzz",
+      "snippet": "[Wikipedia Synopsis] Hot Fuzz is a 2007 British action comedy film directed by Edgar Wright and written by Wright and Simon Pegg. Pegg stars as Nicholas Angel, an elite police officer who is reassigned to a West Country village and investigates a series of gruesome deaths. Nick Frost co-stars as Police Constable Danny Butterman, Angel's partner.\nHot Fuzz is the second and most commercially successful film in the Three Flavours Cornetto trilogy, following Shaun of the Dead and followed by The World's End. Over 100 action films were used as inspiration for the script. Principal photography took place in Wells, Somerset, for eleven weeks and ten artists worked on VFX, which involved explosions, gory gunfire scenes and a flip book.\nHot Fuzz premiered on 13 February 2007 in the United Kingdom. It received acclaim and grossed US$80 million worldwide on a budget of $12–16 million. In 2020, Empire named it the 67th-greatest film of the 21st century.",
+      "link": "https://en.wikipedia.org/wiki/Hot%20Fuzz"
+    }
+  ],
+  "uuid": "972795ab-2307-e8d8-734a-cfbd968212cf"
+}

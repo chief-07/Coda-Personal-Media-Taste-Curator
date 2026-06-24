@@ -1,0 +1,62 @@
+{
+  "title": "Jumanji",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Jumanji",
+    "genres": [
+      "Adventure",
+      "Comedy",
+      "Family"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "Jumanji, one of the most unique--and dangerous--board games ever, falls into the hands of the curious teen, Alan Parrish, in 1969. Mysterious and magical, the game strands the unsuspecting boy in the lush, savage forests of a mythical realm. Nearly three decades later, the game releases him before the awed eyes of the young orphaned siblings, Judy and Peter Shepherd. Now, the wild and incessant beat of the jungle's tribal drums is calling for the now-adult Alan and the other hesitant players, as the one who rolls the dice must never leave undone what the roll has started. Has anyone ever escaped from the game and Jumanji's formidable foes?",
+    "image": "https://m.media-amazon.com/images/M/MV5BYTFkMjFmODgtYzRiZi00NmQwLTliZWMtMzRhMWQ5ZmY3ZDExXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1995",
+    "director": "Joe Johnston",
+    "writer": "Jonathan Hensleigh, Greg Taylor, Jim Strain",
+    "cast": [
+      "Robin Williams",
+      "Kirsten Dunst",
+      "Bonnie Hunt"
+    ],
+    "runtime": "104 min",
+    "score": "7.1/10 IMDb (408,456 votes) | 56% Rotten Tomatoes | 41/100 Metacritic",
+    "awards": "4 wins & 11 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Jumanji",
+      "snippet": "[Letterboxd Review of \"Jumanji\"] the part where alan asks if his parents are still around and the guy is like, \"yeah, i see 'em now and then. they're over on adams street\"... and then he goes to adams street and it's a CEMETERY and they're DEAD. i would have gone back and punched that guy in the face.",
+      "link": "https://letterboxd.com/film/jumanji/"
+    },
+    {
+      "title": "Letterboxd review of Jumanji",
+      "snippet": "[Letterboxd Review of \"Jumanji\"] straight line:————————dotted line:- - - - - - - - - - - -iconic line:“ignore him honey, he’s a libra.”",
+      "link": "https://letterboxd.com/film/jumanji/"
+    },
+    {
+      "title": "Letterboxd review of Jumanji",
+      "snippet": "[Letterboxd Review of \"Jumanji\"] they turned that little boy into a monkey for absolutely no reason",
+      "link": "https://letterboxd.com/film/jumanji/"
+    },
+    {
+      "title": "Letterboxd review of Jumanji",
+      "snippet": "[Letterboxd Review of \"Jumanji\"] Jumanji is a children's version of a horror movie in every sense of word, and even more surprising than that: it's actually got a strong emotional core, anchored by Robin Williams' terrific performance. I loved this movie as a kid, because unlike lots of other children's entertainment, it actually made me FEEL things like fear and sadness.",
+      "link": "https://letterboxd.com/film/jumanji/"
+    },
+    {
+      "title": "Letterboxd review of Jumanji",
+      "snippet": "[Letterboxd Review of \"Jumanji\"] The CGI monkeys are my new sleep paralysis demons.",
+      "link": "https://letterboxd.com/film/jumanji/"
+    },
+    {
+      "title": "Wikipedia: Jumanji (film)",
+      "snippet": "[Wikipedia Synopsis] Jumanji is a 1995 American fantasy adventure film directed by Joe Johnston from a screenplay by Jonathan Hensleigh, Greg Taylor, and Jim Strain, based on the 1981 children's picture book by Chris Van Allsburg. The film is the first installment in the Jumanji film series and stars Robin Williams, Kirsten Dunst, David Alan Grier, Bonnie Hunt, Jonathan Hyde, and Bebe Neuwirth. The story centers on a supernatural board game that unleashes jungle-based hazards on its players with every turn they take. The film was produced by Interscope Communications and Golden Mean Productions, and distributed by Sony Pictures Releasing through its TriStar Pictures label.\nJumanji premiered on December 10, 1995, in Culver City, California, and went into general release on December 15. The film received mixed reviews from critics, but was a box office success, grossing $263 million worldwide on a budget of approximately $65 million. It was the tenth highest-grossing film of 1995.\nThe film spawned an animated television series that aired from 1996 to 1999, and was followed by a spin-off film, Zathura: A Space Adventure (2005), and two sequels, Jumanji: Welcome to the Jungle (2017) and Jumanji: The Next Level (2019), with a third sequel, Jumanji: Open World, set to be released in 2026.",
+      "link": "https://en.wikipedia.org/wiki/Jumanji%20(film)"
+    }
+  ],
+  "uuid": "febbf514-d68a-2cdc-2fa2-99e0abb9a041"
+}

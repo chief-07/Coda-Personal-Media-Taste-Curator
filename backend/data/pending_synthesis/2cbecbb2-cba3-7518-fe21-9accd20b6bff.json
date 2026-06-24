@@ -1,0 +1,62 @@
+{
+  "title": "Cars",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Cars",
+    "genres": [
+      "Animation",
+      "Adventure",
+      "Comedy"
+    ],
+    "tags": [
+      "movie",
+      "G"
+    ],
+    "description": "While traveling to California for the dispute of the final race of the Piston Cup against The King and Chick Hicks, the famous Lightning McQueen accidentally damages the road of the small town Radiator Springs and is sentenced to repair it. Lightning McQueen has to work hard and finds friendship and love in the simple locals, changing its values during his stay in the small town and becoming a true winner.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTg5NzY0MzA2MV5BMl5BanBnXkFtZTYwNDc3NTc2._V1_SX300.jpg",
+    "release_year": "2006",
+    "director": "John Lasseter, Joe Ranft",
+    "writer": "Dan Fogelman, John Lasseter, Joe Ranft",
+    "cast": [
+      "Owen Wilson",
+      "Bonnie Hunt",
+      "Paul Newman"
+    ],
+    "runtime": "116 min",
+    "score": "7.3/10 IMDb (528,959 votes) | 74% Rotten Tomatoes | 73/100 Metacritic",
+    "awards": "Nominated for 2 Oscars. 28 wins & 34 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Cars",
+      "snippet": "[Letterboxd Review of \"Cars\"] How the fuck do these cars reproduce",
+      "link": "https://letterboxd.com/film/cars/"
+    },
+    {
+      "title": "Letterboxd review of Cars",
+      "snippet": "[Letterboxd Review of \"Cars\"] i cried when guido did the pit stop",
+      "link": "https://letterboxd.com/film/cars/"
+    },
+    {
+      "title": "Letterboxd review of Cars",
+      "snippet": "[Letterboxd Review of \"Cars\"] So I have a couple questions...Why does Lightning McQueen have a tongue?How does money work in this world?Cars can be seen using men and women’s restrooms. What are they doing in the bathroom? Why are they gendered?Are cars built or born? How do they become sentient?If they’re born, how?How is Mater able to use his rear view mirrors when they’re behind his eyes?Why do cars have passenger doors? Despite no humans existing, they seem to be designed for humans to drive them?The VW van references listening to Hendrix. Is this human Jimi Hendrix or a car Jimi Hendrix. If it’s car Hendrix, how is he",
+      "link": "https://letterboxd.com/film/cars/"
+    },
+    {
+      "title": "Letterboxd review of Cars",
+      "snippet": "[Letterboxd Review of \"Cars\"] In my junior year of high school we had to watch this movie in health class and write a paper on Lightning McQueen's character growth and how he forms healthy relationships with the people around him over the course of the movie. So that was fun",
+      "link": "https://letterboxd.com/film/cars/"
+    },
+    {
+      "title": "Letterboxd review of Cars",
+      "snippet": "[Letterboxd Review of \"Cars\"] ford v ferrari wants what this movie has.",
+      "link": "https://letterboxd.com/film/cars/"
+    },
+    {
+      "title": "Wikipedia: Cars (film)",
+      "snippet": "[Wikipedia Synopsis] Cars is a 2006 American animated sports comedy film produced by Pixar Animation Studios for Walt Disney Pictures. Directed by John Lasseter, who co-wrote it with Joe Ranft, Dan Fogelman, Kiel Murray, Phil Lorin and Jorgen Klubien, the film stars Paul Newman and Owen Wilson, with an ensemble voice cast consisting of Bonnie Hunt, Larry the Cable Guy, Tony Shalhoub, Cheech Marin, Michael Wallis, George Carlin, Paul Dooley, Jenifer Lewis, Guido Quaroni, Michael Keaton, Katherine Helmond, John Ratzenberger, and Richard Petty.\nSet in a world populated entirely by anthropomorphic vehicles, the film follows a young self-obsessed racecar named Lightning McQueen who, on the way to the most important race of his life for the Piston Cup, becomes stranded in a forgotten town along U.S. Route 66 called Radiator Springs, where he learns about friendship and begins to reevaluate his priorities.\nDevelopment for Cars started in 1998 following discussions between Lasseter and Klubien after production of A Bug's Life had wrapped. Klubien began to develop a new script titled The Yellow Car, which was about an electric car living in a gas-guzzling world. Shortly after, production was resumed with major script changes. The film was inspired by Lasseter's experiences on a cross-country road trip. Randy Newman composed the film's score, while artists Sheryl Crow, Rascal Flatts, John Mayer, and Brad Paisley contributed to the film's soundtrack. Cars ultimately served as the final film independently pr",
+      "link": "https://en.wikipedia.org/wiki/Cars%20(film)"
+    }
+  ],
+  "uuid": "2cbecbb2-cba3-7518-fe21-9accd20b6bff"
+}

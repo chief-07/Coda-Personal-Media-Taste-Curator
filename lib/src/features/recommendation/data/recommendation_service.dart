@@ -1,11 +1,12 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart' as coda_domain;
 import 'package:coda/src/features/home/domain/media_type.dart' as coda_domain;
 import 'package:coda/src/core/providers/api_config.dart';
+import 'package:coda/src/core/providers/user_id_provider.dart';
 
 class RecommendationResult {
   final String title;
@@ -95,9 +96,6 @@ class RecommendationResult {
   }
 }
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:coda/src/core/providers/user_id_provider.dart';
-
 final recommendationServiceProvider = Provider<RecommendationService>((ref) {
   final userId = ref.watch(userIdProvider);
   return RecommendationService(userId: userId);
@@ -116,86 +114,24 @@ class RecommendationService {
     coda_domain.MediaType selectedMediaType, {
     List<String> additionalExclusions = const [],
     int limit = 1,
+    bool watchlistOnly = false,
+    String? ambientContext,
   }) async {
-    final now = DateTime.now();
-    final hour = now.hour;
-    
-    // Simple heuristic for time of day
-    String timeOfDay = 'evening';
-    if (hour >= 5 && hour < 12) {
-      timeOfDay = 'morning';
-    } else if (hour >= 12 && hour < 17) {
-      timeOfDay = 'afternoon';
-    } else if (hour >= 17 && hour < 21) {
-      timeOfDay = 'evening';
-    } else {
-      timeOfDay = 'late night';
-    }
-
-    // In a full app, we could add weather or season here.
-    final localContext = 'It is currently a $timeOfDay on a ${now.weekday == 6 || now.weekday == 7 ? 'weekend' : 'weekday'}.';
-
-    // Format the living memory for the LLM (The "You" store)
-    final coreIdentity = memory.globalIdentity.join('. ');
-
-    // Normalize selectedMediaType name to find specific category profile key
-    String cleanKey = selectedMediaType.name;
-    switch (selectedMediaType) {
-      case coda_domain.MediaType.anime:
-        cleanKey = 'anime';
-        break;
-      case coda_domain.MediaType.movie:
-        cleanKey = 'movies';
-        break;
-      case coda_domain.MediaType.tv:
-        cleanKey = 'tv_shows';
-        break;
-      case coda_domain.MediaType.visualNovel:
-        cleanKey = 'visual_novels';
-        break;
-      case coda_domain.MediaType.manga:
-        cleanKey = 'manga';
-        break;
-      case coda_domain.MediaType.book:
-        cleanKey = 'books';
-        break;
-      case coda_domain.MediaType.game:
-        cleanKey = 'games';
-        break;
-      case coda_domain.MediaType.youtube:
-        cleanKey = 'youtube';
-        break;
-      case coda_domain.MediaType.music:
-        cleanKey = 'music';
-        break;
-      default:
-        break;
-    }
-
-    // Isolate context: only pass the "You" store and the profile of the requested media type
-    final specificTastes = memory.categoryProfiles[cleanKey] ?? [];
-    final specificTastesStr = specificTastes.isEmpty ? 'None' : specificTastes.join('. ');
-    final fullCoreIdentity = '$coreIdentity. Specific Tastes in ${selectedMediaType.label}: $specificTastesStr';
-    
-    final guardrails = memory.guardrails.join(', ');
-
     // Build seen list including exclusions
     final finalSeen = List<String>.from(memory.seen);
     for (final title in additionalExclusions) {
       if (!finalSeen.contains(title)) finalSeen.add(title);
     }
+    final fallbackMemory = memory.toJson();
+    fallbackMemory['seen'] = finalSeen;
 
     final payload = {
       'userId': userId,
-      'core_identity': fullCoreIdentity,
-      'recent_context': memory.recentContext,
-      'guardrails': guardrails,
-      'local_context': localContext,
       'requested_media_type': selectedMediaType.name, // The user explicitly tapped this tab
-      'seen': finalSeen,
-      'not_for_me': memory.notForMe,
-      'watchlist': memory.watchlist.map((e) => e.toJson()).toList(),
+      'current_memory': fallbackMemory,
+      if (ambientContext != null) 'contextualState': ambientContext,
       'limit': limit,
+      'watchlist_only': watchlistOnly,
     };
 
 
@@ -266,34 +202,11 @@ class RecommendationService {
     required String title,
     required String mediaType,
   }) async {
-    final coreIdentity = memory.globalIdentity.join('. ');
-    String cleanKey;
-    switch (mediaType) {
-      case 'anime': cleanKey = 'anime'; break;
-      case 'movie': cleanKey = 'movies'; break;
-      case 'tv': cleanKey = 'tv_shows'; break;
-      case 'visualNovel': cleanKey = 'visual_novels'; break;
-      case 'manga': cleanKey = 'manga'; break;
-      case 'book': cleanKey = 'books'; break;
-      case 'game': cleanKey = 'games'; break;
-      case 'youtube': cleanKey = 'youtube'; break;
-      case 'music': cleanKey = 'music'; break;
-      default: cleanKey = mediaType;
-    }
-    final specificTastes = memory.categoryProfiles[cleanKey] ?? [];
-    final specificTastesStr = specificTastes.isEmpty ? 'None' : specificTastes.join('. ');
-    final fullCoreIdentity = '$coreIdentity. Specific Tastes in $mediaType: $specificTastesStr';
-    final guardrails = memory.guardrails.join(', ');
-
     final payload = {
       'userId': userId,
-      'core_identity': fullCoreIdentity,
-      'recent_context': memory.recentContext,
-      'guardrails': guardrails,
       'title': title,
       'requested_media_type': mediaType,
-      'seen': memory.seen,
-      'not_for_me': memory.notForMe,
+      'current_memory': memory.toJson(),
     };
 
     final targetUrl = '${getApiBaseUrl()}/api/recommend/pitch';
@@ -323,12 +236,14 @@ class RecommendationService {
     required LivingMemory memory,
     required List<Map<String, dynamic>> chatHistory,
     required String userMessage,
+    bool watchlistOnly = false,
   }) async {
     final payload = {
       'userId': userId,
       'current_memory': memory.toJson(),
       'chat_history': chatHistory,
       'user_message': userMessage,
+      'watchlist_only': watchlistOnly,
     };
 
     final targetUrl = '${getApiBaseUrl()}/api/recommend/ask';
@@ -461,4 +376,107 @@ class DiscussResult {
     this.oneLineSummary,
     this.memoryUpdates,
   });
+}
+
+class VibeCheckResult {
+  final bool? isMatch;
+  final String convictionStatement;
+
+  const VibeCheckResult({
+    required this.isMatch,
+    required this.convictionStatement,
+  });
+
+  factory VibeCheckResult.fromJson(Map<String, dynamic> json) {
+    return VibeCheckResult(
+      isMatch: json['is_match'] as bool?,
+      convictionStatement: json['conviction_statement'] as String? ?? 'Hmm, I am not sure.',
+    );
+  }
+}
+
+extension RecommendationServiceMatch on RecommendationService {
+  Future<VibeCheckResult> vibeCheck({
+    required String title,
+    required LivingMemory memory,
+  }) async {
+    final payload = {
+      'title': title,
+      'userId': userId,
+      'current_memory': memory.toJson(),
+    };
+
+    final targetUrl = '${getApiBaseUrl()}/api/recommend/vibe-check';
+
+    try {
+      final response = await http.post(
+        Uri.parse(targetUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        return VibeCheckResult.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Vibe check failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Vibe check error: $e");
+      return const VibeCheckResult(
+        isMatch: null,
+        convictionStatement: "I'm having trouble connecting right now. Let's try again in a bit.",
+      );
+    }
+  }
+
+  Future<Recommendation?> promoteMedia({
+    required String title,
+    required LivingMemory memory,
+  }) async {
+    final payload = {
+      'title': title,
+      'current_memory': memory.toJson(),
+    };
+
+    final targetUrl = '${getApiBaseUrl()}/api/recommend/promote';
+
+    try {
+      final response = await http.post(
+        Uri.parse(targetUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == 'success' && data['recommendation'] != null) {
+          final result = RecommendationResult.fromJson(data['recommendation']);
+          return result.toDomain();
+        }
+      }
+      return null;
+    } catch (e) {
+      print("Promote error: $e");
+      return null;
+    }
+  }
+
+  Future<void> submitSwipe({
+    required String title,
+    required String action, // 'loved', 'not_for_me', 'seen'
+  }) async {
+    try {
+      await http.post(
+        Uri.parse('${getApiBaseUrl()}/api/recommend/swipe'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'userId': userId,
+          'title': title,
+          'action': action,
+        }),
+      );
+    } catch (e) {
+      print("Submit swipe error: $e");
+    }
+  }
 }

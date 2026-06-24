@@ -1,0 +1,82 @@
+{
+  "title": "The Big Short",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Big Short",
+    "genres": [
+      "Biography",
+      "Comedy",
+      "Drama"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Three separate but parallel stories of the U.S mortgage housing crisis of 2005 are told. Michael Burry, an eccentric ex-physician turned one-eyed Scion Capital hedge fund manager, has traded traditional office attire for shorts, bare feet and a Supercuts haircut. He believes that the US housing market is built on a bubble that will burst within the next few years. Autonomy within the company allows Burry to do largely as he pleases, so Burry proceeds to bet against the housing market with the banks, who are more than happy to accept his proposal for something that has never happened in American history. The banks believe that Burry is a crackpot and therefore are confident in that they will win the deal. Jared Vennett with Deutschebank gets wind of what Burry is doing and, as an investor believes he too can cash in on Burry's beliefs. An errant telephone call to FrontPoint Partners gets this information into the hands of Mark Baum, an idealist who is fed up with the corruption in the financial industry. Baum and his associates, who work at an arms length under Morgan Stanley, decide to join forces with Vennett despite not totally trusting him. In addition to Burry's information, they further believe that most of the mortgages are overrated by the bond agencies, with the banks collating all the sub-prime mortgages under AAA packages. Charlie Geller and Jamie Shipley, who are minor players in a $30 million start-up garage company called Brownfield, get a hold of Vennett's prospectus on the matter. Wanting in on the action but not having the official clout to play, they decide to call an old \"friend\", retired investment banker Ben Rickert, to help out. All three of these groups work on the premise that the banks are stupid and don't know what's going on, while for them to win, the general economy has to lose, which means the suffering of the general investor who trusts the financial institutions. That latter aspect may not sit well with Baum. Some of these assumptions may be incorrect and may be far more manipulative than they could have ever imagined, which in turn may throw curves into the process.",
+    "image": "https://m.media-amazon.com/images/M/MV5BZDZkNDQ3YjktYjBlZC00YTY1LTgxOGYtY2RhMWFhZmNkZGY3XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2015",
+    "director": "Adam McKay",
+    "writer": "Charles Randolph, Adam McKay, Michael Lewis",
+    "cast": [
+      "Christian Bale",
+      "Steve Carell",
+      "Ryan Gosling"
+    ],
+    "runtime": "130 min",
+    "score": "7.8/10 IMDb (532,875 votes) | 89% Rotten Tomatoes | 81/100 Metacritic",
+    "awards": "Won 1 Oscar. 37 wins & 81 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Big Short",
+      "snippet": "[Letterboxd Review of \"The Big Short\"] literally what the fuck were they talking about",
+      "link": "https://letterboxd.com/film/the-big-short/"
+    },
+    {
+      "title": "Letterboxd review of The Big Short",
+      "snippet": "[Letterboxd Review of \"The Big Short\"] The way this is made is really fun for what could’ve been such a boring movie",
+      "link": "https://letterboxd.com/film/the-big-short/"
+    },
+    {
+      "title": "Letterboxd review of The Big Short",
+      "snippet": "[Letterboxd Review of \"The Big Short\"] Five stars? Yeah, five stars. Call me Standard & Poor's because I'm just tossing out AAA ratings.A (frequently hilarious) crime movie where the American economy is the corpse, the entire financial system is the culprit, and the detectives all have bets on the body dropping. But for the bearish take, you can hear Josh try to rain on my Adam McKay party on Filmspotting #566.",
+      "link": "https://letterboxd.com/film/the-big-short/"
+    },
+    {
+      "title": "Letterboxd review of The Big Short",
+      "snippet": "[Letterboxd Review of \"The Big Short\"] my google recent searches:who is mark baumwhat is shorting (finance)scionwhat is scionwhat is a void contractwhat’s a mortgage brokerthe big short explained",
+      "link": "https://letterboxd.com/film/the-big-short/"
+    },
+    {
+      "title": "Letterboxd review of The Big Short",
+      "snippet": "[Letterboxd Review of \"The Big Short\"] i wonder if margot robbie's back hurts from carrying this entire movie",
+      "link": "https://letterboxd.com/film/the-big-short/"
+    },
+    {
+      "title": "The Big Short | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Big Short on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/the_big_short"
+    },
+    {
+      "title": "The Big Short movie review & film summary - Roger Ebert",
+      "snippet": "The Big Short is quite a movie: entertaining and engaging, but also mortifying; a good alternate title might be \"American Horror Story.\"",
+      "link": "www.rogerebert.com/reviews/the-big-short-2015"
+    },
+    {
+      "title": "Rotten Tomatoes: Movies | TV Shows | Movie Trailers | Reviews",
+      "snippet": "Rotten Tomatoes, home of the Tomatometer, is the most trusted measurement of quality for Movies & TV. The definitive site for Reviews, Trailers, Showtimes, and Tickets",
+      "link": "www.rottentomatoes.com"
+    },
+    {
+      "title": "The big short is so damn good even though i don't understand it",
+      "snippet": "I'm so dumb economically, but it is so entertaining to watch (i know it isn't 100% accurate). I wish i could understand swaps and other things just to appreciate even more. The screenplay is so good, i feel it beeing written in all caps and the cast work just accentuates it (it kinda reminds me of Glengarry Glen Ross). I rewatched it today and just now i realized Kendall Roy was in it, wich ...",
+      "link": "www.reddit.com/r/movies/comments/147zcn5/the_big_short_is_so_damn_good_even_though_i_dont/"
+    },
+    {
+      "title": "The Big Short (film) - Wikipedia",
+      "snippet": "On review aggregator website Rotten Tomatoes, The Big Short has an approval rating of 89% based on 331 reviews, with an average rating of 7.8/10. The site's critical consensus reads, \" The Big Short approaches a serious, complicated subject with an impressive attention to detail - and manages to deliver a well-acted, scathingly funny ...",
+      "link": "en.wikipedia.org/wiki/The_Big_Short_(film)"
+    }
+  ],
+  "uuid": "5e844989-7325-7d0a-bdd3-9151ba90cff2"
+}

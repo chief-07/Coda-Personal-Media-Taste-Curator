@@ -1,0 +1,62 @@
+{
+  "title": "12 Monkeys",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "12 Monkeys",
+    "genres": [
+      "Mystery",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "James Cole, a prisoner of the state in the year 2035, can earn parole if he agrees to travel back in time and thwart a devastating plague. The virus has wiped out most of the Earth's population and the remainder live underground because the air is poisonous. Returning to the year 1990, six years before the start of the plague, Cole is soon imprisoned in a psychiatric facility because his warnings sound like mad ravings. There he meets a scientist named Dr. Kathryn Railly and Jeffrey Goines, the mad son of an eminent virologist. Cole is returned by the authorities to the year 2035, and finally ends up at his intended destination in 1996. He kidnaps Dr. Railly in order to enlist her help in his quest. Cole discovers graffiti by an apparent animal rights group called the Army of the Twelve Monkeys, but as he delves into the mystery, he hears voices, loses his bearings, and doubts his own sanity. He must figure out if Goines, who seems to be a raving lunatic, holds the key to the puzzle.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMDQwNDY0M2MtOGFmNy00ZjI5LTkzN2ItMzg5M2IwZTZjY2MyXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1995",
+    "director": "Terry Gilliam",
+    "writer": "Chris Marker, David Webb Peoples, Janet Peoples",
+    "cast": [
+      "Bruce Willis",
+      "Madeleine Stowe",
+      "Brad Pitt"
+    ],
+    "runtime": "129 min",
+    "score": "8.0/10 IMDb (676,593 votes) | 88% Rotten Tomatoes | 75/100 Metacritic",
+    "awards": "Nominated for 2 Oscars. 11 wins & 25 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of 12 Monkeys",
+      "snippet": "[Letterboxd Review of \"12 Monkeys\"] About an hour into Twelve Monkeys, Bruce Willis says, 'All I see are dead people'. Did he like have a sixth sense??",
+      "link": "https://letterboxd.com/film/12-monkeys/"
+    },
+    {
+      "title": "Letterboxd review of 12 Monkeys",
+      "snippet": "[Letterboxd Review of \"12 Monkeys\"] i'm not crazy... he says right after eating a spider",
+      "link": "https://letterboxd.com/film/12-monkeys/"
+    },
+    {
+      "title": "Letterboxd review of 12 Monkeys",
+      "snippet": "[Letterboxd Review of \"12 Monkeys\"] absolutely beside myself to realize that the 1995 science-fiction time travel film 12 Monkeys accurately predicted the greatest historical event of my lifetime, the 2009 balloon boy hoax. truly terrific performance by brad pitt. lovely to see bruce willis give a shit. love madeleine stowe's slow progression into full psychosis. really could've thrown it all away and made the whole movie balloon boy, though.",
+      "link": "https://letterboxd.com/film/12-monkeys/"
+    },
+    {
+      "title": "Letterboxd review of 12 Monkeys",
+      "snippet": "[Letterboxd Review of \"12 Monkeys\"] tag yourself: I'm Brad Pitt compulsively giving everyone the middle finger for no particular reason",
+      "link": "https://letterboxd.com/film/12-monkeys/"
+    },
+    {
+      "title": "Letterboxd review of 12 Monkeys",
+      "snippet": "[Letterboxd Review of \"12 Monkeys\"] monke lovers please dont be fooled there are 0 monke in this movie 😒🐒‼️",
+      "link": "https://letterboxd.com/film/12-monkeys/"
+    },
+    {
+      "title": "Wikipedia: 12 Monkeys",
+      "snippet": "[Wikipedia Synopsis] 12 Monkeys is a 1995 American science fiction thriller film directed by Terry Gilliam from a screenplay by David Peoples and Janet Peoples, based on Chris Marker's 1962 short film La Jetée. It stars Bruce Willis, Madeleine Stowe, Brad Pitt, and Christopher Plummer. Set in a post-apocalyptic future devastated by disease, the film follows a convict who is sent back in time to gather information about the man-made virus that wiped out most of the human population on the planet.\nThe film was theatrically released in the United States on December 29, 1995, by Universal Pictures. It received positive reviews from critics and grossed over $168.8 million worldwide against a $29 million budget. At the 68th Academy Awards, the film was nominated for Best Supporting Actor (for Pitt) and Best Costume Design. It garnered seven nominations at the 22nd Saturn Awards, winning three: Best Science Fiction Film, Best Supporting Actor, and Best Costumes. Pitt also won Best Supporting Actor at the 53rd Golden Globe Awards.",
+      "link": "https://en.wikipedia.org/wiki/12%20Monkeys"
+    }
+  ],
+  "uuid": "825d876d-57e3-96d9-f496-340299e7f2e6"
+}

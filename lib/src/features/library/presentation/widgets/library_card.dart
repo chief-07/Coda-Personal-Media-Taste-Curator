@@ -11,6 +11,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/library/presentation/library_screen.dart';
 import 'package:coda/src/features/session/application/archived_sessions_controller.dart';
+import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
+import 'package:coda/src/features/session/data/living_memory_provider.dart';
+import 'package:coda/src/features/home/data/recommendation_provider.dart';
+import 'package:coda/src/features/home/presentation/home_screen.dart';
+import 'package:coda/src/core/providers/watchlist_mode_provider.dart';
+import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 
 class LibraryCard extends ConsumerStatefulWidget {
   const LibraryCard({super.key, required this.tab});
@@ -45,6 +51,13 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
           _topScrollController.offset != _maskScrollController.offset) {
         _maskScrollController.jumpTo(_topScrollController.offset);
       }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final prefs = ref.read(sharedPreferencesProvider);
+      setState(() {
+        _audioEnabled = prefs.getBool('coda_autoplay_audio') ?? false;
+      });
     });
   }
 
@@ -139,7 +152,11 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
                     currentTab: widget.tab,
                     horizontalControllerProvider: _getHorizontalController,
                     onThemeChanged: (val) => setState(() => _themeEnabled = val),
-                    onAudioChanged: (val) => setState(() => _audioEnabled = val),
+                    onAudioChanged: (val) async {
+                      final prefs = ref.read(sharedPreferencesProvider);
+                      await prefs.setBool('coda_autoplay_audio', val);
+                      setState(() => _audioEnabled = val);
+                    },
                     onReduceAnimationsChanged: (val) => setState(() => _reduceAnimationsEnabled = val),
                   ),
                 ),
@@ -276,6 +293,7 @@ class _CardLayout extends ConsumerWidget {
                       [item.mediaType, ...item.tags],
                       item.posterUrl,
                       horizontalControllerProvider(item.title),
+                      onTap: () => _promoteToHome(context, ref, item.title),
                       onDelete: () async {
                         _showDeleteConfirmDialog(
                           context,
@@ -330,6 +348,13 @@ class _CardLayout extends ConsumerWidget {
             _buildSettingsRow(
               'Manage Guardrails',
               onTap: () => context.push('/memories?tab=2'),
+            ),
+            const SizedBox(height: 48),
+            _buildSettingsRow(
+              'Watchlist Mode',
+              hasToggle: true,
+              toggleValue: ref.watch(watchlistModeProvider),
+              onToggle: (val) => ref.read(watchlistModeProvider.notifier).toggle(),
             ),
             const SizedBox(height: 48),
             _buildSettingsRow(
@@ -738,6 +763,181 @@ class _CardLayout extends ConsumerWidget {
     );
   }
 
+  Future<void> _promoteToHome(BuildContext context, WidgetRef ref, String title) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator(color: Colors.white)),
+    );
+
+    final recommendation = await ref.read(recommendationServiceProvider).promoteMedia(
+      title: title,
+      memory: ref.read(livingMemoryProvider),
+    );
+
+    if (context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop(); // Close loading dialog
+    }
+
+    if (recommendation != null) {
+      await ref.read(homeRecommendationProvider.notifier).setActivePick(recommendation);
+      ref.read(selectedMediaTypeProvider.notifier).select(recommendation.mediaType);
+      if (context.mounted) {
+        context.go('/home');
+      }
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not promote $title.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _showVibeCheckOverlay(BuildContext context, WidgetRef ref, String title) async {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      builder: (context) {
+        return Center(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutBack,
+            builder: (context, val, child) {
+              return Transform.scale(
+                scale: val,
+                child: Opacity(
+                  opacity: val.clamp(0.0, 1.0),
+                  child: child,
+                ),
+              );
+            },
+            child: Material(
+              color: Colors.transparent,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: BackdropFilter(
+                  filter: dart_ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white30, width: 1.5),
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/coda_logo.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Checking the vibes...',
+                          style: GoogleFonts.inter(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        FutureBuilder<VibeCheckResult>(
+                          future: ref.read(recommendationServiceProvider).vibeCheck(
+                            title: title,
+                            memory: ref.read(livingMemoryProvider),
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: CircularProgressIndicator(color: Colors.white),
+                              );
+                            }
+                            if (snapshot.hasError || !snapshot.hasData) {
+                              return Text(
+                                "I couldn't check this one right now.",
+                                style: GoogleFonts.inter(color: Colors.white, fontSize: 16),
+                              );
+                            }
+                            final result = snapshot.data!;
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  result.isMatch == true
+                                      ? "IT'S A MATCH!"
+                                      : result.isMatch == false
+                                          ? "MAYBE NOT"
+                                          : "UNKNOWN",
+                                  style: GoogleFonts.inter(
+                                    color: result.isMatch == true ? Colors.greenAccent : (result.isMatch == false ? Colors.orangeAccent : Colors.white),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  '"${result.convictionStatement}"',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    fontStyle: FontStyle.italic,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white.withValues(alpha: 0.1),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            minimumSize: const Size(double.infinity, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                            ),
+                          ),
+                          child: Text(
+                            'Got it',
+                            style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildListItemRow(
     String title,
     List<String> tags,
@@ -745,6 +945,8 @@ class _CardLayout extends ConsumerWidget {
     ScrollController horizontalScroll, {
     VoidCallback? onDelete,
     VoidCallback? onLongPress,
+    VoidCallback? onTap,
+    VoidCallback? onVibeCheck,
   }) {
     final rowContent = Padding(
       padding: const EdgeInsets.only(left: 24, right: 12),
@@ -764,14 +966,17 @@ class _CardLayout extends ConsumerWidget {
                     ),
                   ),
                 )
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: SizedBox(
-                    width: 72,
-                    height: 72,
-                    child: FallbackImage(
-                      url: imageAsset,
-                      fit: BoxFit.cover,
+              : GestureDetector(
+                  onTap: onTap,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      width: 72,
+                      height: 72,
+                      child: FallbackImage(
+                        url: imageAsset,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
@@ -815,16 +1020,45 @@ class _CardLayout extends ConsumerWidget {
                   clipBehavior: Clip.hardEdge,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: tags.map((tag) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: _buildTagPill(tag),
-                    )).toList(),
+                    children: [
+                      ...tags.map((tag) => Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: _buildTagPill(tag),
+                      )),
+                      if (onVibeCheck != null && !isKnockoutLayer)
+                        GestureDetector(
+                          onTap: onVibeCheck,
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: ShapeDecoration(
+                              color: Colors.white.withValues(alpha: 0.1),
+                              shape: const StadiumBorder(),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(PhosphorIconsBold.magicWand, size: 12, color: Colors.white),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Is this for me?',
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 24),
+          const SizedBox(width: 16),
           if (onDelete != null) ...[
             if (!isKnockoutLayer)
               IconButton(

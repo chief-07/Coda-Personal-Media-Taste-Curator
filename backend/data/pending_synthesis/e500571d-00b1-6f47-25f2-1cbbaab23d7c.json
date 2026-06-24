@@ -1,0 +1,47 @@
+{
+  "title": "Ex Machina",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Ex Machina",
+    "genres": [
+      "Drama",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Caleb, a 26 year old programmer at the world's largest internet company, wins a competition to spend a week at a private mountain retreat belonging to Nathan, the reclusive CEO of the company. But when Caleb arrives at the remote location he finds that he will have to participate in a strange and fascinating experiment in which he must interact with the world's first true artificial intelligence, housed in the body of a beautiful robot girl.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTUxNzc0OTIxMV5BMl5BanBnXkFtZTgwNDI3NzU2NDE@._V1_SX300.jpg",
+    "release_year": "2014",
+    "director": "Alex Garland",
+    "writer": "Alex Garland",
+    "cast": [
+      "Alicia Vikander",
+      "Domhnall Gleeson",
+      "Oscar Isaac"
+    ],
+    "runtime": "108 min",
+    "score": "7.7/10 IMDb (633,967 votes) | 92% Rotten Tomatoes | 78/100 Metacritic",
+    "awards": "Won 1 Oscar. 74 wins & 162 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Ex Machina",
+      "snippet": "[Letterboxd Review of \"Ex Machina\"] Garland does solid intellectual Sci-Fi.",
+      "link": "https://letterboxd.com/film/ex-machina/"
+    },
+    {
+      "title": "Letterboxd review of Ex Machina",
+      "snippet": "[Letterboxd Review of \"Ex Machina\"] Who ya gonna call? Ghostbusters.",
+      "link": "https://letterboxd.com/film/ex-machina/"
+    },
+    {
+      "title": "Wikipedia: Ex Machina (film)",
+      "snippet": "[Wikipedia Synopsis] Ex Machina is a 2014  science fiction film, written and directed by Alex Garland in his directorial debut. It stars Domhnall Gleeson, Alicia Vikander, and Oscar Isaac. It follows a programmer who is invited by his CEO to administer the Turing test to an intelligent female humanoid robot.\nEx Machina premiered at the BFI Southbank on 16 December 2014. It was released in the United Kingdom on 21 January 2015, by Universal Pictures International, and in the United States on 10 April 2015, by A24. It grossed over $36.8 million worldwide on a $15 million budget.\nEx Machina received acclaim for its visual effects, screenplay and performances. At the 88th Academy Awards, it won Best Visual Effects and Garland was nominated for Best Original Screenplay. It earned five nominations at the 69th British Academy Film Awards, including Best Actress in a Supporting Role for Vikander and Best Original Screenplay for Garland, and Vikander was also nominated for Best Supporting Actress at the 73rd Golden Globe Awards. Ex Machina has been cited as among the best films of the 2010s.",
+      "link": "https://en.wikipedia.org/wiki/Ex%20Machina%20(film)"
+    }
+  ],
+  "uuid": "e500571d-00b1-6f47-25f2-1cbbaab23d7c"
+}

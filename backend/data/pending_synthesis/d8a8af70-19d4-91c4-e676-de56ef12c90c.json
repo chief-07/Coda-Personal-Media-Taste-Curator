@@ -1,0 +1,82 @@
+{
+  "title": "Snow White",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Snow White",
+    "genres": [
+      "Adventure",
+      "Family",
+      "Fantasy"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "A live-action re-imaging of Walt Disney's 1937 animated classic about a beautiful young princess who, while being stalked by a jealous queen, seeks shelter in a cabin in a forest inhabited by seven dwarfs with entirely different personalities and must come face-to-face with bravery to the truth to her past of her mother's death since her childbirth.",
+    "image": "https://m.media-amazon.com/images/M/MV5BY2UwOGUxMzEtMzEyZi00NjEwLTkxOTMtYTljOWEzYjYyMWNjXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2025",
+    "director": "Marc Webb",
+    "writer": "Erin Cressida Wilson, Jacob Grimm, Wilhelm Grimm",
+    "cast": [
+      "Rachel Zegler",
+      "Emilia Faucher",
+      "Gal Gadot"
+    ],
+    "runtime": "109 min",
+    "score": "2.1/10 IMDb (389,458 votes) | 50/100 Metacritic",
+    "awards": "3 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Snow White",
+      "snippet": "[Letterboxd Review of \"Snow White\"] Die ersten 50 Drehbücher für Gonzos Filmanalysen werden mit einer ordentlichen Portion Kokain von unserem Sponsor Letterboxd gefeiert, bevor wir uns von YouTube ficken lassen, während uns YouPorn dabei filmt. Wir sind verzweifelt. Ab unserer Sucht, die uns abermals in dies Schlamassel gebracht hat. Die Linie des Todes wartet gespannt ab, bis sie schliesslich die Pfeile des Hasses auf uns schiesst. Dann ist es um uns geschehen. Um diese wahnsinnige Idee, die nur ein Kokain-Süchtiger verstehen kann. Oder ein Speed-Junkie. Oder ein Kiffer. Letzteres trifft in der Realität auf uns zu. Aber Kokain",
+      "link": "https://letterboxd.com/film/snow-white/"
+    },
+    {
+      "title": "Live Action Snow White : r/disneyprincess - Reddit",
+      "snippet": "Honestly, this movie just reminds me of Snow White and the Huntsman which I believe Universal made with how they are describing it. Sorry for my rant but I just wanted to know everyone else's opinions for the new live action Snow White.",
+      "link": "www.reddit.com/r/disneyprincess/comments/1dop67o/live_action_snow_white/"
+    },
+    {
+      "title": "Snow White - Reddit",
+      "snippet": "So, they do it sometimes but my reason for this post is because of the new snow white movie. It's a childhood classic and everybody knows snow white and the seven dwarfs she lived with. Well, why in the world are they using normal sized people to \"act\" as snow whites DWARFS? That seems utterly stupid and insensitive in my opinion.",
+      "link": "www.reddit.com/r/SnowWhiteDisney/"
+    },
+    {
+      "title": "SnowWhite - Reddit",
+      "snippet": "Subreddit for Disney's, Snow White and the Seven Dwarfs animated and live action.",
+      "link": "www.reddit.com/r/SnowWhite/"
+    },
+    {
+      "title": "What are your thoughts on this new snow white \"remake\" - Reddit",
+      "snippet": "I also have gripes with the fact that actress for Snow White keeps seeming to try and drum up drama by shitting on the original by saying things like \"the prince is a stalker.\" Instead of just trying to be respectful of the original.",
+      "link": "www.reddit.com/r/Schaffrillas/comments/15quis6/what_are_your_thoughts_on_this_new_snow_white/"
+    },
+    {
+      "title": "Snow White's movie has everything! Why is it not liked more? - Reddit",
+      "snippet": "Snow White has almost every genre in her movie: FANTASY: From the Magic Mirror to Queen Grimhilde's magic, a Princess dreaming for her Prince, and a staple race in fantasy - Dwarves, fantasy is greatly present. ROMANCE: It starts with Florian and Snow's first meeting at the wishing well and is love at first sight.",
+      "link": "www.reddit.com/r/disneyprincess/comments/1cy718r/snow_whites_movie_has_everything_why_is_it_not/"
+    },
+    {
+      "title": "Snow White (2025) - User reviews - IMDb",
+      "snippet": "This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt6208148/reviews/?rating=10"
+    },
+    {
+      "title": "Snow White (2025) - IMDb",
+      "snippet": "Snow White: Directed by Marc Webb. With Rachel Zegler, Emilia Faucher, Gal Gadot, Andrew Burnap. A princess joins forces with seven dwarfs and a group of rebels to liberate her kingdom from her cruel stepmother the Evil Queen.",
+      "link": "www.imdb.com/title/tt6208148/"
+    },
+    {
+      "title": "Disney's Snow White - Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Disney's Snow White on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/disneys_snow_white"
+    },
+    {
+      "title": "Snow White Reviews - Metacritic",
+      "snippet": "Disney's Snow White is a live-action musical reimagining of the classic 1937 film. The magical music adventure journeys back to the timeless story with beloved characters Bashful, Doc, Dopey, Grumpy, Happy, Sleepy, and Sneezy.",
+      "link": "www.metacritic.com/movie/snow-white/"
+    }
+  ],
+  "uuid": "d8a8af70-19d4-91c4-e676-de56ef12c90c"
+}

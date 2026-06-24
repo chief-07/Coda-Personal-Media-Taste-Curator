@@ -1,0 +1,62 @@
+{
+  "title": "Oppenheimer",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Oppenheimer",
+    "genres": [
+      "Biography",
+      "Drama",
+      "History"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "A dramatization of the life story of J. Robert Oppenheimer, the physicist who had a large hand in the development of the atomic bomb, thus helping end World War 2. We see his life from university days all the way to post-WW2, where his fame saw him embroiled in political machinations.",
+    "image": "https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtZjg3YS00NmFiLWIyZmQtZTJmNTM5MjVmYTQ4XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+    "release_year": "2023",
+    "director": "Christopher Nolan",
+    "writer": "Christopher Nolan, Kai Bird, Martin Sherwin",
+    "cast": [
+      "Cillian Murphy",
+      "Emily Blunt",
+      "Matt Damon"
+    ],
+    "runtime": "180 min",
+    "score": "8.2/10 IMDb (1,024,033 votes) | 93% Rotten Tomatoes | 90/100 Metacritic",
+    "awards": "Won 7 Oscars. 370 wins & 378 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Oppenheimer",
+      "snippet": "[Letterboxd Review of \"Oppenheimer\"] i am become bored, watcher of mediocre biopics",
+      "link": "https://letterboxd.com/film/oppenheimer/"
+    },
+    {
+      "title": "Letterboxd review of Oppenheimer",
+      "snippet": "[Letterboxd Review of \"Oppenheimer\"] A must watch for anyone waiting for the upcoming Christopher Nolan film.",
+      "link": "https://letterboxd.com/film/oppenheimer/"
+    },
+    {
+      "title": "Letterboxd review of Oppenheimer",
+      "snippet": "[Letterboxd Review of \"Oppenheimer\"] where's florence pugh and emily blunt",
+      "link": "https://letterboxd.com/film/oppenheimer/"
+    },
+    {
+      "title": "Letterboxd review of Oppenheimer",
+      "snippet": "[Letterboxd Review of \"Oppenheimer\"] choose da wrong one my bad. other one is top though, films got cillian murphy playing some tormented man for 3 hours thats just Cinema babeh",
+      "link": "https://letterboxd.com/film/oppenheimer/"
+    },
+    {
+      "title": "Letterboxd review of Oppenheimer",
+      "snippet": "[Letterboxd Review of \"Oppenheimer\"] It's 7 hours long. It's the BBC. It's the early 80s. It's got virtually no budget.You won't get flashy cuts, lush photography, Marvel/DC actors or Florence Pugh's boobs.What you will get, however, is a clever and thorough take on a very serious chapter of our recent history. It's not a blockbuster, guys, and why should it be? What a dramatisation of Oppenheimer's life needs to be is an encompassing look at a complex character becoming a key player in complex times. And that's where that BBC limited series excels: it spans quite a number of years, goes from uni campus to Los Alamos to the feder",
+      "link": "https://letterboxd.com/film/oppenheimer/"
+    },
+    {
+      "title": "Wikipedia: Oppenheimer (film)",
+      "snippet": "[Wikipedia Synopsis] Oppenheimer is a 2023 epic biographical thriller film written, co-produced, and directed by Christopher Nolan. It follows the life of J. Robert Oppenheimer, the American theoretical physicist who helped develop the first nuclear weapons during World War II. Based on the 2005 biography American Prometheus by Kai Bird and Martin J. Sherwin, the film dramatizes Oppenheimer's studies, his direction of the Los Alamos Laboratory and his 1954 security hearing. Cillian Murphy stars as Oppenheimer, alongside Robert Downey Jr. as the United States Atomic Energy Commission member Lewis Strauss. The ensemble supporting cast includes Emily Blunt, Matt Damon, Florence Pugh, Josh Hartnett, Casey Affleck, Rami Malek, and Kenneth Branagh.\nOppenheimer was announced in September 2021. It was Nolan's first film not distributed by Warner Bros. Pictures since Memento (2000), due to his conflicts regarding the studio's simultaneous theatrical and HBO Max release schedule. Murphy was the first cast member to join, with the rest joining between November 2021 and April 2022. Pre-production began by January 2022, and filming took place from February to May. The cinematographer, Hoyte van Hoytema, used a combination of IMAX 65 mm and 65 mm large-format film, including, for the first time, selected scenes in IMAX black-and-white film photography. As with many of his previous films, Nolan used extensive practical effects and claimed minimal use of compositing; despite these claims, the final film containe",
+      "link": "https://en.wikipedia.org/wiki/Oppenheimer%20(film)"
+    }
+  ],
+  "uuid": "2c70ef36-592b-0122-656c-ae3b82953272"
+}

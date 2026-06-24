@@ -1,0 +1,61 @@
+{
+  "title": "Rocky",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Rocky",
+    "genres": [
+      "Drama",
+      "Sport"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "Rocky Balboa is a struggling boxer trying to make the big time, working as a debt collector for a pittance. When heavyweight champion Apollo Creed visits Philadelphia, his managers want to set up an exhibition match between Creed and a struggling boxer, touting the fight as a chance for a \"nobody\" to become a \"somebody\". The match is supposed to be easily won by Creed, but someone forgot to tell Rocky, who sees this as his only shot at the big time.",
+    "image": "https://m.media-amazon.com/images/M/MV5BZDEyY2M2MGMtYjg5OC00ZWFjLWFkZDQtNmQzZTdiYmYzZTBkXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1976",
+    "director": "John G. Avildsen",
+    "writer": "Sylvester Stallone",
+    "cast": [
+      "Sylvester Stallone",
+      "Talia Shire",
+      "Burt Young"
+    ],
+    "runtime": "120 min",
+    "score": "8.1/10 IMDb (683,546 votes) | 93% Rotten Tomatoes | 70/100 Metacritic",
+    "awards": "Won 3 Oscars. 23 wins & 23 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Rocky",
+      "snippet": "[Letterboxd Review of \"Rocky\"] I am not American.I really dislike boxing.I generally speaking loathe melo-drama.I respect Stallone, but when he 'acts' he looks like a St. Bernard's dog trying to convey emotions.I am not a fan of sports films.I have every reason to hate this film. But I don't. I absolutely love it. Sometimes simplicity is key to telling the best stories and this film understands that like no other. It is almost impossible to not be swept away and taken along for the ride.",
+      "link": "https://letterboxd.com/film/rocky/"
+    },
+    {
+      "title": "Letterboxd review of Rocky",
+      "snippet": "[Letterboxd Review of \"Rocky\"] I love listening to Rocky's endless ramblings. I love that there is no focus on the result of the fight. And I love everything in between.",
+      "link": "https://letterboxd.com/film/rocky/"
+    },
+    {
+      "title": "Letterboxd review of Rocky",
+      "snippet": "[Letterboxd Review of \"Rocky\"] Apparently Stallone was so broke before he made Rocky that he had to sell his dog to survive and was then able to buy it back after his film's success and if that's not a heart warming story idk what is",
+      "link": "https://letterboxd.com/film/rocky/"
+    },
+    {
+      "title": "Letterboxd review of Rocky",
+      "snippet": "[Letterboxd Review of \"Rocky\"] went into this fully expecting it to be another Angry Man™ movie but rocky is just so...soft? his turtles?? his fishy?? his doggo?? please protect this man who absolutely does not need protection by any means",
+      "link": "https://letterboxd.com/film/rocky/"
+    },
+    {
+      "title": "Letterboxd review of Rocky",
+      "snippet": "[Letterboxd Review of \"Rocky\"] Rocky invented beating meat. His words, not mine.",
+      "link": "https://letterboxd.com/film/rocky/"
+    },
+    {
+      "title": "Wikipedia: Rocky Balboa (film)",
+      "snippet": "[Wikipedia Synopsis] Rocky Balboa is a 2006 American sports drama film starring, written and directed by Sylvester Stallone. It is the sequel to Rocky V (1990) and the sixth installment in the Rocky franchise. The film co-stars Burt Young and Antonio Tarver in his only acting role. In the film, Rocky Balboa (Stallone), now an aging small restaurant owner, is challenged to an exhibition fight by hothead young boxer Mason Dixon (Tarver).\nDevelopment for a sixth Rocky film began after Stallone expressed regret over the outcome of Rocky V, which was viewed as a disappointing conclusion to the series. Rocky Balboa includes references to characters and objects from previous installments, and Stallone was inspired by recent personal struggles and triumphs when writing the film. It is Stallone's first directorial effort since Rocky IV (1985). Principal photography began in December 2005 and lasted until January 2006, with filming locations including Las Vegas, Los Angeles, and Philadelphia. In contrast to previous entries in the franchise, the fight choreography in Rocky Balboa was less scripted, featuring real punches thrown by Stallone and Tarver.\nIt was produced by Metro-Goldwyn-Mayer, Columbia Pictures, Revolution Studios, Chartoff Productions and Winkler Films, and theatrically released by MGM Distribution Co. in North America and 20th Century Fox internationally on December 20, 2006, sixteen years after the release of Rocky V and thirty years after the release of the first film. It received general",
+      "link": "https://en.wikipedia.org/wiki/Rocky%20Balboa%20(film)"
+    }
+  ],
+  "uuid": "7920eae9-c607-9ffc-b1ac-4baf703d4807"
+}

@@ -1,0 +1,62 @@
+{
+  "title": "The Imitation Game",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Imitation Game",
+    "genres": [
+      "Biography",
+      "Drama",
+      "Thriller"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "It is based on the real life story of legendary cryptanalyst Alan Turing. The film portrays the nail-biting race against time by Turing and his brilliant team of code-breakers at Britain's top-secret Government Code and Cypher School at Bletchley Park, during the darkest days of World War II.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNjI3NjY1Mjg3MV5BMl5BanBnXkFtZTgwMzk5MDQ3MjE@._V1_SX300.jpg",
+    "release_year": "2014",
+    "director": "Morten Tyldum",
+    "writer": "Graham Moore, Andrew Hodges",
+    "cast": [
+      "Benedict Cumberbatch",
+      "Keira Knightley",
+      "Matthew Goode"
+    ],
+    "runtime": "114 min",
+    "score": "8.0/10 IMDb (872,710 votes) | 90% Rotten Tomatoes | 71/100 Metacritic",
+    "awards": "Won 1 Oscar. 49 wins & 167 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Imitation Game",
+      "snippet": "[Letterboxd Review of \"The Imitation Game\"] I'm getting a little bit tired of Benedict Cumberbatch always being cast as the \"autistic genius\" but I'm never going to get tired of Benedict Cumberbatch.",
+      "link": "https://letterboxd.com/film/the-imitation-game/"
+    },
+    {
+      "title": "Letterboxd review of The Imitation Game",
+      "snippet": "[Letterboxd Review of \"The Imitation Game\"] Everyone shut the fuck up...benedict cumberbatch is acting.",
+      "link": "https://letterboxd.com/film/the-imitation-game/"
+    },
+    {
+      "title": "Letterboxd review of The Imitation Game",
+      "snippet": "[Letterboxd Review of \"The Imitation Game\"] keira knightley, i’d willingly do math for you",
+      "link": "https://letterboxd.com/film/the-imitation-game/"
+    },
+    {
+      "title": "Letterboxd review of The Imitation Game",
+      "snippet": "[Letterboxd Review of \"The Imitation Game\"] predictable in the way that kiera knightly was in a period piece and benedict cumberbatch was gay",
+      "link": "https://letterboxd.com/film/the-imitation-game/"
+    },
+    {
+      "title": "Letterboxd review of The Imitation Game",
+      "snippet": "[Letterboxd Review of \"The Imitation Game\"] The Imitation Game plays like polite dinner conversation at a party, before drinks have been served to loosen everybody up. It's so mannered and inoffensive that it seems to come at us from the chamber of a prettily-furnished snow globe. It's a biopic that chronicles three interwoven periods in the life of mathematician Alan Turing, a solitary introvert who developed a machine that deciphered codes the Nazis used to deliver tactical messages during WW2. A latent homosexual, the film explores Turing's difficult and ultimately failed efforts to reconcile his nature with societal pressures to lea",
+      "link": "https://letterboxd.com/film/the-imitation-game/"
+    },
+    {
+      "title": "Wikipedia: The Imitation Game",
+      "snippet": "[Wikipedia Synopsis] The Imitation Game is a 2014 American biographical thriller film directed by Morten Tyldum and written by Graham Moore, based on the 1983 biography Alan Turing: The Enigma by Andrew Hodges. The film's title quotes the name of the game cryptanalyst Alan Turing proposed for answering the question \"Can machines think?\", in his 1950 seminal paper \"Computing Machinery and Intelligence\". The film stars Benedict Cumberbatch as Turing, who devised new methods for decrypting German intelligence messages for the British government during World War II. Keira Knightley, Matthew Goode, Rory Kinnear, Charles Dance, and Mark Strong appear in supporting roles.\nFollowing its premiere at the Telluride Film Festival on August 29, 2014, The Imitation Game was released theatrically in the United States by The Weinstein Company on November 14. It grossed over $233 million worldwide on a $14 million production budget, making it the highest-grossing independent film of 2014. The film received critical acclaim but faced significant criticism for its historical inaccuracies, including depicting several events that had never taken place in real life. It received eight nominations at the 87th Academy Awards (including Best Picture), winning for Best Adapted Screenplay. It also received five nominations at the Golden Globes, three at the SAG Awards and nine at the BAFTAs. Cumberbatch and Knightley's highly acclaimed performances were nominated for Best Actor and Best Supporting Actress respectively at ea",
+      "link": "https://en.wikipedia.org/wiki/The%20Imitation%20Game"
+    }
+  ],
+  "uuid": "3d0a0803-36be-b266-4cb6-746ac24e2ca8"
+}

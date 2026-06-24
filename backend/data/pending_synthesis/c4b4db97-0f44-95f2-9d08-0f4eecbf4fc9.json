@@ -1,0 +1,37 @@
+{
+  "title": "The Man from U.N.C.L.E.",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Man from U.N.C.L.E.",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Comedy"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "In the 1960s with the Cold War in play, CIA agent Napoleon Solo successfully helps Gaby Teller defect to West Germany despite the intimidating opposition of KGB agent Illya Kuryakin. Later, all three unexpectedly find themselves working together in a joint mission to stop a private criminal organization from using Gaby's father's scientific expertise to construct their own nuclear bomb. Through clenched teeth and stylish poise, all three must find a way to cooperate for the sake of world peace, even as they each pursue their own agendas.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMDFjN2NlOGItYjZiZi00OThhLTlhYWUtYjgyNWFjMWJlNGU4XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2015",
+    "director": "Guy Ritchie",
+    "writer": "Guy Ritchie, Lionel Wigram, Jeff Kleeman",
+    "cast": [
+      "Henry Cavill",
+      "Armie Hammer",
+      "Alicia Vikander"
+    ],
+    "runtime": "116 min",
+    "score": "7.2/10 IMDb (354,813 votes) | 68% Rotten Tomatoes | 56/100 Metacritic",
+    "awards": "8 wins & 7 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Wikipedia: The Man from U.N.C.L.E. (film)",
+      "snippet": "[Wikipedia Synopsis] The Man from U.N.C.L.E. is a 2015 spy film directed by Guy Ritchie and written by Ritchie and Lionel Wigram. It is based on the 1964 MGM television series of the same name, which was created by Norman Felton and Sam Rolfe. The film stars Henry Cavill, Armie Hammer, Alicia Vikander, Elizabeth Debicki, and Hugh Grant. The film was produced by RatPac-Dune Entertainment and Davis Entertainment while Turner Entertainment Co., the original TV series current holder, was also involved.\nIn 1993, John Davis obtained the rights for a film adaptation based on the original series. However, the film fell into development limbo due to multiple script rewrites. Over the years, Matthew Vaughn, David Dobkin, and Steven Soderbergh were optioned for directing until Ritchie signed on in March 2013.\nThe film premiered at Barcelona on August 2, 2015, and was released on August 14, 2015, by Warner Bros. Pictures It received mixed reviews from critics and was a box office bomb, grossing only $110 million worldwide on a $75 million budget. Rolling Stone listed this movie 50th on the best action movies of all time.",
+      "link": "https://en.wikipedia.org/wiki/The%20Man%20from%20U.N.C.L.E.%20(film)"
+    }
+  ],
+  "uuid": "c4b4db97-0f44-95f2-9d08-0f4eecbf4fc9"
+}

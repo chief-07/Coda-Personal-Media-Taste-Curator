@@ -1,0 +1,82 @@
+{
+  "title": "Pineapple Express",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Pineapple Express",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Crime"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Lazy court-process clerk and stoner Dale Denton has only one reason to visit his equally lazy dealer Saul Silver: to purchase weed, specifically, a rare new strain called Pineapple Express. But when Dale becomes the only witness to a murder by a crooked cop and the city's most dangerous drug lord, he panics and dumps his roach of Pineapple Express at the scene. Dale now has another reason to visit Saul: to find out if the weed is so rare that it can be traced back to him--and it is. As Dale and Saul run for their lives, they quickly discover that they're not suffering from weed-fueled paranoia: incredibly, the bad guys really are hot on their trail and trying to figure out the fastest way to kill them both. All aboard the Pineapple Express.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTY1MTE4NzAwM15BMl5BanBnXkFtZTcwNzg3Mjg2MQ@@._V1_SX300.jpg",
+    "release_year": "2008",
+    "director": "David Gordon Green",
+    "writer": "Seth Rogen, Evan Goldberg, Judd Apatow",
+    "cast": [
+      "Seth Rogen",
+      "James Franco",
+      "Gary Cole"
+    ],
+    "runtime": "111 min",
+    "score": "6.9/10 IMDb (371,628 votes) | 64/100 Metacritic",
+    "awards": "2 wins & 15 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Pineapple Express",
+      "snippet": "[Letterboxd Review of \"Pineapple Express\"] once you go to college you'll start listening to godspeed you! black emperor and become a lesbian",
+      "link": "https://letterboxd.com/film/pineapple-express/"
+    },
+    {
+      "title": "Letterboxd review of Pineapple Express",
+      "snippet": "[Letterboxd Review of \"Pineapple Express\"] Peaceful Stoner cried laughing watching Pineapple Express.",
+      "link": "https://letterboxd.com/film/pineapple-express/"
+    },
+    {
+      "title": "Letterboxd review of Pineapple Express",
+      "snippet": "[Letterboxd Review of \"Pineapple Express\"] I used to use this little gun when I was a prostitute",
+      "link": "https://letterboxd.com/film/pineapple-express/"
+    },
+    {
+      "title": "Letterboxd review of Pineapple Express",
+      "snippet": "[Letterboxd Review of \"Pineapple Express\"] bill hader is the best part (not shocking)",
+      "link": "https://letterboxd.com/film/pineapple-express/"
+    },
+    {
+      "title": "Letterboxd review of Pineapple Express",
+      "snippet": "[Letterboxd Review of \"Pineapple Express\"] I was gonna watch Se7en but then I watched this.",
+      "link": "https://letterboxd.com/film/pineapple-express/"
+    },
+    {
+      "title": "Pineapple Express | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Pineapple Express on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/pineapple_express"
+    },
+    {
+      "title": "Pineapple Express (2008) - Rotten Tomatoes",
+      "snippet": "Critics Consensus: Both funny and scatter shot, this loose-knit action/buddy/stoner comedy bridges genres and keeps a steady tempo of low ball laughs.",
+      "link": "pages.cs.wisc.edu/~rasiga/CS784_project/HTML_data/rottentomatoes/Pineapple Express.html"
+    },
+    {
+      "title": "Pineapple Express (2008) - IMDb",
+      "snippet": "Pineapple Express: Directed by David Gordon Green. With Seth Rogen, James Franco, Gary Cole, Danny McBride. A process server and his marijuana dealer wind up on the run from hitmen and a corrupt police officer after he witnesses his dealer's boss murder a competitor while trying to serve papers on him.",
+      "link": "www.imdb.com/title/tt0910936"
+    },
+    {
+      "title": "Pineapple Express (film) - Wikipedia",
+      "snippet": "Pineapple Express is a 2008 American action stoner comedy film directed by David Gordon Green, written by Seth Rogen and Evan Goldberg, and starring Rogen and James Franco alongside Gary Cole, Rosie Perez and Danny McBride.",
+      "link": "en.wikipedia.org/wiki/Pineapple_Express_(film)"
+    },
+    {
+      "title": "Rotten Tomatoes",
+      "snippet": "Rotten Tomatoes",
+      "link": "www.rottentomatoes.com/\""
+    }
+  ],
+  "uuid": "1ab9b05e-e512-1052-45e4-8604f0f93a9d"
+}

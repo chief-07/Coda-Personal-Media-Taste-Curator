@@ -9,6 +9,10 @@ import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
 import 'package:coda/src/features/library/presentation/widgets/library_tab_bar.dart';
 import 'package:coda/src/features/library/presentation/library_screen.dart';
+import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
+import 'package:coda/src/features/session/data/living_memory_provider.dart';
+import 'package:coda/src/features/home/data/recommendation_provider.dart';
+import 'package:coda/src/features/home/presentation/home_screen.dart';
 
 class DetectedMediaItem {
   final String title;
@@ -132,6 +136,181 @@ class _ShareReceiveScreenState extends ConsumerState<ShareReceiveScreen> {
 
   int _selectedCount() {
     return _selectedMap.values.where((v) => v).length;
+  }
+
+  Future<void> _promoteToHome(BuildContext context, DetectedMediaItem item) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator(color: Colors.white)),
+    );
+
+    final recommendation = await ref.read(recommendationServiceProvider).promoteMedia(
+      title: item.title,
+      memory: ref.read(livingMemoryProvider),
+    );
+
+    if (mounted) {
+      Navigator.of(context, rootNavigator: true).pop(); // Close loading dialog
+    }
+
+    if (recommendation != null) {
+      await ref.read(homeRecommendationProvider.notifier).setActivePick(recommendation);
+      ref.read(selectedMediaTypeProvider.notifier).select(recommendation.mediaType);
+      if (mounted) {
+        context.go('/home');
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not promote ${item.title}.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _showVibeCheckOverlay(BuildContext context, DetectedMediaItem item) async {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      builder: (context) {
+        return Center(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutBack,
+            builder: (context, val, child) {
+              return Transform.scale(
+                scale: val,
+                child: Opacity(
+                  opacity: val.clamp(0.0, 1.0),
+                  child: child,
+                ),
+              );
+            },
+            child: Material(
+              color: Colors.transparent,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: BackdropFilter(
+                  filter: dart_ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white30, width: 1.5),
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/coda_logo.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Checking the vibes...',
+                          style: GoogleFonts.inter(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        FutureBuilder<VibeCheckResult>(
+                          future: ref.read(recommendationServiceProvider).vibeCheck(
+                            title: item.title,
+                            memory: ref.read(livingMemoryProvider),
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: CircularProgressIndicator(color: Colors.white),
+                              );
+                            }
+                            if (snapshot.hasError || !snapshot.hasData) {
+                              return Text(
+                                "I couldn't check this one right now.",
+                                style: GoogleFonts.inter(color: Colors.white, fontSize: 16),
+                              );
+                            }
+                            final result = snapshot.data!;
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  result.isMatch == true
+                                      ? "IT'S A MATCH!"
+                                      : result.isMatch == false
+                                          ? "MAYBE NOT"
+                                          : "UNKNOWN",
+                                  style: GoogleFonts.inter(
+                                    color: result.isMatch == true ? Colors.greenAccent : (result.isMatch == false ? Colors.orangeAccent : Colors.white),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  '"${result.convictionStatement}"',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    fontStyle: FontStyle.italic,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white.withValues(alpha: 0.1),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            minimumSize: const Size(double.infinity, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                            ),
+                          ),
+                          child: Text(
+                            'Got it',
+                            style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -380,28 +559,30 @@ class _ShareReceiveScreenState extends ConsumerState<ShareReceiveScreen> {
                           ),
 
                           // Poster thumbnail
-                          if (item.posterUrl.isNotEmpty && !item.posterUrl.startsWith('holder:'))
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: SizedBox(
-                                width: 64,
-                                height: 88,
-                                child: FallbackImage(url: item.posterUrl, fit: BoxFit.cover),
-                              ),
-                            )
-                          else
-                            Container(
-                              width: 64,
-                              height: 88,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.04),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-                              ),
-                              child: const Center(
-                                child: Icon(PhosphorIconsBold.imageSquare, color: Colors.white24, size: 22),
-                              ),
-                            ),
+                          GestureDetector(
+                            onTap: () => _promoteToHome(context, item),
+                            child: item.posterUrl.isNotEmpty && !item.posterUrl.startsWith('holder:')
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: SizedBox(
+                                      width: 64,
+                                      height: 88,
+                                      child: FallbackImage(url: item.posterUrl, fit: BoxFit.cover),
+                                    ),
+                                  )
+                                : Container(
+                                    width: 64,
+                                    height: 88,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.04),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                                    ),
+                                    child: const Center(
+                                      child: Icon(PhosphorIconsBold.imageSquare, color: Colors.white24, size: 22),
+                                    ),
+                                  ),
+                          ),
                           const SizedBox(width: 14),
 
                           // Title + media type pill + tags
@@ -490,6 +671,39 @@ class _ShareReceiveScreenState extends ConsumerState<ShareReceiveScreen> {
                             ),
                           ),
                         ],
+                        
+                        // "Is this for me?" Button
+                        const SizedBox(height: 14),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: GestureDetector(
+                            onTap: () {
+                              _showVibeCheckOverlay(context, item);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: ShapeDecoration(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                shape: const StadiumBorder(),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(PhosphorIconsBold.magicWand, size: 14, color: Colors.white),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Is this for me?',
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ],
                   ),

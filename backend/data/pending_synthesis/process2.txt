@@ -1,0 +1,157 @@
+import json
+import os
+
+out_dir = r"c:\Users\USER\Documents\Coda\backend\data\completed_synthesis"
+in_dir = r"c:\Users\USER\Documents\Coda\backend\data\pending_synthesis"
+os.makedirs(out_dir, exist_ok=True)
+
+data = {
+"03f3d136-afee-dfbd-15d6-429b33f4182f": {
+    "metadata_synthesis": "Directed by Swedish auteur Roy Andersson in 2014, this comedy-drama concludes his 'Living' trilogy. It emerges from a distinct Nordic cinematic tradition of deadpan existentialism, serving as a philosophical culmination of his career-long observations of the mundane.",
+    "setting_and_subculture": "A drab, gray, hyper-real yet surreal version of modern Sweden mixed with anachronistic historical elements. It captures a sterile, repetitive working-class reality where 1940s beer halls collide with historically displaced kings en route to battle, all steeped in an oppressive mundane routine.",
+    "visual_tone_and_feel": "A highly stylized, static tableaux aesthetic marked by desaturated color palettes, meticulously composed dioramas, and characters caked in corpse-like white makeup. It feels like walking through a tragically funny, lifeless museum exhibition of the human condition.",
+    "media_era_tone": "Mid-2010s European art-house cinema, characterized by a slow cinema movement that favors contemplative, static observation and pitch-black Scandinavian tragicomedy.",
+    "pacing_and_structure": "An episodic, vignette-based structure entirely devoid of traditional narrative momentum. It demands profound patience, pacing itself through painfully prolonged, static wide shots that force the viewer to confront the awkwardness of prolonged silence and stillness.",
+    "atmosphere_and_mood": "Overwhelmingly melancholic and absurd, bathed in a dreary, dreamlike malaise. The mood fluctuates between deadpan hilarity and crushing existential dread, evoking the feeling of an interminable Wednesday afternoon.",
+    "themes_and_messages": "A deep exploration of the pointlessness and absurdity of human existence, routine, and historical trauma. It asks whether we are simply repeating empty rituals without connection, using absurdity to highlight humanity's profound lack of empathy.",
+    "character_relationships": "Disconnected and profoundly lonely. The primary dynamic is between a pair of hapless novelty salesmen who interact with various deeply detached individuals. Interactions are marked by a lack of genuine communication, mirroring a broader societal isolation.",
+    "lead_character_type": "There is no single protagonist, but rather the collective 'hapless human'. The narrative loosely anchors around Sam and Jonathan, two weary, ghostly salesmen of novelty items who are hopelessly lost in their own lives.",
+    "story_and_plot_type": "A nonlinear, surrealistic slice-of-life kaleidoscope. There is no conventional plot, but rather a sequence of interconnected absurdist sketches reflecting on memory, history, and modern ennui.",
+    "who_and_when": "For the existentially weary soul who finds dark humor in the tragic futility of the everyday. Perfect for a moment of profound detachment when one wishes to step back and observe the ridiculous pageant of human life from an alien perspective.",
+    "emotional_evocation": "A profoundly mixed sensation of agonizing boredom punctuated by jaw-dropping shock and belly-laughs. It induces a literal existential crisis, leaving the viewer feeling like a writhing, electrocuted monkey trapped in an absurd reality."
+},
+"09b93a72-77d3-66eb-5e48-96bb371a2227": {
+    "metadata_synthesis": "Released in 2012, this groundbreaking documentary by Joshua Oppenheimer (with Christine Cynn and an anonymous co-director) shattered non-fiction filmmaking conventions. It unearths the unpunished 1965-66 Indonesian mass killings by having the perpetrators themselves recreate their crimes.",
+    "setting_and_subculture": "Modern-day Indonesia, specifically North Sumatra, where the architects of past genocides remain in positions of wealth, power, and societal reverence. It delves into the local gangster (preman) subculture and a society built on historical amnesia and active terror.",
+    "visual_tone_and_feel": "A nauseatingly surreal juxtaposition of horrific reality and vibrant cinematic artifice. It blends the gritty reality of documentary interviews with garish, hyper-stylized reenactments mimicking Hollywood gangster films, lavish musicals, and classic westerns.",
+    "media_era_tone": "Early 2010s boundary-pushing documentary cinema that challenged the ethics of the documentarian-subject relationship and utilized meta-narratives to uncover 'ecstatic truth'.",
+    "pacing_and_structure": "The pacing is deliberate, allowing long, uncomfortable takes to breathe. It structurally oscillates between casual, boastful interviews and elaborate, increasingly unhinged cinematic reenactments, culminating in a devastating, visceral physical reaction.",
+    "atmosphere_and_mood": "Deeply disturbing, chilling, and profoundly grotesque. The atmosphere is thick with the impunity of evil, creating a suffocating tension as the jovial pride of mass murderers slowly unravels into subconscious terror.",
+    "themes_and_messages": "The banality of evil and the psychological gymnastics required to justify atrocities. It explores how trauma and guilt are repressed, how history is written by the victors, and the frightening realization that monsters are terrifyingly, fundamentally human.",
+    "character_relationships": "The central dynamic is the complex, tenuous relationship between the documentarian and the subjects, particularly Anwar Congo. Between the perpetrators, there is a horrific camaraderie rooted in shared atrocities, which slowly fractures as guilt seeps in.",
+    "lead_character_type": "Anwar Congo, an affable, charismatic, and elderly mass-murderer who views himself as a cinematic hero, whose confident exterior slowly crumbles under the weight of his own repressed conscience.",
+    "story_and_plot_type": "A meta-documentary and psychological character study. The plot is the very making of a film within a film, documenting the emotional and psychological journey of perpetrators as they externalize their buried guilt through art.",
+    "who_and_when": "For a resilient spirit seeking to confront the absolute darkest, most uncomfortable truths of human nature. This is for an individual prepared to have their faith in humanity deeply challenged and their stomach turned by confronting pure impunity.",
+    "emotional_evocation": "A choking, suffocating sensation of pure disgust and horror. It elicits physical nausea, shame, and a deeply unsettling realization of human depravity, leaving audiences in a dead, chilled silence long after the credits roll."
+},
+"0f54fc68-33c2-877d-8730-74981c96e307": {
+    "metadata_synthesis": "Marcel Ophüls's 1969 four-hour documentary epic redefined France's memory of WWII. Banned from French TV until 1981, it dismantled the Gaullist myth of a uniformly resistant France, exposing widespread collaboration during the Vichy regime.",
+    "setting_and_subculture": "Clermont-Ferrand, France, spanning the Nazi occupation (1940-1944) and the post-war reflections of 1969. It captures the socio-political divide between the conservative, self-preserving bourgeoisie and the marginalized citizens driven to resistance.",
+    "visual_tone_and_feel": "A stark, unvarnished black-and-white aesthetic blending historical archival footage with intimate, probing talking-head interviews. The tone is forensic, objective, and unflinchingly direct, lacking cinematic embellishment to let the raw truth speak.",
+    "media_era_tone": "Late 60s/early 70s investigative documentary filmmaking that sought to deconstruct nationalistic myths and uncover suppressed historical complicity.",
+    "pacing_and_structure": "An expansive, meticulously structured two-part historical inquiry ('The Collapse' and 'The Choice'). It uses a methodical, probing pace, contrasting archival evidence with present-day testimonies to create a dense, layered historical mosaic.",
+    "atmosphere_and_mood": "Intellectually gripping yet deeply unsettling. A mood of quiet confrontation permeates the film, as the comfortable self-delusions of the interviewees clash with the undeniable reality of their past actions.",
+    "themes_and_messages": "The myth of national heroism versus the uncomfortable reality of collective guilt, complicity, and self-preservation. It asks a painful hypothetical: under fascism, would you have the courage to resist, or would you quietly collaborate?",
+    "character_relationships": "A mosaic of disparate voices—German officers, resistance fighters, aristocrats, and politicians. The dynamic is one of national contradiction, illustrating a deeply divided society where neighbors betrayed neighbors out of fear, prejudice, or caution.",
+    "lead_character_type": "The collective consciousness of the French people, represented by a diverse array of interview subjects from Pierre Mendès-France to unrepentant collaborators.",
+    "story_and_plot_type": "A non-fiction historical tapestry and investigative exposé. It eschews narrative arc for a rigorous, dialectical uncovering of historical truth through oral history and archival juxtaposition.",
+    "who_and_when": "For the historically curious and philosophically minded soul ready to engage with heavy ethical questions. Ideal for a time of deep reflection on societal morality and the fragile nature of national identity.",
+    "emotional_evocation": "It instills a chilling, contemplative dread regarding human frailty and the ease of complicity. Viewers are left grappling with profound unease and the heavy burden of asking themselves what they would have truly done in the face of tyranny."
+},
+"18b320f0-7e22-6d23-8961-393962b62c73": {
+    "metadata_synthesis": "Directed by Alain Resnais in 1956, just ten years after the liberation of the camps, this French documentary short stands as a monumental work of Holocaust memory. With a script by survivor Jean Cayrol, it confronted an world eager to forget.",
+    "setting_and_subculture": "The abandoned, decaying grounds of Auschwitz and Majdanek in 1955, contrasted starkly against the horrifying wartime reality of the Nazi concentration camp system and its bureaucratic machinery of death.",
+    "visual_tone_and_feel": "A hauntingly poetic oscillation between the eerily peaceful, overgrown ruins filmed in gentle, gliding contemporary color, and the agonizing, brutal black-and-white archival footage of the Holocaust's darkest realities.",
+    "media_era_tone": "Post-WWII French Left Bank cinema, characterized by a modernist approach to memory, trauma, and time, pioneering the essay film format to tackle unspeakable historical horrors.",
+    "pacing_and_structure": "A brief but devastating 32 minutes. It builds with a deceivingly calm, essayistic rhythm, steadily peeling back the mundane bureaucracy of the camps before plunging the viewer into the graphic, unbearable abyss of the atrocities.",
+    "atmosphere_and_mood": "An atmosphere of profound, sickening sorrow and terrifying calm. It creates a surreal horror out of the absolute mundanity of genocide, resulting in a cold, blackened piece of cinema.",
+    "themes_and_messages": "The fragility of memory and the eternal threat of human cruelty. It warns that the monstrous mechanisms of fascism are not anomalies of the past, but latent potentials within humanity that we must remain vigilantly aware of.",
+    "character_relationships": "The relationship is entirely between the viewer and the ghosts of history. It forces a stark confrontation between the perpetrators' clinical detachment and the victims' incomprehensible suffering.",
+    "lead_character_type": "The narrator, serving as a solemn, poetic, and urgent voice of conscience and memory, guiding the viewer through the architecture of mass murder.",
+    "story_and_plot_type": "A poetic documentary essay. It is a historical meditation that transcends a simple retelling of events to become a philosophical warning about the nature of humanity.",
+    "who_and_when": "For anyone ready to bear witness to the deepest abyss of human history. It is essential viewing for a solemn, grounded moment when one is prepared to confront the ultimate darkness of reality.",
+    "emotional_evocation": "A violently scarring and permanently ingrained trauma. It provokes visceral, physical reactions—nausea, tears, and a deep, unforgettable chill that permanently alters one's perception of human capability."
+},
+"1bec9433-ff0d-6cc1-9d09-315d4335c4d1": {
+    "metadata_synthesis": "Ingmar Bergman's 1957 Swedish masterpiece is a defining pillar of world cinema. Emerging from the existential angst of the Cold War era, it projects contemporary fears of nuclear annihilation onto a medieval tapestry of the Black Death.",
+    "setting_and_subculture": "A bleak, apocalyptic 14th-century Sweden ravaged by the bubonic plague. It is a world consumed by religious fervor, flagellants, witch burnings, and the absolute collapse of societal order in the face of inevitable death.",
+    "visual_tone_and_feel": "High-contrast, stark black-and-white cinematography loaded with iconic, dramatic iconography. The visual tone is deeply theatrical, stark, and deeply symbolic, painting a bleak yet strikingly beautiful landscape of despair.",
+    "media_era_tone": "The zenith of 1950s European auteur cinema, bringing philosophical and theological debates directly to the silver screen and cementing the image of the brooding art-house film.",
+    "pacing_and_structure": "A methodical, deliberate journey paced like a literal chess match. The narrative alternates between the intense, philosophical stillness of the game with Death and the chaotic, desperate vignettes of the plague-ridden countryside.",
+    "atmosphere_and_mood": "A heavy, oppressive atmosphere of dread interwoven with sudden bursts of life and dark humor. It feels like a horror film where the monster is not a creature, but the terrifying silence of God.",
+    "themes_and_messages": "The silence of God, the terror of death, and the desperate search for meaning in an indifferent universe. It questions faith in the face of immense suffering and examines the lengths humans go to deny their own mortality.",
+    "character_relationships": "A microcosm of humanity: the cynical but truth-seeking knight and his pragmatic, atheistic squire; an innocent family of traveling actors; and Death himself, a personable but absolute force. Their interactions reveal varying human responses to mortality.",
+    "lead_character_type": "Antonius Block, a weary, disillusioned crusader knight suffering a profound crisis of faith, desperately seeking a single guarantee of God's existence before his demise.",
+    "story_and_plot_type": "An allegorical road movie and historical fantasy. A literal journey homeward that serves as a metaphysical quest for answers, framed by the ultimate delaying tactic against the grim reaper.",
+    "who_and_when": "For the introspective seeker grappling with their own existential doubts. Perfect for a dark, quiet night when one is inclined to ponder the grand, terrifying questions of life, faith, and meaning.",
+    "emotional_evocation": "It induces a stark, awe-inspiring contemplation of mortality. It leaves the viewer feeling dwarfed by the ultimate questions of existence, yet strangely comforted by the shared, timeless nature of human dread."
+},
+"20c43c6c-8613-a73c-6a29-f3fc42537d0e": {
+    "metadata_synthesis": "Lars von Trier's 2000 psychological tragedy won the Palme d'Or and deeply divided audiences. Starring Icelandic pop icon Björk, it deconstructs the classic American musical through the punishing, cynical lens of the Dogme 95-adjacent Danish avant-garde.",
+    "setting_and_subculture": "A grim, bleakly idealized vision of small-town Washington state in 1964. It focuses on the blue-collar, immigrant working-class experience, centering on the monotonous grind of factory assembly lines and the desperation of rural poverty.",
+    "visual_tone_and_feel": "A jarring clash of aesthetics: the harsh, nauseatingly shaky, desaturated handheld digital video of the real world collides abruptly with the vibrant, static, multi-camera choreography of the lush musical fantasy sequences.",
+    "media_era_tone": "Turn-of-the-millennium European provocation. It weaponizes the melodrama of the past against the raw, unfiltered realism of the modern indie film movement.",
+    "pacing_and_structure": "An agonizingly relentless downward spiral. The film punctuates moments of unbearable dramatic tension and misery with sweeping, ecstatic musical numbers, leading to an ending that refuses to cut away, punishing the viewer.",
+    "atmosphere_and_mood": "Suffocatingly tragic and deeply manipulative. The mood swings violently from the euphoric escapism of song to the crushing, inevitable weight of systemic injustice and personal doom.",
+    "themes_and_messages": "The power of escapism and art in the face of insurmountable suffering. It is a cynical indictment of the American dream, the justice system, and the cruelty of the world toward innocent, self-sacrificing maternal figures.",
+    "character_relationships": "A devastating portrayal of betrayal and sacrifice. Selma is fiercely protected by her friend Kathy but tragically exploited by a desperate, cowardly authority figure, all while entirely sacrificing herself out of pure, unconditional love for her son.",
+    "lead_character_type": "Selma Jezková, a purely innocent, tragic martyr. She is a visually impaired, naive immigrant whose sole defense mechanism against a brutal world is retreating into the joy of musicals.",
+    "story_and_plot_type": "A tragic melodrama and anti-musical. The narrative is a systematic, fatalistic destruction of an innocent life, moving with the horrifying inevitability of an execution.",
+    "who_and_when": "For a soul prepared to be emotionally pulverized. Do not watch casually; it requires a state of emotional fortitude and a willingness to engage with art that actively seeks to break your heart and leave you weeping.",
+    "emotional_evocation": "An absolute emotional devastation. It tears the viewer in half with perfect synchronicity of love and hate, leaving them sobbing, profoundly angry at the injustice, and permanently scarred by its unrelenting cruelty."
+},
+"2848cfa2-c639-8ea3-54ad-66af6bccb0bc": {
+    "metadata_synthesis": "Jim Jarmusch's 2019 absurdist zombie comedy premiered at Cannes, bringing his signature deadpan indie sensibilities to the horror genre. Featuring a massive ensemble cast of Jarmusch regulars, it serves as a metacinematic, dry critique of modern consumerism.",
+    "setting_and_subculture": "Centerville, 'A Real Nice Place'—a sleepy, archetypal Americana small town entirely unequipped to handle a supernatural apocalypse. It captures the mundane, coffee-and-doughnuts routine of local police amidst rural oddballs and corporate greed.",
+    "visual_tone_and_feel": "A low-energy, deadpan aesthetic that feels intentionally flat and stagey. It combines the visual tropes of classic Romero zombie films with the sluggish, heavily ironic, and strangely disjointed vibe of a late-night indie comedy.",
+    "media_era_tone": "Late 2010s post-modern, meta-aware cinema. A film deeply conscious of its own genre, utilizing heavy irony and breaking the fourth wall in a time of pervasive political and environmental exhaustion.",
+    "pacing_and_structure": "Intentionally lethargic and glacially paced. It wanders through episodic character interactions and repetitive running gags, moving toward an apocalyptic climax with a shoulder-shrug rather than a sense of urgency.",
+    "atmosphere_and_mood": "A bizarrely chilled-out apocalypse. The mood is entirely fatalistic, laced with a dry, exhausted irony where the characters seem too tired to even panic about their impending doom.",
+    "themes_and_messages": "A blunt ecological and anti-consumerist warning. It suggests humanity has essentially become a horde of materialistic zombies long before the actual undead rise, and that our collective apathy is leading to an inevitable, unceremonious end.",
+    "character_relationships": "Detached and oddly calm. The police officers interact with the townsfolk and the undead with the same polite, world-weary resignation, lacking traditional emotional bonds in favor of quirky, situational camaraderie.",
+    "lead_character_type": "A collective ensemble of stone-faced, heavily ironic observers, led by Chief Cliff Robertson and Officer Ronnie Peterson, who wander through the apocalypse with a sense of scripted inevitability.",
+    "story_and_plot_type": "A metacinematic zombie spoof and absurdist comedy. The plot deliberately eschews traditional horror arcs, instead leaning into self-aware commentary, bizarre non-sequiturs, and inevitable defeat.",
+    "who_and_when": "For the cynically amused viewer who appreciates dry, deadpan humor and has a high tolerance for deliberate pacing. Best watched when you want to hang out with a cool cast making fun of the end of the world.",
+    "emotional_evocation": "A sense of mild amusement mixed with intentional boredom. It evokes a shoulder-shrugging chuckle at the absurdity of existence, leaving viewers either vibing with its ultra-dry frequency or entirely frustrated by its lack of conventional thrills."
+},
+"31458c3b-73bc-520b-ebfa-f1c4dd70a0b4": {
+    "metadata_synthesis": "Luis Buñuel’s 1933 Spanish ethnofiction mockumentary is a savage transition from pure surrealism to radical social critique. Highly controversial and immediately banned in Spain, it weaponized the documentary format to attack bourgeois complacency and governmental neglect.",
+    "setting_and_subculture": "Las Hurdes, an agonizingly impoverished, geographically isolated mountainous region in Spain. It is a God-forsaken land characterized by disease, starvation, inbreeding, and a brutal daily struggle for mere existence.",
+    "visual_tone_and_feel": "A stark, unvarnished, and incredibly harsh black-and-white ethnographic realism, completely subverted by a jarringly calm, condescending, and ironically detached voiceover. The imagery of suffering is staged for maximum brutal impact.",
+    "media_era_tone": "1930s European radical cinema, blending the aesthetic of early anthropological travelogues with the biting, anti-establishment venom of the Surrealist movement during the buildup to the Spanish Civil War.",
+    "pacing_and_structure": "A brisk, relentless 30-minute assault of misery. It structures itself as a traditional travelogue, but systematically escalates the horrific imagery to completely overwhelm the viewer with the absurdity of such extreme poverty.",
+    "atmosphere_and_mood": "Cruel, cynical, and deeply unsettling. The mood is a bizarre collision of sincere outrage at human suffering and a pitch-black, mocking sadism directed at the audience's expectation of a neat, educational documentary.",
+    "themes_and_messages": "A ferocious attack on the romanticization of poverty, the hypocrisy of the Church, and governmental apathy. It exposes how objective documentary truth is an illusion and forces the viewer to confront their own complicity in viewing suffering as entertainment.",
+    "character_relationships": "There are no traditional characters; the relationship is entirely between the smug, detached narrator and the deeply suffering, exploited subjects of Las Hurdes, reflecting a brutal class divide.",
+    "lead_character_type": "The narrator acts as the protagonist—a satirical embodiment of the patronizing, educated bourgeois outsider documenting the misery of the lower classes with cold, scientific detachment.",
+    "story_and_plot_type": "A pseudo-documentary (ethnofiction) and satirical travelogue. It uses staged scenes of genuine misery to construct a politically explosive, mock-objective narrative.",
+    "who_and_when": "For the cinephile or political provocateur looking to study the roots of cinematic manipulation. Best viewed when one is ready to engage critically with the ethics of documentary filmmaking and the weaponization of irony.",
+    "emotional_evocation": "It generates a palpable, uncomfortable energy. Viewers are left reeling from the shock of the staged cruelty, feeling a potent mix of profound pity, outrage, and cynical amusement at Buñuel's audacious manipulation."
+},
+"35d5d8ac-1ed5-2eb9-ec9e-fde5a59cb99a": {
+    "metadata_synthesis": "Magnus von Horn's 2015 Swedish-Polish co-production is a striking directorial debut starring Swedish pop singer Ulrik Munther. It firmly roots itself in the Scandinavian tradition of austere, morally complex social dramas reminiscent of Ruben Östlund's early work.",
+    "setting_and_subculture": "A sterile, unforgiving rural Swedish farming community. It portrays an insular, small-town ecosystem where unspoken rules dictate social interactions and where the collective memory refuses to forgive or forget.",
+    "visual_tone_and_feel": "An icy, detached, and meticulously framed aesthetic. The cinematography relies on static shots and muted colors, often placing the central violence or emotional climax off-screen or out of focus to emphasize the mundane, chilling reality of the aftermath.",
+    "media_era_tone": "Mid-2010s European psychological realism, characterized by its refusal to offer easy moral answers, opting instead for a cold, clinical observation of human behavior under pressure.",
+    "pacing_and_structure": "A slow, simmering pressure cooker. The narrative builds tension implicitly, withholding key information about the past while slowly tightening the psychological noose around the protagonist through quiet, everyday micro-aggressions.",
+    "atmosphere_and_mood": "Sombre, intensely oppressive, and quietly suffocating. A lynch-mob atmosphere slowly gathers in the background, making every ordinary interaction feel laced with an underlying, explosive threat.",
+    "themes_and_messages": "The impossibility of reintegration and the limits of societal forgiveness. It explores the cyclical nature of violence, trauma, and how the self-righteousness of a community can drive an individual back toward the monstrosity they seek to escape.",
+    "character_relationships": "Defined by heavy, suffocating silence and profound alienation. John’s dynamic with his father is fraught with an inability to communicate, while his relationship with the community is purely antagonistic, rooted in irreconcilable hatred.",
+    "lead_character_type": "John, a deeply flawed, traumatized teenage ex-convict. He is an emotionally stunted, psychologically complex anti-hero seeking redemption in a world that fundamentally refuses to grant it.",
+    "story_and_plot_type": "A psychological character study and social thriller. The plot revolves around the agonizingly difficult process of societal reentry, functioning as a slow-motion collision between a boy's desire for a new life and a town's demand for retribution.",
+    "who_and_when": "For the viewer drawn to morally grey, challenging narratives that offer no easy catharsis. Ideal for a thoughtful, quiet viewing when you want to examine the complexities of justice, guilt, and the darker shades of human nature.",
+    "emotional_evocation": "It evokes a harrowing, frustrating, and deeply tense anxiety. It leaves the viewer with a lingering sense of unease, haunted by the moral ambiguities and the quiet, devastating violence of societal exclusion."
+},
+"3df69165-2665-fd01-5fd5-90339e9e034b": {
+    "metadata_synthesis": "Joshua Oppenheimer’s 2014 companion piece to The Act of Killing shifts the focus from the perpetrators of the 1965 Indonesian genocide to the victims. Executive produced by Werner Herzog and Errol Morris, it stands as a monumental work of human rights cinema.",
+    "setting_and_subculture": "Rural Indonesia, a society totally paralyzed by fear and state-sanctioned historical denial. It explores the terrifying reality of survivors living side-by-side with the unpunished, politically powerful men who slaughtered their families.",
+    "visual_tone_and_feel": "A profound, sedate, and beautifully devastating visual language. It utilizes extreme, uncomfortable close-ups during interviews, capturing the micro-expressions of guilt, defiance, and heartbreak in the deafening silence of the subjects.",
+    "media_era_tone": "A defining work of 2010s investigative and restorative documentary filmmaking, prioritizing the unearthing of hidden atrocities and providing a platform for the voiceless victims of systemic historical trauma.",
+    "pacing_and_structure": "Patient, deliberate, and emotionally agonizing. It is structured as a series of quiet, tense confrontations under the guise of optometry exams, rhythmically punctuated by the silent, resolute gaze of the protagonist.",
+    "atmosphere_and_mood": "Suffocatingly tense, heartbreakingly sad, and filled with a quiet, dignified outrage. The mood is a heavy, hopeless confrontation between a pursuit of truth and an impenetrable wall of arrogant denial.",
+    "themes_and_messages": "The heavy burden of memory, the pathology of denial, and the impossibility of reconciliation without truth. It vividly illustrates how perpetrators and their families aggressively blind themselves to their own evil to maintain their sanity and power.",
+    "character_relationships": "A dynamic of extreme, terrifying imbalance. Adi approaches his brother’s murderers with incredible calm, empathy, and dignity, which is met entirely with hostility, threats, and a chilling refusal to take responsibility.",
+    "lead_character_type": "Adi Rukun, a soft-spoken, incredibly brave optometrist. He is a man of monumental dignity and quiet courage, demanding truth and an apology from monsters who hold his life in their hands.",
+    "story_and_plot_type": "An investigative documentary and personal quest for closure. The narrative is a direct, confrontational journey of a brother seeking to understand the incomprehensible and attempting to force a society to look at its own reflection.",
+    "who_and_when": "For a viewer with profound emotional fortitude seeking to witness an extraordinary act of human courage. It requires a setting of complete focus and respect to fully absorb the weight of the historical trauma being uncovered.",
+    "emotional_evocation": "A soul-crushing mixture of boiling anger at the arrogance of evil and profound heartbreak for the victims. It evokes a deeply powerful, almost religious silence in the viewer, leaving an indelible mark on their understanding of human empathy."
+}
+}
+
+for uuid, record in data.items():
+    with open(os.path.join(out_dir, f"{uuid}.json"), "w", encoding="utf-8") as f:
+        json.dump(record, f, indent=4)
+    proc_file = os.path.join(in_dir, f"{uuid}.json.processing")
+    if os.path.exists(proc_file):
+        os.remove(proc_file)
+        print(f"Processed and removed {uuid}")

@@ -1,0 +1,55 @@
+{
+  "title": "Ferris Bueller's Day Off",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Ferris Bueller's Day Off",
+    "genres": [
+      "Comedy"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "High school student Ferris Bueller wants a day off from school and he's developed an incredibly sophisticated plan to pull it off. He talks his friend Cameron into taking his father's prized Ferrari and with his girlfriend Sloane head into Chicago for the day. While they are taking in what the city has to offer school principal Ed Rooney is convinced that Ferris is, not for the first time, playing hooky for the day and is hell bent to catch him out. Ferris has anticipated that, much to Rooney's chagrin.",
+    "image": "https://m.media-amazon.com/images/M/MV5BZWYwMjUxNjMtMzE0MC00NDM3LWIxMmQtYmEyNWVjNjdlZGZjXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1986",
+    "director": "John Hughes",
+    "writer": "John Hughes",
+    "cast": [
+      "Matthew Broderick",
+      "Alan Ruck",
+      "Mia Sara"
+    ],
+    "runtime": "103 min",
+    "score": "7.8/10 IMDb (413,405 votes) | 85% Rotten Tomatoes | 61/100 Metacritic",
+    "awards": "3 wins & 1 nomination total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Ferris Bueller's Day Off",
+      "snippet": "[Letterboxd Review of \"Ferris Bueller's Day Off\"] In a selfish attempt to cope with his separation anxiety, a sociopathic student abuses his relationship with his mentally unstable best friend in order to throw his future away on a single day of raucous debauchery.",
+      "link": "https://letterboxd.com/film/ferris-buellers-day-off/"
+    },
+    {
+      "title": "Letterboxd review of Ferris Bueller's Day Off",
+      "snippet": "[Letterboxd Review of \"Ferris Bueller's Day Off\"] i got lost today in the art institute trying to find the painting that cameron had an existential crisis in front of but it was fucking worth it",
+      "link": "https://letterboxd.com/film/ferris-buellers-day-off/"
+    },
+    {
+      "title": "Letterboxd review of Ferris Bueller's Day Off",
+      "snippet": "[Letterboxd Review of \"Ferris Bueller's Day Off\"] \"Oh, he's very popular Ed. The sportos, the motorheads, geeks, sluts, bloods, wastoids, dweebies, dickheads - they all adore him. They think he's a righteous dude.\"",
+      "link": "https://letterboxd.com/film/ferris-buellers-day-off/"
+    },
+    {
+      "title": "Letterboxd review of Ferris Bueller's Day Off",
+      "snippet": "[Letterboxd Review of \"Ferris Bueller's Day Off\"] when i was a kid i always thought cameron had a crush on ferris and you know what? i was right",
+      "link": "https://letterboxd.com/film/ferris-buellers-day-off/"
+    },
+    {
+      "title": "Letterboxd review of Ferris Bueller's Day Off",
+      "snippet": "[Letterboxd Review of \"Ferris Bueller's Day Off\"] ferris bueller is my manic pixie dream boy",
+      "link": "https://letterboxd.com/film/ferris-buellers-day-off/"
+    }
+  ],
+  "uuid": "a2d4062a-7c6f-03fe-05a8-419945750974"
+}

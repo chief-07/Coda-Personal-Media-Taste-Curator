@@ -226,17 +226,24 @@ class _CardLayout extends ConsumerWidget {
               left: 24,
               right: 55,
             ), // Adjusted right pad for wider letters
-            child: isKnockoutLayer
-                ? _buildHeroText(Colors.black)
-                : GestureDetector(
-                    onTap: () {
-                      context.push('/pitch/${recommendation.id}', extra: recommendation);
-                    },
-                    child: Opacity(
-                      opacity: 0,
-                      child: _buildHeroText(Colors.white),
-                    ),
-                  ),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                width: 330, // Force wrap at a standard readable width
+                child: isKnockoutLayer
+                    ? _buildHeroText(Colors.black)
+                    : GestureDetector(
+                        onTap: () {
+                          context.push('/pitch/${recommendation.id}', extra: recommendation);
+                        },
+                        child: Opacity(
+                          opacity: 0,
+                          child: _buildHeroText(Colors.white),
+                        ),
+                      ),
+              ),
+            ),
           ),
 
           const SizedBox(height: 18), // Reduced bottom gap
@@ -530,6 +537,21 @@ class _PosterWithTrailerState extends State<_PosterWithTrailer> with SingleTicke
                               });
                             }
                           },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              // Inner border overlay to hide YouTube player square corners bleeding on Android
+              if (widget.isPlayingTrailer && hasTrailer)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: const Color(0xFF1C1C1E), // Match dark card background
+                          width: 2.0,
                         ),
                       ),
                     ),

@@ -1,0 +1,57 @@
+{
+  "title": "Constantine",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Constantine",
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Horror"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "John Constantine is approached by Det. Angela Dodson who needs his help to prove that her twin sister Isabel's death was not a suicide. The dead woman was a devout Catholic and Angela refuses to accept she would have taken her own life. She's asked Constantine for help because he has a reputation for dealing with the mystical. In fact, he is a demon hunter whose sole purpose on Earth is to send demons back to the nether regions. John himself has been to Hell and knows that he is destined to return there on his death - but hopes his good deeds may find him a place in Heaven. As he looks into Isabel's death, he realizes demons are trying to break through to the human world, and his battles lead him into a direct conflict with Satan.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMjNhNTlmYmYtYjcxZi00ZDU1LTkxMWYtYzFlMWMzY2RiODM1XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2005",
+    "director": "Francis Lawrence",
+    "writer": "Jamie Delano, Garth Ennis, Kevin Brodbin",
+    "cast": [
+      "Keanu Reeves",
+      "Rachel Weisz",
+      "Djimon Hounsou"
+    ],
+    "runtime": "121 min",
+    "score": "7.0/10 IMDb (404,706 votes) | 46% Rotten Tomatoes | 50/100 Metacritic",
+    "awards": "2 wins & 11 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Constantine",
+      "snippet": "[Letterboxd Review of \"Constantine\"] ten stars for tilda as a non-binary angel",
+      "link": "https://letterboxd.com/film/constantine/"
+    },
+    {
+      "title": "Letterboxd review of Constantine",
+      "snippet": "[Letterboxd Review of \"Constantine\"] Me & the bad bitch I pulled by killing myself",
+      "link": "https://letterboxd.com/film/constantine/"
+    },
+    {
+      "title": "Letterboxd review of Constantine",
+      "snippet": "[Letterboxd Review of \"Constantine\"] what if we kissed 😳😳 in papa midnite's club",
+      "link": "https://letterboxd.com/film/constantine/"
+    },
+    {
+      "title": "Letterboxd review of Constantine",
+      "snippet": "[Letterboxd Review of \"Constantine\"] when he flipped off lucifer as he went to heaven. Iconic™",
+      "link": "https://letterboxd.com/film/constantine/"
+    },
+    {
+      "title": "Letterboxd review of Constantine",
+      "snippet": "[Letterboxd Review of \"Constantine\"] Makes the following sexy choices:- Tilda in her androgynous form.- Keanu says a lot of Latin.- Rachel Weisz is wet for 90% of the runtime.- Djimon Honsou exists.- Shia LaBeouf dies.",
+      "link": "https://letterboxd.com/film/constantine/"
+    }
+  ],
+  "uuid": "5dbd0f73-c445-480b-4830-a0fea955578a"
+}

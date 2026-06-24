@@ -1,0 +1,82 @@
+{
+  "title": "The Mist",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Mist",
+    "genres": [
+      "Horror",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "The Draytons - David, Steff and their son Billy - live in a small Maine town. One night a ferocious storm hits the area, damaging their house. The storm is accompanied by a strange mist the following morning. David and Billy and their neighbour Brent Norton go into town and find themselves trapped in a grocery store with several other people. There they discover that the mist contains something frightening and intent on killing humans.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTU2NjQyNDY1Ml5BMl5BanBnXkFtZTcwMTk1MDU1MQ@@._V1_SX300.jpg",
+    "release_year": "2007",
+    "director": "Frank Darabont",
+    "writer": "Frank Darabont, Stephen King",
+    "cast": [
+      "Thomas Jane",
+      "Marcia Gay Harden",
+      "Laurie Holden"
+    ],
+    "runtime": "126 min",
+    "score": "7.1/10 IMDb (371,131 votes) | 74% Rotten Tomatoes | 58/100 Metacritic",
+    "awards": "6 wins & 13 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Mist",
+      "snippet": "[Letterboxd Review of \"The Mist\"] Before you make any big decision, just wait 5 minutes.",
+      "link": "https://letterboxd.com/film/the-mist/"
+    },
+    {
+      "title": "Letterboxd review of The Mist",
+      "snippet": "[Letterboxd Review of \"The Mist\"] when ollie shoots the religious lady in the head, that’s cinema",
+      "link": "https://letterboxd.com/film/the-mist/"
+    },
+    {
+      "title": "Letterboxd review of The Mist",
+      "snippet": "[Letterboxd Review of \"The Mist\"] And the award for the biggest bitch in cinematic history goes to....",
+      "link": "https://letterboxd.com/film/the-mist/"
+    },
+    {
+      "title": "Letterboxd review of The Mist",
+      "snippet": "[Letterboxd Review of \"The Mist\"] What.The. Fuck.Pardon my language, but this is one of the most fucked up endings I've ever seen on screen. FUCK! Excuse me while I literally can't even over here. I'll let you know when I'm able to even again.P.S. When bad CGI happens to good movies though...P.P.S. Sorry, I realize this is not a quality review of any kind, but FUCK.",
+      "link": "https://letterboxd.com/film/the-mist/"
+    },
+    {
+      "title": "Letterboxd review of The Mist",
+      "snippet": "[Letterboxd Review of \"The Mist\"] Absolutley no fucking way that’s how this movie ended.",
+      "link": "https://letterboxd.com/film/the-mist/"
+    },
+    {
+      "title": "The Mist | Audience Reviews | Rotten Tomatoes",
+      "snippet": "See what audiences are saying about The Mist. Read user reviews, reactions, and ratings on Rotten Tomatoes. Join the conversation today.",
+      "link": "www.rottentomatoes.com/m/mist/reviews"
+    },
+    {
+      "title": "The Mist critic reviews - Metacritic",
+      "snippet": "Showing 29 Critic Reviews 88",
+      "link": "www.metacritic.com/movie/the-mist/critic-reviews/"
+    },
+    {
+      "title": "Attention shoppers! Get eaten during our loading dock sale!",
+      "snippet": "In \"The Mist,\" based on a Stephen King story, a violent storm blows in a heavy mist that envelops that favorite King locale, a village in Maine. When the electric power goes out, David Drayton (Thomas Jane) and his young son Billy (Nathan Gamble) drive slowly into town to buy emergency supplies at the supermarket.",
+      "link": "www.rogerebert.com/reviews/the-mist-2007"
+    },
+    {
+      "title": "Rotten Tomatoes: Movies | TV Shows | Movie Trailers | Reviews",
+      "snippet": "Rotten Tomatoes, home of the Tomatometer, is the most trusted measurement of quality for Movies & TV. The definitive site for Reviews, Trailers, Showtimes, and Tickets",
+      "link": "www.rottentomatoes.com"
+    },
+    {
+      "title": "Is \"The Mist\" Worth Watching? A Deep Dive into Stephen King's Chilling ...",
+      "snippet": "\"The Mist,\" the 2007 film directed by Frank Darabont and based on Stephen King's novella, is a film that lingers in the memory long after the credits roll. It's a movie that provokes discussion, inspires debate, and leaves viewers grappling with unsettling questions about humanity, faith, and the nature of fear. But the core question remains: is \"The Mist\" worth watching? The ...",
+      "link": "www.scifidimensions.com/is-the-mist-worth-watching-a-deep-dive-into-stephen-kings-chilling-adaptation/"
+    }
+  ],
+  "uuid": "580e071e-2b06-0426-6465-5fc7b8533b14"
+}

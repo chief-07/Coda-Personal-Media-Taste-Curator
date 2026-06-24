@@ -7,15 +7,14 @@ process.env.UV_THREADPOOL_SIZE = 128;
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const dotenv = require('dotenv');
 const https = require('https');
 const fs = require('fs');
 const selfsigned = require('selfsigned');
 
-// Load environment variables from the root assets/.env file
+// Load non-secret app config plus ignored local backend secrets if present.
+// Production should provide secrets through the hosting environment.
 const projectRoot = path.join(__dirname, '..');
-const envPath = path.join(projectRoot, 'assets', '.env');
-dotenv.config({ path: envPath });
+require('./loadEnv');
 
 // Initialize database connections
 const qdrantService = require('./services/qdrantService');
@@ -28,17 +27,25 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const chatRoute = require('./routes/chat');
-const recommendRoute = require('./routes/recommend');
-const onboardingRoute = require('./routes/onboarding');
-const detectRoute = require('./routes/detect');
-const visualizeRoute = require('./routes/visualize');
-app.use('/api/openai', chatRoute);
-app.use('/api/recommend', recommendRoute);
-app.use('/api/onboarding', onboardingRoute);
-app.use('/api/detect', detectRoute);
-app.use('/api/visualize', visualizeRoute);
-app.use('/share', detectRoute); // Mount PWA share target at root /share
+const soulRouter = require('./routes/soul');
+const recommendRouter = require('./routes/recommend');
+const onboardingRouter = require('./routes/onboarding');
+const matchRouter = require('./routes/match');
+const detectRouter = require('./routes/detect');
+const chatRouter = require('./routes/chat');
+const visualizeRouter = require('./routes/visualize');
+const enrichRouter = require('./routes/enrich');
+
+// Mounting Routes
+app.use('/api/soul', soulRouter);
+app.use('/api/recommend', recommendRouter);
+app.use('/api/onboarding', onboardingRouter);
+app.use('/api/match', matchRouter);
+app.use('/api/detect', detectRouter);
+app.use('/api/chat', chatRouter);
+app.use('/api/visualize', visualizeRouter);
+app.use('/api/enrich', enrichRouter);
+app.use('/share', detectRouter); // Mount PWA share target at root /share
 
 // Serve static Flutter web files
 const webBuildPath = path.join(projectRoot, 'build', 'web');

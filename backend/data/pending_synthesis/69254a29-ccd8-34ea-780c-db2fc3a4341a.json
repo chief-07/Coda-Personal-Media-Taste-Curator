@@ -1,0 +1,57 @@
+{
+  "title": "Superman",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Superman",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Set within a new DC universe. A few years into his heroics, Superman embarks on a personal quest to understand his Kryptonian heritage and mix it with his upbringing as mild mannered Clark Kent. But things get complicated when ruthless industrialist Lex Luthor frames Superman for an international incident and plans to put himself on top by bringing Superman down. Now with aid from Lois Lane, Jimmy Olsen and the Justice Gang, Superman must embrace his lineage and fully become the hero we deserve in order to stop Luthor's plot and save the world.",
+    "image": "https://m.media-amazon.com/images/M/MV5BOGMwZGJiM2EtMzEwZC00YTYzLWIxNzYtMmJmZWNlZjgxZTMwXkEyXkFqcGc@._V1_QL75_UY562_CR35,0,380,562_.jpg",
+    "release_year": "2025",
+    "director": "James Gunn",
+    "writer": "James Gunn, Jerry Siegel, Joe Shuster",
+    "cast": [
+      "David Corenswet",
+      "Rachel Brosnahan",
+      "Nicholas Hoult"
+    ],
+    "runtime": "129 min",
+    "score": "7.0/10 IMDb (406,287 votes) | 83% Rotten Tomatoes | 68/100 Metacritic",
+    "awards": "5 wins & 73 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Superman",
+      "snippet": "[Letterboxd Review of \"Superman\"] This is my dad's favorite film he even brought my mom to see it on their first date, 30 years later when this was on TV my mom admitted to all of us that it was a pretty shitty date because my dad was so transfixed by the movie he didn't pay any attention to her at all, what a nerd!!",
+      "link": "https://letterboxd.com/film/superman/"
+    },
+    {
+      "title": "Letterboxd review of Superman",
+      "snippet": "[Letterboxd Review of \"Superman\"] Can someone please teach Lois Lane how to spell?",
+      "link": "https://letterboxd.com/film/superman/"
+    },
+    {
+      "title": "Letterboxd review of Superman",
+      "snippet": "[Letterboxd Review of \"Superman\"] “Do you like pink?”“I like pink very much, Lois.”Hot",
+      "link": "https://letterboxd.com/film/superman/"
+    },
+    {
+      "title": "Letterboxd review of Superman",
+      "snippet": "[Letterboxd Review of \"Superman\"] now I am not claiming to be an expert but I am not entirely sure if that's how the earth's orbit works",
+      "link": "https://letterboxd.com/film/superman/"
+    },
+    {
+      "title": "Letterboxd review of Superman",
+      "snippet": "[Letterboxd Review of \"Superman\"] With apologies to Marlon Brando, Glenn Ford, and people who pronounce the word ‘Krypton’ wrong, this movie would be even stronger if you cut out the first 45 minutes entirely and started with the very first shot in Metropolis. That’s when the story really begins anyway. Even in 1978, everyone knew Superman’s origin — or at least enough to understand the rest of the movie. The thing Superman still has going for it, even as its cutting edge you-will-believe-a-man-can-fly effects age, is Christopher Reeve. Very few comic book movies feature one performance as good as his Clark Kent or his Superma",
+      "link": "https://letterboxd.com/film/superman/"
+    }
+  ],
+  "uuid": "69254a29-ccd8-34ea-780c-db2fc3a4341a"
+}

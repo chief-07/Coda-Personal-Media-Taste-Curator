@@ -1,0 +1,62 @@
+{
+  "title": "Don't Look Up",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Don't Look Up",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Kate Dibiasky (Jennifer Lawrence), an astronomy grad student, and her professor Dr. Randall Mindy (Leonardo DiCaprio) make an astounding discovery of a comet orbiting within the solar system. The problem - it's on a direct collision course with Earth. The other problem? No one really seems to care. Turns out warning mankind about a planet-killer the size of Mount Everest is an inconvenient fact to navigate. With the help of Dr. Oglethorpe (Rob Morgan), Kate and Randall embark on a media tour that takes them from the office of an indifferent President Orlean (Meryl Streep) and her sycophantic son and Chief of Staff, Jason (Jonah Hill), to the airwaves of The Daily Rip, an upbeat morning show hosted by Brie (Cate Blanchett) and Jack (Tyler Perry). With only six months until the comet makes impact, managing the 24-hour news cycle and gaining the attention of the social media obsessed public before it's too late proves shockingly comical - what will it take to get the world to just look up?.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMjhhNWFjNzctYTJjOS00MDc0LThiNjItZmM0ZDVmMWViY2UzXkEyXkFqcGc@._V1_QL75_UY562_CR35,0,380,562_.jpg",
+    "release_year": "2021",
+    "director": "Adam McKay",
+    "writer": "Adam McKay, David Sirota",
+    "cast": [
+      "Leonardo DiCaprio",
+      "Jennifer Lawrence",
+      "Meryl Streep"
+    ],
+    "runtime": "138 min",
+    "score": "7.1/10 IMDb (669,471 votes) | 49/100 Metacritic",
+    "awards": "Nominated for 4 Oscars. 25 wins & 100 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Don't Look Up",
+      "snippet": "[Letterboxd Review of \"Don't Look Up\"] This has zero redeeming qualities",
+      "link": "https://letterboxd.com/film/dont-look-up/"
+    },
+    {
+      "title": "Letterboxd review of Don't Look Up",
+      "snippet": "[Letterboxd Review of \"Don't Look Up\"] Can't believe I stopped my Haikyu!! marathon for this shit. The practical effects were okay I guess.",
+      "link": "https://letterboxd.com/film/dont-look-up/"
+    },
+    {
+      "title": "Letterboxd review of Don't Look Up",
+      "snippet": "[Letterboxd Review of \"Don't Look Up\"] If you are choosing your films based only on how short they are...You get what you deserve.",
+      "link": "https://letterboxd.com/film/dont-look-up/"
+    },
+    {
+      "title": "Letterboxd review of Don't Look Up",
+      "snippet": "[Letterboxd Review of \"Don't Look Up\"] Incredibly generic..and what in the hell is Eli Roth doing in this?",
+      "link": "https://letterboxd.com/film/dont-look-up/"
+    },
+    {
+      "title": "Letterboxd review of Don't Look Up",
+      "snippet": "[Letterboxd Review of \"Don't Look Up\"] I remember when it looked like Fruit Chan had \"arrived\" and was about to mean business. Dumplings was an incredible horror film, one of the very best of the \"Asia Extreme\" boom of the 2000s. His early drama Made In Hong Kong was powerful and original. Even his artier films like Public Toilet showed an auteur emerging and then......this? This is absolutely incoherent nonsense of the most painfully Z-Grade order. Anyone who has even the slightest respect for story structure will want to give up in the first 30 seconds, as we're treated to five (FIVE!!!) slides of lengthy incomprehensible exposit",
+      "link": "https://letterboxd.com/film/dont-look-up/"
+    },
+    {
+      "title": "Wikipedia: Don't Look Up",
+      "snippet": "[Wikipedia Synopsis] Don't Look Up is a 2021 American political satire black comedy film written, co-produced, and directed by Adam McKay from a story he co-wrote with David Sirota. It stars an ensemble cast featuring Leonardo DiCaprio, Jennifer Lawrence, Rob Morgan, Jonah Hill, Mark Rylance, Tyler Perry, Timothée Chalamet, Ron Perlman, Ariana Grande, Kid Cudi, Cate Blanchett, and Meryl Streep. The film tells the story of two astronomers attempting to warn humanity about an approaching comet that will destroy human civilization.\nThe movie's central comet impact event was used by McKay as an allegory for threats arising from climate change. The film satirizes social, political, corporate, celebrity, and media indifference, in particular to the climate crisis, and parallels societal responses to science during the COVID-19 pandemic.\nProduced by McKay's Hyperobject Industries and Bluegrass Films, the film was announced in November 2019. Originally set for a theatrical release by Paramount Pictures, the distribution rights were acquired by Netflix several months later. Lawrence became the first member of the cast to join, with DiCaprio signing on after his discussions with McKay on adjustments to the script; the rest of the cast was added through 2020. Filming was initially set to begin in April 2020 in Massachusetts, but it was delayed due to the COVID-19 pandemic; it eventually began in November 2020 and wrapped in February 2021.\nDon't Look Up began a limited theatrical release on December 10, 2021",
+      "link": "https://en.wikipedia.org/wiki/Don't%20Look%20Up"
+    }
+  ],
+  "uuid": "62c1d8bf-f7f2-3198-1d91-d3c73f40ec32"
+}

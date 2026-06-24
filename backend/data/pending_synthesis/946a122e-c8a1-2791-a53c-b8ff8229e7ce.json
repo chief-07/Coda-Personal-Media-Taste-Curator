@@ -1,0 +1,62 @@
+{
+  "title": "F1: The Movie",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "F1: The Movie",
+    "genres": [
+      "Action",
+      "Drama",
+      "Sport"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Dubbed \"the greatest that never was,\" Sonny Hayes was FORMULA 1's most promising phenom of the 1990s until an accident on the track nearly ended his career. Thirty years later, he's a nomadic racer-for-hire when he's approached by his former teammate Ruben Cervantes, owner of a struggling FORMULA 1 team that is on the verge of collapse. Ruben convinces Sonny to come back to FORMULA 1 for one last shot at saving the team and being the best in the world. He'll drive alongside Joshua Pearce, the team's hotshot rookie intent on setting his own pace. But as the engines roar, Sonny's past catches up with him and he finds that in FORMULA 1, your teammate is your fiercest competition--and the road to redemption is not something you can travel alone.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNGI0MDI4NjEtOWU3ZS00ODQyLWFhYTgtNGYxM2ZkM2Q2YjE3XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+    "release_year": "2025",
+    "director": "Joseph Kosinski",
+    "writer": "Joseph Kosinski, Ehren Kruger",
+    "cast": [
+      "Brad Pitt",
+      "Damson Idris",
+      "Javier Bardem"
+    ],
+    "runtime": "155 min",
+    "score": "7.6/10 IMDb (353,753 votes) | 82% Rotten Tomatoes | 68/100 Metacritic",
+    "awards": "Won 1 Oscar. 31 wins & 129 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of F1: The Movie",
+      "snippet": "[Letterboxd Review of \"F1: The Movie\"] Radio: “Box, Box, Box!”Brad Pitt: “WHAT’S IN THE BOX”",
+      "link": "https://letterboxd.com/film/f1-the-movie/"
+    },
+    {
+      "title": "Letterboxd review of F1: The Movie",
+      "snippet": "[Letterboxd Review of \"F1: The Movie\"] So when Brad Pitt crashes a bunch of cars it’s “the blockbuster event of the summer” but when I do it I’m a “liability” and “an insurance risk.”",
+      "link": "https://letterboxd.com/film/f1-the-movie/"
+    },
+    {
+      "title": "Letterboxd review of F1: The Movie",
+      "snippet": "[Letterboxd Review of \"F1: The Movie\"] how can you explain a generic title like \"f1 the movie\" when \"pitt-stop\" was literally there for the taking",
+      "link": "https://letterboxd.com/film/f1-the-movie/"
+    },
+    {
+      "title": "Letterboxd review of F1: The Movie",
+      "snippet": "[Letterboxd Review of \"F1: The Movie\"] brad pitt: i'm going to crash every car you own.javier bardem: LISAN AL GAIB",
+      "link": "https://letterboxd.com/film/f1-the-movie/"
+    },
+    {
+      "title": "Letterboxd review of F1: The Movie",
+      "snippet": "[Letterboxd Review of \"F1: The Movie\"] 85% of the movie**Hans Zimmer’s very own Challengers score blaring over the most exhilarating race car footage ever captured**10% of the movieBrad Pitt: “you kids and your damn phones, you just gotta drive man 🤙”Damson Idris: “shut it bruv, you’re old”5% of the movie**Kerry Condon bats her eye lashes**(is this movie formulaic? yes.but is the thrills and exhilaration of Formula 1 in a bottle? also yes.)",
+      "link": "https://letterboxd.com/film/f1-the-movie/"
+    },
+    {
+      "title": "Wikipedia: F1 (film)",
+      "snippet": "[Wikipedia Synopsis] F1 (marketed as F1 the Movie) is a 2025 American sports drama film directed by Joseph Kosinski from a screenplay by Ehren Kruger. It stars Brad Pitt as a Formula One (F1) racing driver who returns after a 30-year absence to save his former teammate's underdog team from collapse. Damson Idris, Kerry Condon, Tobias Menzies, and Javier Bardem also star in supporting roles.\nDevelopment of the film began in December 2021 with Pitt, Kosinski, Kruger, and producer Jerry Bruckheimer attached to the project; the latter three had previously collaborated on Top Gun: Maverick (2022). Supporting cast members were revealed in early 2023, before the start of principal photography at Silverstone that July. Filming also took place during Grand Prix weekends of the 2023 and 2024 World Championships, with the collaboration of the FIA, the governing body of F1. Racing sequences were adapted from the real-life races, with F1 teams and drivers appearing throughout, including Lewis Hamilton, who was also a producer. Hans Zimmer composed the film's score, while numerous artists contributed to its soundtrack.\nF1 premiered at Radio City Music Hall in New York City on June 16, 2025, and was released in the United States by Warner Bros. Pictures and Apple Original Films on June 27. The film grossed over $634 million worldwide against a $200–300 million budget, becoming the ninth-highest-grossing film of 2025, the highest-grossing auto racing film of all time, the highest-grossing film by Apple, and the",
+      "link": "https://en.wikipedia.org/wiki/F1%20(film)"
+    }
+  ],
+  "uuid": "946a122e-c8a1-2791-a53c-b8ff8229e7ce"
+}

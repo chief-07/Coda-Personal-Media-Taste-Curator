@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
+import 'package:coda/src/features/onboarding/data/coda_ai_service.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
 
@@ -25,12 +26,12 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
   final _topScrollController = ScrollController();
 
   // Inputs
-  final _identityController = TextEditingController();
+  final _summaryController = TextEditingController();
   final _tasteController = TextEditingController();
   final _guardrailsController = TextEditingController();
   final _historyController = TextEditingController();
 
-  final _identityFocusNode = FocusNode();
+  final _summaryFocusNode = FocusNode();
   final _tasteFocusNode = FocusNode();
   final _guardrailsFocusNode = FocusNode();
   final _historyFocusNode = FocusNode();
@@ -67,11 +68,11 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
   void dispose() {
     _maskScrollController.dispose();
     _topScrollController.dispose();
-    _identityController.dispose();
+    _summaryController.dispose();
     _tasteController.dispose();
     _guardrailsController.dispose();
     _historyController.dispose();
-    _identityFocusNode.dispose();
+    _summaryFocusNode.dispose();
     _tasteFocusNode.dispose();
     _guardrailsFocusNode.dispose();
     _historyFocusNode.dispose();
@@ -349,155 +350,148 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
 
   // ── Tab 0: Identity ──────────────────────────────────────────────
   Widget _buildIdentityTab(bool isKnockoutLayer, ScrollController scrollController, LivingMemory memory) {
-    final soulGraph = memory.soulGraph;
-    if (soulGraph != null) {
-      final demographics = soulGraph['demographics'] as Map<String, dynamic>? ?? {};
-      final emotionalResonances = soulGraph['emotional_resonances'] as Map<String, dynamic>? ?? {};
-      final aestheticAffinities = soulGraph['aesthetic_affinities'] as Map<String, dynamic>? ?? {};
-      final creativeAnchors = soulGraph['creative_anchors'] as Map<String, dynamic>? ?? {};
-      final themes = soulGraph['themes'] as Map<String, dynamic>? ?? {};
-      final tropes = soulGraph['tropes'] as Map<String, dynamic>? ?? {};
-      final guardrails = List<String>.from(soulGraph['guardrails'] ?? []);
-
-      final sortedResonances = emotionalResonances.keys.toList()
-        ..sort((a, b) => ((emotionalResonances[b] as num? ?? 0.0).toDouble())
-            .compareTo((emotionalResonances[a] as num? ?? 0.0).toDouble()));
-
-      final sortedAesthetic = aestheticAffinities.keys.toList()
-        ..sort((a, b) => ((aestheticAffinities[b] as num? ?? 0.0).toDouble())
-            .compareTo((aestheticAffinities[a] as num? ?? 0.0).toDouble()));
-
-      final manualTraits = memory.globalIdentity
-          .where((t) => !(t.trim().startsWith('{') && t.trim().endsWith('}')))
-          .toList();
-
-      return ListView(
-        controller: scrollController,
-        physics: isKnockoutLayer ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(bottom: 64),
-        children: [
-          _buildAddBar(
-            isKnockoutLayer: isKnockoutLayer,
-            controller: _identityController,
-            focusNode: _identityFocusNode,
-            hintText: 'Add an identity trait...',
-            onAdd: _addIdentityTrait,
-          ),
-          const SizedBox(height: 16),
-          
-          // Section 1: Demographics & Struggles
-          _buildCategoryHeader(isKnockoutLayer, 'Identity & Life Stage'),
-          _buildProfileCard(isKnockoutLayer, demographics),
-          const SizedBox(height: 24),
-
-          // Section 2: Emotional Resonances
-          if (emotionalResonances.isNotEmpty) ...[
-            _buildCategoryHeader(isKnockoutLayer, 'Emotional Resonances'),
-            const SizedBox(height: 8),
-            ...sortedResonances.map((k) {
-              final val = (emotionalResonances[k] as num? ?? 0.0).toDouble();
-              return _buildProgressBar(isKnockoutLayer, k, val);
-            }),
-            const SizedBox(height: 24),
-          ],
-
-          // Section 3: Aesthetic Affinities
-          if (aestheticAffinities.isNotEmpty) ...[
-            _buildCategoryHeader(isKnockoutLayer, 'Aesthetic Affinities'),
-            const SizedBox(height: 8),
-            ...sortedAesthetic.map((k) {
-              final val = (aestheticAffinities[k] as num? ?? 0.0).toDouble();
-              return _buildProgressBar(isKnockoutLayer, k, val);
-            }),
-            const SizedBox(height: 24),
-          ],
-
-          // Section 4: Creative Anchors
-          if (creativeAnchors.values.any((val) => val is Map && val.isNotEmpty)) ...[
-            _buildCategoryHeader(isKnockoutLayer, 'Creative Anchors'),
-            _buildCreativeAnchors(isKnockoutLayer, creativeAnchors),
-            const SizedBox(height: 24),
-          ],
-
-          // Section 5: Themes & Tropes
-          if (themes.isNotEmpty || tropes.isNotEmpty) ...[
-            _buildCategoryHeader(isKnockoutLayer, 'Themes & Tropes'),
-            const SizedBox(height: 12),
-            if (themes.isNotEmpty) ...[
-              _buildWeightMapChips(isKnockoutLayer, themes),
-            ],
-            if (tropes.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              _buildWeightMapChips(isKnockoutLayer, tropes),
-            ],
-            const SizedBox(height: 24),
-          ],
-
-          // Section 6: Guardrails
-          if (guardrails.isNotEmpty) ...[
-            _buildCategoryHeader(isKnockoutLayer, 'Negative Guardrails'),
-            const SizedBox(height: 12),
-            _buildGuardrailsChips(isKnockoutLayer, guardrails),
-            const SizedBox(height: 24),
-          ],
-
-          // Section 7: Manual Traits / Custom Traits
-          if (manualTraits.isNotEmpty) ...[
-            _buildCategoryHeader(isKnockoutLayer, 'Manual Traits'),
-            const SizedBox(height: 16),
-            ...manualTraits.asMap().entries.map((entry) {
-              final idx = entry.key;
-              final trait = entry.value;
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (idx > 0) const SizedBox(height: 16) else const SizedBox(height: 8),
-                  _buildMemoryRow(
-                    isKnockoutLayer,
-                    trait,
-                    onDelete: () => _deleteIdentityTrait(trait),
-                  ),
-                ],
-              );
-            }),
-          ],
-        ],
-      );
+    if (_summaryController.text.isEmpty && memory.globalIdentity.isNotEmpty) {
+      // Use the first line, or join them if there are multiple lines 
+      // (though our new system provides a single paragraph in globalIdentity)
+      _summaryController.text = memory.globalIdentity.join('\n\n');
     }
 
     return ListView(
       controller: scrollController,
       physics: isKnockoutLayer ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
-      padding: const EdgeInsets.only(bottom: 64),
+      padding: const EdgeInsets.only(bottom: 64, left: 24, right: 24),
       children: [
-        _buildAddBar(
-          isKnockoutLayer: isKnockoutLayer,
-          controller: _identityController,
-          focusNode: _identityFocusNode,
-          hintText: 'Add an identity trait...',
-          onAdd: _addIdentityTrait,
+        const SizedBox(height: 16),
+        isKnockoutLayer
+            ? Text(
+                'YOUR SOUL SUMMARY',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
+                  letterSpacing: 1.0,
+                ),
+              )
+            : Opacity(
+                opacity: 0,
+                child: Text(
+                  'YOUR SOUL SUMMARY',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isKnockoutLayer ? Colors.transparent : Colors.white.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(16),
+            border: isKnockoutLayer
+                ? Border.all(color: Colors.black, width: 2) // Thick border for knockout cutout
+                : Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          ),
+          child: isKnockoutLayer
+              ? TextFormField(
+                  controller: _summaryController,
+                  focusNode: _summaryFocusNode,
+                  maxLines: null,
+                  minLines: 5,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 1.6,
+                    color: Colors.transparent, // Knockout handles the cutout
+                  ),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                )
+              : TextFormField(
+                  controller: _summaryController,
+                  focusNode: _summaryFocusNode,
+                  maxLines: null,
+                  minLines: 5,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 1.6,
+                    color: Colors.white,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'I am still learning the shape of your soul...',
+                    hintStyle: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      height: 1.6,
+                      color: Colors.white54,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onFieldSubmitted: (_) => _saveSoulSummary(),
+                ),
+        ),
+        const SizedBox(height: 16),
+        // Save Button Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: isKnockoutLayer ? null : _saveSoulSummary,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isKnockoutLayer ? Colors.black : Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: isKnockoutLayer
+                    ? null
+                    : Text(
+                        'Save Summary',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black,
+                        ),
+                      ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 24),
-        if (memory.globalIdentity.isEmpty)
-          _buildEmptyMessage(isKnockoutLayer, 'No identity traits saved yet.')
-        else
-          ...memory.globalIdentity.asMap().entries.map((entry) {
-            final idx = entry.key;
-            final trait = entry.value;
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (idx > 0) const SizedBox(height: 48) else const SizedBox(height: 8),
-                _buildMemoryRow(
-                  isKnockoutLayer,
-                  trait,
-                  onDelete: () => _deleteIdentityTrait(trait),
-                ),
-              ],
-            );
-          }),
       ],
     );
+  }
+
+  Future<void> _saveSoulSummary() async {
+    final text = _summaryController.text.trim();
+    if (text.isNotEmpty) {
+      _summaryFocusNode.unfocus();
+      
+      final memory = ref.read(livingMemoryProvider);
+      final updatedMemory = LivingMemory(
+        globalIdentity: [text],
+        categoryProfiles: memory.categoryProfiles,
+        recentContext: memory.recentContext,
+        guardrails: memory.guardrails,
+        mediaReflections: memory.mediaReflections,
+        seen: memory.seen,
+        notForMe: memory.notForMe,
+        watchlist: memory.watchlist,
+      );
+      
+      // Update locally
+      await ref.read(livingMemoryProvider.notifier).seedMemory(updatedMemory);
+      
+      // Sync to backend explicitly using the new endpoint
+      await ref.read(codaAiServiceProvider).updateSoulSummary(memory, text);
+    }
   }
 
   Widget _buildProgressBar(bool isKnockoutLayer, String label, double value) {
@@ -914,40 +908,6 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
     );
   }
 
-  Future<void> _addIdentityTrait() async {
-    final text = _identityController.text.trim();
-    if (text.isNotEmpty) {
-      final memory = ref.read(livingMemoryProvider);
-      final newIdentity = List<String>.from(memory.globalIdentity)..add(text);
-      final updatedMemory = LivingMemory(
-        globalIdentity: newIdentity,
-        categoryProfiles: memory.categoryProfiles,
-        recentContext: memory.recentContext,
-        guardrails: memory.guardrails,
-        seen: memory.seen,
-        notForMe: memory.notForMe,
-        watchlist: memory.watchlist,
-      );
-      await ref.read(livingMemoryProvider.notifier).seedMemory(updatedMemory);
-      _identityController.clear();
-      _identityFocusNode.unfocus();
-    }
-  }
-
-  Future<void> _deleteIdentityTrait(String trait) async {
-    final memory = ref.read(livingMemoryProvider);
-    final newIdentity = List<String>.from(memory.globalIdentity)..remove(trait);
-    final updatedMemory = LivingMemory(
-      globalIdentity: newIdentity,
-      categoryProfiles: memory.categoryProfiles,
-      recentContext: memory.recentContext,
-      guardrails: memory.guardrails,
-      seen: memory.seen,
-      notForMe: memory.notForMe,
-      watchlist: memory.watchlist,
-    );
-    await ref.read(livingMemoryProvider.notifier).seedMemory(updatedMemory);
-  }
 
   // ── Tab 1: Tastes ────────────────────────────────────────────────
   Widget _buildTastesTab(bool isKnockoutLayer, ScrollController scrollController, LivingMemory memory) {

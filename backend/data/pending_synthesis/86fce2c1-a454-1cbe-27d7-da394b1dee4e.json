@@ -1,0 +1,61 @@
+{
+  "title": "2001: A Space Odyssey",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "2001: A Space Odyssey",
+    "genres": [
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "G"
+    ],
+    "description": "\"2001\" is a story of evolution. Sometime in the distant past, someone or something nudged evolution by placing a monolith on Earth (presumably elsewhere throughout the universe as well). Evolution then enabled humankind to reach the moon's surface, where yet another monolith is found, one that signals the monolith placers that humankind has evolved that far. Now a race begins between computers (HAL) and human (Bowman) to reach the monolith placers. The winner will achieve the next step in evolution, whatever that may be.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNjU0NDFkMTQtZWY5OS00MmZhLTg3Y2QtZmJhMzMzMWYyYjc2XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1968",
+    "director": "Stanley Kubrick",
+    "writer": "Stanley Kubrick, Arthur C. Clarke",
+    "cast": [
+      "Keir Dullea",
+      "Gary Lockwood",
+      "William Sylvester"
+    ],
+    "runtime": "149 min",
+    "score": "8.3/10 IMDb (772,787 votes) | 90% Rotten Tomatoes | 84/100 Metacritic",
+    "awards": "Won 1 Oscar. 18 wins & 14 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of 2001: A Space Odyssey",
+      "snippet": "[Letterboxd Review of \"2001: A Space Odyssey\"] 2001:A Space Odyssey is quite simply the worst thing to happen to cinema ever. Its forced profundity has caused millions of people all over the world to force themselves to like what is quite simply nothing more than an exercise in style.Kubrick has no idea what he is doing here. His film jumps around with little to no sense of unity. The great film makers of the world create a series of events that contain clarity of information, something Kubrick couldn't bet his life on. What is the purpose of what is going on here? Is there any coherent message? I have heard suggestions that it is Kubrick'",
+      "link": "https://letterboxd.com/film/2001-a-space-odyssey/"
+    },
+    {
+      "title": "Letterboxd review of 2001: A Space Odyssey",
+      "snippet": "[Letterboxd Review of \"2001: A Space Odyssey\"] Man invents tools. Man becomes slave to those tools. The tools start to behave like man so man brutally murders them. Man sees the cycle, sees everything, and transcends—goes nuclear space baby mode. The 4k disc looks very nice.",
+      "link": "https://letterboxd.com/film/2001-a-space-odyssey/"
+    },
+    {
+      "title": "Letterboxd review of 2001: A Space Odyssey",
+      "snippet": "[Letterboxd Review of \"2001: A Space Odyssey\"] so people in the 60s thought that 2001 would be the peak of human intelligence and space travel but all we got was low waist jeans and shrek",
+      "link": "https://letterboxd.com/film/2001-a-space-odyssey/"
+    },
+    {
+      "title": "Letterboxd review of 2001: A Space Odyssey",
+      "snippet": "[Letterboxd Review of \"2001: A Space Odyssey\"] Dear College-Age Matt Singer, who thinks this movie is long, boring, and pretentious:You’re a fucking idiot.Love,Your Older, Smarter Self.",
+      "link": "https://letterboxd.com/film/2001-a-space-odyssey/"
+    },
+    {
+      "title": "Letterboxd review of 2001: A Space Odyssey",
+      "snippet": "[Letterboxd Review of \"2001: A Space Odyssey\"] LITERALLY NOTHING HAPPENED FOR OVER AN HOUR",
+      "link": "https://letterboxd.com/film/2001-a-space-odyssey/"
+    },
+    {
+      "title": "Wikipedia: 2001: A Space Odyssey",
+      "snippet": "[Wikipedia Synopsis] 2001: A Space Odyssey is a 1968 epic science fiction film produced and directed by Stanley Kubrick, who co-wrote the screenplay with Arthur C. Clarke. Its plot was inspired by several short stories optioned from Clarke, primarily \"The Sentinel\" (1951) and \"Encounter in the Dawn\" (1953). The film stars Keir Dullea, Gary Lockwood, William Sylvester, and Douglas Rain, and follows a voyage by astronauts, scientists, and the sentient supercomputer HAL 9000 to Jupiter to investigate an alien monolith.\nThe film is noted for its scientifically accurate depiction of spaceflight, pioneering special effects, and ambiguous themes. Kubrick avoided conventional cinematic and narrative techniques; dialogue is used sparingly, and long sequences are accompanied only by music. Shunning the convention that major film productions should feature original music, 2001: A Space Odyssey takes numerous works of classical music for its soundtrack, including pieces by Richard Strauss, Johann Strauss II, Aram Khachaturian, and György Ligeti.\n2001: A Space Odyssey premiered at Uptown Theater on 2 April 1968 before being released by Metro-Goldwyn-Mayer on 3 April 1968 in the United States and 1 May 1968 in the United Kingdom. Polarising critics after its release, 2001: A Space Odyssey has since been subject to a variety of interpretations, ranging from the darkly apocalyptic to an optimistic reappraisal of the hopes of humanity. Critics noted its exploration of themes such as human evolution, technology, a",
+      "link": "https://en.wikipedia.org/wiki/2001%3A%20A%20Space%20Odyssey"
+    }
+  ],
+  "uuid": "86fce2c1-a454-1cbe-27d7-da394b1dee4e"
+}

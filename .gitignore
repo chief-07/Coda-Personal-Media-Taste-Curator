@@ -49,6 +49,8 @@ node_modules/
 
 # Environment files
 assets/.env
+assets/env.local
+backend/.env
 
 # Coda agent brain and log dumps
 brain/

@@ -257,4 +257,27 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
       return null;
     }
   }
+
+  Future<void> updateSoulSummary(LivingMemory currentMemory, String summaryText) async {
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final body = jsonEncode({
+      'userId': userId,
+      'summaryText': summaryText,
+      'currentMemory': currentMemory.toJson(),
+    });
+
+    final targetUrl = '${getApiBaseUrl()}/api/soul/update-summary';
+
+    try {
+      final response = await http.post(Uri.parse(targetUrl), headers: headers, body: body);
+      if (response.statusCode != 200) {
+        print("updateSoulSummary HTTP error: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      print("updateSoulSummary network error: $e");
+    }
+  }
 }

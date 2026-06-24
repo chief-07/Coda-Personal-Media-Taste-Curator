@@ -1,0 +1,82 @@
+{
+  "title": "The Simpsons Movie",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Simpsons Movie",
+    "genres": [
+      "Animation",
+      "Adventure",
+      "Comedy"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Homer adopts a pig who's run away from Krusty Burger after Krusty tried to have him slaughtered, naming the pig \"Spider Pig.\" At the same time, the lake is protected after the audience sinks the barge Green Day is on with garbage after they mention the environment. Meanwhile, Spider Pig's waste has filled up a silo in just 2 days, apparently with Homer's help. Homer can't get to the dump quickly so dumps the silo in the lake, polluting it. Russ Cargill, the villainous boss of the EPA, gives Arnold Schwarzenegger, president of the USA, 5 options and forces him to choose 4 (which is, unfortunately, to destroy Springfield) and put a dome over Springfield to prevent evacuation. Homer, however, has escaped, along with his family. Can he stop the evil Cargill from annihilating his hometown, and his family, who have been forced to return to Springfield?",
+    "image": "https://m.media-amazon.com/images/M/MV5BMzIxN2IzOGItOTcyZi00MTkzLWE4ZjktZTdlOWFiYWE4NzlmXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2007",
+    "director": "David Silverman",
+    "writer": "James L. Brooks, Matt Groening, Al Jean",
+    "cast": [
+      "Dan Castellaneta",
+      "Julie Kavner",
+      "Nancy Cartwright"
+    ],
+    "runtime": "87 min",
+    "score": "7.3/10 IMDb (362,148 votes) | 87% Rotten Tomatoes | 80/100 Metacritic",
+    "awards": "Won 1 BAFTA Award5 wins & 34 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Simpsons Movie",
+      "snippet": "[Letterboxd Review of \"The Simpsons Movie\"] what ‘don’t look up’ should’ve been",
+      "link": "https://letterboxd.com/film/the-simpsons-movie/"
+    },
+    {
+      "title": "Letterboxd review of The Simpsons Movie",
+      "snippet": "[Letterboxd Review of \"The Simpsons Movie\"] Maybe I’m alone here but the Bart penis thing is such a chilling childhood memory. Still a pretty crazy shot. This is crazy relevant and still very funny.",
+      "link": "https://letterboxd.com/film/the-simpsons-movie/"
+    },
+    {
+      "title": "Letterboxd review of The Simpsons Movie",
+      "snippet": "[Letterboxd Review of \"The Simpsons Movie\"] petition to change “spider-pig” composed by hans zimmer to the US national anthem",
+      "link": "https://letterboxd.com/film/the-simpsons-movie/"
+    },
+    {
+      "title": "Letterboxd review of The Simpsons Movie",
+      "snippet": "[Letterboxd Review of \"The Simpsons Movie\"] \"despite everything, i miss your father.\"\"me too. his big fat ass could shield us all.\"",
+      "link": "https://letterboxd.com/film/the-simpsons-movie/"
+    },
+    {
+      "title": "Letterboxd review of The Simpsons Movie",
+      "snippet": "[Letterboxd Review of \"The Simpsons Movie\"] minus a half star because legendary clown icon sideshow bob doesn't make a single appearance",
+      "link": "https://letterboxd.com/film/the-simpsons-movie/"
+    },
+    {
+      "title": "The Simpsons Movie (2007) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review. This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt0462538/reviews/"
+    },
+    {
+      "title": "The Simpsons Movie (2007) - IMDb",
+      "snippet": "The Simpsons Movie: Directed by David Silverman. With Dan Castellaneta, Julie Kavner, Nancy Cartwright, Yeardley Smith. After Homer pollutes the town's water supply, Springfield is encased in a gigantic dome by the EPA and the Simpsons are declared fugitives.",
+      "link": "www.imdb.com/title/tt0462538/"
+    },
+    {
+      "title": "The Simpsons Movie - Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Simpsons Movie on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/the_simpsons_movie"
+    },
+    {
+      "title": "The Simpsons Movie critic reviews - Metacritic",
+      "snippet": "Showing 36 Critic Reviews 100",
+      "link": "www.metacritic.com/movie/the-simpsons-movie/critic-reviews/"
+    },
+    {
+      "title": "The Simpsons Movie - Wikipedia",
+      "snippet": "The Simpsons Movie is a 2007 American animated comedy film based on the animated television series The Simpsons created by Matt Groening. The film was directed by David Silverman and stars Dan Castellaneta, Julie Kavner, Nancy Cartwright, Yeardley Smith, Hank Azaria, Harry Shearer, Pamela Hayden, Tress MacNeille, and other recurring actors ...",
+      "link": "en.wikipedia.org/wiki/The_Simpsons_Movie"
+    }
+  ],
+  "uuid": "53cb2ad2-eda4-53e3-6f49-b164fa3a3784"
+}

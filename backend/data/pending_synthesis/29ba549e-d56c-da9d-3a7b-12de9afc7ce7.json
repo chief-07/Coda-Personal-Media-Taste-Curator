@@ -1,0 +1,25 @@
+{
+  "title": "I Am a Cat",
+  "media_type": "book",
+  "structured_data": {
+    "title": "I am a Cat",
+    "genres": [
+      "Fiction & Literature",
+      "Classics",
+      "Historical Fiction"
+    ],
+    "tags": [],
+    "description": "I Am a Cat is a satirical novel written in 1905–1906 by Natsume Sōseki about Japanese society during the Meiji period (1868–1912), particularly the uneasy mix of Western culture and Japanese traditions.\n\nSōseki's title, Wagahai wa Neko de Aru, uses a very high-register phrasing more appropriate to a nobleman, conveying grandiloquence and self-importance. This is somewhat ironic, since the speaker, an anthropomorphized domestic cat, is a regular house cat of a teacher, and not of a high-ranking noble as the manner of speech suggests, an example of Sōseki's love for droll writing.\n\nThe book was first published in ten installments in the literary journal Hototogisu. At first, Sōseki intended only to write the short story that constitutes the first chapter of I Am a Cat. However, Takahama Kyoshi, one of the editors of Hototogisu, persuaded Sōseki to serialize the work, which evolved stylistically as the installments progressed. Nearly all the chapters can stand alone as discrete works.",
+    "image": "https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/1c/66/91/1c669193-3bd4-0d03-f8ea-c3174dc21c24/ca558c1c-d0a9-433a-8164-93cafd6878ef_cover_image.png/600x900bb.jpg",
+    "studio": "Natsume Sōseki",
+    "director": "Natsume Sōseki"
+  },
+  "community_snippets": [
+    {
+      "title": "Wikipedia: I Am a Cat",
+      "snippet": "[Wikipedia Synopsis] I Am a Cat (Japanese: 吾輩は猫である, Hepburn: Wagahai wa Neko de Aru) is a satirical novel written in 1905–1906 by Natsume Sōseki about Japanese society during the Meiji period (1868–1912), particularly the uneasy mix of Western culture and Japanese traditions.\nSōseki's title, Wagahai wa Neko de Aru, uses a very high-register phrasing more appropriate to a nobleman, conveying grandiloquence and self-importance. This is somewhat ironic, since the speaker, an anthropomorphized domestic cat, is a regular house cat of a teacher, and not of a high-ranking noble as the manner of speech suggests, an example of Sōseki's love for droll writing.\nThe book was first published in ten installments in the literary journal Hototogisu. At first, Sōseki intended only to write the short story that constitutes the first chapter of I Am a Cat. However, Takahama Kyoshi, one of the editors of Hototogisu, persuaded Sōseki to serialize the work, which evolved stylistically as the installments progressed. Nearly all the chapters can stand alone as discrete works.",
+      "link": "https://en.wikipedia.org/wiki/I%20Am%20a%20Cat"
+    }
+  ],
+  "uuid": "29ba549e-d56c-da9d-3a7b-12de9afc7ce7"
+}

@@ -1,0 +1,82 @@
+{
+  "title": "Ghostbusters",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Ghostbusters",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Fantasy"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "Peter Venkman, Ray Stantz and Egon Spengler work at Columbia University. where they delve into the paranormal and fiddle with many unethical experiments on their students. As they are kicked out of the University, they really understand the paranormal and go into business for themselves. Under the new snazzy business name of 'Ghostbusters', and living in the old firehouse building they work out of, they are called to rid New York City of paranormal phenomenon at everyone's whim. - for a price. They make national press as the media reports the Ghostbusters are the cause of it all. Thrown in jail by the EPA, the mayor takes a chance and calls on them to help save the city. Unbeknownst to all, a long dead Gozer worshiper (Evo Shandor) erected a downtown apartment building which is the cause of all the paranormal activity. They find out the building could resurrect the ancient Hittite god, Gozer, and bring an end to all of humanity. Who are you gonna call to stop this terrible world-ending menace?",
+    "image": "https://m.media-amazon.com/images/M/MV5BYWE0YzYxNDUtMjk2ZC00NTEyLWE1MjktNzFkMjdjOWEwNTcyXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+    "release_year": "1984",
+    "director": "Ivan Reitman",
+    "writer": "Dan Aykroyd, Harold Ramis",
+    "cast": [
+      "Bill Murray",
+      "Dan Aykroyd",
+      "Sigourney Weaver"
+    ],
+    "runtime": "105 min",
+    "score": "7.8/10 IMDb (486,775 votes) | 95% Rotten Tomatoes | 71/100 Metacritic",
+    "awards": "Nominated for 2 Oscars. 9 wins & 9 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Ghostbusters",
+      "snippet": "[Letterboxd Review of \"Ghostbusters\"] A movie with no emotional core, no character arcs or growth. No one learns anything. It’s not saying anything. It shouldn’t work but somehow it’s perfect. No one has been able to replicate it and they should stop trying.",
+      "link": "https://letterboxd.com/film/ghostbusters/"
+    },
+    {
+      "title": "Letterboxd review of Ghostbusters",
+      "snippet": "[Letterboxd Review of \"Ghostbusters\"] fellas, is it gay to bust some slime with your bros?",
+      "link": "https://letterboxd.com/film/ghostbusters/"
+    },
+    {
+      "title": "Letterboxd review of Ghostbusters",
+      "snippet": "[Letterboxd Review of \"Ghostbusters\"] Very glad they included the ghost sex scene, felt that definitely added to the plot",
+      "link": "https://letterboxd.com/film/ghostbusters/"
+    },
+    {
+      "title": "Letterboxd review of Ghostbusters",
+      "snippet": "[Letterboxd Review of \"Ghostbusters\"] Imagine thinking this is a sacred text open to ruination.",
+      "link": "https://letterboxd.com/film/ghostbusters/"
+    },
+    {
+      "title": "Letterboxd review of Ghostbusters",
+      "snippet": "[Letterboxd Review of \"Ghostbusters\"] imagine having a theme song that goes this hard",
+      "link": "https://letterboxd.com/film/ghostbusters/"
+    },
+    {
+      "title": "Ghostbusters Movies Ranked by Tomatometer - Rotten Tomatoes",
+      "snippet": "Critics Consensus: Ghostbusters does an impressive job of standing on its own as a freewheeling, marvelously cast supernatural comedy -- even if it can't help but pale somewhat in comparison with the classic original. Synopsis: Paranormal researcher Abby Yates and physicist Erin Gilbert are trying to prove that ghosts exist in modern society.",
+      "link": "editorial.rottentomatoes.com/guide/ghostbusters-movies-ranked/"
+    },
+    {
+      "title": "Ghostbusters | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Ghostbusters on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/ghostbusters"
+    },
+    {
+      "title": "Ghostbusters movie review & film summary - Roger Ebert",
+      "snippet": "I would have preferred that they simply had shut their naysayers down by producing a better movie.",
+      "link": "www.rogerebert.com/reviews/ghostbusters-2016"
+    },
+    {
+      "title": "Ghostbusters movie review & film summary - Roger Ebert",
+      "snippet": "\"Ghostbusters\" is a head-on collision between two comic approaches that have rarely worked together very successfully. This time, they do. It's (1) a special-effects blockbuster, and (2) a sly dialogue movie, in which everybody talks to each other like smart graduate students who are in on the joke.",
+      "link": "www.rogerebert.com/reviews/ghostbusters-1984"
+    },
+    {
+      "title": "Ranking The 'Ghostbusters' Movies By Box Office And Reviews",
+      "snippet": "From the 1984 classic to the latest sequel, here's a full breakdown of how every 'Ghostbusters' movie performed at the box office, and ranked with critics.",
+      "link": "www.higgypop.com/news/ghostbusters-ranked/"
+    }
+  ],
+  "uuid": "63b31691-ea20-9f24-4d65-ab9beaf459b0"
+}

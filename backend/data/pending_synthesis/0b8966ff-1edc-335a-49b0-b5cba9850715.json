@@ -1,0 +1,37 @@
+{
+  "title": "Léon: The Professional",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Léon: The Professional",
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "After her father, step-mother, step-sister and little brother are killed by her father's employers, the 12-year-old daughter of an abject drug dealer manages to take refuge in the apartment of a professional hitman who at her request teaches her the methods of his job so she can take her revenge on the corrupt DEA agent who ruined her life by killing her beloved brother.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNGRkYTNhOWQtYmI0Ni00MjZhLWJmMzAtMTA2Mjg4NGNiNDU0XkEyXkFqcGc@._V1_QL75_UX380_CR0,2,380,562_.jpg",
+    "release_year": "1994",
+    "director": "Luc Besson",
+    "writer": "Luc Besson",
+    "cast": [
+      "Jean Reno",
+      "Gary Oldman",
+      "Natalie Portman"
+    ],
+    "runtime": "110 min",
+    "score": "8.5/10 IMDb (1,348,574 votes) | 76% Rotten Tomatoes | 64/100 Metacritic",
+    "awards": "5 wins & 16 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Wikipedia: Léon: The Professional",
+      "snippet": "[Wikipedia Synopsis] Léon (released in the United States as The Professional originally and then as Léon: The Professional) is a 1994 French English-language action-thriller film written and directed by Luc Besson. It stars Jean Reno, Gary Oldman and Natalie Portman in her feature film debut. The plot centers on Léon (Reno), an Italian-American professional hitman who reluctantly takes in twelve-year-old Mathilda Lando (Portman) after her family is murdered by corrupt Drug Enforcement Administration (DEA) agent Norman Stansfield (Oldman). Léon and Mathilda form an unusual relationship as she becomes his protégée and learns the hitman's trade. The film was released in France by Gaumont Buena Vista International on 14 September 1994 and received mostly positive reviews from critics.",
+      "link": "https://en.wikipedia.org/wiki/L%C3%A9on%3A%20The%20Professional"
+    }
+  ],
+  "uuid": "0b8966ff-1edc-335a-49b0-b5cba9850715"
+}

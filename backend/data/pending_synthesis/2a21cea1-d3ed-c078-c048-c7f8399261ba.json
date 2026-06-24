@@ -1,0 +1,80 @@
+{
+  "title": "The Dictator",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Dictator",
+    "genres": [
+      "Comedy"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "The Republic of Wadiya is ruled by an eccentric and oppressive leader named Hafez Aladeen. Aladeen is summoned to New York to a UN assembly to address concerns about his country's nuclear weapons program, but the trip goes awry.",
+    "image": "https://m.media-amazon.com/images/M/MV5BM2IwMDM3ZmQtNjQ3NS00OTFiLWI5YzEtYWE3YjI5NTk3YzkwXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2012",
+    "director": "Larry Charles",
+    "writer": "Sacha Baron Cohen, Alec Berg, David Mandel",
+    "cast": [
+      "Sacha Baron Cohen",
+      "Anna Faris",
+      "John C. Reilly"
+    ],
+    "runtime": "83 min",
+    "score": "6.5/10 IMDb (362,816 votes) | 56% Rotten Tomatoes | 58/100 Metacritic",
+    "awards": "1 win & 1 nomination total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Dictator",
+      "snippet": "[Letterboxd Review of \"The Dictator\"] The basic story had also been filmed in 1915 with John Barrymore who had played a supporting part in the 1904 Broadway starring production of comedian William Collier. Both this film and the 1915 version are now lost.",
+      "link": "https://letterboxd.com/film/the-dictator/"
+    },
+    {
+      "title": "What are your thoughts on The Dictator (2012)? : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/j4pndv/what_are_your_thoughts_on_the_dictator_2012/"
+    },
+    {
+      "title": "The Dictator (2012) : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions ...",
+      "link": "www.reddit.com/r/movies/comments/zp6m68/the_dictator_2012/"
+    },
+    {
+      "title": "r/movies on Reddit: What's the general consensus on The Dictator by SBC ...",
+      "snippet": "What's the general consensus on The Dictator by SBC now almost 10 years later? I just rewatched The Dictator for the first time since it's release (it's on Amazon Prime atm) last night. I remember liking it then (obv not like the original Borat) and thought it actually held up just fine on rewatch...granted 8 years later.",
+      "link": "www.reddit.com/r/movies/comments/jxdt6t/whats_the_general_consensus_on_the_dictator_by/"
+    },
+    {
+      "title": "What are your opinions on the movie The Dictator? - Reddit",
+      "snippet": "46M subscribers in the AskReddit community. r/AskReddit is the place to ask and answer thought-provoking questions.",
+      "link": "www.reddit.com/r/AskReddit/comments/10pmv50/what_are_your_opinions_on_the_movie_the_dictator/"
+    },
+    {
+      "title": "what y'all think about the film the dictator 2012? - Reddit",
+      "snippet": "43M subscribers in the AskReddit community. r/AskReddit is the place to ask and answer thought-provoking questions.",
+      "link": "www.reddit.com/r/AskReddit/comments/16e9ney/what_yall_think_about_the_film_the_dictator_2012/"
+    },
+    {
+      "title": "The Dictator (2012) | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Dictator (2012) on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/the_dictator_2012"
+    },
+    {
+      "title": "What are your thoughts on The Dictator (2012)? : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/j4pndv/what_are_your_thoughts_on_the_dictator_2012/"
+    },
+    {
+      "title": "The Dictator Reviews - Metacritic",
+      "snippet": "The film tells the heroic story of a dictator who risked his life to ensure that democracy would never come to the country he so lovingly oppressed. It is inspired by the best selling novel \"Zabibah and The King\" by Saddam Hussein. (Paramount Pictures)",
+      "link": "www.metacritic.com/movie/the-dictator/"
+    },
+    {
+      "title": "The Dictator (2012) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review. This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt1645170/reviews/"
+    }
+  ],
+  "uuid": "2a21cea1-d3ed-c078-c048-c7f8399261ba"
+}

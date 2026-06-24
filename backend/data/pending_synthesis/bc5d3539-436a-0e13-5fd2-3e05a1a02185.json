@@ -1,0 +1,56 @@
+{
+  "title": "The Ring",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Ring",
+    "genres": [
+      "Horror",
+      "Mystery"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Rachel Keller is a journalist investigating a videotape that may have killed four teenagers (including her niece). There is an urban legend about this tape: the viewer will die seven days after watching it. If the legend is correct, Rachel will have to run against time to save her son's and her own life.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNDA2NTg2NjE4Ml5BMl5BanBnXkFtZTYwMjYxMDg5._V1_SX300.jpg",
+    "release_year": "2002",
+    "director": "Gore Verbinski",
+    "writer": "Ehren Kruger, Kôji Suzuki, Hiroshi Takahashi",
+    "cast": [
+      "Naomi Watts",
+      "Martin Henderson",
+      "Brian Cox"
+    ],
+    "runtime": "115 min",
+    "score": "7.1/10 IMDb (400,067 votes) | 72% Rotten Tomatoes | 57/100 Metacritic",
+    "awards": "14 wins & 12 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Ring",
+      "snippet": "[Letterboxd Review of \"The Ring\"] What Hitchcock would proclaim as his second “true” film, “The Ring,” a sports-centered romance, is proof that the director doesn’t need a serial killer to carry the emotional stakes of a movie. He makes do just fine with a boxer. Following on his success with the Jack the Ripper-inspired “Lodger,” Hitchcock looks to his second passion in life (after torturing blondes) to make “The Ring;” boxing. Apparently a fervent patron of matches in London, Hitchcock has an immediate eloquence with filming fights - captured like only one who had witnessed an exceptional number of them himself. Boxing alrea",
+      "link": "https://letterboxd.com/film/the-ring/"
+    },
+    {
+      "title": "Letterboxd review of The Ring",
+      "snippet": "[Letterboxd Review of \"The Ring\"] Action! - The Master & The Fan: Hitchcock's Bumping Road To Mastering SuspenseOk, clearly I watch a different movie than everyone else, cause this one seems to be getting its fair share of praises.To be honest, this picture has a lot going for it. Many have pointed out the camera work and editing as being somewhat experimental, which is accurate; the filmmaker chooses not to just keep to the then-standard but attempts to push the bounds here and there; one thing that quickly comes to mind is something easy and probably had been done a number of times back then, and that is the interpolation of",
+      "link": "https://letterboxd.com/film/the-ring/"
+    },
+    {
+      "title": "Letterboxd review of The Ring",
+      "snippet": "[Letterboxd Review of \"The Ring\"] A boxing movie from Alfred Hitchcock was not something I had expected at all! And for someone who's known especially for his violent and thrilling stories, this one had plenty of slapstick humor mixed in as well, which came as a surprise.But there’s more to it than just sports. The premise is actually quite simple compared to his later films, but it’s still very gripping, with a theme has been done many times since. But what makes it special is that it’s Hitchcock’s first (and only) solo writing credit, and he does a great job. There were times it almost felt like a disparaging critique of the",
+      "link": "https://letterboxd.com/film/the-ring/"
+    },
+    {
+      "title": "Letterboxd review of The Ring",
+      "snippet": "[Letterboxd Review of \"The Ring\"] Hitchcock #50Just like contemporary films Shame and Alienated, great-grandaddy The Ring smoothly brings up the same item that symbolizes relationships through the good and the bad; the very symbol that endorses a promise and infinite sacrifice. It even does this while matter-of-factly referring to the boxing ring. What Carl Brisson's Sanders fights for is the literal metaphor for the lengths one will go for love. Something as temperamental as melodrama demands this kind of set-up; a triangle built upon jealousy, success, and to a farther extent power. Hitchcock pulls all the punches in his bag",
+      "link": "https://letterboxd.com/film/the-ring/"
+    },
+    {
+      "title": "Letterboxd review of The Ring",
+      "snippet": "[Letterboxd Review of \"The Ring\"] Hitchcock's early silent film about a boxer caught up in a scandalous love triangle between his wife and his latest opponent, was honestly a difficult watch for me. It's hard to deny his camera flourishes and attention to detail, but this just hasn't aged well. The opening scene starts with a bunch of white people dunking and throwing eggs at a black man, which they find absolutely hilarious, and no matter which way you look at it, it just feels wrong. It doesn't stop there, with a later intertitle using the n-word to describe one of Jack's opponents. Sure, it's a product of it's time, but tha",
+      "link": "https://letterboxd.com/film/the-ring/"
+    }
+  ],
+  "uuid": "bc5d3539-436a-0e13-5fd2-3e05a1a02185"
+}

@@ -1,0 +1,57 @@
+{
+  "title": "Kung Fu Panda 2",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Kung Fu Panda 2",
+    "genres": [
+      "Animation",
+      "Action",
+      "Adventure"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "After a year of being the dragon warrior, obesitized but fearless Po (Black) is a hero in China along with Crane (Cross), Mantis (Rogen), Monkey (Chan), Viper (Liu), Tigress (Jolie), and Shifu (Hoffman). But trouble pops out when villian Shen (Oldman) begins chaos. Everybody is ready to fight, but Po is unprepared when he learns Shen was his enemy in his infancy.",
+    "image": "https://m.media-amazon.com/images/M/MV5BYmIxMGYzMTUtZDQzYy00ODc4LWE1YzQtZGMwYTc0YTYyYTE0XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2011",
+    "director": "Jennifer Yuh Nelson",
+    "writer": "Jonathan Aibel, Glenn Berger, Ethan Reiff",
+    "cast": [
+      "Jack Black",
+      "Angelina Jolie",
+      "Jackie Chan"
+    ],
+    "runtime": "90 min",
+    "score": "7.3/10 IMDb (349,971 votes) | 82% Rotten Tomatoes | 67/100 Metacritic",
+    "awards": "Nominated for 1 Oscar. 5 wins & 47 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Kung Fu Panda 2",
+      "snippet": "[Letterboxd Review of \"Kung Fu Panda 2\"] Being a panda myself, abandoned as a baby and brought up by a Chinese goose, this film really moved me.",
+      "link": "https://letterboxd.com/film/kung-fu-panda-2/"
+    },
+    {
+      "title": "Letterboxd review of Kung Fu Panda 2",
+      "snippet": "[Letterboxd Review of \"Kung Fu Panda 2\"] Great sequel that isn't afraid to tell an even more emotionally rich story than its predecessor. It's much slower paced and not nearly as funny, but it shines in its second half and leads to a sensational climax. Ending really made me soft <3",
+      "link": "https://letterboxd.com/film/kung-fu-panda-2/"
+    },
+    {
+      "title": "Letterboxd review of Kung Fu Panda 2",
+      "snippet": "[Letterboxd Review of \"Kung Fu Panda 2\"] finally a movie that understands that peacocks are terrifying",
+      "link": "https://letterboxd.com/film/kung-fu-panda-2/"
+    },
+    {
+      "title": "Letterboxd review of Kung Fu Panda 2",
+      "snippet": "[Letterboxd Review of \"Kung Fu Panda 2\"] why am i crying over a panda’s backstory",
+      "link": "https://letterboxd.com/film/kung-fu-panda-2/"
+    },
+    {
+      "title": "Letterboxd review of Kung Fu Panda 2",
+      "snippet": "[Letterboxd Review of \"Kung Fu Panda 2\"] monkey mondays #12letterboxd wasn’t working and i almost couldn’t log this in time. could’ve been bad",
+      "link": "https://letterboxd.com/film/kung-fu-panda-2/"
+    }
+  ],
+  "uuid": "f45d18af-03b0-5f4a-f555-1a8708eb5fc6"
+}

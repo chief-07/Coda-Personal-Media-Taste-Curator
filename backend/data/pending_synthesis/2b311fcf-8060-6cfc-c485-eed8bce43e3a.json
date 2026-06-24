@@ -1,0 +1,82 @@
+{
+  "title": "Amadeus",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Amadeus",
+    "genres": [
+      "Biography",
+      "Drama",
+      "Music"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "Antonio Salieri believes that Wolfgang Amadeus Mozart's music is divine and miraculous. He wishes he was himself as good a musician as Mozart so that he can praise the Lord through composing. He began his career as a devout man who believes his success and talent as a composer are God's rewards for his piety. He's also content as the respected, financially well-off, court composer of Austrian Emperor Joseph II. But he's shocked to learn that Mozart is such a vulgar creature, and can't understand why God favored Mozart to be his instrument. Salieri's envy has made him an enemy of God whose greatness was evident in Mozart. He is ready to take revenge against God and Mozart for his own musical mediocrity.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMzc2MjM0NTMtOGY4NC00NzY1LWE2ODUtZjMzY2RhNGNkZDAyXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1984",
+    "director": "Milos Forman",
+    "writer": "Peter Shaffer, Zdenek Mahler",
+    "cast": [
+      "F. Murray Abraham",
+      "Tom Hulce",
+      "Elizabeth Berridge"
+    ],
+    "runtime": "160 min",
+    "score": "8.4/10 IMDb (465,171 votes) | 90% Rotten Tomatoes | 87/100 Metacritic",
+    "awards": "Won 8 Oscars. 43 wins & 15 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Amadeus",
+      "snippet": "[Letterboxd Review of \"Amadeus\"] Perfection.I don't understand why this movie isn't higher rated. What criticism could possibly be raised about this flawless masterpiece?Too many notes?",
+      "link": "https://letterboxd.com/film/amadeus/"
+    },
+    {
+      "title": "Letterboxd review of Amadeus",
+      "snippet": "[Letterboxd Review of \"Amadeus\"] not naming this movie after Salieri is *such* a good joke.",
+      "link": "https://letterboxd.com/film/amadeus/"
+    },
+    {
+      "title": "Letterboxd review of Amadeus",
+      "snippet": "[Letterboxd Review of \"Amadeus\"] a retelling of squidward and spongebob’s relationship through the contemptuous maelstrom of music!",
+      "link": "https://letterboxd.com/film/amadeus/"
+    },
+    {
+      "title": "Letterboxd review of Amadeus",
+      "snippet": "[Letterboxd Review of \"Amadeus\"] pretty good but the whole soundtrack was just samples of old music. kinda lazy :/",
+      "link": "https://letterboxd.com/film/amadeus/"
+    },
+    {
+      "title": "Letterboxd review of Amadeus",
+      "snippet": "[Letterboxd Review of \"Amadeus\"] men would rather spend years praying on your downfall than go to therapy",
+      "link": "https://letterboxd.com/film/amadeus/"
+    },
+    {
+      "title": "Let's talk about \"Amadeus\" : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers.",
+      "link": "www.reddit.com/r/movies/comments/105hhyv/lets_talk_about_amadeus/"
+    },
+    {
+      "title": "Not a hot take, but Amadeus is perfection : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers.",
+      "link": "www.reddit.com/r/movies/comments/10yfphp/not_a_hot_take_but_amadeus_is_perfection/"
+    },
+    {
+      "title": "How is the movie Amadeus? : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers.",
+      "link": "www.reddit.com/r/movies/comments/15vy443/how_is_the_movie_amadeus/"
+    },
+    {
+      "title": "Amadeus might just be the perfect movie. : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions ...",
+      "link": "www.reddit.com/r/movies/comments/rzvpka/amadeus_might_just_be_the_perfect_movie/"
+    },
+    {
+      "title": "Amadeus is an incredible film : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers.",
+      "link": "www.reddit.com/r/movies/comments/cao455/amadeus_is_an_incredible_film/"
+    }
+  ],
+  "uuid": "2b311fcf-8060-6cfc-c485-eed8bce43e3a"
+}

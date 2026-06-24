@@ -58,6 +58,35 @@ class MediaBrainService {
     const results = await qdrantService.search('media_brain', vector, limit, filter);
     return results.map(r => r.payload);
   }
+
+  /**
+   * Retrieves a media's full soul by title. If not found, falls back to enriching it.
+   */
+  async getMediaSoulByTitle(title, media_type = null) {
+    try {
+      // 1. Check Qdrant directly
+      const existingPayload = await qdrantService.searchByTitle('media_brain', title);
+
+      if (existingPayload) {
+        return existingPayload;
+      }
+      
+      // 2. If not found, do an on-demand enrichment
+      console.log(`[MediaBrain] Title "${title}" not found in brain. Triggering on-demand enrichment...`);
+      const mediaEnrichmentService = require('./mediaEnrichmentService');
+      
+      // We pass the title. If media_type is null, enrichment service will default to movie
+      await mediaEnrichmentService.enrichSingleTitle(title, media_type || 'movie');
+      
+      // 3. Check Qdrant again
+      const payloadAfter = await qdrantService.searchByTitle('media_brain', title);
+      return payloadAfter;
+
+    } catch (e) {
+      console.error(`[MediaBrain] Error getting soul for ${title}:`, e.message);
+    }
+    return null;
+  }
 }
 
 module.exports = new MediaBrainService();

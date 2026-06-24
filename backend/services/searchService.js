@@ -536,16 +536,8 @@ const scrapeForums = async (query) => {
     if (redditResults.length > 0) return redditResults;
   }
 
-  // ── FALLBACK 1: Yahoo web scrape ──────────────────────────────────
-  await delay(Math.floor(Math.random() * 300) + 200);
-  console.log(`[SearchService] Trying Yahoo search fallback for: "${cleanedQuery}"`);
-  const yahooResults = await scrapeYahoo(cleanedQuery);
-  if (yahooResults && yahooResults.length > 0) {
-    return await expandListResults(yahooResults);
-  }
-
-  // ── FALLBACK 2: DuckDuckGo web scrape ──────────────────────────────
-  console.log(`[SearchService] Yahoo failed/returned 0. Trying DuckDuckGo search fallback for: "${cleanedQuery}"`);
+  // ── FALLBACK 1: DuckDuckGo web scrape ──────────────────────────────
+  console.log(`[SearchService] Trying DuckDuckGo search fallback for: "${cleanedQuery}"`);
   const ddgResults = await scrapeDDG(cleanedQuery);
   if (ddgResults && ddgResults.length > 0) {
     return await expandListResults(ddgResults);
@@ -1267,7 +1259,7 @@ const fetchVNMetadata = async (title) => {
 
       return {
         title: vn.title || vn.alttitle || title,
-        genres: vn.platforms || [],
+        genres: tags,
         tags: tags,
         description: (vn.description || '').replace(/\[url=.*?\]|\[\/url\]/g, '').replace(/\[.*?\]/g, ''),
         image: '',
@@ -1287,7 +1279,7 @@ const fetchMovieMetadata = async (title) => {
   try {
     const apiKey = process.env.OMDB_API_KEY;
     if (!apiKey) {
-      console.warn(`[OMDb] No OMDB_API_KEY set. Get a free key at https://www.omdbapi.com/apikey.aspx and add OMDB_API_KEY=yourkey to assets/env.txt`);
+      console.warn(`[OMDb] No OMDB_API_KEY set. Get a free key at https://www.omdbapi.com/apikey.aspx and add OMDB_API_KEY=yourkey to assets/env.local or backend/.env`);
       return null;
     }
     const res = await axios.get(`http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}&plot=full`, { timeout: 30000 });

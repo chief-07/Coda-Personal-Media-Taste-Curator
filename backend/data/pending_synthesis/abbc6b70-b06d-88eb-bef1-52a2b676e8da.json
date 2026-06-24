@@ -1,0 +1,82 @@
+{
+  "title": "Training Day",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Training Day",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "In Los Angeles, a city where streets are overrun by drug dealers, those who have sworn to uphold the law are breaking them to clean up the streets. Denzel Washington plays L.A.P.D. detective Alonzo Harris, a veteran narcotics officer whose methods of enforcing the law are questionable, if not corrupt. 'Training Day' follows Harris as he trains rookie Jake Hoyt over a 24-hour period. Ethical dilemmas arise for Hoyt as well as the audience as questions present themselves as to whether or not Harris' methodology for ridding the streets of South Central Los Angeles of drugs is right or wrong.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMjRlNjUwOGYtNGQxZS00ZjhkLTg0NDgtYjcwNzZlNDU2YjBlXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+    "release_year": "2001",
+    "director": "Antoine Fuqua",
+    "writer": "David Ayer",
+    "cast": [
+      "Denzel Washington",
+      "Ethan Hawke",
+      "Scott Glenn"
+    ],
+    "runtime": "122 min",
+    "score": "7.8/10 IMDb (516,062 votes) | 74% Rotten Tomatoes | 71/100 Metacritic",
+    "awards": "Won 1 Oscar. 18 wins & 23 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Training Day",
+      "snippet": "[Letterboxd Review of \"Training Day\"] From the Trivia section of imdb: \"The quote \"King Kong aint got shit on me\" is a reference to 1930s King Kong\"Fascinating.",
+      "link": "https://letterboxd.com/film/training-day/"
+    },
+    {
+      "title": "Letterboxd review of Training Day",
+      "snippet": "[Letterboxd Review of \"Training Day\"] ethan hawke and the terrible, horrible, no good, very bad day",
+      "link": "https://letterboxd.com/film/training-day/"
+    },
+    {
+      "title": "Letterboxd review of Training Day",
+      "snippet": "[Letterboxd Review of \"Training Day\"] my first day at walmart was like this",
+      "link": "https://letterboxd.com/film/training-day/"
+    },
+    {
+      "title": "Letterboxd review of Training Day",
+      "snippet": "[Letterboxd Review of \"Training Day\"] This is Denzel at his best, he’s simultaneously charming and frightening. I watched this movie not knowing he would be the villain and not knowing if I was supposed to approve of the things he was doing, which I think made it better because I felt the same betrayal Ethan Hawke’s character did. His character is slightly more understated, yet he’s always one of my favorite actors. He focuses on realism over dramatics and knows when to lean back and let another actor have their moment.This definitely the number one first day on the job movie.",
+      "link": "https://letterboxd.com/film/training-day/"
+    },
+    {
+      "title": "Letterboxd review of Training Day",
+      "snippet": "[Letterboxd Review of \"Training Day\"] \"So how was your first day at work, honey?",
+      "link": "https://letterboxd.com/film/training-day/"
+    },
+    {
+      "title": "Training Day (2001) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review. This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt0139654/reviews/"
+    },
+    {
+      "title": "Training Day (2001) - IMDb",
+      "snippet": "Training Day: Directed by Antoine Fuqua. With Denzel Washington, Ethan Hawke, Scott Glenn, Tom Berenger. A rookie cop spends his first day as a Los Angeles narcotics officer with a rogue detective who isn't what he appears to be.",
+      "link": "www.imdb.com/title/tt0139654/"
+    },
+    {
+      "title": "Training Day | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Training Day on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/training_day"
+    },
+    {
+      "title": "Training Day movie review & film summary - Roger Ebert",
+      "snippet": "For Denzel Washington, \"Training Day\" is a rare villainous role; he doesn't look, sound or move like his usual likable characters, and certainly there's no trace of the football coach from \" Remember The Titans.\" The movie, directed by Antoine Fuqua (\" Bait \") and written by David Ayer (\" The Fast and the Furious \") keeps pushing him, and by the end, it has pushed him right ...",
+      "link": "www.rogerebert.com/reviews/training-day-2001"
+    },
+    {
+      "title": "Training Day user reviews - Metacritic",
+      "snippet": "There's nothing better than a movie that goes straight to the point, starts strong and ends just as strong, some films don't need to overcomplicate things, they let the story guide everything, slowly pulling the audience along without revealing too much, keeping you unsure of what's coming next ...",
+      "link": "www.metacritic.com/movie/training-day/user-reviews/"
+    }
+  ],
+  "uuid": "abbc6b70-b06d-88eb-bef1-52a2b676e8da"
+}

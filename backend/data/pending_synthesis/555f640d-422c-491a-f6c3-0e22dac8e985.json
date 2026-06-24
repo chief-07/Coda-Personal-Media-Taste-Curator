@@ -1,0 +1,82 @@
+{
+  "title": "Transformers",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Transformers",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "High-school student Sam Witwicky buys his first car, who is actually the Autobot Bumblebee. Bumblebee defends Sam and his girlfriend Mikaela Banes from the Decepticon Barricade, before the other Autobots arrive on Earth. They are searching for the Allspark, and the war on Earth heats up as the Decepticons attack a United States military base in Qatar. Sam and Mikaela are taken by the top-secret agency Sector 7 to help stop the Decepticons, but when they learn the agency also intends to destroy the Autobots, they formulate their own plan to save the world.",
+    "image": "https://m.media-amazon.com/images/M/MV5BZjM3ZDA2YmItMzhiMi00ZGI3LTg3ZGQtOTk3Nzk0MDY0ZDZhXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2007",
+    "director": "Michael Bay",
+    "writer": "Roberto Orci, Alex Kurtzman, John Rogers",
+    "cast": [
+      "Shia LaBeouf",
+      "Megan Fox",
+      "Josh Duhamel"
+    ],
+    "runtime": "144 min",
+    "score": "7.1/10 IMDb (714,583 votes) | 57% Rotten Tomatoes | 61/100 Metacritic",
+    "awards": "Nominated for 3 Oscars. 25 wins & 50 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Transformers",
+      "snippet": "[Letterboxd Review of \"Transformers\"] Shit blows up.Shit transforms.Shit gets messy.And everyone is sweating.",
+      "link": "https://letterboxd.com/film/transformers/"
+    },
+    {
+      "title": "Letterboxd review of Transformers",
+      "snippet": "[Letterboxd Review of \"Transformers\"] i dunno man when the cars turn into robots and fight each other and things blow up i tend to smile",
+      "link": "https://letterboxd.com/film/transformers/"
+    },
+    {
+      "title": "Letterboxd review of Transformers",
+      "snippet": "[Letterboxd Review of \"Transformers\"] In which Bay hijacks a ludicrously expensive, mediocre toy commercial with a solid family blockbuster base by Spielberg and instead teaches millions of 10-year-olds the visual vocabulary of violent, racist military action movies. Still so funny to me that this was literally only conceived because Hasbro felt GI joe would be considered too controversial with the Iraq war under way and then greenlit Bay turning their children's space robots movie into one of the most jingoistic disaster movies of the Bush era. What's even funnier is that it's one of the better ones, operating on a level of visua",
+      "link": "https://letterboxd.com/film/transformers/"
+    },
+    {
+      "title": "Letterboxd review of Transformers",
+      "snippet": "[Letterboxd Review of \"Transformers\"] Nothing anyone says will ever take away my love for this movie.",
+      "link": "https://letterboxd.com/film/transformers/"
+    },
+    {
+      "title": "Letterboxd review of Transformers",
+      "snippet": "[Letterboxd Review of \"Transformers\"] what i've done by linkin park should play at the end of every movie",
+      "link": "https://letterboxd.com/film/transformers/"
+    },
+    {
+      "title": "Transformers | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Transformers on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/transformers_the_movie"
+    },
+    {
+      "title": "All Transformers Movies Ranked by Tomatometer - Rotten Tomatoes",
+      "snippet": "TRANSFORMERS ONE.) All Transformers Movies Ranked by Tomatometer Debuting in 1984, the Transformers TV show rolled out to viewers the eternal mecha battle between Autobots and Decepticons here on Earth and beyond, though its prime drive was to get Hasbro action figures flying off Toys \"R\" Us shelves.",
+      "link": "editorial.rottentomatoes.com/guide/transformers-movies/"
+    },
+    {
+      "title": "Every Transformers Movie, Ranked Worst To Best - Screen Rant",
+      "snippet": "The Transformers have been around as a live-action franchise since 2007, but when looking at the best movies in the series, there is a huge discrepancy when it comes to their success critically and commercially. For many years, it seemed the Transformers movies were critic-proof, meaning that reviews could remain overall negative, but the movie could still make a massive box office, with Dark ...",
+      "link": "screenrant.com/all-transformers-movie-ranked/"
+    },
+    {
+      "title": "Transformers One movie review - Roger Ebert",
+      "snippet": "Of course, the characters alluded to here are Optimus Prime and Megatron. They're introduced as two lonely nobodies named Orion Pax (voiced by Chris Hemsworth) and D-16 (voiced by Brian Tyree Henry). Orion Pax and D-16 work as miners on Cybertron, a planet of intelligent robots divided into two social classes: those with transformation cogs (or t-cogs) and those without. The ones without are ...",
+      "link": "www.rogerebert.com/reviews/transformers-one-film-review"
+    },
+    {
+      "title": "Transformers movies ranked, worst to best | Space",
+      "snippet": "After Transformers One surprised fans in 2024, it's a good time to rewatch all their flicks. This is our Transformers movies ranked list.",
+      "link": "www.space.com/transformers-movies-ranked-worst-to-best"
+    }
+  ],
+  "uuid": "555f640d-422c-491a-f6c3-0e22dac8e985"
+}

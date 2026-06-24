@@ -1,0 +1,347 @@
+﻿=== 64081710-0c83-7ba0-aeb7-d3244ebdbeac.json.processing ===
+{
+  "title": "The Silences of the Palace",
+  "media_type": "movie",
+  "uuid": "64081710-0c83-7ba0-aeb7-d3244ebdbeac",
+  "structured_data": {
+    "title": "The Silences of the Palace",
+    "genres": [
+      "Drama"
+    ],
+    "tags": [
+      "movie"
+    ],
+    "description": "Set in 1950s Tunisia, a 25-year-old woman, Alia, returns to her place of birth-a prince's palace in which her mother, Khedija, worked as a house servant and mistress of prince Sid' Ali. She had fled the palace ten years earlier, at which time she spent burying tortured memories of her childhood. In her visit to pay respects for the death of the prince, she wanders through the largely abandoned palace where she is confronted by these memories represented as detailed flashbacks of her childhood. She begins to piece together a narrative about her mother's sexuality and sexual exploitation in a space ordered by gender and class difference, and is re-awakened to her persistent questioning about her father's identity. As she negotiates her past, she also deals with her current relationship to her lover, Lotfi, who has asked her to have another abortion. Her development throughout the film contrasts her awakening to a past of sexual and social servitude which many of the female servants experienced in the palace against her own contested independence fraught with pain, conflict and uncertainty.",
+    "image": "https://m.media-amazon.com/images/M/MV5BODc5NDBlNmYtNDE4YS00ODQ4LTk5NmItNGJiNGI0ZWQxZTc3XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1994",
+    "director": "Moufida Tlatli",
+    "writer": "Nouri Bouzid, Moufida Tlatli",
+    "cast": [
+      "Hind Sabri",
+      "Ghalya Lacroix",
+      "Nejia Ouerghi"
+    ],
+    "runtime": "116 min",
+    "score": "7.4/10 IMDb (1,201 votes)",
+    "awards": "7 wins & 1 nomination total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Silences of the Palace",
+      "snippet": "[Letterboxd Review of \"The Silences of the Palace\"] Perhaps the best film I've seen all year... not exaggerating if I say that one of the greatest films I've ever seen. So perfectly weaves together Tunisian history, class tensions, family portrait, womanhood and woman's struggle, all these in poetic, slow but perfectly paced package that moves on like a dream but is as painful as the real memories. Watching this is just remarkable...",
+      "link": "https://letterboxd.com/film/the-silences-of-the-palace/"
+    },
+    {
+      "title": "Letterboxd review of The Silences of the Palace",
+      "snippet": "[Letterboxd Review of \"The Silences of the Palace\"] The Silences of the Palace peers into the crushing tiled walls of a Tunisian household through the rushing memories of a young woman’s childhood as daughter to a servant. Moufida Tlatli, the first Arab woman to direct a feature film in the Arab World, uses the female perspective of character’s coming of age to echo her country’s past story of oppressive violence, colonialism, and poverty set in the mid-fifties. A distinctive voice with long, slow shots of gluttonous patriarchy through the decadent of the upstairs monarchs, beautifully composed scenes with elegant sets and costumes, and powerfu",
+      "link": "https://letterboxd.com/film/the-silences-of-the-palace/"
+    },
+    {
+      "title": "Letterboxd review of The Silences of the Palace",
+      "snippet": "[Letterboxd Review of \"The Silences of the Palace\"] a beautiful and sad memory film about fighting for a different kind of freedom when your nation is fighting for its own",
+      "link": "https://letterboxd.com/film/the-silences-of-the-palace/"
+    },
+    {
+      "title": "Letterboxd review of The Silences of the Palace",
+      "snippet": "[Letterboxd Review of \"The Silences of the Palace\"] 1st Moufida TlatliTo use a hackneyed phrase, \"this doesn't get nearly the credit it deserves\", but here it's completely true. Indeed, I first found this on a list from Sight and Sound, \"100 Overlooked Films by Women\", never having heard about it any other context.* But this is a beautiful and thoughtful meditation on colonialism and feminism in 1930s and 50s Tunisia. Set almost entirely in the confines of the titular palace, it navigates the complex memories of Alia, the daughter of a servant to a family involved with the Ber regime. Life consists entirely of making food and beds for the adult",
+      "link": "https://letterboxd.com/film/the-silences-of-the-palace/"
+    },
+    {
+      "title": "Letterboxd review of The Silences of the Palace",
+      "snippet": "[Letterboxd Review of \"The Silences of the Palace\"] Magnificent multi-layered liberation text, balances the historical moment of Tunisia's emergence from French colonial rule against the personal arcs of a number of women (one in particular) working as household staff/sex chattels for an aristocratic old-government family. Has the richness and detail of a great novel, and it's the kind of story that needs to be told before it fades from cultural memory.",
+      "link": "https://letterboxd.com/film/the-silences-of-the-palace/"
+    },
+    {
+      "title": "Polanski's latest film PANNED by critics: The Palace review - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers.",
+      "link": "www.reddit.com/r/Fauxmoi/comments/169orb3/polanskis_latest_film_panned_by_critics_the/"
+    },
+    {
+      "title": "Polanski's The Palace Faces a Harsh Reality Debuting with 0% ... - Reddit",
+      "snippet": "2.5K votes, 340 comments. 5M subscribers in the entertainment community. For news and discussion of the entertainment industry.",
+      "link": "www.reddit.com/r/entertainment/comments/169qw3n/polanskis_the_palace_faces_a_harsh_reality/"
+    },
+    {
+      "title": "Polanski's \"The Palace\" : r/blankies - Reddit",
+      "snippet": "I unfortunately have a broken brain and sailed the high seas once I saw Bad Man Roman Polanski's very much derided 2023 film The Palace was finally out there. Pretty cool of Polanski after 90 years of being a very consistent filmmaker to finally make something truly abysmal. Such a kind gift to the \"you can't separate the art from the artist\" people. Awful looking digital photography and CG ...",
+      "link": "www.reddit.com/r/blankies/comments/195njln/polanskis_the_palace/"
+    },
+    {
+      "title": "Tunisian cinema : r/Tunisia - Reddit",
+      "snippet": "I would like some recommendations for Tunisian movies. As far as I can recall, I've only seen two; Dachra (which I wasn't really a fan of) and The Silences of the Palace (which I thought was great).",
+      "link": "www.reddit.com/r/Tunisia/comments/1clgzzm/tunisian_cinema/"
+    },
+    {
+      "title": "Which movie made you the most emotional? : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions ...",
+      "link": "www.reddit.com/r/movies/comments/rn11fm/which_movie_made_you_the_most_emotional/"
+    }
+  ]
+}
+
+=== 6677dba6-c292-b11a-780c-52561d81adc7.json.processing ===
+{
+  "title": "Welcome to Me",
+  "media_type": "movie",
+  "uuid": "6677dba6-c292-b11a-780c-52561d81adc7",
+  "structured_data": {
+    "title": "Welcome to Me",
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Alice suffers from borderline personality disorder, but she has what she needs in life. She has an apartment, she has a best friend, and she has tapes of every Oprah Winfrey show. And now, after winning the lottery, she also has 83 million dollars. What she doesn't have is an outlet for the whole world to know who she really is. The TV station cut her off when she tried turning her lottery announcement into a frank discussion of her sexual experiences, but with her money in hand, she's off to LA to convince two struggling TV producer brothers to produce her own TV show. Whatever it costs, she's going to do it. From swan entrances to dog neutering, she is going to introduce the world to Alice. But is the world ready for Alice?",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTA0NTAyNTYwNDheQTJeQWpwZ15BbWU4MDY2ODcyNTQx._V1_SX300.jpg",
+    "release_year": "2014",
+    "director": "Shira Piven",
+    "writer": "Eliot Laurence",
+    "cast": [
+      "Kristen Wiig",
+      "James Marsden",
+      "Linda Cardellini"
+    ],
+    "runtime": "87 min",
+    "score": "5.9/10 IMDb (19,845 votes) | 74% Rotten Tomatoes | 69/100 Metacritic",
+    "awards": "1 win & 2 nominations"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Welcome to Me",
+      "snippet": "[Letterboxd Review of \"Welcome to Me\"] ok what is it with kristen wiig and starring in 'Emotionally Draining Indie Dramedies That Are Never Quite As Good As You Hope They'll Be'",
+      "link": "https://letterboxd.com/film/welcome-to-me/"
+    },
+    {
+      "title": "Letterboxd review of Welcome to Me",
+      "snippet": "[Letterboxd Review of \"Welcome to Me\"] I don't have a prepared statement for this",
+      "link": "https://letterboxd.com/film/welcome-to-me/"
+    },
+    {
+      "title": "Letterboxd review of Welcome to Me",
+      "snippet": "[Letterboxd Review of \"Welcome to Me\"] maybe my favorite film that contains where is my mind playing while kristen wiig neuters a dog on her talk show",
+      "link": "https://letterboxd.com/film/welcome-to-me/"
+    },
+    {
+      "title": "Letterboxd review of Welcome to Me",
+      "snippet": "[Letterboxd Review of \"Welcome to Me\"] i’ve been using masturbation as a sedative since 1991",
+      "link": "https://letterboxd.com/film/welcome-to-me/"
+    },
+    {
+      "title": "Letterboxd review of Welcome to Me",
+      "snippet": "[Letterboxd Review of \"Welcome to Me\"] Too sad to be funny. Too funny to be sad. I wonder if they knew how unmarketable this would be when they were making it?",
+      "link": "https://letterboxd.com/film/welcome-to-me/"
+    },
+    {
+      "title": "Welcome to Me | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Welcome to Me on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/welcome_to_me"
+    },
+    {
+      "title": "Welcome to Me movie review & film summary - Roger Ebert",
+      "snippet": "Since moving onto the big screen, however, Kristen Wiig has added a nuanced dramatic edge to her skill set that finds her digging deeper inside the damaged psyches of her characters.",
+      "link": "www.rogerebert.com/reviews/welcome-to-me-2014"
+    },
+    {
+      "title": "Rotten Tomatoes: Movies | TV Shows | Movie Trailers | Reviews",
+      "snippet": "Rotten Tomatoes, home of the Tomatometer, is the most trusted measurement of quality for Movies & TV. The definitive site for Reviews, Trailers, Showtimes, and Tickets",
+      "link": "www.rottentomatoes.com"
+    },
+    {
+      "title": "Welcome to Me - Wikipedia",
+      "snippet": "Reception On Rotten Tomatoes, the film received a rating of 74%, based on 108 reviews, with a rating of 6.46/10. The site's critical consensus reads, \"A transfixing central performance by Kristen Wiig holds Welcome to Me together and compensates for its uneven stretches.\" [18]",
+      "link": "en.wikipedia.org/wiki/Welcome_to_Me"
+    },
+    {
+      "title": "Welcome to Me (2014) - IMDb",
+      "snippet": "Welcome to Me: Directed by Shira Piven. With Kristen Wiig, James Marsden, Linda Cardellini, Wes Bentley. When Alice Klieg wins the Mega-Millions lottery, she immediately quits her psychiatric meds and buys her own talk show.",
+      "link": "www.imdb.com/title/tt2788716"
+    }
+  ]
+}
+
+=== 6cb0c411-8736-2054-da18-0ea159c011af.json.processing ===
+{
+  "title": "Making Of",
+  "media_type": "movie",
+  "uuid": "6cb0c411-8736-2054-da18-0ea159c011af",
+  "structured_data": {
+    "title": "Making Of",
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "tags": [
+      "movie"
+    ],
+    "description": "Workers fighting to protect the factory from being relocated but nothing goes as planned. Joseph wants to get into the film industry, agrees to direct and takes his role very seriously and starts following around the crew.",
+    "image": "https://m.media-amazon.com/images/M/MV5BODhhYmM0ZmEtNTk1Mi00NzkwLWJiNDEtZDQ3NjRjMjk5OWYwXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2023",
+    "director": "Cédric Kahn",
+    "writer": "Fanny Burdino, Samuel Doux, Cédric Kahn",
+    "cast": [
+      "Denis Podalydès",
+      "Jonathan Cohen",
+      "Stefan Crepon"
+    ],
+    "runtime": "114 min",
+    "score": "6.2/10 IMDb (841 votes) | 60% Rotten Tomatoes",
+    "awards": "1 win & 1 nomination total"
+  },
+  "community_snippets": [
+    {
+      "title": "Making Of (2006) - User reviews - IMDb",
+      "snippet": "The film takes a couple of sidesteps out of the movie and gives you a glimpse of the actual actor struggling to portray this character due to his opposite real-life beliefs and you see the director trying to convince him to continue and believe in him.",
+      "link": "www.imdb.com/title/tt0976145/reviews/?featured=rw2206073"
+    },
+    {
+      "title": "Making Of (2023) - IMDb",
+      "snippet": "Making Of: Directed by Cédric Kahn. With Denis Podalydès, Jonathan Cohen, Stefan Crepon, Souheila Yacoub. Workers fighting to protect the factory from being relocated but nothing goes as planned. Joseph wants to get into the film industry, agrees to direct and takes his role very seriously and starts following around the crew.",
+      "link": "www.imdb.com/title/tt25650046/"
+    },
+    {
+      "title": "'Making Of' Review: Cedric Kahn's Playful French Dramedy",
+      "snippet": "The latest feature from the director of 'The Goldman Case,' about a movie shoot that seriously flies off the rails, premiered out of competition in Venice.",
+      "link": "www.hollywoodreporter.com/movies/movie-reviews/making-of-review-cedric-kahn-1235577610/"
+    },
+    {
+      "title": "How long before IMDb removes user reviews? : r/imdb - Reddit",
+      "snippet": "That's all gone now, and making a thread about a long-lost movie on Reddit isn't going to generate as many responses. ANYWAY. i was perusing the site for the first time in a while this morning, and I noticed they have removed the user review highlights from the title pages. You now have to specifically click on \"user reviews\" to access the ...",
+      "link": "www.reddit.com/r/imdb/comments/92mgmy/how_long_before_imdb_removes_user_reviews/"
+    },
+    {
+      "title": "‎Sign in to access user reviews | IMDb Community Forums",
+      "snippet": "Hi andreasmueller - We're updating how you access user reviews on IMDb which will require you to sign in to view, write, edit, or report reviews. This will roll out to all users over the next few weeks. This extra step is part of our ongoing effort to keep IMDb's reviews a space for genuine, human voices. I hope this helps clarify!",
+      "link": "community-imdb.sprinklr.com/conversations/imdbcom/sign-in-to-access-user-reviews/69e276cafe47d80875cd19b8"
+    },
+    {
+      "title": "Wikipedia: Making It (film)",
+      "snippet": "[Wikipedia Synopsis] Making It is a 1971 comedy-drama film directed by John Erman and written by Peter Bart and James Leigh. It stars Kristoffer Tabori, Bob Balaban, Lawrence Pressman, Dick Van Patten, Joyce Van Patten, and Marlyn Mason. Adapted from Leigh's 1965 novel What Can You Do?, the film follows several months in the life of an intelligent, precocious 17-year-old high school student who fancies himself a smooth Lothario.",
+      "link": "https://en.wikipedia.org/wiki/Making%20It%20(film)"
+    }
+  ]
+}
+
+=== 71852c33-0b0a-8177-b1da-cdc88dbf2205.json.processing ===
+{
+  "title": "Men Behind the Sun",
+  "media_type": "movie",
+  "uuid": "71852c33-0b0a-8177-b1da-cdc88dbf2205",
+  "structured_data": {
+    "title": "Men Behind the Sun 4",
+    "genres": [
+      "Drama",
+      "History",
+      "Horror"
+    ],
+    "tags": [
+      "movie"
+    ],
+    "description": "Black Sun: The Nanking Massacre is an uncompromising portrayal of the war crimes perpetrated by the Japanese Imperial Army upon the Chinese military and civilian population of Nanking during the occupation of the city. Hailed by critics as one of the most disturbing films ever released, Black Sun: The Nanking Massacre is unflinching in it's depiction of the barbaric cruelty with which the occupying army raped, pillaged and terrorized the defeated populace.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMTcxNjM4NjQxMl5BMl5BanBnXkFtZTcwNzg5OTYyMQ@@._V1_SX300.jpg",
+    "release_year": "1995",
+    "director": "Tun-Fei Mou",
+    "writer": "Ho-Shui Li",
+    "cast": [
+      "Stephen Cecil Thomas",
+      "Liang Zhang",
+      "Yung Pan"
+    ],
+    "runtime": "91 min",
+    "score": "6.2/10 IMDb (985 votes)",
+    "awards": ""
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Men Behind the Sun",
+      "snippet": "[Letterboxd Review of \"Men Behind the Sun\"] If you break this movie into scenes, you get pretty cool goregrind song titles:Entrails Ripped from an Unsuspecting ChildBaptized in Hypothermia and FrostbiteDigested into Acidic SlushInto the Pit of Bubonic Pestilence",
+      "link": "https://letterboxd.com/film/men-behind-the-sun/"
+    },
+    {
+      "title": "Letterboxd review of Men Behind the Sun",
+      "snippet": "[Letterboxd Review of \"Men Behind the Sun\"] Whew. Okay this is a toughie. I felt obligated to warn people about this.I’ve done a bit of reading on the subject so it is no secret that the atrocities committed onto the people of Manchuria by the Japanese during WWII are some of the most heinous acts ever inflicted upon a people , rivaling or perhaps surpassing what the Germans and Russians (and the Americans and everyone else) did during those horrible years. I was unfamiliar with this particular story which looks at a Japanese experimental research facility that conducted all sorts of sadistic and unspeakable research on prisoners and in",
+      "link": "https://letterboxd.com/film/men-behind-the-sun/"
+    },
+    {
+      "title": "Letterboxd review of Men Behind the Sun",
+      "snippet": "[Letterboxd Review of \"Men Behind the Sun\"] Mou Tun-fei is an interesting figure in cinematic history if nothing else. A film student from a school with no cameras, he was one of the first (if not only) Shaw Brothers directors to film a production in cooperation with mainland China, after amassing a resume that ranged between children's kung fu movies and hardcore pornography. He's an unreliable narrator for the history of Men Behind the Sun, as he's walked back a lot of the initial explanations for how it was filmed after people reacted with disgust. Having watched this film, I'm inclined to believe the more controversial claims about",
+      "link": "https://letterboxd.com/film/men-behind-the-sun/"
+    },
+    {
+      "title": "Letterboxd review of Men Behind the Sun",
+      "snippet": "[Letterboxd Review of \"Men Behind the Sun\"] This notorious Hong Kong exploitation film about Japanese war atrocities was spoken about in hushed tones back when it used to circulate in the west on bootleg VHS tapes. Now, like everything, you can get it from a boutique Blu-Ray label, in this case Massacre Video.The action unfolds at Unit 731 in China's northeast, where gruesome medical experiments are being done by Japanese \"doctors\" on the unlucky Chinese prisoners. Bodies are cut open, limbs are frozen off, body parts are fed into an incinerator, babies are smothered, men are crucified, and one guy is made to shit out some of his intest",
+      "link": "https://letterboxd.com/film/men-behind-the-sun/"
+    },
+    {
+      "title": "Letterboxd review of Men Behind the Sun",
+      "snippet": "[Letterboxd Review of \"Men Behind the Sun\"] Hoop-Tober, Film 29 of 31:The cinematic equivalent of watching pounds of dung spew from the ass of a full grown elephant in slow motion for several hours. It's that uncomfortable of a watch.",
+      "link": "https://letterboxd.com/film/men-behind-the-sun/"
+    },
+    {
+      "title": "Wikipedia: Men Behind the Sun",
+      "snippet": "[Wikipedia Synopsis] Men Behind the Sun (Chinese: 黑太陽731, literally Black Sun: 731, is a 1988 Hong Kong historical fact-based horror film directed by T. F. Mou and written by Mei Liu, Wen Yuan Mou and Dun Jing Teng. \nIt was the first film to be classified \"level III\" (equivalent to the US rating NC-17) in Hong Kong.",
+      "link": "https://en.wikipedia.org/wiki/Men%20Behind%20the%20Sun"
+    }
+  ]
+}
+
+=== 7271eb81-f897-7878-c7ff-8d128ef48bca.json.processing ===
+{
+  "title": "The Fifth Season",
+  "media_type": "movie",
+  "uuid": "7271eb81-f897-7878-c7ff-8d128ef48bca",
+  "structured_data": {
+    "title": "The Fifth Season",
+    "genres": [
+      "Drama",
+      "Romance",
+      "Sport"
+    ],
+    "tags": [
+      "movie"
+    ],
+    "description": "A motorcycle racer falls in love with a blind girl.",
+    "image": "https://m.media-amazon.com/images/M/MV5BOGZkYzMzOTYtN2Y2Yy00NDYxLWI4NGMtZmY1MmRlMTA3ZDMxXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1978",
+    "director": "Gordon Vorster",
+    "writer": "Emil Nofal, Gordon Vorster",
+    "cast": [
+      "Martin Dreyer",
+      "Louise Roux",
+      "Barry Trengove"
+    ],
+    "runtime": "88 min",
+    "score": "7.5/10 IMDb (19 votes)",
+    "awards": ""
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Fifth Season",
+      "snippet": "[Letterboxd Review of \"The Fifth Season\"] A mournful elegy shot in pale, wintry tones, a small farming village turns to desperation when the earth slowly becomes barren. The cause is an enigma, a possible ecological catastrophe, and the result is quietly horrific: a tangible \"what if\" that delves into somber recesses and social breakdown.",
+      "link": "https://letterboxd.com/film/the-fifth-season/"
+    },
+    {
+      "title": "Letterboxd review of The Fifth Season",
+      "snippet": "[Letterboxd Review of \"The Fifth Season\"] A bit like what would have happened if Béla Tarr and Roy Andersson co-directed The Wicker Man. See it.",
+      "link": "https://letterboxd.com/film/the-fifth-season/"
+    },
+    {
+      "title": "Letterboxd review of The Fifth Season",
+      "snippet": "[Letterboxd Review of \"The Fifth Season\"] What if Winter refused to let go stopping Spring from weaving its calmer air onto the nature that so desperately awaits it? How would the green shoots sprout once again, animals find their nutrition or the crops find a way to sustain their growth? How would we respond to a chill that lingers on as the source for so much of our economy and food rapidly dwindles?These are the questions we see facing a village in Belgium, indicative of a problem facing the entire world. Set in the near-future, Mother Nature has gone AWOL leaving winter on an eternal pause reeking havoc with a way of life mankind",
+      "link": "https://letterboxd.com/film/the-fifth-season/"
+    },
+    {
+      "title": "Letterboxd review of The Fifth Season",
+      "snippet": "[Letterboxd Review of \"The Fifth Season\"] Just when I was thinking to myself that we need more directors to counter the Bela Tarr's, the Angelopoulos's, the entirety of Romanian New Wave, to represent a slice of Eastern Europe that isn't so grim, that isn't so ghastly, it does a complete 180 on me and proves that in terms of Eastern Europe, it truly is always and forever Apocalypse Now. Two weeks of bliss two years of hell. Those giant stilt things were where the real nightmares were at, I won't soon forget the image of their heads bobbing up and down behind houses before fully emerging. The devil is here, the camera is scared to move",
+      "link": "https://letterboxd.com/film/the-fifth-season/"
+    },
+    {
+      "title": "Letterboxd review of The Fifth Season",
+      "snippet": "[Letterboxd Review of \"The Fifth Season\"] Unrelenting and unkind, 'La cinquième saison' makes itself to be a cruel tragedy of nature where transcendence of humanity into a tableaux of devouring presences bring in a sensation of extreme coldness, exposing the filthy nature of man on unyielding situations. The merry days are gone. The springs don't bring warmth anymore and children don't laugh. The isolated existence of 'La cinquième saison' is suspended in a purgatorial loop of utter dread, where the nature takes the metaphorical personification of death, inverting it's optimistic effects on the people who are gradually succumbing into",
+      "link": "https://letterboxd.com/film/the-fifth-season/"
+    }
+  ]
+}
+

@@ -1,0 +1,414 @@
+﻿=== 88f86688-1bd0-5178-dc6e-8061b7856b00.json.processing ===
+{
+  "title": "Me and Earl and the Dying Girl",
+  "media_type": "movie",
+  "uuid": "88f86688-1bd0-5178-dc6e-8061b7856b00",
+  "structured_data": {
+    "title": "Me and Earl and the Dying Girl",
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Seventeen-year-old Greg has managed to become part of every social group at his Pittsburgh high school without having any friends, but his life changes when his mother forces him to befriend Rachel, a girl he once knew in Hebrew school who has leukemia.ndnd",
+    "image": "https://m.media-amazon.com/images/M/MV5BNTA1NzUzNjY4MV5BMl5BanBnXkFtZTgwNDU0MDI0NTE@._V1_SX300.jpg",
+    "release_year": "2015",
+    "director": "Alfonso Gomez-Rejon",
+    "writer": "Jesse Andrews",
+    "cast": [
+      "Thomas Mann",
+      "RJ Cyler",
+      "Olivia Cooke"
+    ],
+    "runtime": "105 min",
+    "score": "7.7/10 IMDb (144,057 votes) | 81% Rotten Tomatoes | 74/100 Metacritic",
+    "awards": "18 wins & 30 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Me and Earl and the Dying Girl",
+      "snippet": "[Letterboxd Review of \"Me and Earl and the Dying Girl\"] “don’t worry, she doesn’t die”all men do is lie and cause pain",
+      "link": "https://letterboxd.com/film/me-and-earl-and-the-dying-girl/"
+    },
+    {
+      "title": "Letterboxd review of Me and Earl and the Dying Girl",
+      "snippet": "[Letterboxd Review of \"Me and Earl and the Dying Girl\"] earl says \"titties\" 7 times throughout this movie",
+      "link": "https://letterboxd.com/film/me-and-earl-and-the-dying-girl/"
+    },
+    {
+      "title": "Letterboxd review of Me and Earl and the Dying Girl",
+      "snippet": "[Letterboxd Review of \"Me and Earl and the Dying Girl\"] ‪i know it was called me earl and the dying girl but I CANT BELIEVE SHE ACTUALLY DIED ‬",
+      "link": "https://letterboxd.com/film/me-and-earl-and-the-dying-girl/"
+    },
+    {
+      "title": "Letterboxd review of Me and Earl and the Dying Girl",
+      "snippet": "[Letterboxd Review of \"Me and Earl and the Dying Girl\"] greg gaines would have 10 thousand letterboxd followers and rule film twitter i just know it",
+      "link": "https://letterboxd.com/film/me-and-earl-and-the-dying-girl/"
+    },
+    {
+      "title": "Letterboxd review of Me and Earl and the Dying Girl",
+      "snippet": "[Letterboxd Review of \"Me and Earl and the Dying Girl\"] it's The Fault in Our Stars for Criterion Collection fetishists + a Brian Eno soundtrack ugh it's so good ugh this hurts my brand ugh.",
+      "link": "https://letterboxd.com/film/me-and-earl-and-the-dying-girl/"
+    },
+    {
+      "title": "Me and Earl and the Dying Girl [SPOILERS] : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions ...",
+      "link": "www.reddit.com/r/movies/comments/3btddy/official_discussion_me_and_earl_and_the_dying/"
+    },
+    {
+      "title": "r/movies on Reddit: Me and Earl and the Dying Girl is a heartwrenching ...",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/177470x/me_and_earl_and_the_dying_girl_is_a/"
+    },
+    {
+      "title": "Me and Earl and the Dying Girl : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/1dhidzy/me_and_earl_and_the_dying_girl/"
+    },
+    {
+      "title": "Me and Earl and the Dying Girl was bittersweet : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/dq36h1/me_and_earl_and_the_dying_girl_was_bittersweet/"
+    },
+    {
+      "title": "Thoughts on Me, Earl and the dying girl? : r/movies - Reddit",
+      "snippet": "Thoughts on Me, Earl and the dying girl? I thought it was insightful and had an excellent premise that was simple yet immediately gives you an emotional attachment. On rewatches I find it harder to enjoy the second half (once Rachel goes bald) as the film becomes much darker, the first half was so fun and joyous in comparison (likely intentional.)",
+      "link": "www.reddit.com/r/movies/comments/k6hiw5/thoughts_on_me_earl_and_the_dying_girl/"
+    }
+  ]
+}
+
+=== 8a226bb7-88b0-64a7-e7dc-4c65b2c146b1.json.processing ===
+{
+  "title": "Suspiria",
+  "media_type": "movie",
+  "uuid": "8a226bb7-88b0-64a7-e7dc-4c65b2c146b1",
+  "structured_data": {
+    "title": "Suspiria",
+    "genres": [
+      "Horror"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Suzy Bannion travels to Germany to perfect her ballet skills. She arrives at the Tanz dance academy in the pouring rain and is refused admission after another woman is seen fleeing the school. She returns the next morning and this time is let in. She learns that the young woman she saw fleeing the previous evening, Pat Hingle, has been found dead. Strange things soon begin to occur. Suzy becomes ill and is put on a special diet; the school becomes infested with maggots; odd sounds abound; and Daniel, the pianist, is killed by his own dog. A bit of research indicates that the ballet school was once a witches' coven - and as Suzy learns, still is.",
+    "image": "https://m.media-amazon.com/images/M/MV5BZGIyYmI3ZjMtODI3ZC00NGQwLTk3ZGUtYWU4MDE3MzI3ZTk1XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1977",
+    "director": "Dario Argento",
+    "writer": "Dario Argento, Daria Nicolodi, Thomas De Quincey",
+    "cast": [
+      "Jessica Harper",
+      "Stefania Casini",
+      "Flavio Bucci"
+    ],
+    "runtime": "92 min",
+    "score": "7.3/10 IMDb (115,510 votes) | 94% Rotten Tomatoes | 79/100 Metacritic",
+    "awards": "1 win & 4 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Suspiria",
+      "snippet": "[Letterboxd Review of \"Suspiria\"] actors: $2000hair/makeup: $300dubbing: $1050lighting: $12 millionspecial effects: $750someone who is good at the economy please help me budget this. my family is dying",
+      "link": "https://letterboxd.com/film/suspiria/"
+    },
+    {
+      "title": "Letterboxd review of Suspiria",
+      "snippet": "[Letterboxd Review of \"Suspiria\"] me, getting murdered in a neon house of horrors: wow i love this aesthetic :)",
+      "link": "https://letterboxd.com/film/suspiria/"
+    },
+    {
+      "title": "Letterboxd review of Suspiria",
+      "snippet": "[Letterboxd Review of \"Suspiria\"] dario argento wants to fuck the primary colors and u know what, i think we should let him",
+      "link": "https://letterboxd.com/film/suspiria/"
+    },
+    {
+      "title": "Letterboxd review of Suspiria",
+      "snippet": "[Letterboxd Review of \"Suspiria\"] dario argento: *bashes me over the head with a neon light while Goblin is screaming in my ear* me: wow.............thank you so much",
+      "link": "https://letterboxd.com/film/suspiria/"
+    },
+    {
+      "title": "Letterboxd review of Suspiria",
+      "snippet": "[Letterboxd Review of \"Suspiria\"] Me, pretending to know what I'm talking about: hmmmmm....I'm sensing a very strong theme of ummm red? don't know if anyone else caught that just throwing things out there.....",
+      "link": "https://letterboxd.com/film/suspiria/"
+    },
+    {
+      "title": "Suspiria (2018) | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Suspiria (2018) on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/suspiria_2018"
+    },
+    {
+      "title": "Suspiria movie review & film summary - Roger Ebert",
+      "snippet": "Luca Guadagnino 's \"Suspiria\" isn't so much a remake of the 1977 Dario Argento horror classic as it is a seriously insane (and seriously serious) expansion on the original. The two films share a setting, a few character names and a basic premise—that a prestigious German dance academy is a front for a witches' coven, because of course it is—and that's about it. So if you love ...",
+      "link": "www.rogerebert.com/reviews/suspiria-2018"
+    },
+    {
+      "title": "Suspiria 2018 review (no spoilers) : r/horror - Reddit",
+      "snippet": "The subgenre of artsy horror movies is something that for a long time has fascinated me, and the 2018 remake of Dario Argento's Suspiria was my first experience with the genre.",
+      "link": "www.reddit.com/r/horror/comments/qrjefy/suspiria_2018_review_no_spoilers/"
+    },
+    {
+      "title": "Suspiria (2018 film) - Wikipedia",
+      "snippet": "On review aggregator Rotten Tomatoes, the film has an approval rating of 65% based on 335 reviews, with an average rating of 6.9/10. The website's critical consensus reads: \" Suspiria attacks heady themes with garish vigor, offering a viewing experience that's daringly confrontational—and definitely not for everyone.\" [112]",
+      "link": "en.wikipedia.org/wiki/Suspiria_(2018_film)"
+    },
+    {
+      "title": "'Suspiria' reviews: Is the horror remake 'grotesque,' 'horrible ...",
+      "snippet": "As the Rotten Tomatoes critics consensus says, it's \"daringly confrontational — and definitely not for everyone\" — that's putting it mildly. An unlikely followup to Guadagnino's Oscar-winning romance \" Call Me by Your Name,\" \" Suspiria \" is a reimagining of the 1977 horror classic of the same name by Dario Argento.",
+      "link": "www.imdb.com/news/ni62260180/"
+    }
+  ]
+}
+
+=== 91988caf-6799-856c-76f2-236f74a4143b.json.processing ===
+{
+  "title": "Das Boot",
+  "media_type": "movie",
+  "uuid": "91988caf-6799-856c-76f2-236f74a4143b",
+  "structured_data": {
+    "title": "Das Boot",
+    "genres": [
+      "Drama",
+      "War"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "It is 1942 and the German submarine fleet is heavily engaged in the so-called \"Battle of the Atlantic\" to harass and destroy British shipping. With better escorts of the destroyer class, however, German U-boats have begun to take heavy losses. \"Das Boot\" is the story of the crew of one such U-Boat, with the film examining how these submariners maintained their professionalism as soldiers and attempted to accomplish impossible missions, all the while attempting to understand and obey the ideology of the government under which they served.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNGU0MWZlMTUtM2Y3Ny00NGNmLWE5NmEtN2YxOWQzMGM3ZWYzXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1981",
+    "director": "Wolfgang Petersen",
+    "writer": "Lothar G. Buchheim, Wolfgang Petersen",
+    "cast": [
+      "Jürgen Prochnow",
+      "Herbert Grönemeyer",
+      "Klaus Wennemann"
+    ],
+    "runtime": "149 min",
+    "score": "8.4/10 IMDb (285,572 votes) | 98% Rotten Tomatoes | 85/100 Metacritic",
+    "awards": "Nominated for 6 Oscars. 15 wins & 12 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Das Boot",
+      "snippet": "[Letterboxd Review of \"Das Boot\"] PTAbro's World Tour Stop 6: West GermanyIt's one thing to fill a 90 minute film with relentless action, interesting and sympathetic characters, and a relatively fresh perspective on WWII, but to stretch that to 3.5 hours? And contain that action to little more than three small rooms? It's an amazing feat that Das Boot pulls off, and is justifiably labeled as not only one of the best German films ever made, but one of the best war films ever made (no small feat considering how crowded that category is).Wolfgang Peterson plots Das Boot out to feel like a blockbuster - big explosions, manly men d",
+      "link": "https://letterboxd.com/film/das-boot/"
+    },
+    {
+      "title": "Letterboxd review of Das Boot",
+      "snippet": "[Letterboxd Review of \"Das Boot\"] One of the greatest films ever made, Das Boot is a sheer masterpiece of unrelenting terror that makes impeccable use of its claustrophobic atmosphere, nerve-wracking tension & nail-biting suspense to cement its spot amongst the finest examples of its genre and is arguably the very pinnacle of German cinema.Set during World War II, the story concerns the crew of a German U-boat as they head out to the sea to seek & destroy Allied ships. The plot covers their initial excitement for battle, days of boredom & frustration of a fruitless hunt as well as the endless assault that follows and pushes th",
+      "link": "https://letterboxd.com/film/das-boot/"
+    },
+    {
+      "title": "Letterboxd review of Das Boot",
+      "snippet": "[Letterboxd Review of \"Das Boot\"] Watched the director's cut of this one, being 3 hours 30, and honestly, I'm shocked how great and equally terrifying this one is. It's truly one of the great war films and easily the best submarine-focused, and it's down to its striking realism. It's 3 hours of pure terror and misery, and the lengths it goes to portray the exhaustion and misery of these men is so strikingly grounded and precise, which makes the viewer feel just as exhausted. It's very human-focused at its core, and it's grounded in following these men in this claustrophobic setting, and even if they are German and on the enemy",
+      "link": "https://letterboxd.com/film/das-boot/"
+    },
+    {
+      "title": "Letterboxd review of Das Boot",
+      "snippet": "[Letterboxd Review of \"Das Boot\"] \"Das Boot\" isn't your prototypical World War II film. It's an endurance test. The three and a half hour runtime is a purposefully gruelling experience. Every clang, every piston that churns, every bolt that springs free from the intense pressure of the cold depths of Davey Jones' locker eats away at your nerves. This isn't a film where valiant soldiers go about their merry way on some gallant quest to defeat their enemy. This is a film about survival. It's about how much pressure the human psyche can take before it completely snaps. \"Das Boot\" in many ways reminds me of William Friedkin's mast",
+      "link": "https://letterboxd.com/film/das-boot/"
+    },
+    {
+      "title": "Letterboxd review of Das Boot",
+      "snippet": "[Letterboxd Review of \"Das Boot\"] Das Boot is a 1981 West German war film written and directed by Wolfgang Petersen and stars Jürgen Prochnow, Herbert Grönemeyer, and Klaus Wennemann. Set in WWII, the story follows a German submarine U-96 and its crew, as they set out on a hazardous patrol during the Battle of the Atlantic.This weeks Film Club pick, brought to us by the ever brilliant Michael, was Das Boot. A German war “masterpiece” I was yet to see. However, sadly the theatrical cut didn’t quite live up to my expectations. Don’t get me wrong, Das Boot is a brilliant film. The performances from Jürgen Prochnow, Herbert Grönem",
+      "link": "https://letterboxd.com/film/das-boot/"
+    },
+    {
+      "title": "Thoughts on Das Boot? : r/moviecritic - Reddit",
+      "snippet": "239 votes, 139 comments. I think this is a nearly perfect film. An unbelievably realistic depiction of life on a submarine.",
+      "link": "www.reddit.com/r/moviecritic/comments/16kngqj/thoughts_on_das_boot/"
+    },
+    {
+      "title": "Any love for Das Boot? Absolutely gripped me from start to finish. - Reddit",
+      "snippet": "Das Boot is greatly claustrophobic, though the length will get to you The version I saw was roughly 200 minutes and even that drained me. Still, it was an incredibly tense and worthwhile 3 and a half hours.",
+      "link": "www.reddit.com/r/movies/comments/14kndx/any_love_for_das_boot_absolutely_gripped_me_from/"
+    },
+    {
+      "title": "r/movies on Reddit: Das Boot is such a great film. Highly recommend for ...",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers.",
+      "link": "www.reddit.com/r/movies/comments/zlhrb9/das_boot_is_such_a_great_film_highly_recommend/"
+    },
+    {
+      "title": "Das Boot (1981) : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/1do6fgz/das_boot1981/"
+    },
+    {
+      "title": "I watched Das Boot (1981) : r/iwatchedanoldmovie - Reddit",
+      "snippet": "Das Boot (1981) On land they dreamed of being heroes. Beneath the sea they pray to be survivors. A German submarine hunts allied ships during the Second World War, but it soon becomes the hunted. The crew tries to survive below the surface, while stretching both the boat and themselves to their limits. Drama | History | War Director: Wolfgang Petersen Actors: Jürgen Prochnow, Herbert ...",
+      "link": "www.reddit.com/r/iwatchedanoldmovie/comments/18un9n1/i_watched_das_boot_1981/"
+    }
+  ]
+}
+
+=== 9271415e-df93-c192-8a69-0c889302b515.json.processing ===
+{
+  "title": "Halfaouine: Boy of the Terraces",
+  "media_type": "movie",
+  "uuid": "9271415e-df93-c192-8a69-0c889302b515",
+  "structured_data": {
+    "title": "Halfaouine: Boy of the Terraces",
+    "genres": [
+      "Drama",
+      "Comedy"
+    ],
+    "tags": [
+      "movie",
+      "Unrated"
+    ],
+    "description": "A coming-of-age comedy/drama set in Tunisia. Twelve-year-old Noura is an impressionable boy who must learn to reconcile two conflicting worlds - the loving world of Muslim women and the vastly different, harsher world of men - while also dealing with his own budding sexuality.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNzk3NjEyODcyNV5BMl5BanBnXkFtZTcwMjIyMDUyMQ@@._V1_SX300.jpg",
+    "release_year": "1990",
+    "director": "Férid Boughedir",
+    "writer": "Férid Boughedir, Nouri Bouzid, Taoufik Jebali",
+    "cast": [
+      "Selim Boughedir",
+      "Mustapha Adouani",
+      "Rabiah Ben-Abdullah"
+    ],
+    "runtime": "98 min",
+    "score": "6.7/10 IMDb (2,145 votes)",
+    "awards": "4 wins & 1 nomination"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Halfaouine: Boy of the Terraces",
+      "snippet": "[Letterboxd Review of \"Halfaouine: Boy of the Terraces\"] احترم هالفلم كثيرلانه جريء بطرحه لموضوع قد يكون شائك حتى في كل الدول لكن طبقه المخرج فريد بوغدير بدون اي خوف من إظهار الواقع بكل جرأه عرض لك الموضوعتحفه سينمائيه تونسيه واقعيه جدا ودافئه وايضا عبقريه في طرحها!رحله في احياء تونس بعين نورا الولد الي يمر بمرحله صعبه بالنص لاهو الطفل الي بيقدر يخش حمامات النساء وولا هو الرجل الي يجلس مع الكبار عالقهوهانا سعيد اني تابعت الفلم بأعلى جوده ممكنه الفلم ملياان حياه والوان واصوات ضحك وهروج حرفيا الفلم عيشك الحياه وقتها في تونس استعرض لك البيئه بافضل شكل ممكن لدرجه وانا اتابع قاعد اتذكر تحفه ايمير كوستريكا وطريقه استعراضه للغجر في فلم \"Time of the Gypsie",
+      "link": "https://letterboxd.com/film/halfaouine-boy-of-the-terraces/"
+    },
+    {
+      "title": "Letterboxd review of Halfaouine: Boy of the Terraces",
+      "snippet": "[Letterboxd Review of \"Halfaouine: Boy of the Terraces\"] i’m so done with this film class",
+      "link": "https://letterboxd.com/film/halfaouine-boy-of-the-terraces/"
+    },
+    {
+      "title": "Letterboxd review of Halfaouine: Boy of the Terraces",
+      "snippet": "[Letterboxd Review of \"Halfaouine: Boy of the Terraces\"] Ferid Boughhedir tells the story of a newly adolescent boy's discovery of his waning childhood and oncoming adulthood in \"Halfaouine: Boy of the Terraces.\" Focusing on 12-year-old Noura, the light-toned drama follows the young Tunisian as he finds himself caught between the world of his mother's apron strings and trips to Turkish baths, and his older, amorous peers. The film is not necessarily deep, but it communicates themes and a narrative that are very familiar.Taking place in the days leading up to a certain cultural tradition, the film charts Noura's new awareness of the political, the se",
+      "link": "https://letterboxd.com/film/halfaouine-boy-of-the-terraces/"
+    },
+    {
+      "title": "Letterboxd review of Halfaouine: Boy of the Terraces",
+      "snippet": "[Letterboxd Review of \"Halfaouine: Boy of the Terraces\"] مشوفتش في دلال المبارزة الغنائية هنا وظهور اللهجة التونسية فيها، خلتني افتكر مقال بحبه عن التعليلة، الطقس البدوي اللي أنا مغرمة بيه وأجّج ولعي وحرارتي أكتر بالشعر والغزل والسينشواليتي فيهم، خلّاني أتمنى أكون بدوية في وقت ما، وقت ما كان أجمل ما في البداوة الحرية، ده المقالraseef22.net/article/1089804-قهوة-وشعر-وغزل-التعليلة-لا-تكون-إلا-في-الليالي-غير-المقمرةمن حظنا العاثر ان ده الفيلم الوحيد ل Carolyn Chelby (ليلى)لقيت انها بتمتلك سحر مشابه لسحر چينيفر كولوني في كان ياما كان في أمريكا، لكن بمسحة شرقية محببة للنفس أكتر، ظهورها كان فاتن، وغرّتها البيضاء كذلك اللي حسيت بألم شديد أما صبغوها لها بصر",
+      "link": "https://letterboxd.com/film/halfaouine-boy-of-the-terraces/"
+    },
+    {
+      "title": "Letterboxd review of Halfaouine: Boy of the Terraces",
+      "snippet": "[Letterboxd Review of \"Halfaouine: Boy of the Terraces\"] Peeping Tom in Turkish baths... or a delightful coming-of-age story made in Tunisia.Not only is \"Halfaouine\" the most successful and watched Tunisian movie of all time but it's also a wonderful reflection of the so typical mores in moorish countries regarding many taboo subjects, on the top of them: sex. And yet this is not a political movie Ferid Boughedi made; choosing the very standpoint of a pre-teen, which means a kid caught between two ages, he shows the difficult passing from infancy to adulthood in societies where adolescence is hardly considered.Noura, the carrier of the adolescent ga",
+      "link": "https://letterboxd.com/film/halfaouine-boy-of-the-terraces/"
+    },
+    {
+      "title": "Why Halfaouine: Boy of the Terraces is a Must-Watch Film - Reddit",
+      "snippet": "1 subscriber in the plotpeekrecaps community. Why Halfaouine: Boy of the Terraces is a Must-Watch Film",
+      "link": "www.reddit.com/r/plotpeekrecaps/comments/192q8iw/why_halfaouine_boy_of_the_terraces_is_a_mustwatch/"
+    },
+    {
+      "title": "Carolyn Chelby - Asfour Stah - Halfaouine Boy of the Terraces ... - Reddit",
+      "snippet": "2.8K subscribers in the imagesofthe1990s community. Carolyn Chelby - Asfour Stah - Halfaouine Boy of the Terraces (1990)",
+      "link": "www.reddit.com/r/imagesofthe1990s/comments/6jbmv8/carolyn_chelby_asfour_stah_halfaouine_boy_of_the/"
+    },
+    {
+      "title": "Iranian films that don't leave you dead inside? : r/FIlm - Reddit",
+      "snippet": "Iranian films that don't leave you dead inside? My girlfriend was born in Iran, I love film and I think watching an Iranian movie would be a cool way for us to connect and start some great conversation.",
+      "link": "www.reddit.com/r/FIlm/comments/188v1fd/iranian_films_that_dont_leave_you_dead_inside/"
+    },
+    {
+      "title": "Which movie made you the most emotional? : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions ...",
+      "link": "www.reddit.com/r/movies/comments/rn11fm/which_movie_made_you_the_most_emotional/"
+    },
+    {
+      "title": "Seeking help finding films from obscure countries - Reddit",
+      "snippet": "Greece: Dogtooth New Zealand: Eagle vs Shark Czech: Zelary Vietnam: The vertical ray of the sun Tunisia: Halfaouine: Boy of the terraces Spain: Blancanieves Israel: Bonjour Monsieur Shlomi, Or, my treasure Canada: Cafe de flore Japan: Sonatine, Ballad of Orin, Departures China: Blind Mountain, Raise the red lantern, Breaking the silence Mexico ...",
+      "link": "www.reddit.com/r/ForeignMovies/comments/1w53p1/seeking_help_finding_films_from_obscure_countries/"
+    }
+  ]
+}
+
+=== 9452fb75-a972-a7e4-10f2-2e12e0d5909c.json.processing ===
+{
+  "title": "Rag Tag",
+  "media_type": "movie",
+  "uuid": "9452fb75-a972-a7e4-10f2-2e12e0d5909c",
+  "structured_data": {
+    "title": "Rag Tag",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "tags": [
+      "movie",
+      "Not Rated"
+    ],
+    "description": "Raymond and Tagbo met when they were eight. Although from radically different worlds - Raymond/Rag is from a single parent West Indian home, while Tagbo/Tag is the only son of middle class Nigerian parents - they remain inseparable until the cusp of their teens, Social Services take Rag from London. Ten years later, Rag returns to find Tag. They still want to be together. But now twenty-three, their need has shifted into something more urgent and consuming. Other things have changed too. Tag is just finishing law school and discovering how hard it is to find a position. Tag also has a white girlfriend, and since her impressive credentials aren't even good enough for Tag's father, Rag doesn't stand a chance. Rag sees even less room for himself in Tag's life when Tag's friend Olisa flies into London. Young, rich and shady, Rag knows Olisa is trouble. When Rag and Tag are invited to Nigeria for Olisa's Chieftaincy ceremony, Rag is determined to save Tag from his machinations. In this tale of family, friendship and love, everyone has to discover a definition of what these things mean to them. Then stake their future on it.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNmRhZTViYjMtMWUxZi00MWViLWE4MjUtZDNiMGY0OGEwODcxXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2006",
+    "director": "Adaora Nwandu",
+    "writer": "Adaora Nwandu",
+    "cast": [
+      "Danny Parsons",
+      "Damola Adelaja",
+      "Tamsin Clarke"
+    ],
+    "runtime": "98 min",
+    "score": "5.8/10 IMDb (284 votes)",
+    "awards": ""
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Rag Tag",
+      "snippet": "[Letterboxd Review of \"Rag Tag\"] When I call this an improbable love story, I do not mean that it is improbable that these two men would love each other, but that it relies on coincidence to effect its plot. In many narratives, this can be a problem, defying credibility, but in love stories, it often just makes them sweeter. Love often feels so improbable that letting coincidence drive a romantic story does not feel quite as out of place. The strength of this narrative is entirely in the tenderness of the love story and the affirmation of its conclusion. The defiance, the strength, the fortitude of these men in loving each ot",
+      "link": "https://letterboxd.com/film/rag-tag/"
+    },
+    {
+      "title": "Letterboxd review of Rag Tag",
+      "snippet": "[Letterboxd Review of \"Rag Tag\"] The year was 2006. So the lack of representation for Nigerian led LGBT stories made this film unique. Is it excellent ? No. But how can you fault the filmmakers for taking what little resources they had to create this story ? If mainstream studios aren’t going to finance screenplays like this, then you have to respect the effort. It may not be a $20 million production, but I commend them for at least trying. The two lead characters, Rag and Tag, are played very appealingly. I appreciated their intimate scenes because it felt genuine and daring. The plot does drag in certain areas but when it c",
+      "link": "https://letterboxd.com/film/rag-tag/"
+    },
+    {
+      "title": "Letterboxd review of Rag Tag",
+      "snippet": "[Letterboxd Review of \"Rag Tag\"] I’ve tried to watch this movie once before and stopped not two minutes in because it looked like a 90’s propaganda commercial you’d watch in sex ed or at an anti-drug awareness assembly. nevertheless, I returned to it tonight (not expecting much), and these are my thoughts. for a movie that is so poorly filmed, scored, and edited, the storyline manages to be beautifully complex and politically charged. it deals with the religious aspect of homosexuality and the cultural aspect (Nigerian beliefs and behavior in a traditional setting), as well as briefly exploring the racial issues that were ext",
+      "link": "https://letterboxd.com/film/rag-tag/"
+    },
+    {
+      "title": "Letterboxd review of Rag Tag",
+      "snippet": "[Letterboxd Review of \"Rag Tag\"] Tiene sus cosas de bajo presupuesto pero sinceramente la admiro por ser una película gay de 2006 hecha en a partir de la experiencia inmigrante. Es hermosa en muchos sentidos y muy sensible. Admiro esta clase de trabajos, son necesarios!",
+      "link": "https://letterboxd.com/film/rag-tag/"
+    },
+    {
+      "title": "Letterboxd review of Rag Tag",
+      "snippet": "[Letterboxd Review of \"Rag Tag\"] the white girlfriend just laying there while they were fighting abt how they love each other 🏆",
+      "link": "https://letterboxd.com/film/rag-tag/"
+    },
+    {
+      "title": "Official Discussion: Tag [SPOILERS] : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions ...",
+      "link": "www.reddit.com/r/movies/comments/8r7cz6/official_discussion_tag_spoilers/"
+    },
+    {
+      "title": "Tag (2018) - One of the best feel good laughing out loud ... - Reddit",
+      "snippet": "The 2018 comedy film Tag starring Jeremy Renner, Ed Helms, Jake Johnson, Hannibal Bures and Jon Hamm is easily one of the best comedies of all time. The film is so crimically underrated that it is just really sad how few people talk about it. The film is the definition of a \"laughing out load, feel good comedy\". I think it quote it every day.",
+      "link": "www.reddit.com/r/MovieSuggestions/comments/161y096/tag_2018_one_of_the_best_feel_good_laughing_out/"
+    },
+    {
+      "title": "TAG (2018) - When the Bad outweighs the Good : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/azq9kf/tag_2018_when_the_bad_outweighs_the_good/"
+    },
+    {
+      "title": "Tag (2018) - no spoilers : r/movies - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/ezpy3g/tag_2018_no_spoilers/"
+    },
+    {
+      "title": "Tag (2018) has some of the most realistic dialogues I've ever seen - Reddit",
+      "snippet": "The goal of /r/Movies is to provide an inclusive place for discussions and news about films with major releases. Submissions should be for the purpose of informing or initiating a discussion, not just to entertain readers. Read our extensive list of rules for more information on other types of posts like fan-art and self-promotion, or message the moderators if you have any questions.",
+      "link": "www.reddit.com/r/movies/comments/nkvfnz/tag_2018_has_some_of_the_most_realistic_dialogues/"
+    }
+  ]
+}
+

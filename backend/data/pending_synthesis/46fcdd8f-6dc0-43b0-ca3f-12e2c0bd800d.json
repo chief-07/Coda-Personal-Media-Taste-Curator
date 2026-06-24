@@ -1,0 +1,82 @@
+{
+  "title": "Captain Marvel",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Captain Marvel",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "After crashing an experimental aircraft, Air Force pilot Carol Danvers is discovered by the Kree and trained as a member of the elite Starforce Military under the command of her mentor Yon-Rogg. Six years later, after escaping to Earth while under attack by the Skrulls, Danvers begins to discover there's more to her past. With help from S.H.I.E.L.D. agent Nick Fury, they set out to unravel the truth.",
+    "image": "https://m.media-amazon.com/images/M/MV5BZDI1NGU2ODAtNzBiNy00MWY5LWIyMGEtZjUxZjUwZmZiNjBlXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+    "release_year": "2019",
+    "director": "Anna Boden, Ryan Fleck",
+    "writer": "Anna Boden, Ryan Fleck, Geneva Robertson-Dworet",
+    "cast": [
+      "Brie Larson",
+      "Samuel L. Jackson",
+      "Ben Mendelsohn"
+    ],
+    "runtime": "123 min",
+    "score": "6.7/10 IMDb (658,051 votes) | 79% Rotten Tomatoes | 64/100 Metacritic",
+    "awards": "10 wins & 57 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Captain Marvel",
+      "snippet": "[Letterboxd Review of \"Captain Marvel\"] These stars are not for Brie Larson, I will sacrifice my own life…for Brie Larson",
+      "link": "https://letterboxd.com/film/captain-marvel/"
+    },
+    {
+      "title": "Letterboxd review of Captain Marvel",
+      "snippet": "[Letterboxd Review of \"Captain Marvel\"] for the past 11 years we thought these various heroes were hot shit but all it took was carol danvers absolutely shattering the glass ceiling with her glowing fists to make the rest of the mcu look like kids in halloween costumes. and to find out that all along they’ve been following her lead without knowing it? that they wouldn’t even BE the avengers without her? the galaxy brain of it all. also she’s clearly a lesbian. because i said so",
+      "link": "https://letterboxd.com/film/captain-marvel/"
+    },
+    {
+      "title": "Letterboxd review of Captain Marvel",
+      "snippet": "[Letterboxd Review of \"Captain Marvel\"] i know nothing about marvel so here is a guest review from my frat kid brother home from college for spring break: “captain marvel was dope. brie larson was great. um, i dunno! it was good! i don’t know what to say. brie larson was really good. uh, yeah. i’d give it 3 1/2 stars and a rotten tomatoes score of 82%. [pause as he as zelda demolishes olimar in smash] i personally just really like brie larson. her name is a cheese. the cat was great too. why the in-depth questions? jude law? yeah, jude law is in it a pretty solid amount. lee pace? who is that? oh shit, ronan? uh, barely. he’s barely",
+      "link": "https://letterboxd.com/film/captain-marvel/"
+    },
+    {
+      "title": "Letterboxd review of Captain Marvel",
+      "snippet": "[Letterboxd Review of \"Captain Marvel\"] This is what happens when all the better Marvel producers, writers, and directors are busy with Avengers: Endgame.",
+      "link": "https://letterboxd.com/film/captain-marvel/"
+    },
+    {
+      "title": "Letterboxd review of Captain Marvel",
+      "snippet": "[Letterboxd Review of \"Captain Marvel\"] For a film that’s almost completely incoherent for most of its first act — and seldom finds its footing after that — “Captain Marvel” is rather clear about its one big idea. Jude Law, playing an alien military commander named Yon-Rogg, mansplains it to his promising female protege as they spar during the opening scene. “There’s nothing more dangerous to a warrior than emotion,” he barks at Vers (Brie Larson). “You have to let go of the part of yourself that makes you vulnerable.” He’s Morpheus, she’s Neo, and this is the dojo fight from “The Matrix” if it were less visceral and more explicitly",
+      "link": "https://letterboxd.com/film/captain-marvel/"
+    },
+    {
+      "title": "Captain Marvel (2019) - User reviews - IMDb",
+      "snippet": "See opinions from other fans, or write your own review. This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt4154664/reviews/"
+    },
+    {
+      "title": "Captain Marvel (2019) - IMDb",
+      "snippet": "Captain Marvel: Directed by Anna Boden, Ryan Fleck. With Brie Larson, Samuel L. Jackson, Ben Mendelsohn, Jude Law. Carol Danvers becomes one of the universe's most powerful heroes when Earth is caught in the middle of a galactic war between two alien races.",
+      "link": "www.imdb.com/title/tt4154664/"
+    },
+    {
+      "title": "Captain Marvel | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Captain Marvel on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/captain_marvel"
+    },
+    {
+      "title": "Captain Marvel movie review & film summary - Roger Ebert",
+      "snippet": "It's finally here: the first film in the Marvel Cinematic Universe with a female superhero at its center and a woman serving as a co-director and writer. These are unprecedented, exciting and long overdue achievements all around within a pop-culture powerhouse that's long been dominated by male stories and storytellers. So why does \"Captain Marvel\" feel like a bit of a disappointment ...",
+      "link": "www.rogerebert.com/reviews/captain-marvel-2019"
+    },
+    {
+      "title": "Captain Marvel user reviews - Metacritic",
+      "snippet": "Despite not being a big fan of Brie Larson, this movie has great visuals and a great story that left me feeling overall satisfied. I really loved Captain Marvel. From the very beginning, it's clear that Carol Danvers isn't just powerful — she's charismatic, determined, and has a personal ...",
+      "link": "www.metacritic.com/movie/captain-marvel/user-reviews/"
+    }
+  ],
+  "uuid": "46fcdd8f-6dc0-43b0-ca3f-12e2c0bd800d"
+}

@@ -1,0 +1,81 @@
+{
+  "title": "Home Alone",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Home Alone",
+    "genres": [
+      "Comedy",
+      "Family"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "It is Christmas time and the McCallister family is preparing for a vacation in Paris, France. But the youngest in the family, Kevin (Macaulay Culkin), got into a scuffle with his older brother Buzz (Devin Ratray) and was sent to his room, which is on the third floor of his house. Then, the next morning, while the rest of the family was in a rush to make it to the airport on time, they completely forgot about Kevin, who now has the house all to himself. Being home alone was fun for Kevin, having a pizza all to himself, jumping on his parents' bed, and making a mess. Then, Kevin discovers about two burglars, Harry (Joe Pesci) and Marv (Daniel Stern), about to rob his house on Christmas Eve. Kevin acts quickly by wiring his own house with makeshift booby traps to stop the burglars and to bring them to justice.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNzNmNmQ2ZDEtMTc1MS00NjNiLThlMGUtZmQxNTg1Nzg5NWMzXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1990",
+    "director": "Chris Columbus",
+    "writer": "John Hughes",
+    "cast": [
+      "Macaulay Culkin",
+      "Joe Pesci",
+      "Daniel Stern"
+    ],
+    "runtime": "103 min",
+    "score": "7.8/10 IMDb (739,162 votes) | 66% Rotten Tomatoes | 63/100 Metacritic",
+    "awards": "Nominated for 2 Oscars. 13 wins & 8 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Home Alone",
+      "snippet": "[Letterboxd Review of \"Home Alone\"] do you think the wet bandits ever explored each other's bodies",
+      "link": "https://letterboxd.com/film/home-alone/"
+    },
+    {
+      "title": "Letterboxd review of Home Alone",
+      "snippet": "[Letterboxd Review of \"Home Alone\"] a small child and a duo of criminals attempt to brutally murder each other. hilarity ensues",
+      "link": "https://letterboxd.com/film/home-alone/"
+    },
+    {
+      "title": "Letterboxd review of Home Alone",
+      "snippet": "[Letterboxd Review of \"Home Alone\"] If you don't like this movie, you're what the French call, les incompétents",
+      "link": "https://letterboxd.com/film/home-alone/"
+    },
+    {
+      "title": "Letterboxd review of Home Alone",
+      "snippet": "[Letterboxd Review of \"Home Alone\"] The second best Die Hard movie.",
+      "link": "https://letterboxd.com/film/home-alone/"
+    },
+    {
+      "title": "Letterboxd review of Home Alone",
+      "snippet": "[Letterboxd Review of \"Home Alone\"] I’m very glad things turned out all right in the end. If it were me, I’d have simply invited the burglars in for some tea. A little kindness can go a long way.",
+      "link": "https://letterboxd.com/film/home-alone/"
+    },
+    {
+      "title": "Home Alone (1990) - User reviews - IMDb",
+      "snippet": "This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt0099785/reviews/"
+    },
+    {
+      "title": "Home Alone (1990) - IMDb",
+      "snippet": "Home Alone: Directed by Chris Columbus. With Macaulay Culkin, Joe Pesci, Daniel Stern, John Heard. An eight-year-old troublemaker, mistakenly left home alone, must defend his home against a pair of burglars on Christmas Eve.",
+      "link": "www.imdb.com/title/tt0099785/"
+    },
+    {
+      "title": "Home Alone movie review & film summary - Roger Ebert",
+      "snippet": "\"Home Alone\" is a splendid movie title because it evokes all sorts of scary nostalgia. Being left home alone, when you were a kid, meant hearing strange noises and being afraid to look in the basement - but it also meant doing all the things that grownups would tell you to stop doing, if they were there. Things like staying up to watch Johnny Carson, eating all the ice cream, and ...",
+      "link": "www.rogerebert.com/reviews/home-alone-1990"
+    },
+    {
+      "title": "Home Alone | Audience Reviews | Rotten Tomatoes",
+      "snippet": "See what audiences are saying about Home Alone. Read user reviews, reactions, and ratings on Rotten Tomatoes. Join the conversation today.",
+      "link": "www.rottentomatoes.com/m/home_alone/reviews"
+    },
+    {
+      "title": "Home Alone Movie Review | Common Sense Media",
+      "snippet": "Family comedy has slapstick violence and language. Read Common Sense Media's Home Alone review, age rating, and parents guide.",
+      "link": "www.commonsensemedia.org/movie-reviews/home-alone"
+    }
+  ],
+  "uuid": "30fcd011-34e4-ca58-a7bd-4b520e338f33"
+}

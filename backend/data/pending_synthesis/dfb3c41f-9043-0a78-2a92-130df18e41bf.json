@@ -1,0 +1,82 @@
+{
+  "title": "Alice in Wonderland",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Alice in Wonderland",
+    "genres": [
+      "Adventure",
+      "Family",
+      "Fantasy"
+    ],
+    "tags": [
+      "movie",
+      "PG"
+    ],
+    "description": "Alice, an unpretentious and individual 19-year-old, is betrothed to a dunce of an English nobleman. At her engagement party, she escapes the crowd to consider whether to go through with the marriage and falls down a hole in the garden after spotting an unusual rabbit. Arriving in a strange and surreal place called \"Underland,\" she finds herself in a world that resembles the nightmares she had as a child, filled with talking animals, villainous queens and knights, and frumious bandersnatches. Alice realizes that she is there for a reason--to conquer the horrific Jabberwocky and restore the rightful queen to her throne.",
+    "image": "https://m.media-amazon.com/images/M/MV5BYjgxMTQ3NjMtOTI1Yy00Yzg4LWJlNWQtMjFkNjVlYjU0OWIyXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2010",
+    "director": "Tim Burton",
+    "writer": "Linda Woolverton, Lewis Carroll",
+    "cast": [
+      "Mia Wasikowska",
+      "Johnny Depp",
+      "Helena Bonham Carter"
+    ],
+    "runtime": "108 min",
+    "score": "6.4/10 IMDb (464,214 votes) | 51% Rotten Tomatoes | 53/100 Metacritic",
+    "awards": "Won 2 Oscars. 35 wins & 65 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Alice in Wonderland",
+      "snippet": "[Letterboxd Review of \"Alice in Wonderland\"] i'm such a slut for alice in wonderland",
+      "link": "https://letterboxd.com/film/alice-in-wonderland/"
+    },
+    {
+      "title": "Letterboxd review of Alice in Wonderland",
+      "snippet": "[Letterboxd Review of \"Alice in Wonderland\"] I think that, under the modern scope of things, it is the tendency of contemporary viewers to underrate around 83% of the films released in the silent era because the era feels so distant, that it is impossible for many to appreciate those hidden ancient gems through the lens of modernity. There seems to be some effect of involuntary repulsion that make them even call this as \"not entertaining\". If this is not entertaining, I don't know what is, because this landmark British project is something to cherish, including its cheesiness.Made 37 years after the release of the novel, kickstarting the",
+      "link": "https://letterboxd.com/film/alice-in-wonderland/"
+    },
+    {
+      "title": "Letterboxd review of Alice in Wonderland",
+      "snippet": "[Letterboxd Review of \"Alice in Wonderland\"] actually cannot deal with the superimposed real cat sitting in the bushes",
+      "link": "https://letterboxd.com/film/alice-in-wonderland/"
+    },
+    {
+      "title": "Letterboxd review of Alice in Wonderland",
+      "snippet": "[Letterboxd Review of \"Alice in Wonderland\"] the children dressed as cards were such a delight!",
+      "link": "https://letterboxd.com/film/alice-in-wonderland/"
+    },
+    {
+      "title": "Letterboxd review of Alice in Wonderland",
+      "snippet": "[Letterboxd Review of \"Alice in Wonderland\"] \"The Duchess's Cheshire Cat appears to Alice and directs her to the Mad Hatter.\"Spoiler: Everything was a dream! The year is 1903 and Lewis Carroll's classic novel, Alice's Adventures in Wonderland, gets its first adaptation. Just over 8 (badly damaged) minutes survive from the original 12, so the incoherency of the ''nonsense literature'' source is even further increased. That said, considering its era, the (compressed) imagination the filmmakers tried to capture is nevertheless admirable. The most major special effects involved here would be the ''Eat me/Drink me'' scenes where Alice grows a",
+      "link": "https://letterboxd.com/film/alice-in-wonderland/"
+    },
+    {
+      "title": "Alice in Wonderland | Audience Reviews | Rotten Tomatoes",
+      "snippet": "See what audiences are saying about Alice in Wonderland. Read user reviews, reactions, and ratings on Rotten Tomatoes. Join the conversation today.",
+      "link": "www.rottentomatoes.com/m/1223275-alice_in_wonderland/reviews"
+    },
+    {
+      "title": "Alice in Wonderland - Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Alice in Wonderland on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/1221547-alice_in_wonderland"
+    },
+    {
+      "title": "Enchanting and mordant, but does it need an action climax?",
+      "snippet": "Disney presents a film directed by Tim Burton. Written by Linda Woolverton, based on the books Alice's Adventures in Wonderland and Through the Looking Glass by Lewis Carroll. Running time: 108 minutes. Rated PG (for fantasy action/violence involving scary images and situations, and a smoking ...",
+      "link": "www.rogerebert.com/reviews/alice-in-wonderland-2010"
+    },
+    {
+      "title": "Alice in Wonderland (2010) - Rotten Tomatoes",
+      "snippet": "Critics Consensus: Tim Burton's Alice sacrifices the book's minimal narrative coherence -- and much of its heart -- but it's an undeniable visual treat.",
+      "link": "pages.cs.wisc.edu/~shreyakamath/rottenHTML/Alice_in_Wonderland.html"
+    },
+    {
+      "title": "\"Alice in Wonderland\" Review - The Independent Critic",
+      "snippet": "There's little doubt that the Alice in Wonderland of 2010, a brilliant blend of all things Disney and all things Tim Burton, will be unable to match the unfathomably outrageous box-office of a certain muchly overrated Oscar-nominated sci-fi \"Crapatar.\" It's a pity. Really. Burton's imaginative and blissfully fantastic spectacle is an unquestionably superior film, a film so rich and wondrous ...",
+      "link": "theindependentcritic.com/alice_in_wonderland2010"
+    }
+  ],
+  "uuid": "dfb3c41f-9043-0a78-2a92-130df18e41bf"
+}

@@ -1,0 +1,61 @@
+{
+  "title": "Scream",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Scream",
+    "genres": [
+      "Horror",
+      "Mystery"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "A year after her mother's death, Sidney Prescott (Neve Campbell) and her friends started experiencing some strange phone calls. They later learned the calls were coming from a crazed serial killer, in a white faced mask and a large black robe, looking for revenge. His phone calls usually consist of many questions, the main one being: What's your favorite scary movie? Along with much scary movie trivia, ending with bloody pieces of innocent lives scattered around the small town of Woodsboro.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMjA2NjU5MTg5OF5BMl5BanBnXkFtZTgwOTkyMzQxMDE@._V1_SX300.jpg",
+    "release_year": "1996",
+    "director": "Wes Craven",
+    "writer": "Kevin Williamson",
+    "cast": [
+      "Neve Campbell",
+      "Courteney Cox",
+      "David Arquette"
+    ],
+    "runtime": "111 min",
+    "score": "7.4/10 IMDb (438,930 votes) | 78% Rotten Tomatoes | 66/100 Metacritic",
+    "awards": "12 wins & 11 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Scream",
+      "snippet": "[Letterboxd Review of \"Scream\"] gale weathers setting up her camera immediately after surviving a serial killer attack: STORYTIME! I ALMOST DIED [No Clickbait] [Gone WRONG]",
+      "link": "https://letterboxd.com/film/scream/"
+    },
+    {
+      "title": "Letterboxd review of Scream",
+      "snippet": "[Letterboxd Review of \"Scream\"] Billy rlly said “you’ve been acting like such a bitch since ur mom died :/“",
+      "link": "https://letterboxd.com/film/scream/"
+    },
+    {
+      "title": "Letterboxd review of Scream",
+      "snippet": "[Letterboxd Review of \"Scream\"] i already knew billy was gonna be the killer because i have seen so many fifteen year old girls on tumblr nutting over pics of him covered in blood but i did not suspect shaggy from scooby doo for one god damn second consider me SHOOK",
+      "link": "https://letterboxd.com/film/scream/"
+    },
+    {
+      "title": "Letterboxd review of Scream",
+      "snippet": "[Letterboxd Review of \"Scream\"] sidney: i was literally just almost brutally murdered last nightbilly: haha yeah idk anything abt that haha that’s so weird 😂😂😂 so anyways more importantly ............. what are we? 😝😝",
+      "link": "https://letterboxd.com/film/scream/"
+    },
+    {
+      "title": "Letterboxd review of Scream",
+      "snippet": "[Letterboxd Review of \"Scream\"] when he tells you the exorcist reminded him of you 😍",
+      "link": "https://letterboxd.com/film/scream/"
+    },
+    {
+      "title": "Wikipedia: Scream (1996 film)",
+      "snippet": "[Wikipedia Synopsis] Scream is a 1996 American slasher film directed by Wes Craven and written by Kevin Williamson. It stars David Arquette, Neve Campbell, Courteney Cox, Matthew Lillard, Rose McGowan, Skeet Ulrich, and Drew Barrymore. Set in the fictional town of Woodsboro, California, the plot follows high school student Sidney Prescott (Campbell) and her friends as they become the targets of a costumed serial killer on the anniversary of her mother's murder.\nWilliamson, who was struggling to get his projects off the ground, was inspired by reports of the Gainesville Ripper murders to write a screenplay that satirized the clichés of the slasher genre popularized by films such as Halloween (1978), Friday the 13th (1980), and Craven's own A Nightmare on Elm Street (1984). Developed under the title Scary Movie, the script became the subject of an intense bidding war among multiple studios before Miramax Films purchased the rights for its Dimension Films label. Although Craven initially declined the project several times, he agreed to direct after reading the script, hoping to re-establish himself following a series of career setbacks. The involvement of the well-known Barrymore and Cox helped secure additional studio support. Principal photography took place in California from April to June 1996 on a budget of $15 million. Craven also trimmed the film's violence following a dispute with the Motion Picture Association of America over securing an R rating.\nReleased on December 20, Scream was not exp",
+      "link": "https://en.wikipedia.org/wiki/Scream%20(1996%20film)"
+    }
+  ],
+  "uuid": "60c02e1a-75b2-8d99-750f-d6464e34d32b"
+}

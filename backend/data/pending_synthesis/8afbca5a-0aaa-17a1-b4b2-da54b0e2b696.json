@@ -1,0 +1,57 @@
+{
+  "title": "The Nice Guys",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Nice Guys",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Crime"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Set against the backdrop of 1977 Los Angeles, The Nice Guys opens when single father and licensed PI Holland March (Gosling) is hired to investigate the apparent suicide of famous porn star Misty Mountains. As the trail leads him to track down a girl named Amelia (Qualley), he encounters less licensed and less hands-off private eye Jackson Healey (Russell Crowe) and his brass knuckles, both hired by the young hippie. However, the situation takes a turn for the worse when Amelia vanishes and it becomes apparent that March wasn't the only party interested. As both men are forced to team up, they'll have to take on a world filled with eccentric goons, strippers dressed as mermaids and even a possible government conspiracy.",
+    "image": "https://m.media-amazon.com/images/M/MV5BM2YwNWZlZGEtYTEyZi00NjdjLWEwM2ItM2Q2MDMwZjkzMjk0XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2016",
+    "director": "Shane Black",
+    "writer": "Shane Black, Anthony Bagarozzi",
+    "cast": [
+      "Russell Crowe",
+      "Ryan Gosling",
+      "Angourie Rice"
+    ],
+    "runtime": "116 min",
+    "score": "7.4/10 IMDb (410,135 votes) | 91% Rotten Tomatoes | 70/100 Metacritic",
+    "awards": "9 wins & 34 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Nice Guys",
+      "snippet": "[Letterboxd Review of \"The Nice Guys\"] me every time ryan gosling made a high-pitched noise: now this is cínëmà",
+      "link": "https://letterboxd.com/film/the-nice-guys/"
+    },
+    {
+      "title": "Letterboxd review of The Nice Guys",
+      "snippet": "[Letterboxd Review of \"The Nice Guys\"] he was questioning the mermaids",
+      "link": "https://letterboxd.com/film/the-nice-guys/"
+    },
+    {
+      "title": "Letterboxd review of The Nice Guys",
+      "snippet": "[Letterboxd Review of \"The Nice Guys\"] [high-pitched ryan gosling scream]",
+      "link": "https://letterboxd.com/film/the-nice-guys/"
+    },
+    {
+      "title": "Letterboxd review of The Nice Guys",
+      "snippet": "[Letterboxd Review of \"The Nice Guys\"] 94\"Why don't we invite him in?\"\"No animals in the house, sweetheart.\"Goes right into a certain pile of movies (The Big Lebowski, Inherent Vice, The Long Goodbye) which utilize comedic trappings to explore emptiness, loss, and the strangling grip of capitalism. The tightest, snappiest, most deceptively beautiful screenplay in years.",
+      "link": "https://letterboxd.com/film/the-nice-guys/"
+    },
+    {
+      "title": "Letterboxd review of The Nice Guys",
+      "snippet": "[Letterboxd Review of \"The Nice Guys\"] 2023 UPDATE: please stop liking this. it's been 6 years. i have moved on and you should too. you should all want better for yourselves. i am only keeping this post up because i'm a digital hoarder......\"this is not you. you're not a murderer.\"\"she killed three people.\"\"i know, but i'm saying deep down.\"",
+      "link": "https://letterboxd.com/film/the-nice-guys/"
+    }
+  ],
+  "uuid": "8afbca5a-0aaa-17a1-b4b2-da54b0e2b696"
+}

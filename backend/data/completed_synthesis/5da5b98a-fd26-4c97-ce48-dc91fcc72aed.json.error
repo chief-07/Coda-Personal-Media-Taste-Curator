@@ -1,0 +1,40 @@
+{
+  "title": "April Story",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "April Story",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "tags": [
+      "movie"
+    ],
+    "description": "In spring, a girl leaves the island of Hokkaido to attend university in Tokyo. Once there, she's very lonely and finds out people aren't anywhere near as friendly like she'd hoped.",
+    "image": "https://m.media-amazon.com/images/M/MV5BYjI0Mjg1NGQtM2Q3MS00NmYwLTgyYjAtODE4ZGRkMmM1Y2FlXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1998",
+    "director": "Shunji Iwai",
+    "writer": "Shunji Iwai",
+    "cast": [
+      "Takako Matsu",
+      "Seiichi Tanabe",
+      "Kazuhiko Kato"
+    ],
+    "runtime": "67 min",
+    "score": "7.1/10 IMDb (4,730 votes)",
+    "awards": "1 win total"
+  },
+  "uuid": "5da5b98a-fd26-4c97-ce48-dc91fcc72aed",
+  "metadata_synthesis": "Film. 1998. Shunji Iwai. Takako Matsu. Short feature. Coming-of-age romance.",
+  "setting_and_subculture": "Springtime Tokyo. Bustling university campuses. Niche college fishing clubs. Cherry blossom showers. Unfamiliar big-city streets.",
+  "visual_tone_and_feel": "Pastel spring hues. Soft-focus nostalgia. Falling sakura petals. Gentle. Idyllic but melancholy. Impressionistic vignettes.",
+  "media_era_tone": "Late 1990s Japanese cinema. Delicate slice-of-life. Lyrical and understated. Pure unadulterated yearning.",
+  "pacing_and_structure": "Breezy 67-minute runtime. Anecdotal vignettes. Drifting from day to day. A quiet reveal.",
+  "atmosphere_and_mood": "Shy and observant. Wistful loneliness. Hopeful trepidation. The gentle ache of a secret crush. Overwhelmingly sweet.",
+  "themes_and_messages": "Moving away from home. The terrifying scale of the big city. Hidden motivations for massive life changes. Finding your footing.",
+  "character_relationships": "Awkward roommate dynamics. New, fragile friendships. A one-sided secret longing. The warmth of familiar strangers.",
+  "lead_character_type": "Shy transplant. Small-town girl in a big city. Quiet romantic. Observant wallflower.",
+  "story_and_plot_type": "Slice-of-life. College freshman adjustment. Secret romance. Quiet revelation.",
+  "who_and_when": "Uzuki Nireno. Springtime. First year of university. Late 1990s Tokyo.",
+  "emotional_evocation": "Gentle homesickness. Heart-swelling nostalgia. Innocent hope. The flutter of a new beginning."
+}

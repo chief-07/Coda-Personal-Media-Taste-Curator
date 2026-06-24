@@ -1,0 +1,44 @@
+{
+    "title":  "Journey Under the Midnight Sun",
+    "media_type":  "book",
+    "structured_data":  {
+                            "title":  "Journey of the Midnight Sun",
+                            "genres":  [
+                                           "Religion for Kids",
+                                           "Kids",
+                                           "Transportation for Kids",
+                                           "Fiction for Kids",
+                                           "Social Issues in Kids Fiction",
+                                           "Biographies for Kids",
+                                           "Social Issues for Kids",
+                                           "General Nonfiction for Kids"
+                                       ],
+                            "tags":  [
+
+                                     ],
+                            "description":  "This is the true story of the journey of the Midnight Sun Mosque.\u003cbr /\u003e\u003cbr /\u003eIn 2010 a Winnipeg-based charity raised funds to build and ship a mosque to Inuvik, one of the most northern towns in Canada’s Arctic. A small but growing Muslim community there had been using a cramped trailer for their services, but there just wasn\u0027t enough space. The mosque travelled over 4,000 kilometers on a journey fraught with poor weather, incomplete bridges, narrow roads, low traffic wires and a deadline to get on the last barge heading up the Mackenzie River before the first winter freeze. But it made it just in time and is now one of the most northern mosques in the world.\u003cbr /\u003e\u003cbr /\u003eThis beautiful picture book reminds us that the collective dream of fostering a multicultural and tolerant Canada exists and that people of all backgrounds will come together to build bridges and overcome obstacles for the greater good of their neighbors.",
+                            "image":  "https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/ad/19/c0/ad19c0ce-3894-0fd6-b8b9-5ddfdc3930cd/9781459827622.jpg/600x900bb.jpg",
+                            "studio":  "Shazia Afzal",
+                            "director":  "Shazia Afzal"
+                        },
+    "community_snippets":  [
+                               {
+                                   "title":  "Wikipedia: Journey Under the Midnight Sun",
+                                   "snippet":  "[Wikipedia Synopsis] Journey Under the Midnight Sun (白夜行, Byakuyakō) (also published in English as Under the Midnight Sun) is a mystery novel written by Keigo Higashino, first serialized in the monthly novel magazine Subaru from Shueisha from January 1997 to January 1999. The entire volume was published in August 1999 and became a bestseller.\nDuring the serialization, the novel was at first written as a series of short stories representing chronological snapshots of the overall plot line. Higashino modified its structure to make it a single coherent story before publishing it as a single volume. As of November 2005 the book had sold 550,000 copies. However, its sales quickly picked up after the first episode of the adapted TV series was aired. By January 2006 its sales had broken a million. Its sales exceeded 2 million in December 2010.\nThe novel attracted adaptations, including a stage drama in 2005, a Japanese TV series in 2006, a Korean motion picture in 2009, and a Japanese motion picture in 2010.",
+                                   "link":  "https://en.wikipedia.org/wiki/Journey%20Under%20the%20Midnight%20Sun"
+                               }
+                           ],
+    "uuid":  "3d0ad7e5-f1e7-8169-d22e-10be9017a0c3",
+    "metadata_synthesis":  "Raw unyielding look. Raw unyielding look. Journey Under the Midnight Sun",
+    "setting_and_subculture":  "Bleak landscapes. Concrete shadows. A world stripped of hope.",
+    "visual_tone_and_feel":  "Handheld chaos. Breath on the lens. Handheld chaos. Breath on the lens.",
+    "media_era_tone":  "Post-modern anxiety. Grimy realism. Post-modern anxiety. Grimy realism.",
+    "pacing_and_structure":  "Glacial dread. Waiting for the snap. Relentless. Slow-burn to violent climax.",
+    "atmosphere_and_mood":  "Numb. A quiet apocalypse. Sweat-stained. Paranoia creeping in.",
+    "themes_and_messages":  "Blood and consequence. Survival at any cost. Decay of morality.",
+    "character_relationships":  "Trust is a weapon. Trust is a weapon.",
+    "lead_character_type":  "Broken. Unreliable. Carrying weight of past sins. Feral survivalist. Dead eyes.",
+    "story_and_plot_type":  "Chasing ghosts. Purgatory loop. Chasing ghosts. Purgatory loop.",
+    "who_and_when":  "Late night consumption. Those who stare into the abyss.",
+    "emotional_evocation":  "Pure dread. Visceral ache. Heart in throat."
+}

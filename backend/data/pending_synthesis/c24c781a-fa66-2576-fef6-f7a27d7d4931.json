@@ -1,0 +1,62 @@
+{
+  "title": "Jurassic World",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Jurassic World",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Twenty-two years after the original Jurassic Park failed, the new park, also known as Jurassic World, is open for business. After years of studying genetics, the scientists on the park genetically engineer a new breed of dinosaur, the Indominus Rex. When everything goes horribly wrong, will our heroes make it off the island?",
+    "image": "https://m.media-amazon.com/images/M/MV5BNzBhNzlkM2UtZTQyOC00NjUyLTkzMmMtNDQ1YTM5N2NmMGE5XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2015",
+    "director": "Colin Trevorrow",
+    "writer": "Rick Jaffa, Amanda Silver, Colin Trevorrow",
+    "cast": [
+      "Chris Pratt",
+      "Bryce Dallas Howard",
+      "Ty Simpkins"
+    ],
+    "runtime": "124 min",
+    "score": "6.9/10 IMDb (723,175 votes) | 72% Rotten Tomatoes | 59/100 Metacritic",
+    "awards": "15 wins & 58 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Jurassic World",
+      "snippet": "[Letterboxd Review of \"Jurassic World\"] tag yourself i'm the tourist making sure he grabs his two margaritas as the dinosaur is attacking",
+      "link": "https://letterboxd.com/film/jurassic-world/"
+    },
+    {
+      "title": "Letterboxd review of Jurassic World",
+      "snippet": "[Letterboxd Review of \"Jurassic World\"] Why the dinosaur whale did not eat the whole park?",
+      "link": "https://letterboxd.com/film/jurassic-world/"
+    },
+    {
+      "title": "Letterboxd review of Jurassic World",
+      "snippet": "[Letterboxd Review of \"Jurassic World\"] God creates dinosaursGod destroys dinosaursGod creates Steven SpielbergSteven Spielberg creates dinosaurs Dinosaurs inspire manMan destroys GodThe Indie-to-Hollywood Conversion Factory creates Colin TrevorrowColin Trevorrow reverse-engineers a beloved childhood favorite and puts most of the pieces back in a satisfying, nostalgic and highly entertaining fashion, if also neglecting the importance of character and the great, oh-so-great value of Goldblumian acting capabilities. Second-rate writers inherit the earth",
+      "link": "https://letterboxd.com/film/jurassic-world/"
+    },
+    {
+      "title": "Letterboxd review of Jurassic World",
+      "snippet": "[Letterboxd Review of \"Jurassic World\"] laura dern walked so bryce dallas howard could run ... in heels",
+      "link": "https://letterboxd.com/film/jurassic-world/"
+    },
+    {
+      "title": "Letterboxd review of Jurassic World",
+      "snippet": "[Letterboxd Review of \"Jurassic World\"] Why does Chris Pratt deliver every line like it’s for a movie trailer, he sounds ridiculous",
+      "link": "https://letterboxd.com/film/jurassic-world/"
+    },
+    {
+      "title": "Wikipedia: Jurassic World",
+      "snippet": "[Wikipedia Synopsis] Jurassic World is a 2015 American science fiction action film directed by Colin Trevorrow, who co-wrote the screenplay with Rick Jaffa, Amanda Silver, and Derek Connolly from a story by Jaffa and Silver. It is the first installment in the Jurassic World series and the fourth installment overall in the Jurassic Park franchise, following Jurassic Park III (2001). It stars an ensemble cast including Chris Pratt, Bryce Dallas Howard, Vincent D'Onofrio, Ty Simpkins, Nick Robinson, Omar Sy, BD Wong, and Irrfan Khan; Wong reprised his role from the original Jurassic Park film. Set twenty-two years after the events of Jurassic Park, the film takes place on the same fictional island of Isla Nublar, located off the Pacific coast of Costa Rica. A successful theme park of cloned dinosaurs, dubbed Jurassic World,  has operated on the island for years, bringing John Hammond's dream to fruition. The park plunges into chaos when a transgenic dinosaur escapes from its enclosure and goes on a rampage.\nUniversal Pictures intended to begin production of a fourth Jurassic Park film in 2004 for a mid-2005 release, but the project lingered in development hell while the script underwent several revisions. Following a suggestion from executive producer Steven Spielberg, writers Jaffa and Silver explored the idea of a functional dinosaur park. Once Trevorrow was hired as director in 2013 he followed the same idea while developing a new script with Connolly. Filming lasted from April to August 2014 in",
+      "link": "https://en.wikipedia.org/wiki/Jurassic%20World"
+    }
+  ],
+  "uuid": "c24c781a-fa66-2576-fef6-f7a27d7d4931"
+}

@@ -1,0 +1,82 @@
+{
+  "title": "Raging Bull",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Raging Bull",
+    "genres": [
+      "Biography",
+      "Drama",
+      "Sport"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "When Jake LaMotta steps into a boxing ring and obliterates his opponent, he's a prizefighter. But when he treats his family and friends the same way, he's a ticking time bomb, ready to go off at any moment. Though LaMotta wants his family's love, something always seems to come between them. Perhaps it's his violent bouts of paranoia and jealousy. This kind of rage helped make him a champ, but in real life, he winds up in the ring alone.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMjlkYmYyZWQtNTZkOS00ZjA0LWEwNWUtNzE2ZGNiYjg0MjA2XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "1980",
+    "director": "Martin Scorsese",
+    "writer": "Jake LaMotta, Joseph Carter, Peter Savage",
+    "cast": [
+      "Robert De Niro",
+      "Cathy Moriarty",
+      "Joe Pesci"
+    ],
+    "runtime": "129 min",
+    "score": "8.1/10 IMDb (407,608 votes) | 92% Rotten Tomatoes | 90/100 Metacritic",
+    "awards": "Won 2 Oscars. 24 wins & 28 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Raging Bull",
+      "snippet": "[Letterboxd Review of \"Raging Bull\"] The most frightening thing about Jake LaMotta isn’t his rage. It’s that look in his eyes when he’s caught onto something, when he thinks he has somebody cornered. He latches on to a sentence, or a phrase, and then he repeats it over and over until it starts to take on a different meaning for everybody in the room. He makes himself believe things that aren’t true, perhaps because he wants these things to be true, because he wants to punish himself. But why?\"You ever think of anybody else when we're in bed?\"Raging Bull explores the classic Madonna-whore complex: a man falls in love with a woman,",
+      "link": "https://letterboxd.com/film/raging-bull/"
+    },
+    {
+      "title": "Letterboxd review of Raging Bull",
+      "snippet": "[Letterboxd Review of \"Raging Bull\"] Do you think Scorsese and DeNiro have kissed",
+      "link": "https://letterboxd.com/film/raging-bull/"
+    },
+    {
+      "title": "Letterboxd review of Raging Bull",
+      "snippet": "[Letterboxd Review of \"Raging Bull\"] What a sunbeam of positivity and hope.",
+      "link": "https://letterboxd.com/film/raging-bull/"
+    },
+    {
+      "title": "Letterboxd review of Raging Bull",
+      "snippet": "[Letterboxd Review of \"Raging Bull\"] how i imagine every conversation went between martin scorsese and robert de niro when it was time to make their new movie, circa 1973-1995marty: hey bobrobert: heymarty: so, how would you like to play the worst man of all time? just like, the worst man to ever exist?robert *tearing up*: oh man, you just get me as a creator and an actor, don't you?(i really liked this, btw.)",
+      "link": "https://letterboxd.com/film/raging-bull/"
+    },
+    {
+      "title": "Letterboxd review of Raging Bull",
+      "snippet": "[Letterboxd Review of \"Raging Bull\"] not to be that filmbro bitch but this film was an experience and it changed me",
+      "link": "https://letterboxd.com/film/raging-bull/"
+    },
+    {
+      "title": "Raging Bull (1980) - User reviews - IMDb",
+      "snippet": "Raging Bull (1980), directed by Martin Scorsese and starring Robert De Niro, isn't just a boxing movie - it's a deep dive into one man's rise and fall, and it hits hard in more ways than one.",
+      "link": "www.imdb.com/title/tt0081398/reviews/"
+    },
+    {
+      "title": "Raging Bull (1980) - IMDb",
+      "snippet": "Raging Bull: Directed by Martin Scorsese. With Robert De Niro, Cathy Moriarty, Joe Pesci, Frank Vincent. The life of boxer Jake LaMotta, whose violence and temper that led him to the top in the ring destroyed his life outside of it.",
+      "link": "www.imdb.com/title/tt0081398/"
+    },
+    {
+      "title": "Raging Bull (1980) - Raging Bull (1980) - User Reviews - IMDb",
+      "snippet": "The power of the movie comes from De Niro under the direction of Martin Scorsese, providing a wholly convincing performance of the furious, bitter, bovine pugilist with serious psychological issues.",
+      "link": "www.imdb.com/title/tt00081398/reviews"
+    },
+    {
+      "title": "Raging Bull (1980) - Ratings - IMDb",
+      "snippet": "Ratings Raging Bull IMDb rating The IMDb rating is weighted to help keep it reliable. Learn more",
+      "link": "www.imdb.com/title/tt0081398/ratings/"
+    },
+    {
+      "title": "Raging Bull (1980) - Metacritic reviews - IMDb",
+      "snippet": "The entire film is played at such high pitch it may well exhaust audiences that don't come prepared. And, at the heart of the film, there is the mystery of Jake himself, but that is what separates Raging Bull from all other fight movies, in fact, from most movies about anything. Raging Bull is an achievement.",
+      "link": "www.imdb.com/title/tt0081398/criticreviews/"
+    }
+  ],
+  "uuid": "fba66d29-3194-3f06-e958-a9192117ad48"
+}

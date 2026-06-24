@@ -1,0 +1,62 @@
+{
+  "title": "Us",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Us",
+    "genres": [
+      "Horror",
+      "Mystery",
+      "Thriller"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "In order to get away from their busy lives, the Wilson family takes a vacation to Santa Cruz, California with the plan of spending time with their friends, the Tyler family. On a day at the beach, their young son Jason almost wanders off, causing his mother Adelaide to become protective of her family. That night, four mysterious people break into Adelaide's childhood home where they're staying. The family is shocked to find out that the intruders look like them, only with grotesque appearances.",
+    "image": "https://m.media-amazon.com/images/M/MV5BMzhkMjFkN2YtODU2Ni00YWYwLWExN2MtOWNjZmQxM2U4YTM5XkEyXkFqcGc@._V1_QL75_UX380_CR0,20,380,562_.jpg",
+    "release_year": "2019",
+    "director": "Jordan Peele",
+    "writer": "Jordan Peele",
+    "cast": [
+      "Lupita Nyong'o",
+      "Winston Duke",
+      "Elisabeth Moss"
+    ],
+    "runtime": "116 min",
+    "score": "6.8/10 IMDb (390,771 votes) | 93% Rotten Tomatoes | 81/100 Metacritic",
+    "awards": "87 wins & 135 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Us",
+      "snippet": "[Letterboxd Review of \"Us\"] wow jordan peele's getting used to this whole directin- wait why are they white?",
+      "link": "https://letterboxd.com/film/us/"
+    },
+    {
+      "title": "Letterboxd review of Us",
+      "snippet": "[Letterboxd Review of \"Us\"] another one for the “at least rebecca was sexy” film experience",
+      "link": "https://letterboxd.com/film/us/"
+    },
+    {
+      "title": "Letterboxd review of Us",
+      "snippet": "[Letterboxd Review of \"Us\"] this is fucked upalso if a man ~even a skarsgård~ made me choose between him and rebecca i'd be like *nsync mode* bye bye bye",
+      "link": "https://letterboxd.com/film/us/"
+    },
+    {
+      "title": "Letterboxd review of Us",
+      "snippet": "[Letterboxd Review of \"Us\"] Rebecca Ferguson stealing someone's girlfriend? Now that's totally believable.",
+      "link": "https://letterboxd.com/film/us/"
+    },
+    {
+      "title": "Letterboxd review of Us",
+      "snippet": "[Letterboxd Review of \"Us\"] what im doing for u miss rebecca fergusonif ida doesnt want you linda i take you !!",
+      "link": "https://letterboxd.com/film/us/"
+    },
+    {
+      "title": "Wikipedia: Us (2019 film)",
+      "snippet": "[Wikipedia Synopsis] Us is a 2019 American psychological horror film written and directed by Jordan Peele, and starring Lupita Nyong'o, Winston Duke, Elisabeth Moss and Tim Heidecker. The story follows Adelaide Wilson and her family, who are attacked by a group of menacing doppelgängers, called the \"Tethered\".\nThe project was announced in February 2018. Peele produced the film alongside Jason Blum and Sean McKittrick, having previously collaborated with them on Get Out and BlacKkKlansman. Filming took place in California, including Los Angeles, Pasadena and Santa Cruz, from July to October 2018.\nUs premiered at South by Southwest on March 8, 2019, and was theatrically released in the United States on March 22, by Universal Pictures. The film was a commercial success, grossing $256 million against a budget of $20 million, and is viewed as one of the greatest horror films of the 21st century.",
+      "link": "https://en.wikipedia.org/wiki/Us%20(2019%20film)"
+    }
+  ],
+  "uuid": "1997e680-bc24-b31a-8573-c8a206e0baa1"
+}

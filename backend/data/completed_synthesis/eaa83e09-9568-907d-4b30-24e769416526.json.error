@@ -1,0 +1,38 @@
+{
+    "title":  "The Guest Cat",
+    "media_type":  "book",
+    "structured_data":  {
+                            "title":  "The Guest Cat",
+                            "genres":  [
+                                           "Fiction \u0026 Literature",
+                                           "Family Fiction \u0026 Literature"
+                                       ],
+                            "tags":  [
+
+                                     ],
+                            "description":  "A wonderful sui generis novel about a visiting cat who brings joy into a couple’s life in Tokyo\u003cbr /\u003e\u003cbr /\u003eA bestseller in France and winner of Japan’s Kiyama Shohei Literary Award, The Guest Cat, by the acclaimed poet Takashi Hiraide, is a subtly moving and exceptionally beautiful novel about the transient nature of life and idiosyncratic but deeply felt ways of living. A couple in their thirties live in a small rented cottage in a quiet part of Tokyo; they work at home, freelance copy-editing; they no longer have very much to say to one another. But one day a cat invites itself into their small kitchen. It leaves, but the next day comes again, and then again and again. Soon they are buying treats for the cat and enjoying talks about the animal and all its little ways. Life suddenly seems to have more promise for the husband and wife — the days have more light and color. The novel brims with new small joys and many moments of staggering poetic beauty, but then something happens….\u003cbr /\u003e\u003cbr /\u003eAs Kenzaburo Oe has remarked, Takashi Hiraide’s work \"really shines.\" His poetry, which is remarkably cross-hatched with beauty, has been acclaimed here for \"its seemingly endless string of shape-shifting objects and experiences,whose splintering effect is enacted via a unique combination of speed and minutiae.\"",
+                            "image":  "https://is1-ssl.mzstatic.com/image/thumb/Publication/v4/61/14/da/6114daa6-b0bb-9411-14b6-20d9b0625929/9780811221511.jpg/600x900bb.jpg",
+                            "studio":  "Takashi Hiraide \u0026 Eric Selland",
+                            "director":  "Takashi Hiraide \u0026 Eric Selland"
+                        },
+    "community_snippets":  [
+                               {
+                                   "title":  "Wikipedia: Ordinary People (Guest novel)",
+                                   "snippet":  "[Wikipedia Synopsis] Ordinary People is Judith Guest\u0027s first novel. Published in 1976, it tells the story of a year in the life of the Jarretts, an affluent suburban family trying to cope with the aftermath of two traumatic events.\nAlthough it won critical praise and awards upon its release, it is best remembered today as the basis for the 1980 film version, which won four Academy Awards including Best Picture. The novel received the 1976 Janet Heidinger Kafka Prize and is also assigned in many American secondary school English classes.",
+                                   "link":  "https://en.wikipedia.org/wiki/Ordinary%20People%20(Guest%20novel)"
+                               }
+                           ],
+    "uuid":  "eaa83e09-9568-907d-4b30-24e769416526",
+    "metadata_synthesis":  "Raw unyielding look. A brutal experience. The Guest Cat",
+    "setting_and_subculture":  "Sterile rooms. Cold fluorescent hum. A world stripped of hope.",
+    "visual_tone_and_feel":  "Handheld chaos. Breath on the lens. Handheld chaos. Breath on the lens.",
+    "media_era_tone":  "Rejecting the glossy mainstream. Cynical edge. Unfiltered noise.",
+    "pacing_and_structure":  "Fragmented memory. Jagged cuts. No breathing room. Suffocating rhythm.",
+    "atmosphere_and_mood":  "The air is thick with unspoken trauma. Heavy. Claustrophobic.",
+    "themes_and_messages":  "Generational scars. Silence as a weapon. Blood and consequence.",
+    "character_relationships":  "Fractured. Toxic codependency. Trust is a weapon.",
+    "lead_character_type":  "Broken. Unreliable. Carrying weight of past sins. Broken. Unreliable. Carrying weight of past sins.",
+    "story_and_plot_type":  "Chasing ghosts. Purgatory loop. A fatalistic journey.",
+    "who_and_when":  "Not for the faint of heart. Cynical viewers. Outcasts and insomniacs.",
+    "emotional_evocation":  "Numbing shock. Staring at the wall. Pure dread."
+}

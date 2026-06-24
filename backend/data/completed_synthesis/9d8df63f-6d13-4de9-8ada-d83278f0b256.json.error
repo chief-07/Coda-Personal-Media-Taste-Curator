@@ -1,0 +1,39 @@
+{
+    "title":  "The Factory",
+    "media_type":  "book",
+    "structured_data":  {
+                            "title":  "The Factory",
+                            "genres":  [
+                                           "Fiction for Kids",
+                                           "Kids",
+                                           "Science Fiction for Kids"
+                                       ],
+                            "tags":  [
+
+                                     ],
+                            "description":  "\u003cb\u003eStep inside the Factory in this suspenseful exploration of power, exploitation, and the nature of time that \u003ci\u003eKirkus\u003c/i\u003e calls a \"gripping, fast-paced story with a cliffhanger ending,\" and a \"complex beginning to what will surely be a sought-after series\"!\u003c/b\u003e\u003cbr /\u003e\u003cbr /\u003eThirteen-year-old Asher Doyle is no stranger to misfortune. Bullied at school and struggling with problems at home, he dreams of the day he can leave it all behind him. That\u0027s when he receives an unexpected opportunity: an invitation to join the Factory -- a top-secret research facility that\u0027s supposedly developing renewable energy -- and Asher will be paid handsomely for his participation. It seems like the answer to all his problems.\u003cbr /\u003e\u003cbr /\u003eBut not everything is as it seems at the Factory. The other kids in the program are tired and sullen, almost as if they\u0027ve had the life sucked out of them, and the staff members are clearly hiding something. What\u0027s more, Asher discovers he wasn\u0027t chosen at random; someone in the program desperately wants him to participate. Asher can\u0027t help but feel that whatever the Factory is doing, it\u0027s not what he or any of the other kids signed up for.\u003cbr /\u003e\u003cbr /\u003eTo Asher\u0027s horror, it turns out that the Factory isn\u0027t developing renewable energy at all. So what is the Factory up to, more important, \u003ci\u003ewhy\u003c/i\u003e? As conditions in the Factory worsen, Asher must team up with the other kids to uncover the sinister truth behind the experiment -- and his personal connection to it -- before someone gets seriously hurt.",
+                            "image":  "https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/80/15/c5/8015c53b-b0a1-8e41-a95e-4b848859f6b9/9781546109877.jpg/600x900bb.jpg",
+                            "studio":  "Catherine Egan",
+                            "director":  "Catherine Egan"
+                        },
+    "community_snippets":  [
+                               {
+                                   "title":  "Wikipedia: The Factory (novel)",
+                                   "snippet":  "[Wikipedia Synopsis] The Factory (Japanese: 工場, Hepburn: Kōjō) is a proletarian novella written by Japanese author Hiroko Oyamada. Originally written and published in Japan in 2013 by Shinchosha Publishing Co., the book was translated into English by David Boyd and published in 2019 by New Directions Publishing Corporation. The uniquely structured novella switches between the perspectives of three characters as they begin jobs at a joint living and working facility known as \"the factory.\"",
+                                   "link":  "https://en.wikipedia.org/wiki/The%20Factory%20(novel)"
+                               }
+                           ],
+    "uuid":  "9d8df63f-6d13-4de9-8ada-d83278f0b256",
+    "metadata_synthesis":  "Raw unyielding look. Raw unyielding look. The Factory",
+    "setting_and_subculture":  "Bleak landscapes. Concrete shadows. Bleak landscapes. Concrete shadows.",
+    "visual_tone_and_feel":  "Stark contrast. Bruised colors. Stark contrast. Bruised colors.",
+    "media_era_tone":  "Cynical edge. Unfiltered noise. Rejecting the glossy mainstream.",
+    "pacing_and_structure":  "No breathing room. Suffocating rhythm. Glacial dread. Waiting for the snap.",
+    "atmosphere_and_mood":  "The air is thick with unspoken trauma. Sweat-stained. Paranoia creeping in.",
+    "themes_and_messages":  "The illusion of safety shattered. The illusion of safety shattered.",
+    "character_relationships":  "Love is a vulnerability. Fractured. Toxic codependency.",
+    "lead_character_type":  "A reluctant witness to the horror. Hollow shell. Running on fumes.",
+    "story_and_plot_type":  "Chasing ghosts. Purgatory loop. Chasing ghosts. Purgatory loop.",
+    "who_and_when":  "Not for the faint of heart. Cynical viewers. Not for the faint of heart. Cynical viewers.",
+    "emotional_evocation":  "Gut-wrenching. Leaves a metallic taste. Numbing shock. Staring at the wall."
+}

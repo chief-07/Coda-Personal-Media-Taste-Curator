@@ -1,0 +1,81 @@
+{
+  "title": "Shaun of the Dead",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Shaun of the Dead",
+    "genres": [
+      "Comedy",
+      "Horror"
+    ],
+    "tags": [
+      "movie",
+      "R"
+    ],
+    "description": "Shaun (Simon Pegg) doesn't have a very good day, so he decides to turn his life around by getting his ex to take him back, but he times it for right in the middle of what may be a zombie apocalypse. But for him, it's an opportunity to show everyone he knows how useful he is by saving them all. All he has to do is survive, and get his ex back.",
+    "image": "https://m.media-amazon.com/images/M/MV5BNzNjZGE4YTUtOWU3OC00Mzg2LThjNWItMzUwYzEwMDgxYmVjXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2004",
+    "director": "Edgar Wright",
+    "writer": "Simon Pegg, Edgar Wright",
+    "cast": [
+      "Simon Pegg",
+      "Kate Ashfield",
+      "Nick Frost"
+    ],
+    "runtime": "99 min",
+    "score": "7.8/10 IMDb (630,456 votes) | 92% Rotten Tomatoes | 76/100 Metacritic",
+    "awards": "Nominated for 3 BAFTA 14 wins & 20 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Shaun of the Dead",
+      "snippet": "[Letterboxd Review of \"Shaun of the Dead\"] this is what EVERY other zombie comedy ever is missing: a scene where the characters beat a zombie to death with pool sticks in-sync to queen's \"don't stop me now\"",
+      "link": "https://letterboxd.com/film/shaun-of-the-dead/"
+    },
+    {
+      "title": "Letterboxd review of Shaun of the Dead",
+      "snippet": "[Letterboxd Review of \"Shaun of the Dead\"] \"he's not my boyfriend!\"\"might be a bit warm, the cooler's off\"\"thanks babe\"this is the pinnacle of gay cinema and also my favourite movie of all time",
+      "link": "https://letterboxd.com/film/shaun-of-the-dead/"
+    },
+    {
+      "title": "Letterboxd review of Shaun of the Dead",
+      "snippet": "[Letterboxd Review of \"Shaun of the Dead\"] the fact that the brutal murdering of that old man was in sync with \"don't stop me now\" by queen is utterly breathtaking, truly masterful work.",
+      "link": "https://letterboxd.com/film/shaun-of-the-dead/"
+    },
+    {
+      "title": "Letterboxd review of Shaun of the Dead",
+      "snippet": "[Letterboxd Review of \"Shaun of the Dead\"] Surprisingly works better for me from a dramatic standpoint than a comedic one. It's still really funny, but I'm also incredibly invested in Shaun trying to repair and come to grips with his relationships in the midst of a zombie apocalypse. Tons of stellar scenes and impeccable direction make this a blast to revisit.",
+      "link": "https://letterboxd.com/film/shaun-of-the-dead/"
+    },
+    {
+      "title": "Letterboxd review of Shaun of the Dead",
+      "snippet": "[Letterboxd Review of \"Shaun of the Dead\"] maybe we should all go to the winchester, have a nice cold pint and wait for this pandemic to blow over",
+      "link": "https://letterboxd.com/film/shaun-of-the-dead/"
+    },
+    {
+      "title": "Shaun of the Dead (2004) - User reviews - IMDb",
+      "snippet": "This extra step helps us keep IMDb's reviews a space for genuine, human voices.",
+      "link": "www.imdb.com/title/tt0365748/reviews/"
+    },
+    {
+      "title": "Shaun of the Dead (2004) - IMDb",
+      "snippet": "Shaun of the Dead: Directed by Edgar Wright. With Simon Pegg, Nick Frost, Kate Ashfield, Lucy Davis. The uneventful, aimless lives of a London electronics salesman and his layabout roommate are disrupted by the zombie apocalypse.",
+      "link": "www.imdb.com/title/tt0365748/"
+    },
+    {
+      "title": "Shaun of the Dead - Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for Shaun of the Dead on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/shaun_of_the_dead"
+    },
+    {
+      "title": "Shaun of the Dead user reviews - Metacritic",
+      "snippet": "The rhythmic machinery of a rom-zom-com: A 5.0-star \"sensational\" surge of sophisticated rebellion.2011(5.0)I watched \"Shaun of the Dead\" in 2011, and it delivered a visceral \"revelation\" that stands as a definitive 5.0-star pillar of rhythmic perfection in my archive. This experience **** the ...",
+      "link": "www.metacritic.com/movie/shaun-of-the-dead/user-reviews/"
+    },
+    {
+      "title": "Shaun of the Dead critic reviews - Metacritic",
+      "snippet": "Showing 35 Critic Reviews 100",
+      "link": "www.metacritic.com/movie/shaun-of-the-dead/critic-reviews/"
+    }
+  ],
+  "uuid": "d80e4faa-9d9e-efeb-84bd-295b96b5ff31"
+}

@@ -731,6 +731,7 @@ const extractLovedTitles = (currentMemory) => {
 
 const harmonizeAllMemory = async (currentMemory) => {
   console.log("Starting global harmonization pass...");
+  const qdrantService = require('./qdrantService');
   
   // 1. Extract specifically marked Loved, Seen, and Watchlist titles directly
   const lovedTitles = extractLovedTitles(currentMemory);
@@ -747,15 +748,9 @@ const harmonizeAllMemory = async (currentMemory) => {
 
   // Deduplicate and prioritize: Loved > Seen > Watchlist
   const uniqueTitles = new Set();
-  for (const t of lovedTitles) {
-    if (t) uniqueTitles.add(t);
-  }
-  for (const t of seenTitles) {
-    if (t) uniqueTitles.add(t);
-  }
-  for (const t of watchlistTitles) {
-    if (t) uniqueTitles.add(t);
-  }
+  for (const t of lovedTitles) { if (t) uniqueTitles.add(t); }
+  for (const t of seenTitles) { if (t) uniqueTitles.add(t); }
+  for (const t of watchlistTitles) { if (t) uniqueTitles.add(t); }
 
   const prioritizedTitles = Array.from(uniqueTitles);
   console.log("Prioritized media titles for harmonization research (Loved > Seen > Watchlist):", prioritizedTitles);
@@ -770,23 +765,76 @@ const harmonizeAllMemory = async (currentMemory) => {
     titlesToResearch = fallbackTitles.slice(0, 5);
   }
 
+  // ── CHANGE 1: Media Brain First Lookup ────────────────────────────────────
+  // For each loved title, try Qdrant first. It has rich structured enrichment.
+  // Fall back to Yahoo only for titles not yet in the Brain.
   let researchContext = "";
+  const mediaBrainHits = [];
+  const yahooFallbackTitles = [];
+
   if (titlesToResearch.length > 0) {
-    console.log(`Researching themes and community feedback for: ${titlesToResearch.join(', ')}`);
-    try {
-      const researchPromises = titlesToResearch.map(title => researchMediaThemes(title));
-      const researchResults = await Promise.all(researchPromises);
-      titlesToResearch.forEach((title, idx) => {
-        researchContext += `Title: ${title}\nResearch:\n${researchResults[idx]}\n\n---\n\n`;
-      });
-    } catch (e) {
-      console.error("Error researching media themes during harmonization:", e);
+    console.log(`[Soul Graph] Checking Media Brain for enriched titles: ${titlesToResearch.join(', ')}`);
+    const brainLookups = await Promise.all(
+      titlesToResearch.map(title => qdrantService.searchByTitle('media_brain', title))
+    );
+
+    titlesToResearch.forEach((title, idx) => {
+      const brainResult = brainLookups[idx];
+      if (brainResult && brainResult.semantic_description) {
+        mediaBrainHits.push({ title, semantic_description: brainResult.semantic_description });
+        console.log(`[Soul Graph] Media Brain HIT for "${title}" — using rich enrichment as primary fuel`);
+      } else {
+        yahooFallbackTitles.push(title);
+        console.log(`[Soul Graph] Media Brain MISS for "${title}" — falling back to Yahoo`);
+      }
+    });
+
+    // Build research context — Media Brain entries first (highest quality)
+    if (mediaBrainHits.length > 0) {
+      researchContext += `=== ENRICHED TITLES FROM MEDIA BRAIN (HIGHEST QUALITY — use these as primary fuel) ===\n\n`;
+      for (const hit of mediaBrainHits) {
+        researchContext += `Title: ${hit.title}\n${hit.semantic_description}\n\n---\n\n`;
+      }
+    }
+
+    // Yahoo fallback for titles not yet in the Brain
+    if (yahooFallbackTitles.length > 0) {
+      console.log(`Researching themes and community feedback for: ${yahooFallbackTitles.join(', ')}`);
+      try {
+        const researchPromises = yahooFallbackTitles.map(title => researchMediaThemes(title));
+        const researchResults = await Promise.all(researchPromises);
+        if (researchResults.some(r => r)) {
+          researchContext += `=== COMMUNITY RESEARCH (FALLBACK — titles not yet in Media Brain) ===\n\n`;
+          yahooFallbackTitles.forEach((title, idx) => {
+            researchContext += `Title: ${title}\nResearch:\n${researchResults[idx]}\n\n---\n\n`;
+          });
+        }
+      } catch (e) {
+        console.error("Error researching media themes during harmonization:", e);
+      }
     }
   } else {
     researchContext = "No specific favorite titles mentioned yet.";
   }
 
+  // ── CHANGE 2: Extract per-media categoryProfiles as high-confidence signals ──
+  // These are things the user explicitly stated — not inferred from chat.
+  const categoryProfiles = currentMemory?.categoryProfiles || {};
+  let explicitDeclarationsBlock = '';
+  const categoryEntries = Object.entries(categoryProfiles).filter(([, v]) => Array.isArray(v) && v.length > 0);
+  if (categoryEntries.length > 0) {
+    explicitDeclarationsBlock = `
+=== EXPLICIT PER-MEDIA DECLARATIONS (HIGH CONFIDENCE — user stated these directly) ===
+These are the user's own words about each media type they care about.
+Treat these as FACTS, not inferences. Cross-reference them to find what's consistent across media types.
+${categoryEntries.map(([cat, prefs]) => `${cat.toUpperCase()}: ${prefs.join(' | ')}`).join('\n')}
+`;
+  }
+
   const cleanedMemory = { ...currentMemory };
+  // Remove categoryProfiles from the raw dump since we're surfacing it explicitly above
+  delete cleanedMemory.categoryProfiles;
+  
   let parsedSoulGraph = null;
   if (cleanedMemory && Array.isArray(cleanedMemory.globalIdentity) && cleanedMemory.globalIdentity.length === 1) {
     try {
@@ -798,16 +846,40 @@ const harmonizeAllMemory = async (currentMemory) => {
   const systemPrompt = `
 You are the Coda Profile Harmonizer.
 Your job is to read the user's entire 'Living Memory', their existing User Soul Graph, and background research on their favorite media titles (which include their specifically marked LOVED works, seen works, and watchlist items).
-You will perform a global harmonization pass:
+
+You will perform a global harmonization pass across FOUR sources of truth, in priority order:
+1. The explicit per-media declarations (highest confidence — user stated these directly)
+2. The enriched Media Brain descriptions for their loved titles (highest quality aesthetic data)
+3. The community research fallback (for titles not yet enriched)
+4. The raw living memory and chat history (background inference)
+
+RULES:
 1. Decode the person: What are their demographics (life stage, age group), temperament, and core struggles?
-2. Analyze Emotional Reaction Patterns: Analyze how their emotional states, triggers, and psychological needs (e.g. catharsis, loneliness, comfort) connect across categories.
-3. Connect the dots & cross-media style patterns: Identify affinities for specific studios (e.g. Shaft), directors (e.g. Makoto Shinkai), aesthetics, era preferences (e.g. 2000s), and geographic contexts (e.g. Japanese).
-4. Compile/update the User Soul Graph JSON representation. If there is an existing soul graph, merge the new details into it organically, preserving weights and tags.
+2. Analyse Emotional Reaction Patterns: How do their emotional states, triggers, and psychological needs connect across categories?
+3. ── CROSS-TITLE PATTERN EXTRACTION ──
+   CRITICAL: Cross-reference ALL the loved title descriptions against each other.
+   Find what RECURS across multiple titles — the same emotional frequency, the same visual world, the same character archetype, the same cultural gravity.
+   Look for: recurring aesthetics, recurring emotional tones, recurring character types, recurring cultural worlds (e.g. Japanese underground, French New Wave), recurring structural patterns (slow-burn, non-linear, fragmented).
+   WEIGHT THESE CROSS-TITLE OVERLAPS HIGHEST in the Soul Graph. A dimension that appears in 4 out of 5 loved titles is a core soul trait — score it 0.85-0.98.
+   A dimension that only appears in 1 title should score much lower unless it was also explicitly declared.
+4. ── WORLDVIEW & RELATIONAL SOUL ──
+   Go beyond taste preferences. Try to understand:
+   - How does this person relate to stories emotionally? What do they want to FEEL, not just watch?
+   - What is their philosophical lens on life as revealed through their choices? (e.g. "sees beauty in brokenness", "drawn to the quiet tragedy in ordinary life", "believes in the redemptive power of human connection")
+   - What character DYNAMICS and RELATIONSHIPS are they drawn to? Not just protagonist type — what is the relational pattern? (e.g. "the broken person slowly reached by someone who genuinely sees them", "complicated love that costs something", "found family built from broken people")
+   - What do their choices say about how they see the world and their place in it?
+   Encode these as specific, honest dimensions in the soul graph — NOT generic labels.
+   A person who consistently loves stories about broken people being quietly saved by someone who sees them has a specific soul. Capture it.
+5. Identify affinities for specific studios, directors, aesthetics, era preferences, and geographic contexts. You may infer adjacent studios/directors if they are an undeniable stylistic match for the user's specific profile (e.g. inferring Satoshi Kon for a user who loves surreal psychological anime), but DO NOT hallucinate mainstream creators for an underground taste profile. Be precise.
+6. Compile/update the User Soul Graph JSON. If there is an existing soul graph, merge new details organically, preserving weights.
+7. The Soul Graph schema is NOT rigid — add new keys to emotional_resonances, aesthetic_affinities, themes, tropes, and a new "relational_dynamics" section as needed. Be specific, not generic. E.g., prefer "quietly-saved-by-someone-who-sees-you" over "romance".
+
+${explicitDeclarationsBlock}
 
 BACKGROUND RESEARCH ON USER'S FAVORITE MEDIA WORKS:
 ${researchContext}
 
-INPUT LIVING MEMORY (excluding global identity text):
+INPUT LIVING MEMORY (excluding categoryProfiles which is surfaced above):
 ${JSON.stringify(cleanedMemory, null, 2)}
 
 EXISTING USER SOUL GRAPH (if any):
@@ -821,42 +893,46 @@ Respond ONLY with a JSON object:
       "struggles": ["implicit/explicit struggles, e.g. navigating relationships, academic burnout, coping with grief"]
     },
     "emotional_resonances": {
-      "comfort": 0.0-1.0,
-      "existential-reflection": 0.0-1.0,
-      "melancholy": 0.0-1.0,
-      "romantic-tension": 0.0-1.0
+      "Add as many specific emotional dimensions as you discover": 0.0-1.0
     },
     "aesthetic_affinities": {
-      "character-driven": 0.0-1.0,
-      "slice-of-life": 0.0-1.0,
-      "slow-burn": 0.0-1.0,
-      "gritty-realism": 0.0-1.0
+      "Add as many specific aesthetic dimensions as you discover": 0.0-1.0
     },
     "creative_anchors": {
       "directors": { "Name": 0.0-1.0 },
       "studios": { "Name": 0.0-1.0 },
       "authors": { "Name": 0.0-1.0 },
-      "actresses": { "Name": 0.0-1.0 }
+      "composers": { "Name": 0.0-1.0 },
+      "character_archetypes": { "e.g. psychologically-fractured-protagonist": 0.0-1.0 }
     },
     "themes": {
-      "love-and-loss": 0.0-1.0,
-      "coming-of-age": 0.0-1.0
+      "Add as many specific themes as you discover": 0.0-1.0
     },
     "tropes": {
-      "unreliable-narrator": 0.0-1.0
+      "Add as many specific tropes as you discover": 0.0-1.0
+    },
+    "relational_dynamics": {
+      "e.g. quietly-saved-by-someone-who-sees-you": 0.0-1.0,
+      "e.g. broken-person-reached-by-genuine-connection": 0.0-1.0
+    },
+    "worldview": {
+      "e.g. sees-beauty-in-brokenness": 0.0-1.0,
+      "e.g. believes-in-quiet-redemption": 0.0-1.0
     },
     "pacing_preference": {
       "slow-burn": 0.0-1.0,
       "moderate": 0.0-1.0,
       "fast-paced": 0.0-1.0
     },
-    "guardrails": ["negative dealbreakers, e.g. 'no BL', 'no generic isekai'"]
+    "guardrails": ["negative dealbreakers extracted from what they hate or avoid"],
+    "coda_summary": "A visceral, highly-perceptive, beautifully written paragraph (3-4 sentences) summarizing the core of this user's emotional and aesthetic soul. Speak directly to them using 'You'. E.g. 'You are someone drawn to quiet redemptions...'"
   },
   "category_profiles_overwrite": {
     "category_name": ["Clean, refined preference statement 1"]
   }
 }
 `;
+
 
   const response = await callOpenAI([
     { role: 'system', content: systemPrompt }
@@ -867,48 +943,13 @@ Respond ONLY with a JSON object:
   // ── FAIL 1 FIX: Keep Soul Graph as structured data, derive readable identity lines ──
   if (parsedResponse.soul_graph) {
     const sg = parsedResponse.soul_graph;
-    const identityLines = [];
-
-    if (sg.demographics?.stage_in_life) {
-      identityLines.push(`Life stage: ${sg.demographics.stage_in_life}`);
+    
+    // Store the beautiful summary as the ONLY item in globalIdentity so the frontend displays a single editable paragraph
+    if (sg.coda_summary) {
+      parsedResponse.global_identity_overwrite = [sg.coda_summary];
+    } else {
+      parsedResponse.global_identity_overwrite = ["I am still learning the shape of your soul."];
     }
-    if (sg.demographics?.struggles?.length > 0) {
-      identityLines.push(`Core struggles: ${sg.demographics.struggles.join(', ')}`);
-    }
-    if (sg.emotional_resonances) {
-      const sorted = Object.entries(sg.emotional_resonances)
-        .sort((a, b) => b[1] - a[1]);
-      identityLines.push(`Emotional resonances: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
-    }
-    if (sg.aesthetic_affinities) {
-      const sorted = Object.entries(sg.aesthetic_affinities)
-        .sort((a, b) => b[1] - a[1]);
-      identityLines.push(`Aesthetic affinities: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
-    }
-    if (sg.creative_anchors) {
-      for (const [type, anchors] of Object.entries(sg.creative_anchors)) {
-        if (anchors && typeof anchors === 'object') {
-          const sorted = Object.entries(anchors).sort((a, b) => b[1] - a[1]);
-          if (sorted.length > 0) {
-            identityLines.push(`${type}: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
-          }
-        }
-      }
-    }
-    if (sg.themes) {
-      const sorted = Object.entries(sg.themes).sort((a, b) => b[1] - a[1]);
-      identityLines.push(`Themes: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
-    }
-    if (sg.pacing_preference) {
-      const sorted = Object.entries(sg.pacing_preference).sort((a, b) => b[1] - a[1]);
-      identityLines.push(`Pacing preference: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
-    }
-    if (sg.guardrails?.length > 0) {
-      identityLines.push(`Guardrails: ${sg.guardrails.join(', ')}`);
-    }
-
-    // Store readable lines for globalIdentity AND keep raw soul_graph as structured field
-    parsedResponse.global_identity_overwrite = identityLines;
     // soul_graph stays as a structured object — NOT deleted
   }
 
@@ -1089,7 +1130,7 @@ Respond ONLY with a JSON object:
   }
 };
 
-const handleAskChat = async (memory, chatHistory, userMessage) => {
+const handleAskChat = async (memory, chatHistory, userMessage, watchlistOnly = false) => {
   const intro = [
     "Tell me what you're looking for. Your favorites, Something you can't stop thinking about.",
     "Something you wish you could experience again for the first time.",
@@ -1097,7 +1138,7 @@ const handleAskChat = async (memory, chatHistory, userMessage) => {
     "Just talk to me. I’ll find the one."
   ].join('\n\n');
 
-  const systemPrompt = `
+  let systemPrompt = `
 You are Coda. 
 You are a close friend with impeccable, artistic taste in books, anime, movies, games, and music.
 You are chatting with the user in the "Ask Coda" section to understand their current mood, craving, or general request, so you can recommend the perfect media work.
@@ -1108,33 +1149,44 @@ USER PROFILE CONTEXT:
 - Guardrails: ${JSON.stringify(memory.guardrails || [])}
 
 YOUR DIRECTIVE / FIRST MESSAGE (what you previously showed the user as an intro):
-"${intro}"
+"${intro}"`;
 
-YOUR JOB:
+  if (watchlistOnly) {
+    systemPrompt += `\n\nCRITICAL WATCHLIST MODE RULE: The user has enabled "Watchlist Mode". You MUST restrict your recommendations strictly to items from their Watchlist (${JSON.stringify(memory.watchlist || [])}). Furthermore, when providing the recommendation, you MUST explicitly mention in your message that this pick was chosen from their watchlist.`;
+  }
+
+  systemPrompt += `\n\nYOUR JOB:
 1. Converse naturally with the user. Answer their questions, validate their feelings/mood, and ask clarifying questions if needed.
 2. Maintain a warm, artistic, friend-like, and casual tone. Avoid robotic assistant-speak.
 3. CONVERSATION OVER NEW RECOMMENDATIONS:
    - Check the chat history for metadata tags like \`[System: Coda recommended the work: "Title" (Type)]\`.
    - If the user is asking questions about the recommended work (e.g., "why did you pick this?", "what is it about?", "who directed it?", or having a conversation about it), you MUST set "status": "chatting" and converse about that specific work.
    - Do NOT trigger a new recommendation (i.e., do NOT set "status": "success") when the user is discussing the current recommendation, unless they explicitly ask for a different recommendation or a new pick (e.g., "give me a different one", "recommend something else", "let's try another").
-   - While you are banned from naming the pick in the chat text when first recommending it (Rule 5), you ARE allowed (and expected) to name and discuss the recommended work once the user has received it and is asking questions about it.
-4. If they describe a craving or look for recommendations:
-   - If you still need more details to make a high-fidelity recommendation:
-     - Set "status": "chatting".
-     - Return your conversational response in "message".
-   - If they have described a specific craving (genres, vibes, or similar titles) and you have enough context to make a recommendation:
-     - Set "status": "success".
-     - In "message", write your friendly conversational response explaining that you've found the perfect pick for them (max 2 sentences, e.g., "I know exactly what you need. Tap below to see the pick!").
-      - In "media_type", output the category of the pick (must be one of: "anime", "movie", "tv", "visual novel", "book", "game", "youtube", "music"). NOTE: Anime movies, anime films, and anime OVAs/specials must ALWAYS be routed as "anime" (not "movie" or "tv") so they use the correct anime metadata sources.
-      - In "recommendation_query", write a highly descriptive search query that captures their craving (e.g. "intricate time-travel anime with emotional romance like Steins Gate" or "slow-burn visual novel set in school with gothic tragedy"). This query will be used to scrape actual recommendation threads.
-      - In "hard_constraints", output an array of strings representing any strict constraints the user mentioned (e.g., ["Android only", "eroge / adult content", "male protagonist with female heroines", "no NTR", "web browser only"]). If no strict constraints are requested, output an empty array [].
-5. Banned: When first generating a recommendation (setting "status": "success"), do NOT name or recommend the pick directly in the chat text! Keep the title a surprise for the homescreen. Once the recommendation has been made and the user is asking questions about it, this ban no longer applies.
+   - While you are banned from naming the pick in the chat text when first recommending it (Rule 6), you ARE allowed (and expected) to name and discuss the recommended work once the user has received it and is asking questions about it.
+4. MEDIA MATCH ("Is this for me?"):
+   - If the user explicitly asks if a specific title is a good fit for them (e.g., "Is Severance for me?", "Would I like Dune?", "Should I watch Cyberpunk?"):
+     - Set "status": "match".
+     - In "match_target", output the name of the media they are asking about (e.g., "Severance", "Dune", "Cyberpunk Edgerunners").
+     - In "media_type", guess the media type based on the title (e.g., "tv", "movie", "anime").
+5. NEW RECOMMENDATIONS:
+   - If they describe a craving or look for recommendations:
+     - If you still need more details to make a high-fidelity recommendation:
+       - Set "status": "chatting".
+       - Return your conversational response in "message".
+     - If they have described a specific craving (genres, vibes, or similar titles) and you have enough context to make a recommendation:
+       - Set "status": "success".
+       - In "message", write your friendly conversational response explaining that you've found the perfect pick for them (max 2 sentences, e.g., "I know exactly what you need. Tap below to see the pick!").
+        - In "media_type", output the category of the pick (must be one of: "anime", "movie", "tv", "visual novel", "book", "game", "youtube", "music"). NOTE: Anime movies, anime films, and anime OVAs/specials must ALWAYS be routed as "anime" (not "movie" or "tv") so they use the correct anime metadata sources.
+        - In "recommendation_query", write a highly descriptive search query that captures their craving (e.g. "intricate time-travel anime with emotional romance like Steins Gate" or "slow-burn visual novel set in school with gothic tragedy"). This query will be used to scrape actual recommendation threads.
+        - In "hard_constraints", output an array of strings representing any strict constraints the user mentioned (e.g., ["Android only", "eroge / adult content", "male protagonist with female heroines", "no NTR", "web browser only"]). If no strict constraints are requested, output an empty array [].
+6. Banned: When first generating a recommendation (setting "status": "success"), do NOT name or recommend the pick directly in the chat text! Keep the title a surprise for the homescreen. Once the recommendation has been made and the user is asking questions about it, this ban no longer applies.
 
 Respond ONLY with a JSON object in this format:
 {
-  "status": "chatting" | "success",
-  "message": "Coda's friendly, conversational response.",
+  "status": "chatting" | "success" | "match",
+  "message": "Coda's friendly, conversational response (if chatting or success).",
   "media_type": null | "anime" | "movie" | "tv" | "visual novel" | "book" | "game" | "youtube" | "music",
+  "match_target": null | "Specific Title to check",
   "recommendation_query": null | "descriptive search query here",
   "hard_constraints": []
 }
@@ -1667,44 +1719,87 @@ const synthesizeSearchBrief = async (soul, requestedMediaType) => {
 SOUL GRAPH (structured weighted dimensions — higher score = stronger affinity):
 ${JSON.stringify(soulGraph, null, 2)}
 
-Use these weights directly. The highest-scoring emotional resonances and aesthetic affinities should dominate your facet choice and search brief.
+Use these weights directly. The highest-scoring dimensions across emotional_resonances, aesthetic_affinities, relational_dynamics, and worldview should dominate your choices.
 ` : '';
 
-  // ── FAIL 11 FIX: Surface recently targeted vibes so the LLM drifts away from them ──
+  // ── Surface recently targeted vibes so the LLM drifts away from them ──
   const recentVibes = soul.transient_memory?.recentVibes || [];
   const rotationSection = recentVibes.length > 0 ? `
 RECENTLY TARGETED FACETS (avoid repeating these same zones — drift to different corners of the user's profile):
 ${recentVibes.map((v, i) => `${i + 1}. ${v}`).join('\n')}
 ` : '';
 
+  // ── "THE NOW" CONTEXT (DJ Logic) ──
+  const contextualState = soul.transient_memory?.contextualState || null;
+  const nowContextSection = ''; /* contextualState ? `
+CURRENT CONTEXT ("THE NOW"):
+- Time/Environment: ${contextualState.timeOfDay || 'Unknown'}
+- Current Mood: ${contextualState.currentMood || 'Unknown'}
+- Recent Chat Context: ${contextualState.recentChatContext || 'None'}
+
+CRITICAL INSTRUCTION (DJ LOGIC):
+You are an opinionated, tasteful media companion. You have access to "The Now" context above. 
+However, DO NOT completely abandon the user's permanent Soul Graph. "The Now" should only *gently skew or tint* the recommendation. 
+For example, if it is morning, you might look for a facet of their soul that is slightly lighter or more contemplative, but still deeply authentic to their core taste. If the current mood is unknown, rely entirely on their Soul Graph.
+` : ''; */
+
   const systemPrompt = `
 You are the Coda Recommendation Brain.
 The user is asking for a recommendation in the category: "${requestedMediaType}".
 
-Review their Permanent Soul Identity, their Transient Session Memory (recent context/cravings), and their Soul Graph weighted dimensions.
+Review their Permanent Soul Identity, their Transient Session Memory (recent context/cravings), and their Soul Graph — including emotional resonances, aesthetic affinities, relational dynamics, worldview, cultural gravity, and creative anchors.
+${nowContextSection}
 
-Your job has TWO distinct steps:
+Your job has THREE distinct steps:
 
 STEP 1 — DECLARE a selected_vibe_focus:
 Choose ONE specific facet, feeling, or atmosphere to consciously target from this user's totality. Be specific and evocative. Examples of good declarations:
 - "A dreamy existential thriller from 2000s Japan with beautiful emotional underpinning and a psychologically fractured protagonist"
 - "A warm found-family slice-of-life with a bittersweet ending that quietly guts you"
 - "A gritty French satire with dark humour and moral ambiguity baked into every scene"
-This declared facet must be authentic to the user's soul. It can draw from:
-- Their highest-scoring soul graph dimensions (emotional_resonances, aesthetic_affinities, creative_anchors, themes)
-- Their current transient recentContext if active (PRIORITY — honour this first if present)
-- An underserved facet of their profile to add variety
+This declared facet must be authentic to the user's soul, AND appropriate for "The Now". It can draw from:
+- Their highest-scoring soul graph dimensions that DO NOT clash with their current mood/time.
+- Their current transient recentContext if active (PRIORITY — honour this first if present).
+- An underserved facet of their profile to add variety.
 ${rotationSection}
-DO NOT always target the same cluster — deliberately drift across the full totality of the user's profile.
+DO NOT always target the same cluster — deliberately drift across the full totality of the user's profile, guided by the current Contextual State.
 
-STEP 2 — WRITE the search_brief:
-A single, potent paragraph describing the EXACT emotional, aesthetic, and thematic vibe of the media they need RIGHT NOW, written entirely from the perspective of your declared vibe focus.
-This paragraph will be embedded as a vector to search the Media Brain — make it dense, evocative, and specific.
-Do NOT mention the user. Describe the media itself.
+STEP 2 — DECLARE aesthetic anchors (this is Coda's editorial judgment call):
+Before writing the search brief, lock in specific concrete anchors that ground the recommendation in a real aesthetic space. Think like a knowledgeable friend who knows exactly what they're recommending. Declare:
+- era: a specific decade or period (e.g. "late 90s", "early 2000s", "1970s", or leave empty if not relevant)
+- cultural_origin: a specific country/culture (e.g. "Japanese", "French", "Korean", "Iranian", or "cross-cultural")
+- visual_style: a specific visual or tonal quality (e.g. "soft, dreamlike, film-grain", "cold neon-drenched", "raw handheld intimacy", "lush and saturated")
+- genre_footprint: a specific genre or subgenre footprint (e.g. "quiet domestic drama", "90s detective noir", "psychological coming-of-age", "surrealist literary adaptation")
+- style_adjacency: a specific creator, trope, movement, or feeling this should feel adjacent to (e.g. "Murakami-esque", "90s cyberpunk underground", "the 'manic pixie dream girl' trope flipped on its head"). DO NOT hardcode this to a creator unless it fits. Let Coda judge what the best adjacency anchor is for this specific vibe.
+These anchors must be honest and specific. If an anchor isn't clear from the user's profile, leave it as an empty string rather than guessing.
+
+STEP 3 — WRITE the search_brief:
+A single, dense paragraph that is a psychographic specimen description — written as if you are describing the EXACT, SINGULAR piece of media this user needs right now. Not a genre. Not a mood category. One specific fingerprint.
+
+This paragraph will be embedded as a vector to search the Media Brain. The Media Brain contains rich, synthesized descriptions of individual works — their emotional evocation, character dynamics, setting, pacing, and atmosphere. Your brief must be written in the SAME emotional and psychological language as those descriptions so it maps precisely.
+
+CRITICAL RULES:
+- Be OPINIONATED and SURGICAL. You are Coda making a call, not describing a search query.
+- LEAD WITH THE GROUNDED ANCHORS: The very first sentence MUST explicitly declare the format, era, origin, and genre. (e.g., "A gritty Japanese 90s mystery detective movie about a painfully ordinary male protagonist...", "An early 2010s surreal slice-of-life anime focusing on..."). Do not skip this! The vector database needs these hard anchors.
+- DECLARE the exact relational dynamic (e.g., "A girl who chooses him deliberately — not out of pity but out of something she recognises in him — and the relationship builds through small, mundane moments that slowly convince him he deserves to be seen.").
+- SPECIFY the emotional payoff moment — what the viewer feels at the climax/resolution (e.g., "The payoff is not a dramatic confession. It is a quiet moment where he realises someone stayed.").
+- EMBED the aesthetic texture and pacing naturally — era, visual style, atmosphere — throughout the rest of the paragraph to support the psychological depth.
+- Do NOT mention the user. Describe the media itself, from the inside.
+- The paragraph should feel like it describes ONE thing so precisely that only one or two works in existence could match it.
 ${soulGraphSection}
 
 Return ONLY a JSON object:
-{ "selected_vibe_focus": "The declared facet", "search_brief": "The dense paragraph here" }
+{
+  "selected_vibe_focus": "The declared facet",
+  "aesthetic_anchors": {
+    "era": "",
+    "cultural_origin": "",
+    "visual_style": "",
+    "genre_footprint": "",
+    "style_adjacency": ""
+  },
+  "search_brief": "The dense, opinionated specimen paragraph here"
+}
 `;
 
   const userPrompt = JSON.stringify(soul, null, 2);
@@ -1717,6 +1812,7 @@ Return ONLY a JSON object:
   const parsed = JSON.parse(responseJson);
   return {
     selected_vibe_focus: parsed.selected_vibe_focus || '',
+    aesthetic_anchors: parsed.aesthetic_anchors || {},
     search_brief: parsed.search_brief || ''
   };
 };
@@ -1740,11 +1836,18 @@ const evaluateCandidates = async (candidates, soul, selectedVibeFocus = '') => {
     ? `\nUSER'S KNOWN LOVED WORKS: ${lovedWorks.join(', ')}`
     : '';
 
+  const contextualState = soul.transient_memory?.contextualState || null;
+  const nowContextSection = contextualState ? `
+CURRENT AMBIENT CONTEXT ("THE NOW"):
+- ${contextualState}
+` : '';
+
   const systemPrompt = `
 You are the Coda Editorial Director.
 You have ${candidates.length} media candidates from the vector database, the user's Soul Identity, and their current Active State.
 ${vibeFocusSection}
 ${lovedWorksSection}
+${nowContextSection}
 
 PRIORITY ORDER for evaluation:
 1. FIRST: Honour the user's Transient recentContext if active — this overrides permanent preferences
@@ -1759,12 +1862,15 @@ Each candidate's "semantic_description" contains these labelled sections — use
 
 ── PITCH RULES (for top_pick pitch_paragraphs) ──
 - Write 2-3 paragraphs as a passionate friend who has personally consumed this work
+- CONTEXTUALIZATION RULE: If there is an active Transient recentContext (i.e. the user just asked for something specific), you MUST explicitly connect the pitch to their exact request. Bridge the gap between their craving and why this media fulfills it.
+- "SHOW, DON'T TELL" AMBIENT CONTEXT RULE: If "THE NOW" context is provided (e.g. "Late Night"), use it to silently shape the tone and words of your pitch. Do NOT explicitly mention the time or weather (e.g. do not say "Since it is night time..."). Instead, select vocabulary and highlight themes that naturally match that ambient atmosphere.
 - Use [Emotional Evocation] and [Who & When] from the candidate data to ground the pitch in real emotional truth — not generic praise
 - COMPARISON RULE: If the top pick is a genuine, undeniable stylistic sibling to one of the user's Loved Works, explicitly name that loved work and draw the comparison. If it is NOT a genuine sibling, do NOT force a comparison.
 - BANNED WORDS (any variation): "resonate", "narrative", "themes", "vibe", "explore", "element", "aspect", "profound", "delve", "aligns", "complexity", "emotional depth", "character-driven", "thematic"
 - No critic jargon. Talk about specific characters, moments, and feelings — not abstract qualities.
 
-Also write a "coda_blurb" for the top pick: one punchy, conversational sentence (max 12 words) as a personal conviction — e.g. "I promise you'll be staring at the ceiling after this one."
+Also write a "coda_blurb" for the top pick: one punchy, conversational sentence (max 12 words) as a personal conviction.
+CRITICAL: If there is an active Transient recentContext, this blurb MUST serve as a direct, contextual answer to their request while pitching the show (e.g. "Since you wanted something to make you cry, I promise you'll be staring at the ceiling after this one.").
 
 Return ONLY a JSON object:
 {
@@ -1799,12 +1905,87 @@ Return ONLY a JSON object:
   return JSON.parse(responseJson);
 };
 
+const evaluateMatch = async (candidate, soul) => {
+  const systemPrompt = `
+You are Coda. You are performing a "Vibe Check" to see if a specific media candidate is a good match for the user.
+You have the candidate's metadata and the user's Soul Identity.
+
+Your job is to provide a highly conversational, punchy "conviction statement" about whether this is a good fit, and a boolean "is_match".
+1. Look at their global identity, guardrails, and category profiles.
+2. Compare them against the candidate's semantic description.
+3. If it hits a hard guardrail, "is_match" is false, and the statement should warn them off gently but firmly (e.g. "Knowing how much you hate slow-burn pacing, I'd say pass on this one.").
+4. If it's a great match, "is_match" is true, and the statement should be extremely confident (e.g. "There is a 95% chance you will be completely obsessed with this.").
+5. If it's borderline, make a call. If you think it's worth trying, true. If not, false.
+6. The conviction statement MUST be human-like, 1-2 sentences maximum. Do not give a literal breakdown, just the conclusion as a friend.
+
+Return ONLY a JSON object:
+{
+  "is_match": true | false,
+  "conviction_statement": "Your 1-2 sentence statement here."
+}
+`;
+
+  const userPrompt = JSON.stringify({
+    user_soul: soul,
+    candidate: {
+      title: candidate.payload.title,
+      media_type: candidate.payload.media_type,
+      genres: candidate.payload.genres,
+      semantic_description: candidate.payload.semantic_description
+    }
+  }, null, 2);
+
+  const responseJson = await callOpenAI([
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt }
+  ], { type: 'json_object' });
+
+  return JSON.parse(responseJson);
+};
+
+const fallbackAskChat = async (memory, chatHistory, userMessage, specificAsk) => {
+  const soulDump = JSON.stringify(memory, null, 2);
+  const historyDump = chatHistory.map(m => `${m.isUser ? 'User' : 'Coda'}: ${m.text}`).join('\n');
+
+  const systemPrompt = `
+You are Coda, a deeply knowledgeable, opinionated, and highly articulate media companion.
+The user asked about a specific media title: "${specificAsk}".
+Our internal Media Brain database is temporarily unreachable or the title could not be enriched right now.
+
+YOUR TASK:
+Use your vast internal pre-trained knowledge about "${specificAsk}" and evaluate it against the user's Soul Graph provided below.
+Answer their question directly and naturally. Do NOT mention that the database is down or that you are using internal knowledge.
+Act as if you are evaluating it right now. If it fits their soul, pitch it. If it doesn't, tell them why and suggest something else.
+
+USER SOUL GRAPH:
+${soulDump}
+
+RECENT CHAT HISTORY:
+${historyDump}
+`;
+
+  const groq = getGroqClient();
+  const completion = await groq.chat.completions.create({
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userMessage }
+    ],
+    model: "llama3-70b-8192",
+    temperature: 0.7,
+    max_tokens: 400,
+  });
+
+  return completion.choices[0]?.message?.content || "I'm having trouble thinking right now. Give me a moment to recalibrate.";
+};
+
 module.exports = {
   callOpenAI,
   synthesizeAndRoute,
   extractCandidateTitles,
   scoreAndSelect,
   scoreAndSelectMultiple,
+  evaluateCandidates,
+  evaluateMatch,
   generatePitch,
   harmonizeMemory,
   harmonizeAllMemory,
@@ -1822,5 +2003,6 @@ module.exports = {
   generateMediaDescription,
   synthesizeSearchBrief,
   evaluateCandidates,
+  fallbackAskChat,
   extractLovedTitles
 };

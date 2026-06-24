@@ -1,9 +1,8 @@
 const axios = require('axios');
-const dotenv = require('dotenv');
 const path = require('path');
 
-// Load environment variables
-dotenv.config({ path: path.join(__dirname, '../assets/.env') });
+// Load public app config plus ignored local backend secrets.
+require('./loadEnv');
 
 async function run() {
   const apiKey = process.env.OPENAI_API_KEY;

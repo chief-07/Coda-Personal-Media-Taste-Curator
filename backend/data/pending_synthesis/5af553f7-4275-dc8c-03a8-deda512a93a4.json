@@ -1,0 +1,24 @@
+{
+  "title": "Snow Country",
+  "media_type": "book",
+  "structured_data": {
+    "title": "Snow Country",
+    "genres": [
+      "Classics",
+      "Fiction & Literature"
+    ],
+    "tags": [],
+    "description": "Snow Country (雪国 Yukiguni) is a novel by the Japanese author Yasunari Kawabata. The novel is considered a classic work of Japanese literature and was among the three novels the Nobel Committee cited in 1968, when Kawabata was awarded the Nobel Prize in Literature.",
+    "image": "https://is1-ssl.mzstatic.com/image/thumb/Publication123/v4/62/37/5d/62375d34-b177-bdb6-cbe9-51fb1bfd1d52/502.png/600x900bb.jpg",
+    "studio": "Yasunari Kawabata",
+    "director": "Yasunari Kawabata"
+  },
+  "community_snippets": [
+    {
+      "title": "Wikipedia: Snow Country",
+      "snippet": "[Wikipedia Synopsis] Snow Country (雪国, Yukiguni; IPA: [jɯkiꜜɡɯɲi]) is a novel by the Japanese author Yasunari Kawabata. The novel is considered a classic work of Japanese literature and was among the three novels the Nobel Committee cited in 1968, when Kawabata was awarded the Nobel Prize in Literature.",
+      "link": "https://en.wikipedia.org/wiki/Snow%20Country"
+    }
+  ],
+  "uuid": "5af553f7-4275-dc8c-03a8-deda512a93a4"
+}

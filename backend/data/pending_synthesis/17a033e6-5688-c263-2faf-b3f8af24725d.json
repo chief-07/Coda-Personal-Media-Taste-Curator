@@ -1,0 +1,82 @@
+{
+  "title": "Spider-Man",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "Spider-Man",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Based on Marvel Comics' superhero character, this is a story of Peter Parker who is a nerdy high-schooler. He was orphaned as a child, bullied by jocks, and can't confess his crush for his stunning neighborhood girl Mary Jane Watson. To say his life is \"miserable\" is an understatement. But one day while on an excursion to a laboratory a runaway radioactive spider bites him... and his life changes in a way no one could have imagined. Peter acquires a muscle-bound physique, clear vision, ability to cling to surfaces and crawl over walls, shooting webs from his wrist ... but the fun isn't going to last. An eccentric millionaire Norman Osborn administers a performance enhancing drug on himself and his maniacal alter ego Green Goblin emerges. Now Peter Parker has to become Spider-Man and take Green Goblin to the task... or else Goblin will kill him. They come face to face and the war begins in which only one of them will survive at the end.",
+    "image": "https://m.media-amazon.com/images/M/MV5BZWM0OWVmNTEtNWVkOS00MzgyLTkyMzgtMmE2ZTZiNjY4MmFiXkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2002",
+    "director": "Sam Raimi",
+    "writer": "Stan Lee, Steve Ditko, David Koepp",
+    "cast": [
+      "Tobey Maguire",
+      "Kirsten Dunst",
+      "Willem Dafoe"
+    ],
+    "runtime": "121 min",
+    "score": "7.4/10 IMDb (958,249 votes) | 90% Rotten Tomatoes | 73/100 Metacritic",
+    "awards": "Nominated for 2 Oscars. 17 wins & 65 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of Spider-Man",
+      "snippet": "[Letterboxd Review of \"Spider-Man\"] why does Willem Dafoe need to wear that giant green goblin mask when it's identical to his normal facial expression",
+      "link": "https://letterboxd.com/film/spider-man/"
+    },
+    {
+      "title": "Letterboxd review of Spider-Man",
+      "snippet": "[Letterboxd Review of \"Spider-Man\"] i had to beat an old lady with a stick to get these cranberries.",
+      "link": "https://letterboxd.com/film/spider-man/"
+    },
+    {
+      "title": "Letterboxd review of Spider-Man",
+      "snippet": "[Letterboxd Review of \"Spider-Man\"] Uncle Ben would be alive if Pro Wrestling had a union.",
+      "link": "https://letterboxd.com/film/spider-man/"
+    },
+    {
+      "title": "Letterboxd review of Spider-Man",
+      "snippet": "[Letterboxd Review of \"Spider-Man\"] I both adore and detest how this now plays like a nonstop meme compilation",
+      "link": "https://letterboxd.com/film/spider-man/"
+    },
+    {
+      "title": "Letterboxd review of Spider-Man",
+      "snippet": "[Letterboxd Review of \"Spider-Man\"] tobey maguire's acting in this gives off the same energy as me dissociating in the middle of a conversation and then pretending i understood everything",
+      "link": "https://letterboxd.com/film/spider-man/"
+    },
+    {
+      "title": "Spider-Man: No Way Home Critic Reviews Megathread : r/movies - Reddit",
+      "snippet": "Spider-Man: No Way Home is exactly the movie you think it is if you've seen a single trailer for this movie for good and for ill. The first and second acts are very messy, but the third act pulls it together to pack one hell of an emotional punch.",
+      "link": "www.reddit.com/r/movies/comments/rg4u29/spiderman_no_way_home_critic_reviews_megathread/"
+    },
+    {
+      "title": "SPIDER-MAN: NO WAY HOME SPOILER REVIEW (EMOTIONAL) - Reddit",
+      "snippet": "865K subscribers in the Spiderman community. The subreddit for the Marvel character, Spider-Man",
+      "link": "www.reddit.com/r/Spiderman/comments/ri9rct/spiderman_no_way_home_spoiler_review_emotional/"
+    },
+    {
+      "title": "Spider-Man: No Way Home [SPOILERS] : r/movies - Reddit",
+      "snippet": "The ending is kinda insane honestly - its rebooted Spider-Man to the friendly neighbourhood spider, after having him using the most advanced technology, being part of the biggest superheroes, Iron-Man as his mentor, fighting against thanos and his army and being cut out of existence.",
+      "link": "www.reddit.com/r/movies/comments/ri7eum/official_discussion_spiderman_no_way_home_spoilers/"
+    },
+    {
+      "title": "Spider-Man: No Way Home - Early Reviews Megathread - Reddit",
+      "snippet": "A thrilling & emotional end to the \"Homecoming\" trilogy, but also a smart, fun & exciting tribute to 20 years of Spider-Man movies. Both hilarious & heartbreaking, I honestly loved every second.",
+      "link": "www.reddit.com/r/marvelstudios/comments/rg1tbe/spiderman_no_way_home_early_reviews_megathread/"
+    },
+    {
+      "title": "Why Is Spiderman: No Way Home So Critically Acclaimed? - Reddit",
+      "snippet": "When I saw it, it seemed like someone from Marvel watched Spiderman: Into the Spiderverse and decided to wedge the same story into the MCU. The big, emotional payoff for the film and the way it's resolved is pretty much exactly the same as Into the Spiderverse as well. Granted, the story is better than almost every recent MCU entry, but the movie sits at a 93% fresh from critics and 98% fresh ...",
+      "link": "www.reddit.com/r/moviecritic/comments/14khr74/why_is_spiderman_no_way_home_so_critically/"
+    }
+  ],
+  "uuid": "17a033e6-5688-c263-2faf-b3f8af24725d"
+}

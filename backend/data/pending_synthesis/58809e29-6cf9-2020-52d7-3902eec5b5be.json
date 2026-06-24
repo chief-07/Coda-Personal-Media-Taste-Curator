@@ -1,0 +1,81 @@
+{
+  "title": "The Aviator",
+  "media_type": "movie",
+  "structured_data": {
+    "title": "The Aviator",
+    "genres": [
+      "Biography",
+      "Drama"
+    ],
+    "tags": [
+      "movie",
+      "PG-13"
+    ],
+    "description": "Biopic of billionaire Howard Hughes, starting with his early filmmaking years as owner of R.K.O. Pictures, but mostly focusing on his role in designing and promoting new aircraft. Hughes was a risk-taker spending several fortunes on designing experimental aircraft and eventually founding TWA as a rival to Pan Am airlines owned by his great rival Juan Trippe. When Trippe's politico Senator Ralph Owen Brewster accuses Hughes of being a war profiteer, it's Hughes who gains the upper hand. Hughes also had many women in his life including a long relationship with Katharine Hepburn. From an early age, however, Hughes was also germophobic and would have severe bouts of mental illness.",
+    "image": "https://m.media-amazon.com/images/M/MV5BYTUyYWJlNDgtOTM5Ny00YTQ3LWFmYTgtZjJiNTNkYjJlMmY4XkEyXkFqcGc@._V1_SX300.jpg",
+    "release_year": "2004",
+    "director": "Martin Scorsese",
+    "writer": "John Logan",
+    "cast": [
+      "Leonardo DiCaprio",
+      "Cate Blanchett",
+      "Kate Beckinsale"
+    ],
+    "runtime": "170 min",
+    "score": "7.5/10 IMDb (401,380 votes) | 86% Rotten Tomatoes | 77/100 Metacritic",
+    "awards": "Won 5 Oscars. 89 wins & 131 nominations total"
+  },
+  "community_snippets": [
+    {
+      "title": "Letterboxd review of The Aviator",
+      "snippet": "[Letterboxd Review of \"The Aviator\"] Solid movie about an extremely normal guy just being a cool dude. Flying planes, dating teenagers, drinking milk, making movies, taking about titties and llamas, having crippling disorders (that can be traced to visions of American success ingrained in childhood) exacerbated by an industry and culture that celebrates wealth and \"progress\" above anything else.",
+      "link": "https://letterboxd.com/film/the-aviator/"
+    },
+    {
+      "title": "Letterboxd review of The Aviator",
+      "snippet": "[Letterboxd Review of \"The Aviator\"] The way of the future...The way of the future...The way of the future...The way of the future...The way of the future...The way of the future...The way of the future...The way of the future...The way of the (SLAP)*problem solved*",
+      "link": "https://letterboxd.com/film/the-aviator/"
+    },
+    {
+      "title": "Letterboxd review of The Aviator",
+      "snippet": "[Letterboxd Review of \"The Aviator\"] The plane crash in The Aviator >>> the bear attack in The Revenant",
+      "link": "https://letterboxd.com/film/the-aviator/"
+    },
+    {
+      "title": "Letterboxd review of The Aviator",
+      "snippet": "[Letterboxd Review of \"The Aviator\"] I feel like the movie uses both Howard's OCD and wealth for great effect without delving into the explanation/development of how either became such a crucial part of his life, and that's a little frustrating to me– but god, what a film! Nobody makes a breezy three hours like Scorsese. The ending breaks my heart. Also the first moment of the movie is them spelling and saying \"quarantine\" repeatedly. It was so unexpected we screamed. Who'da thunk the movie about the reclusive billionaire germaphobe would be hittin different right now.",
+      "link": "https://letterboxd.com/film/the-aviator/"
+    },
+    {
+      "title": "Letterboxd review of The Aviator",
+      "snippet": "[Letterboxd Review of \"The Aviator\"] This film is good.But it's long as a motherfucker.",
+      "link": "https://letterboxd.com/film/the-aviator/"
+    },
+    {
+      "title": "The Aviator | Rotten Tomatoes",
+      "snippet": "Discover reviews, ratings, and trailers for The Aviator on Rotten Tomatoes. Stay updated with critic and audience scores today!",
+      "link": "www.rottentomatoes.com/m/aviator"
+    },
+    {
+      "title": "The Aviator | Critic Reviews | Rotten Tomatoes",
+      "snippet": "Read what top critics are saying about The Aviator. See ratings, reviews, and more on Rotten Tomatoes. Click to explore full critic breakdown.",
+      "link": "www.rottentomatoes.com/m/1001425-aviator/reviews?type=top_critics"
+    },
+    {
+      "title": "'The Aviator' brilliantly captures mogul's genius, madness movie review",
+      "snippet": "\"The Aviator\" celebrates Scorsese's zest for finding excitement in a period setting, re-creating the kind of glamor he heard about when he was growing up. It is possible to imagine him wanting to be Howard Hughes. Their lives, in fact, are even a little similar: Heedless ambition and talent when young, great early success, tempestuous romances and a dark period, although with Hughes it ...",
+      "link": "www.rogerebert.com/reviews/the-aviator-2004"
+    },
+    {
+      "title": "The Aviator critic reviews - Metacritic",
+      "snippet": "Showing 41 Critic Reviews 100",
+      "link": "www.metacritic.com/movie/the-aviator/critic-reviews/"
+    },
+    {
+      "title": "The Aviator Reviews - Metacritic",
+      "snippet": "Leonardo DiCaprio stars as aviation pioneer Howard Hughes in this biopic directed by Martin Scorsese.",
+      "link": "www.metacritic.com/movie/the-aviator/"
+    }
+  ],
+  "uuid": "58809e29-6cf9-2020-52d7-3902eec5b5be"
+}
