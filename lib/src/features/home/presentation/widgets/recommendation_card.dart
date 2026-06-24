@@ -220,28 +220,32 @@ class _CardLayout extends ConsumerWidget {
           ),
 
           const SizedBox(height: 16), // Reduced top gap to 16px
-          // ── Hero Text ────────────────────────────────────────────
+
+          // ── Hero Text / Blurb ────────────────────────────────────
           Padding(
             padding: const EdgeInsets.only(
               left: 24,
               right: 55,
-            ), // Adjusted right pad for wider letters
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: SizedBox(
-                width: 330, // Force wrap at a standard readable width
-                child: isKnockoutLayer
-                    ? _buildHeroText(Colors.black)
-                    : GestureDetector(
-                        onTap: () {
-                          context.push('/pitch/${recommendation.id}', extra: recommendation);
-                        },
-                        child: Opacity(
-                          opacity: 0,
-                          child: _buildHeroText(Colors.white),
+            ),
+            child: SizedBox(
+              height: 108, // Lock height to exactly 3 lines of 36px line height
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  width: 330, // Force wrap at a standard readable width
+                  child: isKnockoutLayer
+                      ? _buildHeroText(Colors.black)
+                      : GestureDetector(
+                          onTap: () {
+                            context.push('/pitch/${recommendation.id}', extra: recommendation);
+                          },
+                          child: Opacity(
+                            opacity: 0,
+                            child: _buildHeroText(Colors.white),
+                          ),
                         ),
-                      ),
+                ),
               ),
             ),
           ),

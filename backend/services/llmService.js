@@ -1870,6 +1870,7 @@ Each candidate's "semantic_description" contains these labelled sections — use
 - No critic jargon. Talk about specific characters, moments, and feelings — not abstract qualities.
 
 Also write a "coda_blurb" for the top pick: one punchy, conversational sentence (max 12 words) as a personal conviction.
+CRITICAL: YOU ABSOLUTELY MUST INCLUDE the "coda_blurb" string in your JSON output. Failing to include it will break the application.
 CRITICAL: If there is an active Transient recentContext, this blurb MUST serve as a direct, contextual answer to their request while pitching the show (e.g. "Since you wanted something to make you cry, I promise you'll be staring at the ceiling after this one.").
 
 Return ONLY a JSON object:

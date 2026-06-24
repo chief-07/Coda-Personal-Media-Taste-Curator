@@ -127,9 +127,10 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
 
   // 3. Vector Search
   const queryVector = await embeddingService.embed(search_brief);
+  const qdrantMediaType = requestedMediaType === 'visualNovel' ? 'visual novel' : requestedMediaType;
   const filter = {
     must: [
-      { key: "media_type", match: { value: requestedMediaType } }
+      { key: "media_type", match: { value: qdrantMediaType } }
     ]
   };
 
@@ -177,20 +178,50 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     
     // Attempt to fetch runtime/length tags dynamically
     let runtimeTag = null;
+    let fetchedMeta = null;
     try {
-      const detailedMeta = await searchService.fetchMetadataForCandidate(candidate.payload.title, candidate.payload.media_type);
-      if (detailedMeta) {
-        if (detailedMeta.runtime) runtimeTag = detailedMeta.runtime;
-        else if (detailedMeta.length_minutes) runtimeTag = `${detailedMeta.length_minutes}m`;
-        else if (detailedMeta.episodes) runtimeTag = `${detailedMeta.episodes} eps`;
-        else if (detailedMeta.pageCount) runtimeTag = `${detailedMeta.pageCount} pages`;
+      fetchedMeta = await searchService.fetchMetadataForCandidate(candidate.payload.title, candidate.payload.media_type);
+      if (fetchedMeta) {
+        if (fetchedMeta.runtime) runtimeTag = fetchedMeta.runtime;
+        else if (fetchedMeta.length_minutes) runtimeTag = `${fetchedMeta.length_minutes}m`;
+        else if (fetchedMeta.episodes) runtimeTag = `${fetchedMeta.episodes} eps`;
+        else if (fetchedMeta.pageCount) runtimeTag = `${fetchedMeta.pageCount} pages`;
       }
     } catch (e) {
-      console.warn(`[Recommend] Failed to fetch detailed meta for runtime tag:`, e.message);
+      console.warn(`[Recommend] Failed to fetch detailed meta for candidate:`, e.message);
     }
     
-    const finalTags = [...(candidate.payload.tags || [])];
+    let finalTags = [...(candidate.payload.tags || [])];
+    if (fetchedMeta && fetchedMeta.tags) {
+      finalTags = [...new Set([...finalTags, ...fetchedMeta.tags])];
+    }
     if (runtimeTag) finalTags.unshift(runtimeTag);
+
+    const synopsisRaw = candidate.payload.semantic_description || '';
+    const metaMatch = synopsisRaw.match(/\[Metadata & Cultural Context\]:\s*(.*?)(?=\n\[|$)/s);
+    const plotMatch = synopsisRaw.match(/\[Story & Plot Type\]:\s*(.*?)(?=\n\[|$)/s);
+    
+    const cleanDesc = [];
+    if (metaMatch && metaMatch[1]) cleanDesc.push(metaMatch[1].trim());
+    if (plotMatch && plotMatch[1]) cleanDesc.push(plotMatch[1].trim());
+    const description = cleanDesc.length > 0 ? cleanDesc.join('\n\n') : synopsisRaw;
+
+    let payloadGenres = candidate.payload.genres || [];
+    if (payloadGenres.length === 0 || payloadGenres[0] === 'Unknown') {
+      payloadGenres = (fetchedMeta && fetchedMeta.genres) ? fetchedMeta.genres : payloadGenres;
+    }
+
+    let payloadRelease = candidate.payload.release_year || '';
+    if (!payloadRelease || payloadRelease === 'Unknown') {
+      payloadRelease = (fetchedMeta && fetchedMeta.release_year) ? fetchedMeta.release_year : payloadRelease;
+    }
+
+    let payloadStudio = candidate.payload.studio || '';
+    if (!payloadStudio || payloadStudio === 'Unknown') {
+      if (fetchedMeta) {
+        payloadStudio = fetchedMeta.studio || fetchedMeta.developer || fetchedMeta.director || fetchedMeta.author || payloadStudio;
+      }
+    }
 
     return {
       id: candidate.id,
@@ -198,14 +229,14 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
       media_type: candidate.payload.media_type,
       coda_blurb: blurb || null,
       pitch_paragraphs: pitch || [],
-      poster_url: meta.posterUrl || '',
-      ost_url: '',
-      trailer_url: meta.trailerUrl || '',
-      description: candidate.payload.semantic_description,
-      genres: candidate.payload.genres || [],
-      tags: finalTags,
-      release_year: candidate.payload.release_year || '',
-      studio: candidate.payload.studio || ''
+      poster_url: meta.poster_url || '',
+      ost_url: meta.ost_url || '',
+      trailer_url: meta.trailer_url || '',
+      description: description,
+      genres: payloadGenres,
+      tags: finalTags.slice(0, 10),
+      release_year: payloadRelease,
+      studio: payloadStudio
     };
   };
 
@@ -543,7 +574,7 @@ router.post('/vibe-check', async (req, res) => {
 
     const qdrantService = require('../services/qdrantService');
     const exactHits = await qdrantService.searchByTitle('media_brain', title);
-    const hit = exactHits && exactHits.length > 0 ? exactHits[0] : null;
+    const hit = exactHits ? { id: title.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: exactHits } : null;
 
     if (!hit) {
       return res.json({
@@ -578,7 +609,7 @@ router.post('/promote', async (req, res) => {
 
     const qdrantService = require('../services/qdrantService');
     const exactHits = await qdrantService.searchByTitle('media_brain', title);
-    const hit = exactHits && exactHits.length > 0 ? exactHits[0] : null;
+    const hit = exactHits ? { id: title.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: exactHits } : null;
 
     if (!hit) {
       return res.status(404).json({ error: `Could not find ${title} in the database to promote.` });
