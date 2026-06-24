@@ -11,8 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/library/presentation/library_screen.dart';
 import 'package:coda/src/features/session/application/archived_sessions_controller.dart';
-import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
+import 'package:coda/src/features/library/application/soul_profile_controller.dart';
 import 'package:coda/src/features/session/data/living_memory_provider.dart';
+import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/data/recommendation_provider.dart';
 import 'package:coda/src/features/home/presentation/home_screen.dart';
 import 'package:coda/src/core/providers/watchlist_mode_provider.dart';
@@ -501,6 +502,7 @@ class _CardLayout extends ConsumerWidget {
                               categoryProfiles: memory.categoryProfiles,
                               recentContext: memory.recentContext,
                               guardrails: newGuardrails,
+                              mediaReflections: memory.mediaReflections,
                               seen: newSeen,
                               notForMe: memory.notForMe,
                               watchlist: memory.watchlist,
@@ -524,6 +526,7 @@ class _CardLayout extends ConsumerWidget {
                               categoryProfiles: memory.categoryProfiles,
                               recentContext: memory.recentContext,
                               guardrails: newGuardrails,
+                              mediaReflections: memory.mediaReflections,
                               seen: newSeen,
                               notForMe: memory.notForMe,
                               watchlist: memory.watchlist,
@@ -577,6 +580,7 @@ class _CardLayout extends ConsumerWidget {
                               categoryProfiles: memory.categoryProfiles,
                               recentContext: memory.recentContext,
                               guardrails: newGuardrails,
+                              mediaReflections: memory.mediaReflections,
                               seen: memory.seen,
                               notForMe: newNotForMe,
                               watchlist: memory.watchlist,
@@ -600,6 +604,7 @@ class _CardLayout extends ConsumerWidget {
                               categoryProfiles: memory.categoryProfiles,
                               recentContext: memory.recentContext,
                               guardrails: newGuardrails,
+                              mediaReflections: memory.mediaReflections,
                               seen: memory.seen,
                               notForMe: newNotForMe,
                               watchlist: memory.watchlist,

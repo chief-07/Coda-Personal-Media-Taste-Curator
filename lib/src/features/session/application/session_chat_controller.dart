@@ -5,6 +5,7 @@ import 'package:coda/src/features/onboarding/application/onboarding_controller.d
 import 'package:coda/src/features/session/application/archived_sessions_controller.dart';
 import 'package:coda/src/features/session/domain/archived_session.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
+import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
 
 class SessionChatState {
   final List<ChatMessage> messages;

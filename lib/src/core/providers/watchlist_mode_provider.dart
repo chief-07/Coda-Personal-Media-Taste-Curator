@@ -1,17 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 
-class WatchlistModeNotifier extends StateNotifier<bool> {
-  WatchlistModeNotifier(this.ref) : super(false) {
-    _init();
-  }
-
-  final Ref ref;
+class WatchlistModeNotifier extends Notifier<bool> {
   static const _key = 'watchlist_mode_enabled';
 
-  void _init() {
+  @override
+  bool build() {
     final prefs = ref.read(sharedPreferencesProvider);
-    state = prefs.getBool(_key) ?? false;
+    return prefs.getBool(_key) ?? false;
   }
 
   Future<void> toggle() async {
@@ -22,6 +18,6 @@ class WatchlistModeNotifier extends StateNotifier<bool> {
   }
 }
 
-final watchlistModeProvider = StateNotifierProvider<WatchlistModeNotifier, bool>((ref) {
-  return WatchlistModeNotifier(ref);
+final watchlistModeProvider = NotifierProvider<WatchlistModeNotifier, bool>(() {
+  return WatchlistModeNotifier();
 });
