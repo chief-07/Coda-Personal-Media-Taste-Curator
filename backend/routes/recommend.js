@@ -74,8 +74,17 @@ const mapCandidateToResponse = async (candidate, pitch = null, blurb = null) => 
   try {
     fetchedMeta = await searchService.fetchMetadataForCandidate(candidate.payload.title, candidate.payload.media_type);
     if (fetchedMeta) {
-      if (fetchedMeta.runtime) runtimeTag = fetchedMeta.runtime;
-      else if (fetchedMeta.length_minutes) runtimeTag = `${fetchedMeta.length_minutes}m`;
+      const formatRuntime = (val) => {
+        const mins = parseInt(val, 10);
+        if (isNaN(mins)) return val;
+        if (mins < 60) return `${mins}m`;
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return m === 0 ? `${h}h` : `${h}h ${m}m`;
+      };
+
+      if (fetchedMeta.runtime) runtimeTag = formatRuntime(fetchedMeta.runtime);
+      else if (fetchedMeta.length_minutes) runtimeTag = formatRuntime(fetchedMeta.length_minutes);
       else if (fetchedMeta.episodes) runtimeTag = `${fetchedMeta.episodes} eps`;
       else if (fetchedMeta.pageCount) runtimeTag = `${fetchedMeta.pageCount} pages`;
     }
