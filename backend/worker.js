@@ -13,7 +13,11 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 async function runWorkerLoop() {
   // Give Qdrant time to initialize and create collections if needed
   await delay(3000);
-  await qdrantService.setupCollections();
+  try {
+    await qdrantService.setupCollections();
+  } catch (e) {
+    console.error('[Worker] Failed to setup collections:', e.message);
+  }
 
   while (true) {
     let currentTask = null;

@@ -45,7 +45,8 @@ class QdrantService {
    */
   async setupCollections() {
     if (!this.isInitialized || !this.client) {
-      throw new Error('Qdrant client not initialized');
+      console.warn('[QdrantService] setupCollections skipped: client not initialized.');
+      return;
     }
 
     const requiredCollections = [
