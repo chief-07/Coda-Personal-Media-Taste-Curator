@@ -186,6 +186,8 @@ class QdrantService {
       // Silent fail — title just isn't in the Brain yet
       return null;
     }
+  }
+
   /**
    * Queue Push (Tier 1, 2, 3)
    */
