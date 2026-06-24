@@ -995,6 +995,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
         categoryProfiles: profiles,
         recentContext: memory.recentContext,
         guardrails: memory.guardrails,
+        mediaReflections: memory.mediaReflections,
         seen: memory.seen,
         notForMe: memory.notForMe,
         watchlist: memory.watchlist,

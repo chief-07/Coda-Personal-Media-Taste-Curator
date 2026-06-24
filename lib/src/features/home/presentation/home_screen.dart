@@ -9,6 +9,7 @@ import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/home/presentation/widgets/media_type_tab_bar.dart';
 import 'package:coda/src/features/home/presentation/widgets/recommendation_card.dart';
 import 'package:coda/src/features/recommendation/application/audio_player_controller.dart';
+import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
