@@ -1727,11 +1727,15 @@ While the user's highest-scoring dimensions represent their core tastes, do NOT 
   // ── Surface recently targeted vibes so the LLM drifts away from them ──
   const recentVibes = soul.transient_memory?.recentVibes || [];
   const rotationSection = recentVibes.length > 0 ? `
-CRITICAL INSTRUCTION FOR VARIETY:
-The user feels they are getting the SAME recommendations over and over. You MUST radically depart from the genres, eras, and cultural origins you recently targeted.
-RECENTLY TARGETED FACETS (AVOID THESE ENTIRELY):
+INSTRUCTION FOR VARIETY (ROTATION):
+To avoid repeating similar setups, steer away from the exact vibe focuses and tropes targeted in recent runs.
+RECENTLY TARGETED VIBES (AVOID SUBSTANTIALLY REPEATING THESE EXACT ANGLES):
 ${recentVibes.map((v, i) => `${i + 1}. ${v}`).join('\n')}
-Choose an entirely different era, a completely different genre footprint, or a totally different cultural origin from the user's Soul Graph to ensure fresh recommendations.
+
+GUIDELINES FOR VARIETY WITH SOUL-GROUNDING:
+1. Always stay grounded in the user's Soul Graph and core tastes. Never fabricate random genres, eras, or settings that are completely alien to their profile.
+2. For variety, rotate to a *different facet* of their taste profile, or combine their core interests in a novel way. E.g., if we recently did modern romantic dramas, try a retro slice-of-life, a bittersweet coming-of-age, or a quiet psychological mystery that also features their preferred emotional resonances.
+3. Do not over-rotate into completely unrelated genres (like high-octane action, survival horror, or hard sci-fi) if the user has no history of liking them. Variety should feel like a fresh, authentic extension of their identity, not a random leap.
 ` : '';
 
   // ── "THE NOW" CONTEXT (DJ Logic) ──
@@ -1766,18 +1770,18 @@ STEP 1 — DECLARE a selected_vibe_focus:
 Choose ONE specific facet, feeling, or atmosphere to consciously target from this user's totality. Be specific and evocative. Examples of good declarations:
 - "A dreamy existential thriller from 2000s Japan with beautiful emotional underpinning and a psychologically fractured protagonist"
 - "A warm found-family slice-of-life with a bittersweet ending that quietly guts you"
-- "A gritty French satire with dark humour and moral ambiguity baked into every scene"
+- "A melancholic, slow-burn mystery drama set in a rainy coastal town focusing on grief and quiet recovery"
 This declared facet must be authentic to the user's soul, AND appropriate for "The Now". It can draw from:
 - Their highest-scoring soul graph dimensions that DO NOT clash with their current mood/time.
 - Their current transient recentContext if active (PRIORITY — honour this first if present).
 - An underserved facet of their profile to add variety.
 ${rotationSection}
-DO NOT always target the same cluster — deliberately drift across the full totality of the user's profile, guided by the current Contextual State.
+DO NOT always target the same cluster — deliberately drift across the full totality of the user's profile, but ensure every vibe focus remains strictly grounded in their authentic tastes (i.e. do not choose random genres or themes that are completely unsupported by their profile).
 
 STEP 2 — DECLARE aesthetic anchors (this is Coda's editorial judgment call):
 Before writing the search brief, lock in specific concrete anchors that ground the recommendation in a real aesthetic space. Think like a knowledgeable friend who knows exactly what they're recommending. Declare:
-- era: a specific decade or period (e.g. "late 90s", "early 2000s", "1970s", or leave empty if not relevant)
-- cultural_origin: a specific country/culture (e.g. "Japanese", "French", "Korean", "Iranian", or "cross-cultural")
+- era: a specific decade or period (e.g. "late 90s", "early 2000s", "2010s", or leave empty if not relevant). Avoid forcing very old retro eras (like 1970s or older) unless the user's profile explicitly suggests it.
+- cultural_origin: a specific country/culture (e.g. "Japanese", "American/Western", or leave empty/broad). Do NOT choose foreign-language or obscure cultures (like French or Iranian) unless the user's soul graph or history shows a clear preference for them.
 - visual_style: a specific visual or tonal quality (e.g. "soft, dreamlike, film-grain", "cold neon-drenched", "raw handheld intimacy", "lush and saturated")
 - genre_footprint: a specific genre or subgenre footprint (e.g. "quiet domestic drama", "90s detective noir", "psychological coming-of-age", "surrealist literary adaptation")
 - style_adjacency: a specific creator, trope, movement, or feeling this should feel adjacent to (e.g. "Murakami-esque", "90s cyberpunk underground", "the 'manic pixie dream girl' trope flipped on its head"). DO NOT hardcode this to a creator unless it fits. Let Coda judge what the best adjacency anchor is for this specific vibe.
@@ -1811,6 +1815,7 @@ Return ONLY a JSON object:
   "search_brief": "The dense, opinionated specimen paragraph here"
 }
 `;
+
 
   const userPrompt = JSON.stringify(soul, null, 2);
 
@@ -1883,10 +1888,10 @@ ${nowContextSection}
 ${guardrailsSection}
 
 PRIORITY ORDER for evaluation:
-1. FIRST: Honour the user's Transient recentContext if active — this overrides permanent preferences
-2. SECOND: Target the declared vibe focus for this run
-3. THIRD: Use the permanent soul as background and personality grounding
-4. FOURTH: Apply guardrails as hard disqualifiers
+1. FIRST: Honour the user's Transient recentContext if active — this overrides permanent preferences.
+2. SECOND: Ensure the candidate is deeply aligned and grounded in the user's Permanent Soul (their core values, emotional resonances, and aesthetic preferences). NEVER pick something that is completely alien or contrary to their profile.
+3. THIRD: Among the grounded candidates, select the one that best captures the declared vibe focus for this run. Ground the pitch in how this title delivers this exact feeling.
+4. FOURTH: Apply guardrails as hard disqualifiers.
 
 Each candidate's "semantic_description" contains these labelled sections — use them to ground your evaluation:
 - [Emotional Evocation]: the raw emotional truth of how this work actually makes people feel
@@ -1899,6 +1904,7 @@ Each candidate's "semantic_description" contains these labelled sections — use
 - "SHOW, DON'T TELL" AMBIENT CONTEXT RULE: If "THE NOW" context is provided (e.g. "Late Night"), use it to silently shape the tone and words of your pitch. Do NOT explicitly mention the time or weather (e.g. do not say "Since it is night time..."). Instead, select vocabulary and highlight themes that naturally match that ambient atmosphere.
 - Use [Emotional Evocation] and [Who & When] from the candidate data to ground the pitch in real emotional truth — not generic praise
 - COMPARISON RULE: DO NOT mention any of the user's loved works unless there is an overwhelming, undeniable link (e.g. same creator, direct spiritual successor, or exact same very niche subgenre). If the connection is merely "they both have great worldbuilding" or "they are both sad", REMAIN COMPLETELY SILENT about the loved works. Pitch the work on its own standalone merits. Forced connections ruin the magic.
+- Dark / Psychological / Horror works: Do not automatically filter out works with dark, psychological, or horror elements if they align with the user's taste for psychological/character depth (like their affinity for works like Aoi Bungaku, Higurashi, or Kara no Shoujo). However, avoid recommending cheap/generic jump-scare horror, pure gore, or slasher films that lack emotional resonance or introspective character drama.
 - BANNED WORDS (any variation): "resonate", "narrative", "themes", "vibe", "explore", "element", "aspect", "profound", "delve", "aligns", "complexity", "emotional depth", "character-driven", "thematic"
 - No critic jargon. Talk about specific characters, moments, and feelings — not abstract qualities.
 

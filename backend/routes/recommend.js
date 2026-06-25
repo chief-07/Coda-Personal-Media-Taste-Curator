@@ -183,6 +183,54 @@ const areFranchiseTitles = (a, b) => {
   return false;
 };
 
+const isShortOrMusicVideo = (r, requestedMediaType) => {
+  if (requestedMediaType !== 'anime') return false;
+  
+  const genres = (r.payload.genres || []).map(g => g.toLowerCase());
+  const tags = (r.payload.tags || []).map(t => t.toLowerCase());
+  const desc = (r.payload.semantic_description || '').toLowerCase();
+  const title = (r.payload.title || '').toLowerCase();
+
+  // 1. Check for explicit Music/Music Video indicators
+  if (genres.includes('music') || tags.includes('music')) {
+    return true;
+  }
+  
+  // 2. Check description and title for short runtime indicators (under 10 minutes)
+  const shortPatterns = [
+    /runtime of (just )?\d minute/i,
+    /runtime of (just )?[1-9] minute/i,
+    /\b[1-9]-minute short\b/i,
+    /\b[1-9] minute short\b/i,
+    /short runtime of (just )?[1-9] minute/i,
+    /short film of (just )?[1-9] minute/i,
+    /music video/i,
+    /\bcommercial\b/i,
+    /promotional short/i,
+    /anime music video/i,
+    /amv/i,
+    /runtime of (just )?one (minute|second)/i,
+    /runtime of (just )?two (minute|second)/i,
+    /runtime of (just )?three (minute|second)/i,
+    /runtime of (just )?four (minute|second)/i,
+    /runtime of (just )?five (minute|second)/i,
+    /runtime of (just )?six (minute|second)/i,
+    /runtime of (just )?seven (minute|second)/i,
+    /runtime of (just )?eight (minute|second)/i,
+    /runtime of (just )?nine (minute|second)/i,
+    /runtime of (just )?ten (minute|second)/i
+  ];
+
+  for (const pattern of shortPatterns) {
+    if (pattern.test(desc) || pattern.test(title)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+
 
 // ── Core Recommendation Pipeline (Phase 3) ───────────────────────────────────
 // specificAsk: optional string from /ask route — the user's explicit request text
@@ -337,9 +385,30 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     return true;
   });
 
-  // 4.2 Intra-pool franchise deduplication (keep only the highest-scoring candidate per franchise in this run)
+  // 4.2 Separate into regular and short/music pools to prevent shorts/MVs from crowding out full-length titles
+  const queryText = (specificAsk || selected_vibe_focus || '').toLowerCase();
+  const userWantsMusicOrShort = queryText.includes('music') || 
+                                queryText.includes('song') || 
+                                queryText.includes('short') || 
+                                queryText.includes('mv') || 
+                                queryText.includes('video');
+
+  const regularPool = [];
+  const shortOrMusicPool = [];
+
+  for (const r of baseFiltered) {
+    if (!userWantsMusicOrShort && isShortOrMusicVideo(r, requestedMediaType)) {
+      shortOrMusicPool.push(r);
+    } else {
+      regularPool.push(r);
+    }
+  }
+
+  // Deduplicate and select top 10, prioritizing regular pool
   const candidates = [];
-  for (const candidate of baseFiltered) {
+  const combinedPool = [...regularPool, ...shortOrMusicPool];
+
+  for (const candidate of combinedPool) {
     let isDuplicate = false;
     for (const kept of candidates) {
       if (areFranchiseTitles(candidate.payload.title, kept.payload.title)) {
@@ -353,6 +422,7 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
       if (candidates.length === 10) break; // Take top 10
     }
   }
+
 
   if (candidates.length === 0) {
     throw new Error("No matching candidates found in Media Brain.");
