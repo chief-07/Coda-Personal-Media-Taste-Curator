@@ -328,6 +328,48 @@ class QdrantService {
     }
     return null;
   }
+
+  /**
+   * Retrieves a point's vector and payload by title scroll-scan.
+   * Used for direct vector similarity searches.
+   * @param {string} collectionName
+   * @param {string} title
+   * @returns {object|null} - { vector, payload } or null
+   */
+  async getVectorAndPayloadByTitle(collectionName, title) {
+    if (!this.isInitialized || !this.client) return null;
+    try {
+      const targetBase = title.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      let offset = null;
+      
+      while (true) {
+        const result = await this.client.scroll(collectionName, {
+          limit: 1000,
+          offset: offset,
+          with_payload: true,
+          with_vector: true,
+        });
+        
+        for (const point of result.points) {
+          const ptTitle = point.payload?.title || '';
+          const ptBase = ptTitle.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (ptBase === targetBase) {
+            return {
+              vector: point.vector,
+              payload: point.payload
+            };
+          }
+        }
+        
+        offset = result.next_page_offset;
+        if (!offset) break;
+      }
+      return null;
+    } catch (e) {
+      console.warn('[QdrantService] getVectorAndPayloadByTitle error:', e.message);
+      return null;
+    }
+  }
 }
 
 module.exports = new QdrantService();

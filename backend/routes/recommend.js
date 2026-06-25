@@ -152,11 +152,43 @@ const mapCandidateToResponse = async (candidate, pitch = null, blurb = null) => 
   };
 };
 
+const areFranchiseTitles = (a, b) => {
+  if (!a || !b) return false;
+  const cleanA = a.toLowerCase().replace(/^the\s+/, '').replace(/[^\w\s:]/g, '').trim();
+  const cleanB = b.toLowerCase().replace(/^the\s+/, '').replace(/[^\w\s:]/g, '').trim();
+
+  if (cleanA === cleanB) return true;
+
+  // Substring check for longer titles
+  if (cleanA.length >= 5 && cleanB.length >= 5) {
+    if (cleanA.includes(cleanB) || cleanB.includes(cleanA)) return true;
+  }
+
+  // Colon prefix check (e.g. "ef: a tale of...")
+  const partsA = cleanA.split(':');
+  const partsB = cleanB.split(':');
+  if (partsA.length > 1 && partsB.length > 1) {
+    const rootA = partsA[0].trim();
+    const rootB = partsB[0].trim();
+    if (rootA === rootB && rootA.length >= 2) return true;
+  }
+
+  // Shared word prefix check (e.g. "ef a tale of...")
+  const wordsA = cleanA.split(/\s+/);
+  const wordsB = cleanB.split(/\s+/);
+  if (wordsA.length >= 2 && wordsB.length >= 2) {
+    if (wordsA[0] === wordsB[0] && wordsA[1] === wordsB[1]) return true;
+  }
+
+  return false;
+};
+
 
 // ── Core Recommendation Pipeline (Phase 3) ───────────────────────────────────
 // specificAsk: optional string from /ask route — the user's explicit request text
 // contextualState: optional object representing "The Now" (time, mood, etc)
-async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null, contextualState = null, fallbackMemory = null, watchlistOnly = false) {
+// similarToTitle: optional string — the title of a reference media work for direct vector similarity queries
+async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null, contextualState = null, fallbackMemory = null, watchlistOnly = false, similarToTitle = null) {
   // 1. Fetch User Soul (Core Identity + Active State)
   let soul = { permanent_soul: {}, transient_memory: {} };
   if (userId) {
@@ -182,6 +214,7 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
         seen: fallbackMemory.seen || [],
         notForMe: fallbackMemory.notForMe || fallbackMemory.not_for_me || [],
         watchlist: fallbackMemory.watchlist || [],
+        recentlyRecommended: fallbackMemory.recentlyRecommended || [],
       }
     };
   }
@@ -214,16 +247,45 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
 
   const seen = soul.transient_memory?.seen || [];
   const notForMe = soul.transient_memory?.notForMe || [];
-  const excludeList = [...seen, ...notForMe].map(t => t.toLowerCase());
+  const recentlyRecommended = soul.transient_memory?.recentlyRecommended || [];
+  
+  // Exclude the reference title itself if we are doing a similar-to search
+  const baseExclude = [...seen, ...notForMe];
+  if (similarToTitle) {
+    baseExclude.push(similarToTitle);
+  }
+  const excludeList = [...baseExclude, ...recentlyRecommended].map(t => t.toLowerCase());
 
-  console.log(`[Recommend] Generating brief for ${requestedMediaType}...`);
-  // 2. Synthesize Search Brief (now returns both the facet declaration AND the paragraph)
-  const { selected_vibe_focus, search_brief } = await llmService.synthesizeSearchBrief(soul, requestedMediaType);
-  console.log(`[Recommend] Vibe Focus: "${selected_vibe_focus}"`);
-  console.log(`[Recommend] Brief: "${search_brief}"`);
+  let queryVector = null;
+  let selected_vibe_focus = '';
+  let directMatchFound = false;
 
-  // 3. Vector Search
-  const queryVector = await embeddingService.embed(search_brief);
+  if (similarToTitle) {
+    console.log(`[Recommend] Direct vector similarity query requested for: "${similarToTitle}". Checking database...`);
+    const pointInfo = await qdrantService.getVectorAndPayloadByTitle('media_brain', similarToTitle);
+    if (pointInfo && pointInfo.vector) {
+      queryVector = pointInfo.vector;
+      selected_vibe_focus = `Direct vector similarity search based on "${pointInfo.payload.title}"`;
+      directMatchFound = true;
+      console.log(`[Recommend] Found vector for "${pointInfo.payload.title}". Skipping LLM search brief synthesis.`);
+    } else {
+      console.log(`[Recommend] Vector for "${similarToTitle}" not found in DB. Falling back to LLM brief synthesis.`);
+    }
+  }
+
+  if (!directMatchFound) {
+    console.log(`[Recommend] Generating brief for ${requestedMediaType}...`);
+    // 2. Synthesize Search Brief
+    const briefResult = await llmService.synthesizeSearchBrief(soul, requestedMediaType);
+    selected_vibe_focus = briefResult.selected_vibe_focus;
+    const search_brief = briefResult.search_brief;
+    console.log(`[Recommend] Vibe Focus: "${selected_vibe_focus}"`);
+    console.log(`[Recommend] Brief: "${search_brief}"`);
+
+    // 3. Vector Search
+    queryVector = await embeddingService.embed(search_brief);
+  }
+  
   const qdrantMediaType = requestedMediaType === 'visualNovel' ? 'visual novel' : requestedMediaType;
   const filter = {
     must: [
@@ -259,11 +321,38 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
   const rawResults = await qdrantService.search('media_brain', queryVector, 30, filter);
   
   // 4. Filter Results
-  const candidates = rawResults.filter(r => {
-    // Filter out items the user has seen or rejected
-    if (excludeList.includes(r.payload.title.toLowerCase())) return false;
+  // 4.1 Filter out items the user has seen, rejected, or are sequels of seen/rejected items
+  const baseFiltered = rawResults.filter(r => {
+    const candidateTitle = r.payload.title;
+    // Check direct exclusion first
+    if (excludeList.includes(candidateTitle.toLowerCase())) return false;
+    
+    // Check franchise/sequel match against user's seen and notForMe lists
+    for (const excludedTitle of [...seen, ...notForMe]) {
+      if (areFranchiseTitles(candidateTitle, excludedTitle)) {
+        console.log(`[Recommend Filter] Excluded sequel/franchise "${candidateTitle}" based on seen/rejected: "${excludedTitle}"`);
+        return false;
+      }
+    }
     return true;
-  }).slice(0, 10); // Take top 10 valid candidates for evaluation
+  });
+
+  // 4.2 Intra-pool franchise deduplication (keep only the highest-scoring candidate per franchise in this run)
+  const candidates = [];
+  for (const candidate of baseFiltered) {
+    let isDuplicate = false;
+    for (const kept of candidates) {
+      if (areFranchiseTitles(candidate.payload.title, kept.payload.title)) {
+        console.log(`[Recommend Filter] Intra-pool duplicate excluded: "${candidate.payload.title}" (already kept: "${kept.payload.title}")`);
+        isDuplicate = true;
+        break;
+      }
+    }
+    if (!isDuplicate) {
+      candidates.push(candidate);
+      if (candidates.length === 10) break; // Take top 10
+    }
+  }
 
   if (candidates.length === 0) {
     throw new Error("No matching candidates found in Media Brain.");
@@ -291,23 +380,30 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     return await mapCandidateToResponse(candidate, null, ru.coda_blurb);
   }));
 
-  // ── FAIL 11 FIX: Persist selected_vibe_focus to recentVibes[] so next run drifts ──
+  // ── Persist selected_vibe_focus to recentVibes[] and recommendations to recentlyRecommended[] ──
+  const newlyRecommended = [topResponse.title, ...runnerUpResponses.map(r => r.title)].filter(Boolean);
   if (userId && selected_vibe_focus) {
     setImmediate(async () => {
       try {
         const freshSoul = await userSoulService.getUserMemory(userId);
         const recentVibes = freshSoul.transient_memory?.recentVibes || [];
+        const recentRecs = freshSoul.transient_memory?.recentlyRecommended || [];
+        
         // Prepend current focus, cap at 5
         const updatedVibes = [selected_vibe_focus, ...recentVibes].slice(0, 5);
+        // Prepend current recommendations, cap at 15
+        const updatedRecs = [...new Set([...newlyRecommended, ...recentRecs])].slice(0, 15);
+        
         const updatedMemory = {
           ...(freshSoul.permanent_soul || {}),
           ...(freshSoul.transient_memory || {}),
           recentVibes: updatedVibes,
+          recentlyRecommended: updatedRecs,
         };
         await userSoulService.syncLivingMemory(userId, updatedMemory);
-        console.log(`[Recommend] Saved vibe focus to recentVibes (${updatedVibes.length} tracked): "${selected_vibe_focus}"`);
+        console.log(`[Recommend] Saved vibe focus to recentVibes (${updatedVibes.length} tracked) and ${newlyRecommended.length} recommended titles to recentlyRecommended.`);
       } catch (e) {
-        console.warn('[Recommend] Failed to persist recentVibes:', e.message);
+        console.warn('[Recommend] Failed to persist recentVibes / recentlyRecommended:', e.message);
       }
     });
   }
@@ -532,8 +628,8 @@ router.post('/ask', async (req, res) => {
     if (parsed.status === 'success' && parsed.media_type && parsed.recommendation_query) {
       let recommendations = [];
       try {
-        // ── FAIL 6 FIX PART 1: Pass the specific ask into the pipeline so it shapes the Search Brief ──
-        recommendations = await runQdrantPipeline(userId, parsed.media_type, parsed.recommendation_query, contextualState, current_memory, watchlist_only);
+        // ── Pass the specific ask and any reference title into the pipeline ──
+        recommendations = await runQdrantPipeline(userId, parsed.media_type, parsed.recommendation_query, contextualState, current_memory, watchlist_only, parsed.similar_to_title);
       } catch (pipelineError) {
         console.error('[Ask Engine] Qdrant Pipeline Failed. Falling back to LLM internal knowledge:', pipelineError.message);
         const fallbackMessage = await llmService.fallbackAskChat(current_memory || {}, chat_history || [], user_message, parsed.recommendation_query);

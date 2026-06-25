@@ -462,16 +462,13 @@ const fetchMangaDexPoster = async (title) => {
       });
       const coverFile = coverRes.data?.data?.[0]?.attributes?.fileName;
       if (coverFile) {
-        // Strip any existing extension (e.g. .jpg) before adding .512.jpg
-        const baseName = coverFile.replace(/\.[^.]+$/, '');
-        const img = `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${mangaId}/${baseName}.512.jpg`)}`;
+        const img = `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${mangaId}/${coverFile}.512.jpg`)}`;
         console.log(`[MangaDex] ✅ "${title}": ${img}`);
         return img;
       }
     } else {
-      // Strip any existing extension (e.g. .jpg) before adding .512.jpg
-      const baseName = coverRel.attributes.fileName.replace(/\.[^.]+$/, '');
-      const img = `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${mangaId}/${baseName}.512.jpg`)}`;
+      const coverFile = coverRel.attributes.fileName;
+      const img = `/api/recommend/proxy-image?url=${encodeURIComponent(`https://uploads.mangadex.org/covers/${mangaId}/${coverFile}.512.jpg`)}`;
       console.log(`[MangaDex] ✅ "${title}": ${img}`);
       return img;
     }

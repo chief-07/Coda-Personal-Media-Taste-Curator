@@ -249,6 +249,7 @@ class UserSoulService {
       notForMe: livingMemoryJson.notForMe || [],
       watchlist: livingMemoryJson.watchlist || [],
       recentVibes: livingMemoryJson.recentVibes || [],
+      recentlyRecommended: livingMemoryJson.recentlyRecommended || [],
       updatedAt: new Date().toISOString()
     });
 

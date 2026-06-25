@@ -1170,15 +1170,14 @@ YOUR DIRECTIVE / FIRST MESSAGE (what you previously showed the user as an intro)
      - In "match_target", output the name of the media they are asking about (e.g., "Severance", "Dune", "Cyberpunk Edgerunners").
      - In "media_type", guess the media type based on the title (e.g., "tv", "movie", "anime").
 5. NEW RECOMMENDATIONS:
-   - If they describe a craving or look for recommendations:
-     - If you still need more details to make a high-fidelity recommendation:
-       - Set "status": "chatting".
-       - Return your conversational response in "message".
-     - If they have described a specific craving (genres, vibes, or similar titles) and you have enough context to make a recommendation:
-       - Set "status": "success".
-       - In "message", write your friendly conversational response explaining that you've found the perfect pick for them (max 2 sentences, e.g., "I know exactly what you need. Tap below to see the pick!").
+    - If they describe a craving or look for recommendations:
+      - If they specify a clear reference title (e.g., "recommend an anime like Interstellar" or "similar to Berserk") or a specific vibe, you DO have enough context. You MUST set "status": "success" immediately. Do NOT set "status": "chatting" to ask clarifying questions when they provide a clear title or vibe constraint.
+      - If their query is extremely vague (e.g., just saying "recommend something" or "what should I watch") and you need more details to make a recommendation, set "status": "chatting" and ask for their preferences.
+      - When setting "status": "success":
+        - In "message", write your friendly conversational response explaining that you've found the perfect pick for them (max 2 sentences, e.g., "I know exactly what you need. Tap below to see the pick!").
         - In "media_type", output the category of the pick (must be one of: "anime", "movie", "tv", "visual novel", "book", "game", "youtube", "music"). NOTE: Anime movies, anime films, and anime OVAs/specials must ALWAYS be routed as "anime" (not "movie" or "tv") so they use the correct anime metadata sources.
         - In "recommendation_query", write a highly descriptive search query that captures their craving (e.g. "intricate time-travel anime with emotional romance like Steins Gate" or "slow-burn visual novel set in school with gothic tragedy"). This query will be used to scrape actual recommendation threads.
+        - In "similar_to_title", if the user explicitly asks for recommendations similar to a specific media work (e.g., "something like Interstellar" or "manga similar to Berserk") with no complex modifiers, output the clean proper title of that reference work here (e.g., "Interstellar", "Berserk"). If they mention multiple titles, or if the similarity request contains complex modifiers/constraints that alter the vibe (e.g., "like Interstellar but more funny"), set this to null.
         - In "hard_constraints", output an array of strings representing any strict constraints the user mentioned (e.g., ["Android only", "eroge / adult content", "male protagonist with female heroines", "no NTR", "web browser only"]). If no strict constraints are requested, output an empty array [].
 6. Banned: When first generating a recommendation (setting "status": "success"), do NOT name or recommend the pick directly in the chat text! Keep the title a surprise for the homescreen. Once the recommendation has been made and the user is asking questions about it, this ban no longer applies.
 
@@ -1189,6 +1188,7 @@ Respond ONLY with a JSON object in this format:
   "media_type": null | "anime" | "movie" | "tv" | "visual novel" | "book" | "game" | "youtube" | "music",
   "match_target": null | "Specific Title to check",
   "recommendation_query": null | "descriptive search query here",
+  "similar_to_title": null | "Title of reference media",
   "hard_constraints": []
 }
 `;
@@ -1717,10 +1717,11 @@ const synthesizeSearchBrief = async (soul, requestedMediaType) => {
   // Extract the structured Soul Graph if available — surface float weights explicitly
   const soulGraph = soul.permanent_soul?.soul_graph || null;
   const soulGraphSection = soulGraph ? `
-SOUL GRAPH (structured weighted dimensions — higher score = stronger affinity):
+SOUL GRAPH (structured weighted dimensions):
 ${JSON.stringify(soulGraph, null, 2)}
 
-Use these weights directly. The highest-scoring dimensions across emotional_resonances, aesthetic_affinities, relational_dynamics, and worldview should dominate your choices.
+BALANCE EXPLOITATION AND EXPLORATION:
+While the user's highest-scoring dimensions represent their core tastes, do NOT exclusively target the absolute highest-scoring dimensions on every run. Look for interesting "cross-sections" or less-frequently targeted combinations in the graph (e.g., combining a highly rated emotional resonance with a medium-rated aesthetic affinity, director, author, or trope). Blend familiar emotional depths with novel contexts and settings.
 ` : '';
 
   // ── Surface recently targeted vibes so the LLM drifts away from them ──
@@ -1751,8 +1752,13 @@ For example, if it is morning, you might look for a facet of their soul that is 
 You are the Coda Recommendation Brain.
 The user is asking for a recommendation in the category: "${requestedMediaType}".
 
-Review their Permanent Soul Identity, their Transient Session Memory (recent context/cravings), and their Soul Graph — including emotional resonances, aesthetic affinities, relational dynamics, worldview, cultural gravity, and creative anchors.
+Review their Permanent Soul Identity, their Transient Session Memory (recent context/cravings), and their Soul Graph.
 ${nowContextSection}
+
+CRITICAL: TASTE-ALIGNED NOVELTY & EXPLORATION
+Coda is not a generic query engine that returns the most obvious classic/mainstream matches of the user's favorite works. Your goal is to help them discover "new media but for their tastes" — hidden gems, underrated masterpieces, or less obvious works that share the same psychological/emotional core but differ in setting, style, or genre.
+- Avoid clichés: Do NOT generate a search brief that is a thinly veiled description of a famous title they already love (e.g. do not just describe the plot of Steins;Gate or Anohana).
+- Drive variety: Weave together different aspects of their soul graph, deliberately exploring creative anchors (directors, authors, studios) or themes that have been underserved.
 
 Your job has THREE distinct steps:
 
