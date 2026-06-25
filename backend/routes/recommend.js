@@ -332,6 +332,14 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
 
     // 3. Vector Search
     queryVector = await embeddingService.embed(search_brief);
+
+    // Blend with user's permanent soul_vector (the fence) if available to guide the search
+    if (soul.soul_vector && Array.isArray(soul.soul_vector) && soul.soul_vector.length === queryVector.length) {
+      console.log(`[Recommend] Blending search brief vector with User Soul Vector (70/30) to ground candidates in Taste Space.`);
+      for (let i = 0; i < queryVector.length; i++) {
+        queryVector[i] = 0.7 * queryVector[i] + 0.3 * soul.soul_vector[i];
+      }
+    }
   }
   
   const qdrantMediaType = requestedMediaType === 'visualNovel' ? 'visual novel' : requestedMediaType;
@@ -608,6 +616,13 @@ router.post('/swipe', async (req, res) => {
     };
 
     if (action === 'loved') {
+      // 1. Maintain dedicated loved_titles array
+      livingMemoryJson.loved_titles = livingMemoryJson.loved_titles || [];
+      if (!livingMemoryJson.loved_titles.includes(title)) {
+        livingMemoryJson.loved_titles.push(title);
+      }
+
+      // 2. Backward compatible globalIdentity entry
       livingMemoryJson.globalIdentity = livingMemoryJson.globalIdentity || [];
       const entry = `Highly values: ${title} (loved work)`;
       if (!livingMemoryJson.globalIdentity.includes(entry)) {
@@ -617,22 +632,53 @@ router.post('/swipe', async (req, res) => {
       if (!livingMemoryJson.seen.includes(title)) {
         livingMemoryJson.seen.push(title);
       }
-    } else if (action === 'not_for_me') {
-      livingMemoryJson.notForMe = livingMemoryJson.notForMe || [];
-      if (!livingMemoryJson.notForMe.includes(title)) {
-        livingMemoryJson.notForMe.push(title);
-      }
-    } else if (action === 'seen') {
-      livingMemoryJson.seen = livingMemoryJson.seen || [];
-      if (!livingMemoryJson.seen.includes(title)) {
-        livingMemoryJson.seen.push(title);
-      }
-    } else {
-      return res.status(400).json({ error: 'Invalid action parameter' });
-    }
 
-    // Syncing living memory re-computes the Centroid and triggers the Mycelium Crawler if it was "loved"
-    await userSoulService.syncLivingMemory(userId, livingMemoryJson);
+      // Sync living memory immediately to update the centroid and trigger mycelium crawl
+      await userSoulService.syncLivingMemory(userId, livingMemoryJson);
+
+      // Re-run the global harmonization pass in the background to grow the Soul Graph
+      setImmediate(async () => {
+        try {
+          console.log(`[Swipe Engine] Triggering background Soul Graph harmonization for user ${userId} after loving "${title}"`);
+          const harmonized = await llmService.harmonizeAllMemory(livingMemoryJson);
+          if (harmonized && harmonized.soul_graph) {
+            // Fetch the latest state to avoid race conditions
+            const freshSoul = await userSoulService.getUserMemory(userId);
+            const freshMemory = {
+              ...(freshSoul.permanent_soul || {}),
+              ...(freshSoul.transient_memory || {})
+            };
+            freshMemory.soul_graph = harmonized.soul_graph;
+            if (harmonized.global_identity_overwrite) {
+              freshMemory.globalIdentity = harmonized.global_identity_overwrite;
+            }
+            if (harmonized.category_profiles_overwrite) {
+              freshMemory.categoryProfiles = harmonized.category_profiles_overwrite;
+            }
+            await userSoulService.syncLivingMemory(userId, freshMemory);
+            console.log(`[Swipe Engine] Background Soul Graph harmonization completed successfully for user ${userId}`);
+          }
+        } catch (err) {
+          console.error(`[Swipe Engine] Background Soul Graph harmonization failed:`, err.message);
+        }
+      });
+    } else {
+      if (action === 'not_for_me') {
+        livingMemoryJson.notForMe = livingMemoryJson.notForMe || [];
+        if (!livingMemoryJson.notForMe.includes(title)) {
+          livingMemoryJson.notForMe.push(title);
+        }
+      } else if (action === 'seen') {
+        livingMemoryJson.seen = livingMemoryJson.seen || [];
+        if (!livingMemoryJson.seen.includes(title)) {
+          livingMemoryJson.seen.push(title);
+        }
+      } else {
+        return res.status(400).json({ error: 'Invalid action parameter' });
+      }
+      // Sync living memory for other actions
+      await userSoulService.syncLivingMemory(userId, livingMemoryJson);
+    }
     
     console.log(`[Swipe Engine] Processed '${action}' for ${title} (User: ${userId})`);
     res.json({ status: 'success', action, title });
@@ -737,9 +783,10 @@ router.post('/ask', async (req, res) => {
     if (parsed.status === 'match' && parsed.match_target) {
       // Direct Match Request: "Is Severance for me?"
       const qdrantService = require('../services/qdrantService');
+      const embeddingService = require('../services/embeddingService');
       
-      const exactPayload = await qdrantService.searchByTitle('media_brain', parsed.match_target);
-      const hit = exactPayload ? { id: parsed.match_target.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: exactPayload } : null;
+      const pointInfo = await qdrantService.getVectorAndPayloadByTitle('media_brain', parsed.match_target);
+      const hit = pointInfo ? { id: parsed.match_target.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: pointInfo.payload } : null;
 
       if (!hit) {
         // Fallback: Queue it for enrichment!
@@ -754,12 +801,33 @@ router.post('/ask', async (req, res) => {
       }
 
       // 2. Evaluate the match against the user's soul
-      const evaluation = await llmService.evaluateMatch(hit, current_memory || {});
+      let soulVector = null;
+      let memoryToUse = current_memory || {};
+      if (userId) {
+        try {
+          const freshSoul = await userSoulService.getUserMemory(userId);
+          soulVector = freshSoul.soul_vector;
+          memoryToUse = {
+            ...(freshSoul.permanent_soul || {}),
+            ...(freshSoul.transient_memory || {}),
+            ...memoryToUse
+          };
+        } catch (e) {
+          console.warn('[Ask Match] Failed to fetch user memory:', e.message);
+        }
+      }
+
+      let similarity = null;
+      if (soulVector && pointInfo && pointInfo.vector) {
+        similarity = embeddingService.calculateCosineSimilarity(soulVector, pointInfo.vector);
+      }
+
+      const evaluation = await llmService.evaluateMatch(hit, memoryToUse, similarity);
 
       // 3. We still need to generate the full recommendation payload so it can be promoted to the home screen
       // We can run evaluateCandidates with just this one candidate to generate the pitch and blurb
       const candidates = [hit];
-      const recommendationResponse = await llmService.evaluateCandidates(candidates, current_memory || {}, "Checking if this is for you...");
+      const recommendationResponse = await llmService.evaluateCandidates(candidates, memoryToUse, "Checking if this is for you...");
       
       const finalRecommendation = await mapCandidateToResponse(
         hit,
@@ -792,8 +860,10 @@ router.post('/vibe-check', async (req, res) => {
     }
 
     const qdrantService = require('../services/qdrantService');
-    const exactPayload = await qdrantService.searchByTitle('media_brain', title);
-    const hit = exactPayload ? { id: title.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: exactPayload } : null;
+    const embeddingService = require('../services/embeddingService');
+
+    const pointInfo = await qdrantService.getVectorAndPayloadByTitle('media_brain', title);
+    const hit = pointInfo ? { id: title.toLowerCase().replace(/[^a-z0-9]/g, ''), payload: pointInfo.payload } : null;
 
     if (!hit) {
       await qdrantService.pushToQueue(title, req.body.media_type || "unknown", 1); // Tier 1
@@ -804,16 +874,28 @@ router.post('/vibe-check', async (req, res) => {
       });
     }
 
+    let soulVector = null;
     let memoryToUse = current_memory || {};
-    if (userId && !current_memory) {
-      const freshSoul = await userSoulService.getUserMemory(userId);
-      memoryToUse = {
-        ...(freshSoul.permanent_soul || {}),
-        ...(freshSoul.transient_memory || {})
-      };
+    if (userId) {
+      try {
+        const freshSoul = await userSoulService.getUserMemory(userId);
+        soulVector = freshSoul.soul_vector;
+        memoryToUse = {
+          ...(freshSoul.permanent_soul || {}),
+          ...(freshSoul.transient_memory || {}),
+          ...memoryToUse
+        };
+      } catch (e) {
+        console.warn('[Vibe Check] Failed to fetch user memory:', e.message);
+      }
     }
 
-    const evaluation = await llmService.evaluateMatch(hit, memoryToUse);
+    let similarity = null;
+    if (soulVector && pointInfo && pointInfo.vector) {
+      similarity = embeddingService.calculateCosineSimilarity(soulVector, pointInfo.vector);
+    }
+
+    const evaluation = await llmService.evaluateMatch(hit, memoryToUse, similarity);
     res.json(evaluation);
   } catch (error) {
     console.error('[Vibe Check Error]:', error);

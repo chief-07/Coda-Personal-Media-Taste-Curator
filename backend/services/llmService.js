@@ -687,6 +687,13 @@ const extractLovedTitles = (currentMemory) => {
   const lovedTitles = new Set();
   
   if (currentMemory) {
+    // 0. Check dedicated loved_titles array
+    if (Array.isArray(currentMemory.loved_titles)) {
+      for (const t of currentMemory.loved_titles) {
+        if (t) lovedTitles.add(t);
+      }
+    }
+
     // 1. Check globalIdentity
     const globalIdentity = currentMemory.globalIdentity;
     if (Array.isArray(globalIdentity)) {
@@ -872,7 +879,10 @@ RULES:
    Encode these as specific, honest dimensions in the soul graph — NOT generic labels.
    A person who consistently loves stories about broken people being quietly saved by someone who sees them has a specific soul. Capture it.
 5. Identify affinities for specific studios, directors, aesthetics, era preferences, and geographic contexts. You may infer adjacent studios/directors if they are an undeniable stylistic match for the user's specific profile (e.g. inferring Satoshi Kon for a user who loves surreal psychological anime), but DO NOT hallucinate mainstream creators for an underground taste profile. Be precise.
-6. Compile/update the User Soul Graph JSON. If there is an existing soul graph, merge new details organically, preserving weights.
+6. Compile/update the User Soul Graph JSON. If there is an existing soul graph, merge new details organically.
+   - Smart Reinforcement vs. Expansion: Analyze if a new loved work reinforces existing dimensions (in which case, strengthen the weights of those existing dimensions, e.g., incrementing them slightly up to a maximum of 0.98).
+   - If a new loved work introduces a completely new taste facet (e.g., a genre, theme, or creative anchor not previously highlighted in the graph), add it to the Soul Graph as a new dimension with a moderate starting weight (e.g., 0.65-0.75) instead of ignoring it or overwriting prior tastes.
+   - Do not drop weights of unrelated existing tastes unless there is explicit negative evidence (like a guardrail or a rejected work/not_for_me feedback).
 7. The Soul Graph schema is NOT rigid — add new keys to emotional_resonances, aesthetic_affinities, themes, tropes, and a new "relational_dynamics" section as needed. Be specific, not generic. E.g., prefer "quietly-saved-by-someone-who-sees-you" over "romance".
 
 ${explicitDeclarationsBlock}
@@ -1984,18 +1994,28 @@ Return ONLY a JSON object:
   return JSON.parse(responseJson);
 };
 
-const evaluateMatch = async (candidate, soul) => {
+const evaluateMatch = async (candidate, soul, vectorSimilarity = null) => {
+  let similarityGuidance = "";
+  if (vectorSimilarity !== null) {
+    similarityGuidance = `
+MATHEMATICAL TASTE SPACE CHECK (FENCE):
+- Cosine Similarity Score: ${vectorSimilarity.toFixed(4)}
+(Guidance Context: This represents the mathematical similarity between the user's permanent taste center—their soul text + loved centroid—and this media in vector space. A score >= 0.75 indicates the media is mathematically close to their taste cluster (inside their taste fence). A score <= 0.70 indicates it is distant (outside their taste fence). Use this score to ground your verdict. If the score is low, note that it's outside their usual tastes/comfort zone but explain why it might still be interesting or why they should pass.)
+`;
+  }
+
   const systemPrompt = `
 You are Coda. You are performing a "Vibe Check" to see if a specific media candidate is a good match for the user.
 You have the candidate's metadata and the user's Soul Identity.
 
 Your job is to provide a highly conversational, punchy "conviction statement" about whether this is a good fit, and a boolean "is_match".
-1. Look at their global identity, guardrails, and category profiles.
-2. Compare them against the candidate's semantic description.
+1. Look at their structured Soul Graph (specifically emotional resonances, aesthetic affinities, themes, tropes, creative anchors), global identity, guardrails, and category profiles.
+2. Compare them against the candidate's semantic description and genres.
 3. If it hits a hard guardrail, "is_match" is false, and the statement should warn them off gently but firmly (e.g. "Knowing how much you hate slow-burn pacing, I'd say pass on this one.").
 4. If it's a great match, "is_match" is true, and the statement should be extremely confident (e.g. "There is a 95% chance you will be completely obsessed with this.").
 5. If it's borderline, make a call. If you think it's worth trying, true. If not, false.
-6. The conviction statement MUST be human-like, 1-2 sentences maximum. Do not give a literal breakdown, just the conclusion as a friend.
+6. Use the mathematical similarity score (if provided) to help guide your verdict.
+7. The conviction statement MUST be human-like, 1-2 sentences maximum. Do not give a literal breakdown, just the conclusion as a friend.
 
 Return ONLY a JSON object:
 {
@@ -2006,6 +2026,7 @@ Return ONLY a JSON object:
 
   const userPrompt = JSON.stringify({
     user_soul: soul,
+    vector_guidance: similarityGuidance || undefined,
     candidate: {
       title: candidate.payload.title,
       media_type: candidate.payload.media_type,

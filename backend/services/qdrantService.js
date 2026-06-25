@@ -30,7 +30,8 @@ class QdrantService {
         url: url,
         apiKey: apiKey,
         ...(isCloud ? { port: 443 } : {}),
-        timeout: 60000
+        timeout: 60000,
+        checkCompatibility: false
       });
       this.isInitialized = true;
       console.log('[QdrantService] Initialized Qdrant client successfully.');
@@ -187,12 +188,33 @@ class QdrantService {
   async searchByTitle(collectionName, title) {
     if (!this.isInitialized || !this.client) return null;
     try {
-      const cleanTarget = title.toLowerCase().replace(/[^a-z0-9]/g, '');
-      let offset = null;
+      const targetBase = title.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
       
+      // Try to query directly with a title filter first
+      const directResult = await this.client.scroll(collectionName, {
+        filter: {
+          must: [
+            { key: 'title', match: { value: title } }
+          ]
+        },
+        limit: 10,
+        with_payload: true,
+        with_vector: false,
+      });
+
+      for (const point of directResult.points) {
+        const ptTitle = point.payload?.title || '';
+        const ptBase = ptTitle.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (ptBase === targetBase) {
+          return point.payload;
+        }
+      }
+
+      // Fallback scroll-scanning with smaller limit
+      let offset = null;
       while (true) {
         const result = await this.client.scroll(collectionName, {
-          limit: 1000,
+          limit: 100,
           offset: offset,
           with_payload: true,
           with_vector: false,
@@ -200,16 +222,8 @@ class QdrantService {
         
         for (const point of result.points) {
           const ptTitle = point.payload?.title || '';
-          // Strip year/parentheticals for comparison (e.g. "Title (2022)" -> "Title")
-          const ptBase = ptTitle.split('(')[0].trim();
-          const targetBase = title.split('(')[0].trim();
-          
-          const cleanPt = ptBase.toLowerCase().replace(/[^a-z0-9]/g, '');
-          const cleanTargetBase = targetBase.toLowerCase().replace(/[^a-z0-9]/g, '');
-          
-          // Only match if the cleaned strings are equal after stripping parentheticals.
-          // Never use substring includes — too aggressive, causes wrong matches (e.g. "O" matching everything).
-          if (cleanPt === cleanTargetBase) {
+          const ptBase = ptTitle.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (ptBase === targetBase) {
             return point.payload;
           }
         }
@@ -340,24 +354,52 @@ class QdrantService {
     if (!this.isInitialized || !this.client) return null;
     try {
       const targetBase = title.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-      let offset = null;
       
+      // Try to query directly with a title filter first
+      const directResult = await this.client.scroll(collectionName, {
+        filter: {
+          must: [
+            { key: 'title', match: { value: title } }
+          ]
+        },
+        limit: 10,
+        with_payload: true,
+        with_vector: true,
+      });
+
+      for (const point of directResult.points) {
+        const ptTitle = point.payload?.title || '';
+        const ptBase = ptTitle.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (ptBase === targetBase) {
+          return {
+            vector: point.vector,
+            payload: point.payload
+          };
+        }
+      }
+
+      // Fallback scroll-scanning with smaller limit and NO vectors during scan
+      let offset = null;
       while (true) {
         const result = await this.client.scroll(collectionName, {
-          limit: 1000,
+          limit: 100,
           offset: offset,
           with_payload: true,
-          with_vector: true,
+          with_vector: false,
         });
         
         for (const point of result.points) {
           const ptTitle = point.payload?.title || '';
           const ptBase = ptTitle.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
           if (ptBase === targetBase) {
-            return {
-              vector: point.vector,
-              payload: point.payload
-            };
+            // Fetch the vector separately for this matching point
+            const pointWithVector = await this.getPoint(collectionName, point.id);
+            if (pointWithVector) {
+              return {
+                vector: pointWithVector.vector,
+                payload: pointWithVector.payload
+              };
+            }
           }
         }
         

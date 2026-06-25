@@ -3,6 +3,8 @@ const router = express.Router();
 const mediaBrainService = require('../services/mediaBrainService');
 const userSoulService = require('../services/userSoulService');
 const llmService = require('../services/llmService');
+const qdrantService = require('../services/qdrantService');
+const embeddingService = require('../services/embeddingService');
 
 router.post('/', async (req, res) => {
   try {
@@ -18,11 +20,31 @@ router.post('/', async (req, res) => {
     const userSoul = await userSoulService.getUserMemory(userId);
     const permanentSoul = userSoul.permanent_soul;
 
-    // 2. Fetch Media Soul
-    const mediaSoul = await mediaBrainService.getMediaSoulByTitle(title, media_type);
+    // 2. Fetch Media Soul and Vector
+    let pointInfo = await qdrantService.getVectorAndPayloadByTitle('media_brain', title);
+    if (!pointInfo) {
+      console.log(`[Match Route] "${title}" not found in brain. Triggering enrichment...`);
+      await mediaBrainService.getMediaSoulByTitle(title, media_type);
+      pointInfo = await qdrantService.getVectorAndPayloadByTitle('media_brain', title);
+    }
+
+    const mediaSoul = pointInfo ? pointInfo.payload : await mediaBrainService.getMediaSoulByTitle(title, media_type);
     
     if (!mediaSoul) {
       return res.status(404).json({ error: `Could not find or enrich profile for ${title}.` });
+    }
+
+    // 2.1 Calculate Cosine Similarity for Vector guidance
+    let vectorGuidance = "";
+    if (userSoul.soul_vector && pointInfo && pointInfo.vector) {
+      const similarity = embeddingService.calculateCosineSimilarity(userSoul.soul_vector, pointInfo.vector);
+      if (similarity !== null) {
+        vectorGuidance = `
+MATHEMATICAL TASTE SPACE CHECK (FENCE):
+- Cosine Similarity Score: ${similarity.toFixed(4)}
+(Guidance Context: This represents the mathematical similarity between the user's permanent taste center—their soul text + loved centroid—and this media in vector space. A score >= 0.75 indicates the media is mathematically close to their taste cluster. A score <= 0.70 indicates it is distant or outside their core taste sphere. Use this score to ground your verdict.)
+`;
+      }
     }
 
     // 3. LLM Match Analysis
@@ -35,7 +57,7 @@ USER'S PERMANENT SOUL (Tastes, Themes, Guardrails):
 ${JSON.stringify(permanentSoul.soul_graph || permanentSoul, null, 2)}
 User's explicit media reflections:
 ${JSON.stringify(permanentSoul.media_reflections || [])}
-
+${vectorGuidance}
 MEDIA SOUL (${title}):
 ${mediaSoul.semantic_description || JSON.stringify(mediaSoul)}
 

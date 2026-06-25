@@ -35,6 +35,7 @@ class UserSoulService {
     return {
       userId,
       permanent_soul: soulPoint ? soulPoint.payload : null,
+      soul_vector: soulPoint ? soulPoint.vector : null,
       transient_memory: memoryPoint ? memoryPoint.payload : null,
     };
   }
@@ -221,6 +222,7 @@ class UserSoulService {
       guardrails: livingMemoryJson.guardrails || [],
       media_reflections: livingMemoryJson.media_reflections || [],
       soul_graph: sg,   // ← stored as a proper structured JSON object
+      loved_titles: livingMemoryJson.loved_titles || [], // ← persist loved_titles array
       updatedAt: new Date().toISOString()
     });
 
