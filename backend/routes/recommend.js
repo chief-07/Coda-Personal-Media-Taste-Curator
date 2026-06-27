@@ -247,37 +247,59 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     }
   }
 
-  if ((!soul.permanent_soul || !soul.transient_memory) && fallbackMemory) {
-    console.log('[Recommend] Qdrant memory missing or partial; using client memory snapshot as fallback.');
-    soul = {
-      permanent_soul: soul.permanent_soul || {
-        globalIdentity: fallbackMemory.globalIdentity || [],
-        categoryProfiles: fallbackMemory.categoryProfiles || {},
-        guardrails: fallbackMemory.guardrails || [],
-        media_reflections: fallbackMemory.media_reflections || [],
-        soul_graph: fallbackMemory.soul_graph || null,
-      },
-      transient_memory: soul.transient_memory || {
-        recentContext: fallbackMemory.recentContext || '',
-        seen: fallbackMemory.seen || [],
-        notForMe: fallbackMemory.notForMe || fallbackMemory.not_for_me || [],
-        watchlist: fallbackMemory.watchlist || [],
-        recentlyRecommended: fallbackMemory.recentlyRecommended || [],
-      }
-    };
-  }
-
+  // Always ensure soul structure exists
   soul.permanent_soul = soul.permanent_soul || {};
   soul.transient_memory = soul.transient_memory || {};
 
-  if (fallbackMemory?.seen?.length > 0) {
-    const seenSet = new Set([...(soul.transient_memory.seen || []), ...fallbackMemory.seen]);
-    soul.transient_memory.seen = Array.from(seenSet);
-  }
-  const fallbackNotForMe = fallbackMemory?.notForMe || fallbackMemory?.not_for_me || [];
-  if (fallbackNotForMe.length > 0) {
-    const notForMeSet = new Set([...(soul.transient_memory.notForMe || []), ...fallbackNotForMe]);
-    soul.transient_memory.notForMe = Array.from(notForMeSet);
+  if (fallbackMemory) {
+    let requiresSync = false;
+    
+    // Extract titles using llmService helper to accurately count total loved items
+    const backendExtracted = llmService.extractLovedTitles(soul.permanent_soul);
+    const clientExtracted = llmService.extractLovedTitles(fallbackMemory);
+    
+    const mergedLoved = new Set([...backendExtracted, ...clientExtracted]);
+    
+    if (mergedLoved.size > backendExtracted.length) {
+      requiresSync = true;
+      console.log(`[Recommend] Auto-healing Qdrant: Found ${mergedLoved.size - backendExtracted.length} missing loved titles from client memory.`);
+      
+      // Update the dedicated array so the centroid logic picks it up
+      soul.permanent_soul.loved_titles = Array.from(mergedLoved);
+    }
+
+    // Merge seen, notForMe, watchlist
+    if (fallbackMemory.seen && fallbackMemory.seen.length > 0) {
+      const seenSet = new Set([...(soul.transient_memory.seen || []), ...fallbackMemory.seen]);
+      soul.transient_memory.seen = Array.from(seenSet);
+    }
+    const fallbackNotForMe = fallbackMemory.notForMe || fallbackMemory.not_for_me || [];
+    if (fallbackNotForMe.length > 0) {
+      const notForMeSet = new Set([...(soul.transient_memory.notForMe || []), ...fallbackNotForMe]);
+      soul.transient_memory.notForMe = Array.from(notForMeSet);
+    }
+    if (fallbackMemory.watchlist && fallbackMemory.watchlist.length > 0) {
+      const existingWL = (soul.transient_memory.watchlist || []).map(w => typeof w === 'string' ? w : w.title).filter(Boolean);
+      const fallbackWL = fallbackMemory.watchlist.map(w => typeof w === 'string' ? w : w.title).filter(Boolean);
+      const mergedWL = new Set([...existingWL, ...fallbackWL]);
+      soul.transient_memory.watchlist = Array.from(mergedWL);
+    }
+
+    // If we detected missing loved items, heal the database and fetch the new vector
+    if (requiresSync && userId) {
+      try {
+        const livingMemoryJson = {
+          ...soul.permanent_soul,
+          ...soul.transient_memory
+        };
+        await userSoulService.syncLivingMemory(userId, livingMemoryJson);
+        // Refresh soul to get the newly calculated soul_vector
+        const freshSoul = await userSoulService.getUserMemory(userId);
+        if (freshSoul) soul = freshSoul;
+      } catch (e) {
+        console.warn('[Recommend] Auto-heal sync failed:', e.message);
+      }
+    }
   }
 
   // ── FAIL 6 FIX: If a specific ask exists, inject it as the active recentContext ──
