@@ -1700,17 +1700,10 @@ Return ONLY a JSON object with these 12 exact keys.
 
   const userPrompt = JSON.stringify(mediaData, null, 2);
 
-  const groq = getGroqClient();
-  const response = await groq.chat.completions.create({
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
-    ],
-    model: "llama-3.3-70b-versatile",
-    response_format: { type: "json_object" }
-  });
-
-  const responseJson = response.choices[0]?.message?.content || "{}";
+  const responseJson = await callOpenAI([
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt }
+  ], { type: 'json_object' });
 
   let parsed;
   try {
