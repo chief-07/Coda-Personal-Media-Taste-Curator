@@ -564,7 +564,12 @@ router.post('/pitch', async (req, res) => {
     if (candidatePoint) {
        // Deep Evaluation just for one candidate to write the pitch
        const candidates = [candidatePoint];
-       const editorialDecision = await llmService.evaluateCandidates(candidates, soul);
+       
+       // Pull the most recent vibe focus from transient memory so the LLM knows WHY this was recommended
+       const recentVibes = soul.transient_memory?.recentVibes || [];
+       const latestVibeFocus = recentVibes.length > 0 ? recentVibes[0] : '';
+       
+       const editorialDecision = await llmService.evaluateCandidates(candidates, soul, latestVibeFocus);
        const pitch = editorialDecision.top_pick.pitch_paragraphs || [];
        const blurb = editorialDecision.top_pick.coda_blurb || '';
        res.json({ pitch_paragraphs: pitch, coda_blurb: blurb });
