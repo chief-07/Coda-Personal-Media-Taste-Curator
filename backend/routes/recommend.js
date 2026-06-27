@@ -453,13 +453,21 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     editorialDecision.top_pick.pitch_paragraphs,
     editorialDecision.top_pick.coda_blurb
   );
-  const runnerUpResponses = await Promise.all(editorialDecision.runner_ups.map(async ru => {
-    const candidate = candidates.find(c => c.id === ru.id);
-    return await mapCandidateToResponse(candidate, null, ru.coda_blurb);
-  }));
+  const runnerUpResponses = (await Promise.all(
+    (editorialDecision.runner_ups || []).map(async ru => {
+      const parsedId = typeof ru === 'string' ? ru : ru?.id;
+      const parsedBlurb = typeof ru === 'string' ? null : ru?.coda_blurb;
+      if (!parsedId) return null;
+      
+      const candidate = candidates.find(c => c.id === parsedId);
+      if (!candidate) return null; // Skip if LLM hallucinated an ID
+
+      return await mapCandidateToResponse(candidate, null, parsedBlurb);
+    })
+  )).filter(Boolean);
 
   // ── Persist selected_vibe_focus to recentVibes[] and recommendations to recentlyRecommended[] ──
-  const newlyRecommended = [topResponse.title, ...runnerUpResponses.map(r => r.title)].filter(Boolean);
+  const newlyRecommended = [topResponse?.title, ...runnerUpResponses.map(r => r.title)].filter(Boolean);
   if (userId && selected_vibe_focus) {
     setImmediate(async () => {
       try {
