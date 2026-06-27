@@ -1706,7 +1706,7 @@ Return ONLY a JSON object with these 12 exact keys.
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt }
     ],
-    model: "llama3-70b-8192",
+    model: "llama-3.3-70b-versatile",
     response_format: { type: "json_object" }
   });
 
@@ -2088,7 +2088,7 @@ ${historyDump}
       { role: "system", content: systemPrompt },
       { role: "user", content: userMessage }
     ],
-    model: "llama3-70b-8192",
+    model: "llama-3.3-70b-versatile",
     temperature: 0.7,
     max_tokens: 400,
   });
