@@ -710,24 +710,23 @@ const extractLovedTitles = (currentMemory) => {
       }
     }
 
+    // Universal Regex to flexibly match "Loved: Title", "Highly values: Title (loved work)", etc.
+    const titleRegex = /(?:Loved:|Highly values:)\s*(.*?)(?:\s*\(|$)/i;
+
     // 1. Check globalIdentity
     const globalIdentity = currentMemory.globalIdentity;
     if (Array.isArray(globalIdentity)) {
       for (const line of globalIdentity) {
         if (typeof line === 'string') {
-          const match = line.match(/Highly values:\s*(.*?)\s*\(loved work\)/i);
-          if (match && match[1]) {
-            lovedTitles.add(match[1].trim());
-          }
+          const match = line.match(titleRegex);
+          if (match && match[1]) lovedTitles.add(match[1].trim());
         }
       }
     } else if (typeof globalIdentity === 'object' && globalIdentity !== null) {
       for (const line of Object.values(globalIdentity)) {
         if (typeof line === 'string') {
-          const match = line.match(/Highly values:\s*(.*?)\s*\(loved work\)/i);
-          if (match && match[1]) {
-            lovedTitles.add(match[1].trim());
-          }
+          const match = line.match(titleRegex);
+          if (match && match[1]) lovedTitles.add(match[1].trim());
         }
       }
     }
@@ -739,10 +738,8 @@ const extractLovedTitles = (currentMemory) => {
         if (Array.isArray(list)) {
           for (const line of list) {
             if (typeof line === 'string') {
-              const match = line.match(/Loved:\s*(.*?)\s*\(excellent match\)/i);
-              if (match && match[1]) {
-                lovedTitles.add(match[1].trim());
-              }
+              const match = line.match(titleRegex);
+              if (match && match[1]) lovedTitles.add(match[1].trim());
             }
           }
         }
@@ -1821,18 +1818,16 @@ Before writing the search brief, lock in specific concrete anchors that ground t
 These anchors must be honest and specific. If an anchor isn't clear from the user's profile, leave it as an empty string rather than guessing.
 
 STEP 3 — WRITE the search_brief:
-A single, dense paragraph that is a psychographic specimen description — written as if you are describing the EXACT, SINGULAR piece of media this user needs right now. Not a genre. Not a mood category. One specific fingerprint.
+A structured, literal search query designed to map precisely to a specific vector in the database. DO NOT write a flowery, poetic, or marketing-style paragraph (e.g., avoid "weaves a whimsical tale" or "captivating exploration"). 
 
-This paragraph will be embedded as a vector to search the Media Brain. The Media Brain contains rich, synthesized descriptions of individual works — their emotional evocation, character dynamics, setting, pacing, and atmosphere. Your brief must be written in the SAME emotional and psychological language as those descriptions so it maps precisely.
+This text will be embedded as a vector to search the Media Brain. The Media Brain maps semantics based on literal tropes, themes, and concrete descriptors. If your brief is full of generic adjectives, it will create a "muddy" vector that accidentally pulls in completely unrelated or inappropriate genres just because they share flowery adjectives.
 
-CRITICAL RULES:
-- Be OPINIONATED and SURGICAL. You are Coda making a call, not describing a search query.
-- LEAD WITH THE GROUNDED ANCHORS: The very first sentence MUST explicitly declare the format, era, origin, and genre. (e.g., "A gritty Japanese 90s mystery detective movie about a painfully ordinary male protagonist...", "An early 2010s surreal slice-of-life anime focusing on..."). Do not skip this! The vector database needs these hard anchors.
-- DECLARE the exact relational dynamic (e.g., "A girl who chooses him deliberately — not out of pity but out of something she recognises in him — and the relationship builds through small, mundane moments that slowly convince him he deserves to be seen.").
-- SPECIFY the emotional payoff moment — what the viewer feels at the climax/resolution (e.g., "The payoff is not a dramatic confession. It is a quiet moment where he realises someone stayed.").
-- EMBED the aesthetic texture and pacing naturally — era, visual style, atmosphere — throughout the rest of the paragraph to support the psychological depth.
-- Do NOT mention the user. Describe the media itself, from the inside.
-- The paragraph should feel like it describes ONE thing so precisely that only one or two works in existence could match it.
+CRITICAL RULES FOR THE BRIEF:
+- SURGICAL & LITERAL: State exactly what the work is, its themes, plot focus, and tone directly.
+- AVOID "ADJECTIVE SOUP": Do NOT use words like "poignant", "whimsical", "captivating", "beautiful", or "heart-wrenching" excessively. Use concrete nouns and direct tropes.
+- FORMAT: Write it as a dense block of clear parameters (e.g. "A Japanese 2010s psychological drama. Themes: existential dread, isolation. Plot focus: a protagonist navigating a strange urban landscape while dealing with the burden of memory. Tone: melancholic, slow-burn, gritty realism. Relational dynamic: found-family built from broken people.").
+- Do NOT mention the user. Describe the media itself.
+- Ensure the brief is specific enough that it firmly anchors the search in the correct thematic space, eliminating generic noise or unrelated mature content that might share vague adjectives.
 ${soulGraphSection}
 
 Return ONLY a JSON object:
