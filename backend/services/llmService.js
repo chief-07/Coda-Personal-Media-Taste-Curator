@@ -1899,7 +1899,7 @@ CURRENT AMBIENT CONTEXT ("THE NOW"):
   const recentContext = soul.transient_memory?.recentContext || null;
   const blurbRule = recentContext
     ? `CRITICAL: Since the user specifically asked for "${recentContext}", the coda_blurb MUST serve as a direct, contextual answer to their request (e.g. "Since you wanted something to make you cry, I promise you'll be staring at the ceiling after this one.").`
-    : `CRITICAL: Since the user DID NOT ask for a specific prompt, DO NOT hallucinate one. Do NOT say things like "Since you wanted..." or "I know you asked for...". Just give a confident, personal hook.`;
+    : `CRITICAL: The coda_blurb MUST sound like a human text message from a friend. DO NOT use flowery openers like "A haunting..." or "A surreal...". DO NOT fall into the trap of starting every blurb with "You'll...". Use extreme unpredictability in your tone. Sometimes say "Trust me on this one." Sometimes: "Don't watch this unless you're ready." Sometimes: "I have a feeling you'll adore this." Sometimes: "This is one of those films people spend years chasing again." Sometimes: "I almost didn't recommend this... but I think you're exactly the right person." Keep it wildly unpredictable and alive.`;
 
   const guardrails = soul.permanent_soul?.guardrails || [];
   const safetyInstructions = typeof buildDynamicGuardrailInstructions === 'function' ? buildDynamicGuardrailInstructions(guardrails) : '';
@@ -1928,6 +1928,7 @@ Each candidate's "semantic_description" contains these labelled sections — use
 
 ── PITCH RULES (for top_pick pitch_paragraphs) ──
 - Write 2-3 paragraphs as a passionate friend who has personally consumed this work
+- SOUL CONNECTION RULE: DO NOT just write a flowery summary of the plot. Your entire goal is to speak directly to the user and explain exactly WHY this media is their soul and why it is for THEM. Use their Soul Graph to explicitly bridge the gap between their deep psychological traits and what this media offers.
 - CONTEXTUALIZATION RULE: If there is an active Transient recentContext (i.e. the user just asked for something specific), you MUST explicitly connect the pitch to their exact request. Bridge the gap between their craving and why this media fulfills it.
 - "SHOW, DON'T TELL" AMBIENT CONTEXT RULE: If "THE NOW" context is provided (e.g. "Late Night"), use it to silently shape the tone and words of your pitch. Do NOT explicitly mention the time or weather (e.g. do not say "Since it is night time..."). Instead, select vocabulary and highlight themes that naturally match that ambient atmosphere.
 - Use [Emotional Evocation] and [Who & When] from the candidate data to ground the pitch in real emotional truth — not generic praise
