@@ -16,14 +16,14 @@ class EmbeddingService {
       throw new Error('Valid text is required for embedding.');
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      throw new Error('Missing OPENAI_API_KEY in environment.');
+      throw new Error('Missing OPENROUTER_API_KEY in environment.');
     }
 
     try {
       const response = await axios.post(
-        'https://api.openai.com/v1/embeddings',
+        'https://openrouter.ai/api/v1/embeddings',
         {
           model: 'text-embedding-3-small',
           input: text,
@@ -32,6 +32,8 @@ class EmbeddingService {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`,
+            'HTTP-Referer': 'https://coda.app',
+            'X-Title': 'Coda Media Brain'
           },
         }
       );
