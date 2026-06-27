@@ -284,7 +284,8 @@ class QdrantService {
   async pushToQueue(title, media_type, tier = 2) {
     if (!this.isInitialized || !this.client) return;
     const crypto = require('crypto');
-    const id = crypto.randomUUID();
+    const hash = crypto.createHash('md5').update(`${media_type}:${title.toLowerCase()}`).digest('hex');
+    const id = [hash.substring(0,8), hash.substring(8,12), hash.substring(12,16), hash.substring(16,20), hash.substring(20,32)].join('-');
     try {
       await this.client.upsert('media_queue', {
         wait: true,

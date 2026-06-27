@@ -2,16 +2,30 @@ const axios = require('axios');
 const { researchMediaThemes } = require('./onboardingAgent');
 const loggerService = require('./loggerService');
 const searchService = require('./searchService');
+const Groq = require('groq-sdk');
 
-
+function getGroqClient() {
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error("Missing GROQ_API_KEY environment variable.");
+  }
+  return new Groq({ apiKey: process.env.GROQ_API_KEY });
+}
 const callOpenAI = async (messages, responseFormat = null, modelOverride = null, retries = 2) => {
   const executeCall = async () => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) throw new Error("Missing OPENROUTER_API_KEY");
+
+    // Safeguard: Truncate excessively long inputs to prevent token bleed
+    const safeMessages = messages.map(m => ({
+      ...m,
+      content: typeof m.content === 'string' && m.content.length > 30000 
+        ? m.content.substring(0, 30000) + '...[TRUNCATED]' 
+        : m.content
+    }));
 
     const payload = {
-      model: modelOverride || 'gpt-4o-mini',
-      messages: messages,
+      model: modelOverride === 'gpt-4o-mini' || !modelOverride ? 'openai/gpt-4o-mini' : modelOverride,
+      messages: safeMessages,
       temperature: 0.4, // increased from 0.2 to 0.4 for diverse recommendations
     };
     
@@ -19,10 +33,12 @@ const callOpenAI = async (messages, responseFormat = null, modelOverride = null,
       payload.response_format = responseFormat;
     }
 
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', payload, {
+    const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', payload, {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://coda.app',
+        'X-Title': 'Coda Media Brain'
       },
       timeout: 60000 // 60 seconds timeout
     });
@@ -1687,10 +1703,17 @@ Return ONLY a JSON object with these 12 exact keys.
 
   const userPrompt = JSON.stringify(mediaData, null, 2);
 
-  const responseJson = await callOpenAI([
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: userPrompt }
-  ], { type: 'json_object' });
+  const groq = getGroqClient();
+  const response = await groq.chat.completions.create({
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ],
+    model: "llama3-70b-8192",
+    response_format: { type: "json_object" }
+  });
+
+  const responseJson = response.choices[0]?.message?.content || "{}";
 
   let parsed;
   try {

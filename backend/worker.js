@@ -38,8 +38,8 @@ async function runWorkerLoop() {
 
       if (success === true) {
         console.log(`[Worker] Successfully processed ${title}`);
-        // If it was a Tier 1 or Tier 2 item, let's autonomously trigger Mycelium Crawl to populate Tier 2!
-        if (tier === 1 || tier === 2) {
+        // Only trigger Mycelium Crawl for Tier 1 items to prevent exponential explosion!
+        if (tier === 1) {
           console.log(`[Worker] Triggering autonomous Mycelium crawl for: ${title}`);
           // Mycelium logic handles injecting neighbors into Qdrant Tier 2.
           await mediaEnrichmentService.enrichTitleAndNeighbors(title, media_type);

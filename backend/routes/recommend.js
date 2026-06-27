@@ -633,8 +633,16 @@ router.post('/swipe', async (req, res) => {
         livingMemoryJson.seen.push(title);
       }
 
-      // Sync living memory immediately to update the centroid and trigger mycelium crawl
+      // Sync living memory immediately to update the centroid
       await userSoulService.syncLivingMemory(userId, livingMemoryJson);
+
+      // Trigger targeted Mycelium Crawl for the newly loved title
+      try {
+        const mediaEnrichmentService = require('../services/mediaEnrichmentService');
+        await mediaEnrichmentService.enrichTitleAndNeighbors(title, 'unknown');
+      } catch(e) {
+        console.warn(`[Swipe] Failed to trigger Mycelium crawl:`, e.message);
+      }
 
       // Re-run the global harmonization pass in the background to grow the Soul Graph
       setImmediate(async () => {

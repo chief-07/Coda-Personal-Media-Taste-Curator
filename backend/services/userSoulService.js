@@ -194,24 +194,7 @@ class UserSoulService {
         console.log(`[Soul Mapping] Blended text persona with ${mediaVectors.length} media vectors (${missingTitles.length} titles still enriching).`);
       }
 
-      // ── TRIGGER AUTONOMOUS MYCELIUM CRAWL ──
-      try {
-        const mediaEnrichmentService = require('./mediaEnrichmentService');
-        for (const title of lovedTitles) {
-          // Determine correct media type from soul_graph / categoryProfiles
-          let mediaType = 'movie';
-          if (sg?.creative_anchors?.studios && Object.keys(sg.creative_anchors.studios).some(s => ['shaft', 'kyoani', 'mappa', 'bones', 'ufotable'].includes(s.toLowerCase()))) {
-            mediaType = 'anime';
-          }
-          if (livingMemoryJson.categoryProfiles?.anime?.length > 0) mediaType = 'anime';
-          console.log(`[Soul Mapping] Triggering Mycelium Crawl for loved work: ${title} (${mediaType})`);
-          mediaEnrichmentService.enrichTitleAndNeighbors(title, mediaType).catch(err => {
-            console.warn(`[Soul Mapping] Async crawl failed for ${title}:`, err.message);
-          });
-        }
-      } catch (e) {
-        console.warn(`[Soul Mapping] Failed to trigger Mycelium crawl:`, e.message);
-      }
+      // Removed: Autonomous Mycelium Crawl previously looped over all lovedTitles here, causing massive re-queueing.
     }
 
     // ── FAIL 2 FIX: Store soul_graph as structured Qdrant payload (NOT stringified) ──
