@@ -795,19 +795,35 @@ const harmonizeAllMemory = async (currentMemory) => {
 
   if (titlesToResearch.length > 0) {
     console.log(`[Soul Graph] Checking Media Brain for enriched titles: ${titlesToResearch.join(', ')}`);
-    const brainLookups = await Promise.all(
-      titlesToResearch.map(title => qdrantService.searchByTitle('media_brain', title))
-    );
-
-    titlesToResearch.forEach((title, idx) => {
-      const brainResult = brainLookups[idx];
-      if (brainResult && brainResult.semantic_description) {
-        mediaBrainHits.push({ title, semantic_description: brainResult.semantic_description });
-        console.log(`[Soul Graph] Media Brain HIT for "${title}" — using rich enrichment as primary fuel`);
-      } else {
-        yahooFallbackTitles.push(title);
-        console.log(`[Soul Graph] Media Brain MISS for "${title}" — falling back to Yahoo`);
+    let enrichedTitles = [];
+    let missingTitles = [...titlesToResearch];
+      
+    try {
+      const ids = await qdrantService.findIdsByTitles('media_brain', titlesToResearch);
+      if (ids.length > 0) {
+        const points = await qdrantService.client.retrieve('media_brain', {
+          ids: ids,
+          with_payload: true,
+          with_vector: false
+        });
+        enrichedTitles = points.map(p => p.payload);
+        
+        // Rebuild missing titles correctly
+        const foundTitles = enrichedTitles.map(p => p.title.toLowerCase());
+        missingTitles = titlesToResearch.filter(t => !foundTitles.includes(t.toLowerCase()));
+        
+        console.log(`[Soul Graph] Media Brain HIT for ${enrichedTitles.length} titles. MISS for ${missingTitles.length} titles.`);
       }
+    } catch(e) {
+      console.warn(`[Soul Graph] Media Brain batch fetch failed:`, e.message);
+    }
+
+    enrichedTitles.forEach(hit => {
+      mediaBrainHits.push({ title: hit.title, semantic_description: hit.semantic_description });
+    });
+    
+    missingTitles.forEach(t => {
+      yahooFallbackTitles.push(t);
     });
 
     // Build research context — Media Brain entries first (highest quality)
@@ -1699,8 +1715,9 @@ Extract these exact 12 fields (as detailed string values):
 10. "story_and_plot_type": The narrative structure (e.g., non-linear mystery, character-study, epic sprawling journey).
 11. "who_and_when": The Viewing Context. Do not be too direct (don't say "Watch this when..."). Instead, describe "the type of soul this should be for" and the specific life situation or emotional state (e.g., "For a soul feeling completely lost in their early 20s," or "For someone mourning a missed connection late at night.").
 12. "emotional_evocation": A raw, visceral description of what this media actually does to a person emotionally, drawn directly from the human consensus in the community snippets. Not an academic description, but the actual feeling it provokes (e.g., "Leaves you feeling utterly hollow and staring at the ceiling for an hour," or "A warm, healing blanket of a story that makes you appreciate the little things in life.").
+13. "aliases": An array of any prominent alternative titles (e.g., Romaji, English, Japanese) found within the metadata or community snippets. Must be an array of strings. If none are found, return an empty array.
 
-Return ONLY a JSON object with these 12 exact keys.
+Return ONLY a JSON object with these 13 exact keys.
 `;
 
   const userPrompt = JSON.stringify(mediaData, null, 2);
@@ -1738,7 +1755,10 @@ Return ONLY a JSON object with these 12 exact keys.
 [Emotional Evocation (Consensus)]: ${parsed.emotional_evocation || ''}
   `.trim();
 
-  return semanticDescription;
+  return { 
+    semanticDescription, 
+    aliases: Array.isArray(parsed.aliases) ? parsed.aliases : []
+  };
 };
 
 const synthesizeSearchBrief = async (soul, requestedMediaType) => {

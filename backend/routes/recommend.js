@@ -18,6 +18,144 @@ if (!fs.existsSync(IMAGE_CACHE_DIR)) {
   fs.mkdirSync(IMAGE_CACHE_DIR, { recursive: true });
 }
 
+// ── Local Neighborhood Resonance (LNR) Cache ───────────────────────────────
+const NEIGHBORHOOD_CACHE_DIR = path.join(__dirname, '../cache/neighborhoods');
+if (!fs.existsSync(NEIGHBORHOOD_CACHE_DIR)) {
+  fs.mkdirSync(NEIGHBORHOOD_CACHE_DIR, { recursive: true });
+}
+
+/**
+ * Builds or fetches the candidate pool of 20 closest items per loved title,
+ * and caches it as JSON on disk to prevent hitting Qdrant rate limits at runtime.
+ */
+async function getOrBuildNeighborhoodPool(userId, lovedTitles, mediaType) {
+  if (!userId) return [];
+  const cachePath = path.join(NEIGHBORHOOD_CACHE_DIR, `${userId}_${mediaType}.json`);
+  
+  // Sort lovedTitles to ensure consistent comparisons
+  const sortedLoved = [...lovedTitles].sort();
+  
+  // Try reading cache first
+  if (fs.existsSync(cachePath)) {
+    try {
+      const cacheData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+      const cacheSortedLoved = (cacheData.lovedTitles || []).sort();
+      if (JSON.stringify(sortedLoved) === JSON.stringify(cacheSortedLoved)) {
+        console.log(`[LNR Cache] HIT for user ${userId} (${mediaType}). Using cached pool of ${cacheData.candidates.length} items.`);
+        return cacheData.candidates;
+      }
+      console.log(`[LNR Cache] MISS (Loved list changed). Rebuilding pool for user ${userId} (${mediaType}).`);
+    } catch (e) {
+      console.warn(`[LNR Cache] Failed to read cache for ${userId}:`, e.message);
+    }
+  } else {
+    console.log(`[LNR Cache] MISS (No cache file). Building pool for user ${userId} (${mediaType}).`);
+  }
+
+  // Cache missed/invalid -> fetch from Qdrant
+  const qdrantMediaType = mediaType === 'visualNovel' ? 'visual novel' : mediaType;
+  const filter = {
+    must: [
+      { key: "media_type", match: { value: qdrantMediaType } }
+    ]
+  };
+
+  const lovedIds = await qdrantService.findIdsByTitles('media_brain', lovedTitles);
+  let lovedVectors = [];
+  if (lovedIds.length > 0) {
+    try {
+      const lovedPoints = await qdrantService.client.retrieve('media_brain', {
+        ids: lovedIds,
+        with_payload: false,
+        with_vector: true
+      });
+      lovedVectors = lovedPoints.map(p => p.vector).filter(Boolean);
+    } catch(e) {
+      console.warn("[LNR Cache] Failed to fetch loved vectors:", e.message);
+      return [];
+    }
+  }
+
+  if (lovedVectors.length === 0) return [];
+
+  // Batch search for top 20 nearest neighbors (chunked & retried to avoid flakiness)
+  const batchResults = [];
+  const chunkSize = 5;
+  for (let i = 0; i < lovedVectors.length; i += chunkSize) {
+    const chunk = lovedVectors.slice(i, i + chunkSize);
+    const searches = chunk.map(vector => ({
+      vector: vector,
+      limit: 20,
+      filter: filter,
+      with_payload: true,
+      with_vector: true
+    }));
+    
+    let chunkResults = null;
+    let retries = 5;
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        chunkResults = await qdrantService.client.searchBatch('media_brain', { searches });
+        break; // Succeeded!
+      } catch(e) {
+        console.warn(`[LNR Cache] searchBatch chunk attempt ${attempt}/${retries} failed: ${e.message}`);
+        if (attempt === retries) {
+          throw e; // Fail fast and bubble up
+        }
+        await new Promise(r => setTimeout(r, 1000 * attempt)); // wait 1s, 2s, 3s...
+      }
+    }
+
+    if (chunkResults) {
+      batchResults.push(...chunkResults);
+    }
+    
+    if (i + chunkSize < lovedVectors.length) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+  }
+
+  const candidateMap = new Map();
+  batchResults.forEach((resultsForTitle, idx) => {
+    const sourceLovedTitle = lovedTitles[idx] || 'unknown';
+    resultsForTitle.forEach(point => {
+      if (!point.payload || !point.payload.title) return;
+      const title = point.payload.title;
+      const normalizedTitle = title.toLowerCase().replace(/^the\s+/, '').trim();
+      
+      // Exclude loved titles themselves
+      if (lovedTitles.map(t => t.toLowerCase()).includes(title.toLowerCase())) return;
+
+      if (!candidateMap.has(normalizedTitle)) {
+        candidateMap.set(normalizedTitle, {
+          id: point.id,
+          payload: point.payload,
+          vector: point.vector,
+          lovedScores: {}
+        });
+      }
+      const cand = candidateMap.get(normalizedTitle);
+      cand.lovedScores[sourceLovedTitle.toLowerCase()] = point.score;
+    });
+  });
+
+  const candidates = Array.from(candidateMap.values());
+
+  const cachePayload = {
+    lovedTitles: sortedLoved,
+    candidates: candidates
+  };
+
+  try {
+    fs.writeFileSync(cachePath, JSON.stringify(cachePayload, null, 2), 'utf8');
+    console.log(`[LNR Cache] Saved ${candidates.length} candidates for user ${userId} (${mediaType}).`);
+  } catch(e) {
+    console.warn(`[LNR Cache] Failed to write cache for ${userId}:`, e.message);
+  }
+
+  return candidates;
+}
+
 router.get('/proxy-image', async (req, res) => {
   const { url } = req.query;
   try {
@@ -355,13 +493,8 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     // 3. Vector Search
     queryVector = await embeddingService.embed(search_brief);
 
-    // Blend with user's permanent soul_vector (the fence) if available to guide the search
-    if (soul.soul_vector && Array.isArray(soul.soul_vector) && soul.soul_vector.length === queryVector.length) {
-      console.log(`[Recommend] Blending search brief vector with User Soul Vector (70/30) to ground candidates in Taste Space.`);
-      for (let i = 0; i < queryVector.length; i++) {
-        queryVector[i] = 0.7 * queryVector[i] + 0.3 * soul.soul_vector[i];
-      }
-    }
+    // Note: Vector blending with soul_vector was removed to avoid "Taste Collapse".
+    // We now use pure vibe catching for the initial broad net.
   }
   
   const qdrantMediaType = requestedMediaType === 'visualNovel' ? 'visual novel' : requestedMediaType;
@@ -395,9 +528,58 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     }
   }
 
-  // We fetch up to 30 candidates from the vector DB, but if watchlistOnly is true, we might just get exactly the watchlist
-  const rawResults = await qdrantService.search('media_brain', queryVector, 30, filter);
+  // ── Local Neighborhood Resonance (LNR) Pipeline ──
+  let rawResults = [];
+  let isLnrUsed = false;
+  const skipRandomSeeds = soul.transient_memory?.skip_random_seeds || false;
+  const lovedTitles = llmService.extractLovedTitles(soul) || [];
+
+  if (lovedTitles.length > 0 && !skipRandomSeeds) {
+    try {
+      const lnrPool = await getOrBuildNeighborhoodPool(userId, lovedTitles, requestedMediaType);
+      if (lnrPool.length > 0) {
+        const maxOverlap = Math.max(...lnrPool.map(c => Object.keys(c.lovedScores).length), 1);
+        
+        rawResults = lnrPool.map(c => {
+          const scores = Object.values(c.lovedScores);
+          const overlapCount = scores.length;
+          const maxSimilarity = Math.max(...scores);
+          
+          let vibeSimilarity = 0;
+          if (c.vector && queryVector) {
+            for (let i = 0; i < 1536; i++) {
+              vibeSimilarity += c.vector[i] * queryVector[i];
+            }
+          }
+          
+          // Hybrid Score: 40% Vibe Match, 30% Max similarity to a loved title, 30% Overlap Count boost
+          const score = (vibeSimilarity * 0.4) + (maxSimilarity * 0.3) + ((overlapCount / maxOverlap) * 0.3);
+          
+          return {
+            id: c.id,
+            payload: c.payload,
+            vector: c.vector,
+            score: score
+          };
+        });
+        
+        rawResults.sort((a, b) => b.score - a.score);
+        isLnrUsed = true;
+        console.log(`[LNR Pipeline] Successfully scored ${rawResults.length} candidates using Local Neighborhood Resonance.`);
+      }
+    } catch(e) {
+      console.warn("[LNR Pipeline] Failed to use LNR. Falling back to standard vector search.", e.message);
+    }
+  }
+
+  if (!isLnrUsed) {
+    console.log("[LNR Pipeline] Running fallback standard vector search...");
+    rawResults = await qdrantService.search('media_brain', queryVector, 150, filter, true);
+  }
   
+  // Slice top 30 after re-ranking
+  rawResults = rawResults.slice(0, 30);
+
   // 4. Filter Results
   // 4.1 Filter out items the user has seen, rejected, or are sequels of seen/rejected items
   const baseFiltered = rawResults.filter(r => {

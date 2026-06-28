@@ -21,34 +21,42 @@ class EmbeddingService {
       throw new Error('Missing OPENROUTER_API_KEY in environment.');
     }
 
-    try {
-      const response = await axios.post(
-        'https://openrouter.ai/api/v1/embeddings',
-        {
-          model: 'text-embedding-3-small',
-          input: text,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-            'HTTP-Referer': 'https://coda.app',
-            'X-Title': 'Coda Media Brain'
+    const maxRetries = 5;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await axios.post(
+          'https://openrouter.ai/api/v1/embeddings',
+          {
+            model: 'text-embedding-3-small',
+            input: text,
           },
-        }
-      );
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`,
+              'HTTP-Referer': 'https://coda.app',
+              'X-Title': 'Coda Media Brain'
+            },
+            timeout: 15000
+          }
+        );
 
-      if (response.data && response.data.data && response.data.data.length > 0) {
-        return response.data.data[0].embedding;
-      } else {
-        throw new Error('Invalid response structure from OpenAI embeddings API.');
+        if (response.data && response.data.data && response.data.data.length > 0) {
+          return response.data.data[0].embedding;
+        } else {
+          throw new Error('Invalid response structure from OpenAI embeddings API.');
+        }
+      } catch (error) {
+        console.warn(`[EmbeddingService] Embed attempt ${attempt}/${maxRetries} failed: ${error.message}`);
+        if (attempt === maxRetries) {
+          console.error('[EmbeddingService] Failed to generate embedding after max retries:', error.message);
+          if (error.response && error.response.data) {
+            console.error('[EmbeddingService] API Error:', JSON.stringify(error.response.data, null, 2));
+          }
+          throw error;
+        }
+        await new Promise(r => setTimeout(r, 1000 * attempt));
       }
-    } catch (error) {
-      console.error('[EmbeddingService] Failed to generate embedding:', error.message);
-      if (error.response && error.response.data) {
-        console.error('[EmbeddingService] API Error:', JSON.stringify(error.response.data, null, 2));
-      }
-      throw error;
     }
   }
 

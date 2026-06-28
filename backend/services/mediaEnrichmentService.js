@@ -30,11 +30,17 @@ class MediaEnrichmentService {
 
     console.log(`[EnrichmentService] Enriching: ${title} (${media_type})`);
 
-    // 1. Check if already exists
+    // 1. Check if already exists (by UUID or Title/Alias match)
     try {
-      const existing = await qdrantService.getPoint('media_brain', uuid);
-      if (existing) {
-        console.log(`  -> Already exists in Qdrant. Skipping.`);
+      const existingById = await qdrantService.getPoint('media_brain', uuid);
+      if (existingById) {
+        console.log(`  -> Already exists in Qdrant (by UUID). Skipping.`);
+        return 'ALREADY_EXISTS';
+      }
+      
+      const existingByTitle = await qdrantService.searchByTitle('media_brain', title, false);
+      if (existingByTitle) {
+        console.log(`  -> Already exists in Qdrant (by Title/Alias match). Skipping.`);
         return 'ALREADY_EXISTS';
       }
     } catch (e) {
@@ -97,7 +103,7 @@ class MediaEnrichmentService {
 
       // 5. Generate Semantic Description
       console.log(`  -> Synthesizing semantic description...`);
-      const semanticDescription = await llmService.generateMediaDescription(synthesisPayload);
+      const { semanticDescription, aliases } = await llmService.generateMediaDescription(synthesisPayload);
 
       // 6. Generate Embedding
       console.log(`  -> Embedding...`);
@@ -114,6 +120,7 @@ class MediaEnrichmentService {
         release_year: structuredMeta.release_year || '',
         studio: structuredMeta.studio || '',
         semantic_description: semanticDescription,
+        aliases: aliases || [],
         key: key,
         indexed_at: new Date().toISOString()
       };

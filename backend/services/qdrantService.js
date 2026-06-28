@@ -185,7 +185,7 @@ class QdrantService {
    * Searches for a media title by name in a collection's payload.
    * Returns the best matching point's payload, or null if not found.
    */
-  async searchByTitle(collectionName, title) {
+  async searchByTitle(collectionName, title, withVector = false) {
     if (!this.isInitialized || !this.client) return null;
     try {
       const targetBase = title.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -193,44 +193,26 @@ class QdrantService {
       // Try to query directly with a title filter first
       const directResult = await this.client.scroll(collectionName, {
         filter: {
-          must: [
+          should: [
             { key: 'title', match: { value: title } }
           ]
         },
         limit: 10,
         with_payload: true,
-        with_vector: false,
+        with_vector: withVector,
       });
 
       for (const point of directResult.points) {
         const ptTitle = point.payload?.title || '';
+        const ptAliases = point.payload?.aliases || [];
         const ptBase = ptTitle.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (ptBase === targetBase) {
-          return point.payload;
+        const aliasBases = ptAliases.map(a => a.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
+        if (ptBase === targetBase || aliasBases.includes(targetBase)) {
+          return withVector ? point : point.payload;
         }
       }
 
-      // Fallback scroll-scanning with smaller limit
-      let offset = null;
-      while (true) {
-        const result = await this.client.scroll(collectionName, {
-          limit: 100,
-          offset: offset,
-          with_payload: true,
-          with_vector: false,
-        });
-        
-        for (const point of result.points) {
-          const ptTitle = point.payload?.title || '';
-          const ptBase = ptTitle.split('(')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-          if (ptBase === targetBase) {
-            return point.payload;
-          }
-        }
-        
-        offset = result.next_page_offset;
-        if (!offset) break;
-      }
+      // No fallback scan. If Qdrant index doesn't find it, it's a miss.
       return null;
     } catch (e) {
       console.warn('[QdrantService] searchByTitle error:', e.message);

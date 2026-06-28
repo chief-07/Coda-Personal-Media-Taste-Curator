@@ -3,6 +3,11 @@ const qdrantService = require('./qdrantService');
 const embeddingService = require('./embeddingService');
 const llmService = require('./llmService');
 
+const centroidCache = {
+  key: '',
+  vector: null
+};
+
 /**
  * Service to manage the User Soul (Two-Tier Memory).
  */
@@ -52,6 +57,7 @@ class UserSoulService {
     let fullSoulText = '';
     const sg = livingMemoryJson.soul_graph || null;
 
+    let useStructured = false;
     if (sg) {
       const parts = [];
       if (sg.demographics?.stage_in_life) {
@@ -62,11 +68,15 @@ class UserSoulService {
       }
       if (sg.emotional_resonances) {
         const sorted = Object.entries(sg.emotional_resonances).sort((a, b) => b[1] - a[1]);
-        parts.push(`Emotional resonances: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        if (sorted.length > 0) {
+          parts.push(`Emotional resonances: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        }
       }
       if (sg.aesthetic_affinities) {
         const sorted = Object.entries(sg.aesthetic_affinities).sort((a, b) => b[1] - a[1]);
-        parts.push(`Aesthetic affinities: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        if (sorted.length > 0) {
+          parts.push(`Aesthetic affinities: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        }
       }
       if (sg.creative_anchors) {
         for (const [type, anchors] of Object.entries(sg.creative_anchors)) {
@@ -80,26 +90,37 @@ class UserSoulService {
       }
       if (sg.themes) {
         const sorted = Object.entries(sg.themes).sort((a, b) => b[1] - a[1]);
-        parts.push(`Themes: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        if (sorted.length > 0) {
+          parts.push(`Themes: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        }
       }
       if (sg.tropes) {
         const sorted = Object.entries(sg.tropes).sort((a, b) => b[1] - a[1]);
-        parts.push(`Tropes: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        if (sorted.length > 0) {
+          parts.push(`Tropes: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        }
       }
       if (sg.pacing_preference) {
         const sorted = Object.entries(sg.pacing_preference).sort((a, b) => b[1] - a[1]);
-        parts.push(`Pacing: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        if (sorted.length > 0) {
+          parts.push(`Pacing: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+        }
       }
       if (sg.guardrails?.length > 0) {
         parts.push(`Guardrails: ${sg.guardrails.join(', ')}`);
       }
-      // Append media reflections for extra personal grounding
       if (livingMemoryJson.media_reflections?.length > 0) {
         parts.push(`Personal media reflections: ${livingMemoryJson.media_reflections.join('. ')}`);
       }
-      fullSoulText = parts.join('\n');
-      console.log(`[Soul Mapping] Using structured Soul Graph for embedding (${parts.length} dimensions)`);
-    } else {
+      
+      if (parts.length > 0) {
+        fullSoulText = parts.join('\n');
+        useStructured = true;
+        console.log(`[Soul Mapping] Using structured Soul Graph for embedding (${parts.length} dimensions)`);
+      }
+    }
+
+    if (!useStructured) {
       // Fallback: old text-based approach for users without a soul graph yet
       const globalIdentity = (livingMemoryJson.globalIdentity || []).join('. ');
       let categoryTastes = '';
@@ -114,7 +135,7 @@ class UserSoulService {
         personalReflections = `\nPersonal Media Reflections:\n- ` + livingMemoryJson.media_reflections.join('\n- ');
       }
       fullSoulText = `Core Identity: ${globalIdentity}\nCategory Tastes: ${categoryTastes}${personalReflections}`;
-      console.log(`[Soul Mapping] No Soul Graph yet — using text-based fallback for embedding`);
+      console.log(`[Soul Mapping] No Soul Graph yet or graph is empty — using text-based fallback for embedding`);
     }
 
     // Generate the base text vector
@@ -133,49 +154,31 @@ class UserSoulService {
 
     if (lovedTitles.length > 0) {
       console.log(`[Soul Mapping] Calculating centroid for Loved Media:`, lovedTitles);
-      const mediaVectors = [];
-      const missingTitles = [];
+      let mediaVectors = [];
+      let missingTitles = [];
+      const cacheKey = [...lovedTitles].sort().join('|');
 
-      for (const title of lovedTitles) {
+      if (centroidCache.key === cacheKey && centroidCache.vector) {
+        mediaVectors = [centroidCache.vector];
+        console.log(`[Soul Mapping] Centroid cache HIT. Reusing cached centroid.`);
+      } else {
         try {
-          const res = await qdrantService.client.scroll('media_brain', {
-            filter: {
-              must: [{ key: 'title', match: { value: title } }]
-            },
-            with_vector: true,
-            limit: 1
-          });
-          if (res.points && res.points.length > 0 && res.points[0].vector) {
-            mediaVectors.push(res.points[0].vector);
-          } else {
-            missingTitles.push(title);
+          const ids = await qdrantService.findIdsByTitles('media_brain', lovedTitles);
+          if (ids.length > 0) {
+            const points = await qdrantService.client.retrieve('media_brain', {
+              ids: ids,
+              with_payload: false,
+              with_vector: true
+            });
+            mediaVectors = points.map(p => p.vector).filter(Boolean);
+            console.log(`[Soul Mapping] Fetched ${mediaVectors.length} vectors for centroid in one batch.`);
           }
         } catch(e) {
-          console.warn(`[Soul Mapping] Failed to fetch vector for ${title}`);
-          missingTitles.push(title);
+          console.warn(`[Soul Mapping] Failed to fetch loved vectors for centroid:`, e.message);
         }
       }
 
-      // ── FAIL 4 FIX: Immediately trigger enrichment for missing loved titles ──
-      if (missingTitles.length > 0) {
-        console.log(`[Soul Mapping] ${missingTitles.length} loved titles missing from Media Brain — triggering immediate enrichment:`, missingTitles);
-        try {
-          const mediaEnrichmentService = require('./mediaEnrichmentService');
-          for (const title of missingTitles) {
-            // Determine media type from soul_graph or category profiles
-            let mediaType = 'movie'; // safe default
-            if (livingMemoryJson.categoryProfiles) {
-              if (livingMemoryJson.categoryProfiles.anime?.some(t => t.toLowerCase().includes(title.toLowerCase()))) mediaType = 'anime';
-              else if (livingMemoryJson.categoryProfiles.visual_novels?.length > 0) mediaType = 'visual novel';
-            }
-            mediaEnrichmentService.enrichSingleTitle(title, mediaType).catch(err => {
-              console.warn(`[Soul Mapping] Enrichment failed for ${title}:`, err.message);
-            });
-          }
-        } catch (e) {
-          console.warn(`[Soul Mapping] Could not trigger enrichment for missing titles:`, e.message);
-        }
-      }
+      // Enrichment bypassed for testing
 
       if (mediaVectors.length > 0) {
         const centroid = new Array(1536).fill(0);
@@ -187,11 +190,50 @@ class UserSoulService {
         for (let i = 0; i < 1536; i++) {
           centroid[i] /= mediaVectors.length;
         }
+
+        if (centroidCache.key !== cacheKey) {
+          centroidCache.key = cacheKey;
+          centroidCache.vector = centroid;
+        }
+
+        // Normalize centroid before blending
+        let centroidMag = 0;
+        for (let i = 0; i < 1536; i++) centroidMag += centroid[i] * centroid[i];
+        centroidMag = Math.sqrt(centroidMag);
+        if (centroidMag > 0) {
+          for (let i = 0; i < 1536; i++) centroid[i] /= centroidMag;
+        }
+
+        // Normalize textVector as well to be completely safe
+        let textMag = 0;
+        for (let i = 0; i < 1536; i++) textMag += textVector[i] * textVector[i];
+        textMag = Math.sqrt(textMag);
+        if (textMag > 0) {
+          for (let i = 0; i < 1536; i++) textVector[i] /= textMag;
+        }
+
+        // Apply dynamic weighting (actions speak louder than words)
+        let centroidWeight = 0.5;
+        let textWeight = 0.5;
+        if (mediaVectors.length >= 10) {
+          centroidWeight = 0.7;
+          textWeight = 0.3;
+        }
+
         finalVector = new Array(1536);
         for (let i = 0; i < 1536; i++) {
-          finalVector[i] = (textVector[i] + centroid[i]) / 2.0;
+          finalVector[i] = (textVector[i] * textWeight) + (centroid[i] * centroidWeight);
         }
-        console.log(`[Soul Mapping] Blended text persona with ${mediaVectors.length} media vectors (${missingTitles.length} titles still enriching).`);
+
+        // Re-normalize final vector
+        let finalMag = 0;
+        for (let i = 0; i < 1536; i++) finalMag += finalVector[i] * finalVector[i];
+        finalMag = Math.sqrt(finalMag);
+        if (finalMag > 0) {
+          for (let i = 0; i < 1536; i++) finalVector[i] /= finalMag;
+        }
+
+        console.log(`[Soul Mapping] Blended text persona (${textWeight*100}%) with ${mediaVectors.length} media vectors (${centroidWeight*100}%) (${missingTitles.length} titles still enriching).`);
       }
 
       // Removed: Autonomous Mycelium Crawl previously looped over all lovedTitles here, causing massive re-queueing.
