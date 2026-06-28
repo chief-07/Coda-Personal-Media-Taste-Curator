@@ -60,57 +60,62 @@ class UserSoulService {
     let useStructured = false;
     if (sg) {
       const parts = [];
-      if (sg.demographics?.stage_in_life) {
-        parts.push(`Life stage: ${sg.demographics.stage_in_life}`);
-      }
-      if (sg.demographics?.struggles?.length > 0) {
-        parts.push(`Core struggles: ${sg.demographics.struggles.join(', ')}`);
-      }
-      if (sg.emotional_resonances) {
-        const sorted = Object.entries(sg.emotional_resonances).sort((a, b) => b[1] - a[1]);
-        if (sorted.length > 0) {
-          parts.push(`Emotional resonances: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+      
+      // 1. Psychological Profile
+      const psych = sg.psychological_profile;
+      if (psych) {
+        if (psych.temperament) parts.push(`Temperament: ${psych.temperament}`);
+        if (psych.core_struggles?.length > 0) parts.push(`Core struggles: ${psych.core_struggles.join(', ')}`);
+        if (psych.worldview_lens) parts.push(`Worldview: ${psych.worldview_lens}`);
+        if (psych.relational_dynamics?.length > 0) parts.push(`Relational dynamics: ${psych.relational_dynamics.join(', ')}`);
+        if (psych.implicit_deductions?.likely_likes?.length > 0) {
+          parts.push(`Likely likes: ${psych.implicit_deductions.likely_likes.join(', ')}`);
+        }
+        if (psych.implicit_deductions?.likely_dislikes?.length > 0) {
+          parts.push(`Likely dislikes: ${psych.implicit_deductions.likely_dislikes.join(', ')}`);
         }
       }
-      if (sg.aesthetic_affinities) {
-        const sorted = Object.entries(sg.aesthetic_affinities).sort((a, b) => b[1] - a[1]);
-        if (sorted.length > 0) {
-          parts.push(`Aesthetic affinities: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
-        }
-      }
-      if (sg.creative_anchors) {
-        for (const [type, anchors] of Object.entries(sg.creative_anchors)) {
-          if (anchors && typeof anchors === 'object') {
-            const sorted = Object.entries(anchors).sort((a, b) => b[1] - a[1]);
-            if (sorted.length > 0) {
-              parts.push(`${type}: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+
+      // 2. Isolated Media Profiles
+      const media = sg.media_profiles;
+      if (media) {
+        for (const [mediaType, profile] of Object.entries(media)) {
+          if (!profile) continue;
+          parts.push(`\n=== TASTE PROFILE FOR ${mediaType.toUpperCase()} ===`);
+          
+          if (profile.themes) {
+            const sorted = Object.entries(profile.themes).sort((a, b) => b[1] - a[1]);
+            if (sorted.length > 0) parts.push(`  Themes: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+          }
+          if (profile.emotional_resonances) {
+            const sorted = Object.entries(profile.emotional_resonances).sort((a, b) => b[1] - a[1]);
+            if (sorted.length > 0) parts.push(`  Emotional resonances: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+          }
+          if (profile.aesthetic_affinities) {
+            const sorted = Object.entries(profile.aesthetic_affinities).sort((a, b) => b[1] - a[1]);
+            if (sorted.length > 0) parts.push(`  Aesthetic affinities: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+          }
+          if (profile.creative_anchors) {
+            for (const [anchorType, anchors] of Object.entries(profile.creative_anchors)) {
+              if (anchors && typeof anchors === 'object') {
+                const sorted = Object.entries(anchors).sort((a, b) => b[1] - a[1]);
+                if (sorted.length > 0) parts.push(`  ${anchorType}: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
+              }
             }
+          }
+          if (profile.pacing) {
+            parts.push(`  Pacing preference: ${profile.pacing}`);
           }
         }
       }
-      if (sg.themes) {
-        const sorted = Object.entries(sg.themes).sort((a, b) => b[1] - a[1]);
-        if (sorted.length > 0) {
-          parts.push(`Themes: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
-        }
-      }
-      if (sg.tropes) {
-        const sorted = Object.entries(sg.tropes).sort((a, b) => b[1] - a[1]);
-        if (sorted.length > 0) {
-          parts.push(`Tropes: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
-        }
-      }
-      if (sg.pacing_preference) {
-        const sorted = Object.entries(sg.pacing_preference).sort((a, b) => b[1] - a[1]);
-        if (sorted.length > 0) {
-          parts.push(`Pacing: ${sorted.map(([k, v]) => `${k}:${v}`).join(', ')}`);
-        }
-      }
+
+      // 3. Guardrails
       if (sg.guardrails?.length > 0) {
-        parts.push(`Guardrails: ${sg.guardrails.join(', ')}`);
+        parts.push(`\nGuardrails: ${sg.guardrails.join(', ')}`);
       }
+      
       if (livingMemoryJson.media_reflections?.length > 0) {
-        parts.push(`Personal media reflections: ${livingMemoryJson.media_reflections.join('. ')}`);
+        parts.push(`\nPersonal media reflections: ${livingMemoryJson.media_reflections.join('. ')}`);
       }
       
       if (parts.length > 0) {

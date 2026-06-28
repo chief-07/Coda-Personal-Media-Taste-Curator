@@ -18,6 +18,87 @@ if (!fs.existsSync(IMAGE_CACHE_DIR)) {
   fs.mkdirSync(IMAGE_CACHE_DIR, { recursive: true });
 }
 
+// ── Content Guardrail Blocklists & Helpers ──────────────────────────────────
+const CONTENT_SIGNAL_BLOCKLISTS = [
+  {
+    signals: ['christian', 'religious', 'faith-based', 'faith based', 'wholesome', 'family-friendly', 'family friendly', 'clean content', 'no adult', 'no explicit', 'no sexual', 'no 18+', 'no mature content'],
+    blocked: ['erotica', 'erotic', 'eroge', 'adult', '18+', 'hentai', 'explicit', 'sexual content', 'nudity', 'ecchi', 'sexually explicit', 'pornographic', 'nsfw', 'eroticism', 'softcore', 'hardcore', 'adult content']
+  },
+  {
+    signals: ['no gore', 'no violence', 'no guro', 'avoid violence', 'avoid gore', 'no graphic violence', 'no blood'],
+    blocked: ['gore', 'guro', 'graphic violence', 'extreme violence', 'body horror', 'torture', 'snuff', 'splatter']
+  },
+  {
+    signals: ['no horror', 'avoid horror', 'not horror'],
+    blocked: ['horror', 'psychological horror', 'survival horror', 'terror', 'disturbing']
+  },
+  {
+    signals: ['no ntr', 'no cheating', 'no netorare', 'avoid ntr'],
+    blocked: ['ntr', 'netorare', 'netori', 'cheating', 'cuckold']
+  },
+  {
+    signals: ['no bl', 'no yaoi', 'no boys love', 'no boyslove', 'no male romance'],
+    blocked: ['bl', 'yaoi', 'boys love', 'male x male', 'shounen ai', 'shounen-ai']
+  },
+  {
+    signals: ['no gl', 'no yuri', 'no girls love', 'no girlslove', 'no female romance'],
+    blocked: ['gl', 'yuri', 'girls love', 'shoujo ai', 'shoujo-ai']
+  },
+];
+
+const DEFAULT_BLOCKED_TERMS = [
+  'erotica', 'erotic', 'eroge', 'adult', '18+', 'hentai', 'explicit', 'sexual content', 'nudity', 'ecchi', 'sexually explicit', 'pornographic', 'nsfw', 'eroticism', 'softcore', 'hardcore', 'adult content'
+];
+
+const tagMatchesBlockedTerm = (tag, blockedTerm) => {
+  if (tag === blockedTerm) return true;
+  if (!tag.includes(blockedTerm)) return false;
+  let pos = tag.indexOf(blockedTerm);
+  while (pos !== -1) {
+    const charBefore = pos > 0 ? tag[pos - 1] : '';
+    const charAfter = pos + blockedTerm.length < tag.length ? tag[pos + blockedTerm.length] : '';
+    const isBeforeAlphanumeric = /[a-z0-9\-]/i.test(charBefore);
+    const isAfterAlphanumeric = /[a-z0-9\-]/i.test(charAfter);
+    if (!isBeforeAlphanumeric && !isAfterAlphanumeric) return true;
+    pos = tag.indexOf(blockedTerm, pos + 1);
+  }
+  return false;
+};
+
+const filterCandidatesBySafetyAndGuardrails = (candidates, guardrailsString) => {
+  const activeBlockedTerms = new Set(DEFAULT_BLOCKED_TERMS);
+  
+  if (guardrailsString) {
+    const guardrailsLower = guardrailsString.toLowerCase();
+    for (const rule of CONTENT_SIGNAL_BLOCKLISTS) {
+      const signalTriggered = rule.signals.some(sig => guardrailsLower.includes(sig));
+      if (signalTriggered) {
+        for (const term of rule.blocked) {
+          activeBlockedTerms.add(term.toLowerCase());
+        }
+      }
+    }
+  }
+
+  return candidates.filter(candidate => {
+    const payload = candidate.payload || {};
+    const allTags = [
+      ...(payload.genres || []),
+      ...(payload.tags || []),
+    ].map(t => (t || '').toLowerCase());
+
+    const blocked = allTags.find(tag => {
+      return [...activeBlockedTerms].some(blockedTerm => tagMatchesBlockedTerm(tag, blockedTerm));
+    });
+
+    if (blocked) {
+      console.log(`[SafetyFilter] ✗ Dropping "${payload.title}" — tag/genre "${blocked}" violates guardrails.`);
+      return false;
+    }
+    return true;
+  });
+};
+
 // ── Local Neighborhood Resonance (LNR) Cache ───────────────────────────────
 const NEIGHBORHOOD_CACHE_DIR = path.join(__dirname, '../cache/neighborhoods');
 if (!fs.existsSync(NEIGHBORHOOD_CACHE_DIR)) {
@@ -528,56 +609,15 @@ async function runQdrantPipeline(userId, requestedMediaType, specificAsk = null,
     }
   }
 
-  // ── Local Neighborhood Resonance (LNR) Pipeline ──
-  let rawResults = [];
-  let isLnrUsed = false;
-  const skipRandomSeeds = soul.transient_memory?.skip_random_seeds || false;
-  const lovedTitles = llmService.extractLovedTitles(soul) || [];
+  // ── Global Vector Search (No Net) ──
+  console.log(`[Pipeline] Running global search on media_brain for: ${requestedMediaType}...`);
+  let rawResults = await qdrantService.search('media_brain', queryVector, 150, filter, true);
 
-  if (lovedTitles.length > 0 && !skipRandomSeeds) {
-    try {
-      const lnrPool = await getOrBuildNeighborhoodPool(userId, lovedTitles, requestedMediaType);
-      if (lnrPool.length > 0) {
-        const maxOverlap = Math.max(...lnrPool.map(c => Object.keys(c.lovedScores).length), 1);
-        
-        rawResults = lnrPool.map(c => {
-          const scores = Object.values(c.lovedScores);
-          const overlapCount = scores.length;
-          const maxSimilarity = Math.max(...scores);
-          
-          let vibeSimilarity = 0;
-          if (c.vector && queryVector) {
-            for (let i = 0; i < 1536; i++) {
-              vibeSimilarity += c.vector[i] * queryVector[i];
-            }
-          }
-          
-          // Hybrid Score: 40% Vibe Match, 30% Max similarity to a loved title, 30% Overlap Count boost
-          const score = (vibeSimilarity * 0.4) + (maxSimilarity * 0.3) + ((overlapCount / maxOverlap) * 0.3);
-          
-          return {
-            id: c.id,
-            payload: c.payload,
-            vector: c.vector,
-            score: score
-          };
-        });
-        
-        rawResults.sort((a, b) => b.score - a.score);
-        isLnrUsed = true;
-        console.log(`[LNR Pipeline] Successfully scored ${rawResults.length} candidates using Local Neighborhood Resonance.`);
-      }
-    } catch(e) {
-      console.warn("[LNR Pipeline] Failed to use LNR. Falling back to standard vector search.", e.message);
-    }
-  }
-
-  if (!isLnrUsed) {
-    console.log("[LNR Pipeline] Running fallback standard vector search...");
-    rawResults = await qdrantService.search('media_brain', queryVector, 150, filter, true);
-  }
+  // Apply content safety/NSFW filtering by default and based on user guardrails
+  const guardrailsList = soul.permanent_soul?.soul_graph?.guardrails || [];
+  rawResults = filterCandidatesBySafetyAndGuardrails(rawResults, guardrailsList.join(', '));
   
-  // Slice top 30 after re-ranking
+  // Slice top 30 after safety filtering
   rawResults = rawResults.slice(0, 30);
 
   // 4. Filter Results

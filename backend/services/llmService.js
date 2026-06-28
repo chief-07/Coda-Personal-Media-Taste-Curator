@@ -18,8 +18,8 @@ const callOpenAI = async (messages, responseFormat = null, modelOverride = null,
     // Safeguard: Truncate excessively long inputs to prevent token bleed
     const safeMessages = messages.map(m => ({
       ...m,
-      content: typeof m.content === 'string' && m.content.length > 30000 
-        ? m.content.substring(0, 30000) + '...[TRUNCATED]' 
+      content: typeof m.content === 'string' && m.content.length > 250000 
+        ? m.content.substring(0, 250000) + '...[TRUNCATED]' 
         : m.content
     }));
 
@@ -819,7 +819,13 @@ const harmonizeAllMemory = async (currentMemory) => {
     }
 
     enrichedTitles.forEach(hit => {
-      mediaBrainHits.push({ title: hit.title, semantic_description: hit.semantic_description });
+      mediaBrainHits.push({
+        title: hit.title,
+        media_type: hit.media_type,
+        genres: hit.genres,
+        tags: hit.tags,
+        summary: hit.semantic_description ? hit.semantic_description.substring(0, 450) + '...' : ''
+      });
     });
     
     missingTitles.forEach(t => {
@@ -830,7 +836,7 @@ const harmonizeAllMemory = async (currentMemory) => {
     if (mediaBrainHits.length > 0) {
       researchContext += `=== ENRICHED TITLES FROM MEDIA BRAIN (HIGHEST QUALITY — use these as primary fuel) ===\n\n`;
       for (const hit of mediaBrainHits) {
-        researchContext += `Title: ${hit.title}\n${hit.semantic_description}\n\n---\n\n`;
+        researchContext += `Title: ${hit.title} (${hit.media_type || 'unknown'})\nGenres: ${(hit.genres || []).join(', ')}\nTags: ${(hit.tags || []).join(', ')}\nSummary: ${hit.summary}\n\n---\n\n`;
       }
     }
 
@@ -895,29 +901,14 @@ You will perform a global harmonization pass across FOUR sources of truth, in pr
 3. The community research fallback (for titles not yet enriched)
 4. The raw living memory and chat history (background inference)
 
-RULES:
-1. Decode the person: What are their demographics (life stage, age group), temperament, and core struggles?
-2. Analyse Emotional Reaction Patterns: How do their emotional states, triggers, and psychological needs connect across categories?
-3. ── CROSS-TITLE PATTERN EXTRACTION ──
-   CRITICAL: Cross-reference ALL the loved title descriptions against each other.
-   Find what RECURS across multiple titles — the same emotional frequency, the same visual world, the same character archetype, the same cultural gravity.
-   Look for: recurring aesthetics, recurring emotional tones, recurring character types, recurring cultural worlds (e.g. Japanese underground, French New Wave), recurring structural patterns (slow-burn, non-linear, fragmented).
-   WEIGHT THESE CROSS-TITLE OVERLAPS HIGHEST in the Soul Graph. A dimension that appears in 4 out of 5 loved titles is a core soul trait — score it 0.85-0.98.
-   A dimension that only appears in 1 title should score much lower unless it was also explicitly declared.
-4. ── WORLDVIEW & RELATIONAL SOUL ──
-   Go beyond taste preferences. Try to understand:
-   - How does this person relate to stories emotionally? What do they want to FEEL, not just watch?
-   - What is their philosophical lens on life as revealed through their choices? (e.g. "sees beauty in brokenness", "drawn to the quiet tragedy in ordinary life", "believes in the redemptive power of human connection")
-   - What character DYNAMICS and RELATIONSHIPS are they drawn to? Not just protagonist type — what is the relational pattern? (e.g. "the broken person slowly reached by someone who genuinely sees them", "complicated love that costs something", "found family built from broken people")
-   - What do their choices say about how they see the world and their place in it?
-   Encode these as specific, honest dimensions in the soul graph — NOT generic labels.
-   A person who consistently loves stories about broken people being quietly saved by someone who sees them has a specific soul. Capture it.
-5. Identify affinities for specific studios, directors, aesthetics, era preferences, and geographic contexts. You may infer adjacent studios/directors if they are an undeniable stylistic match for the user's specific profile (e.g. inferring Satoshi Kon for a user who loves surreal psychological anime), but DO NOT hallucinate mainstream creators for an underground taste profile. Be precise.
-6. Compile/update the User Soul Graph JSON. If there is an existing soul graph, merge new details organically.
-   - Smart Reinforcement vs. Expansion: Analyze if a new loved work reinforces existing dimensions (in which case, strengthen the weights of those existing dimensions, e.g., incrementing them slightly up to a maximum of 0.98).
-   - If a new loved work introduces a completely new taste facet (e.g., a genre, theme, or creative anchor not previously highlighted in the graph), add it to the Soul Graph as a new dimension with a moderate starting weight (e.g., 0.65-0.75) instead of ignoring it or overwriting prior tastes.
-   - Do not drop weights of unrelated existing tastes unless there is explicit negative evidence (like a guardrail or a rejected work/not_for_me feedback).
-7. The Soul Graph schema is NOT rigid — add new keys to emotional_resonances, aesthetic_affinities, themes, tropes, and a new "relational_dynamics" section as needed. Be specific, not generic. E.g., prefer "quietly-saved-by-someone-who-sees-you" over "romance".
+Your goal is to act like a deep, highly perceptive psychological profiler. You must:
+1. Decode the person: What is their temperament, their core struggles, and their worldview lens? Write a detailed analysis of what drives them as a person.
+2. Formulate implicit assumptions and deductions: What are their implicit likes (e.g. "prefers slow-burn intimate character studies") and their implicit dislikes/indifferences (e.g. "indifferent to loud spectacle, dislikes cliché melodramas")? Do NOT just guess randomly; base this strictly on their loved titles and what they have stated.
+3. ── STRICT MEDIA CATEGORY ISOLATION ──
+   You MUST build separate taste profiles for each media type (e.g. "movie", "anime", "visualNovel", "book").
+   Analyze what they love in movies separately from what they love in anime. Do NOT cross-pollinate them. If they love space sci-fi in movies, but melancholic coming-of-age in anime, those must live strictly in their respective media profiles!
+   For each media category they have loved works in:
+     - Map their specific themes, emotional resonances, aesthetic affinities, creative anchors (directors, studios, authors), and pacing preferences.
 
 ${explicitDeclarationsBlock}
 
@@ -930,47 +921,81 @@ ${JSON.stringify(cleanedMemory, null, 2)}
 EXISTING USER SOUL GRAPH (if any):
 ${parsedSoulGraph ? JSON.stringify(parsedSoulGraph, null, 2) : "None (this is a new profile or migration)"}
 
-Respond ONLY with a JSON object:
+Respond ONLY with a JSON object containing the "soul_graph" and optionally "category_profiles_overwrite".
+
+The JSON format must be EXACTLY:
 {
   "soul_graph": {
-    "demographics": {
-      "stage_in_life": "guess life stage (e.g. college student, young professional, 18-year-old introspective)",
-      "struggles": ["implicit/explicit struggles, e.g. navigating relationships, academic burnout, coping with grief"]
+    "psychological_profile": {
+      "temperament": "A visceral, highly-perceptive, introspective summary of their temperament.",
+      "core_struggles": ["implicit/explicit struggles they grapple with, e.g., loneliness, academic burnout, processing grief"],
+      "worldview_lens": "How they view stories and life, e.g., 'finds beauty in quiet tragedy', 'believes in redemption through human connection'",
+      "relational_dynamics": ["preferred interpersonal dynamics they crave in stories, e.g., 'broken characters finding slow comfort together'"],
+      "implicit_deductions": {
+        "likely_likes": ["predicted specific sub-genres, themes, or structures they likely enjoy"],
+        "likely_dislikes": ["predicted specific tropes, genres, or styles they likely reject or find boring"]
+      }
     },
-    "emotional_resonances": {
-      "Add as many specific emotional dimensions as you discover": 0.0-1.0
-    },
-    "aesthetic_affinities": {
-      "Add as many specific aesthetic dimensions as you discover": 0.0-1.0
-    },
-    "creative_anchors": {
-      "directors": { "Name": 0.0-1.0 },
-      "studios": { "Name": 0.0-1.0 },
-      "authors": { "Name": 0.0-1.0 },
-      "composers": { "Name": 0.0-1.0 },
-      "character_archetypes": { "e.g. psychologically-fractured-protagonist": 0.0-1.0 }
-    },
-    "themes": {
-      "Add as many specific themes as you discover": 0.0-1.0
-    },
-    "tropes": {
-      "Add as many specific tropes as you discover": 0.0-1.0
-    },
-    "relational_dynamics": {
-      "e.g. quietly-saved-by-someone-who-sees-you": 0.0-1.0,
-      "e.g. broken-person-reached-by-genuine-connection": 0.0-1.0
-    },
-    "worldview": {
-      "e.g. sees-beauty-in-brokenness": 0.0-1.0,
-      "e.g. believes-in-quiet-redemption": 0.0-1.0
-    },
-    "pacing_preference": {
-      "slow-burn": 0.0-1.0,
-      "moderate": 0.0-1.0,
-      "fast-paced": 0.0-1.0
+    "media_profiles": {
+      "movie": {
+        "loved_titles_in_category": ["List of loved movie titles"],
+        "themes": { "specific themes": 0.0-1.0 },
+        "emotional_resonances": { "specific resonances": 0.0-1.0 },
+        "aesthetic_affinities": { "specific aesthetics": 0.0-1.0 },
+        "creative_anchors": {
+          "directors": { "Name": 0.0-1.0 },
+          "studios": { "Name": 0.0-1.0 },
+          "authors": { "Name": 0.0-1.0 },
+          "composers": { "Name": 0.0-1.0 },
+          "character_archetypes": { "archetype": 0.0-1.0 }
+        },
+        "pacing": "slow-burn, moderate, or fast-paced"
+      },
+      "anime": {
+        "loved_titles_in_category": ["List of loved anime titles"],
+        "themes": { "specific themes": 0.0-1.0 },
+        "emotional_resonances": { "specific resonances": 0.0-1.0 },
+        "aesthetic_affinities": { "specific aesthetics": 0.0-1.0 },
+        "creative_anchors": {
+          "directors": { "Name": 0.0-1.0 },
+          "studios": { "Name": 0.0-1.0 },
+          "authors": { "Name": 0.0-1.0 },
+          "composers": { "Name": 0.0-1.0 },
+          "character_archetypes": { "archetype": 0.0-1.0 }
+        },
+        "pacing": "slow-burn, moderate, or fast-paced"
+      },
+      "visualNovel": {
+        "loved_titles_in_category": ["List of loved visual novel titles"],
+        "themes": { "specific themes": 0.0-1.0 },
+        "emotional_resonances": { "specific resonances": 0.0-1.0 },
+        "aesthetic_affinities": { "specific aesthetics": 0.0-1.0 },
+        "creative_anchors": {
+          "directors": { "Name": 0.0-1.0 },
+          "studios": { "Name": 0.0-1.0 },
+          "authors": { "Name": 0.0-1.0 },
+          "composers": { "Name": 0.0-1.0 },
+          "character_archetypes": { "archetype": 0.0-1.0 }
+        },
+        "pacing": "slow-burn, moderate, or fast-paced"
+      },
+      "book": {
+        "loved_titles_in_category": ["List of loved book titles"],
+        "themes": { "specific themes": 0.0-1.0 },
+        "emotional_resonances": { "specific resonances": 0.0-1.0 },
+        "aesthetic_affinities": { "specific aesthetics": 0.0-1.0 },
+        "creative_anchors": {
+          "directors": { "Name": 0.0-1.0 },
+          "studios": { "Name": 0.0-1.0 },
+          "authors": { "Name": 0.0-1.0 },
+          "composers": { "Name": 0.0-1.0 },
+          "character_archetypes": { "archetype": 0.0-1.0 }
+        },
+        "pacing": "slow-burn, moderate, or fast-paced"
+      }
     },
     "guardrails": ["negative dealbreakers extracted from what they hate or avoid"],
-    "coda_summary": "A visceral, highly-perceptive, beautifully written paragraph (3-4 sentences) summarizing the core of this user's emotional and aesthetic soul. Speak directly to them using 'You'. E.g. 'You are someone drawn to quiet redemptions...'"
+    "coda_summary": "A visceral, highly-perceptive, beautifully written paragraph (3-4 sentences) summarizing the core of this user's emotional and aesthetic soul. Speak directly to them using 'You'."
   },
   "category_profiles_overwrite": {
     "category_name": ["Clean, refined preference statement 1"]
@@ -1790,17 +1815,7 @@ GUIDELINES FOR VARIETY WITH SOUL-GROUNDING:
 
   // ── "THE NOW" CONTEXT (DJ Logic) ──
   const contextualState = soul.transient_memory?.contextualState || null;
-  const nowContextSection = ''; /* contextualState ? `
-CURRENT CONTEXT ("THE NOW"):
-- Time/Environment: ${contextualState.timeOfDay || 'Unknown'}
-- Current Mood: ${contextualState.currentMood || 'Unknown'}
-- Recent Chat Context: ${contextualState.recentChatContext || 'None'}
-
-CRITICAL INSTRUCTION (DJ LOGIC):
-You are an opinionated, tasteful media companion. You have access to "The Now" context above. 
-However, DO NOT completely abandon the user's permanent Soul Graph. "The Now" should only *gently skew or tint* the recommendation. 
-For example, if it is morning, you might look for a facet of their soul that is slightly lighter or more contemplative, but still deeply authentic to their core taste. If the current mood is unknown, rely entirely on their Soul Graph.
-` : ''; */
+  const nowContextSection = ''; 
 
   const systemPrompt = `
 You are the Coda Recommendation Brain.
@@ -1809,44 +1824,52 @@ The user is asking for a recommendation in the category: "${requestedMediaType}"
 Review their Permanent Soul Identity, their Transient Session Memory (recent context/cravings), and their Soul Graph.
 ${nowContextSection}
 
+CRITICAL DIRECTIVE (MEDIA-TYPE ISOLATION):
+You MUST inspect the user's Soul Graph, specifically the "media_profiles.${requestedMediaType}" key. You are STRICTLY FORBIDDEN from looking at or mixing in preferences, themes, aesthetics, or anchors from any other media type under "media_profiles" (e.g. if the user wants a movie, do not look at anime or visualNovel profiles). Only use "psychological_profile" (worldview, temperament, relational dynamics) and the target "media_profiles.${requestedMediaType}" sub-profile.
+
 CRITICAL: TASTE-ALIGNED NOVELTY & EXPLORATION
 Coda is not a generic query engine that returns the most obvious classic/mainstream matches of the user's favorite works. Your goal is to help them discover "new media but for their tastes" — hidden gems, underrated masterpieces, or less obvious works that share the same psychological/emotional core but differ in setting, style, or genre.
 - Avoid clichés: Do NOT generate a search brief that is a thinly veiled description of a famous title they already love (e.g. do not just describe the plot of Steins;Gate or Anohana).
-- Drive variety: Weave together different aspects of their soul graph, deliberately exploring creative anchors (directors, authors, studios) or themes that have been underserved.
 
 Your job has THREE distinct steps:
 
-STEP 1 — DECLARE a selected_vibe_focus:
-Choose ONE specific facet, feeling, or atmosphere to consciously target from this user's totality. Be specific and evocative. Examples of good declarations:
+STEP 1 — CHOOSE AN INSPIRATION ANCHOR:
+Look at the array "media_profiles.${requestedMediaType}.loved_titles_in_category". You MUST pick exactly ONE loved title from this list to act as your "Inspiration Anchor" for this run. Write a brief specifically targeting the aesthetic, atmospheric, and emotional depth of that one inspiration anchor. Do NOT try to average their entire list of loved titles. Pick one, and declare it under "inspiration_anchor_title".
+
+STEP 2 — DECLARE a selected_vibe_focus:
+Choose ONE specific facet, feeling, or atmosphere to target, inspired directly by the chosen Inspiration Anchor. Be specific and evocative. Examples:
 - "A dreamy existential thriller from 2000s Japan with beautiful emotional underpinning and a psychologically fractured protagonist"
 - "A warm found-family slice-of-life with a bittersweet ending that quietly guts you"
 - "A melancholic, slow-burn mystery drama set in a rainy coastal town focusing on grief and quiet recovery"
-This declared facet must be authentic to the user's soul, AND appropriate for "The Now". It can draw from:
-- Their highest-scoring soul graph dimensions that DO NOT clash with their current mood/time.
-- Their current transient recentContext if active (PRIORITY — honour this first if present).
+This declared facet must be authentic to the target media profile, AND appropriate for "The Now". It can draw from:
+- The target media profile's themes and emotional resonances.
+- The user's current transient recentContext if active (PRIORITY — honour this first if present).
 - An underserved facet of their profile to add variety.
 ${rotationSection}
-DO NOT always target the same cluster — deliberately drift across the full totality of the user's profile, but ensure every vibe focus remains strictly grounded in their authentic tastes (i.e. do not choose random genres or themes that are completely unsupported by their profile).
+DO NOT always target the same cluster — deliberately drift across different facets of the target media profile, but ensure every vibe focus remains strictly grounded in their authentic tastes.
 
-STEP 2 — DECLARE aesthetic anchors (this is Coda's editorial judgment call):
+STEP 3 — DECLARE aesthetic anchors:
 Before writing the search brief, lock in specific concrete anchors that ground the recommendation in a real aesthetic space. Think like a knowledgeable friend who knows exactly what they're recommending. Declare:
-- era: a specific decade or period (e.g. "late 90s", "early 2000s", "2010s", or leave empty if not relevant). Avoid forcing very old retro eras (like 1970s or older) unless the user's profile explicitly suggests it.
-- cultural_origin: a specific country/culture (e.g. "Japanese", "American/Western", or leave empty/broad). Do NOT choose foreign-language or obscure cultures (like French or Iranian) unless the user's soul graph or history shows a clear preference for them.
+- era: a specific decade or period (e.g. "late 90s", "early 2000s", "2010s", or leave empty if not relevant).
+- cultural_origin: a specific country/culture (e.g. "Japanese", "American/Western", or leave empty/broad). Do NOT choose foreign-language or obscure cultures unless the target media profile or history shows a preference for them.
 - visual_style: a specific visual or tonal quality (e.g. "soft, dreamlike, film-grain", "cold neon-drenched", "raw handheld intimacy", "lush and saturated")
 - genre_footprint: a specific genre or subgenre footprint (e.g. "quiet domestic drama", "90s detective noir", "psychological coming-of-age", "surrealist literary adaptation")
-- style_adjacency: a specific creator, trope, movement, or feeling this should feel adjacent to (e.g. "Murakami-esque", "90s cyberpunk underground", "the 'manic pixie dream girl' trope flipped on its head"). DO NOT hardcode this to a creator unless it fits. Let Coda judge what the best adjSTEP 3 — WRITE the "Phantom Document" (search_brief):
-To perform a surgically precise vector search against the Media Brain, we must synthesize the "Phantom Media" — the perfect, ideal, hypothetical piece of media that satisfies the user right now. 
-The Media Brain documents are structured with 9 specific semantic headers. You will generate a JSON object containing these EXACT same 9 headers. By matching the structure of the database exactly, the vector similarity math will perfectly align.
+- style_adjacency: a specific creator, trope, movement, or feeling this should feel adjacent to (e.g. "Murakami-esque", "90s cyberpunk underground").
+
+STEP 4 — WRITE the "Phantom Document" (search_brief):
+To perform a vector search against the Media Brain, we must synthesize the "Phantom Media" — the perfect, ideal, hypothetical piece of media that satisfies the user right now.
+You will generate a JSON object containing the 9 specific semantic headers of the database.
 
 CRITICAL RULES FOR THE PHANTOM DOCUMENT:
-- SURGICAL & LITERAL: Write dense, descriptive, emotionally honest sentences. Do NOT use flowery "adjective soup" (e.g., avoid "weaves a whimsical tale"). Use concrete nouns and direct tropes.
+- SURGICAL & LITERAL: Write dense, descriptive, emotionally honest sentences. Do NOT use flowery "adjective soup". Use concrete nouns and direct tropes.
 - ALIGNMENT: Ensure the phantom document explicitly embodies the 'selected_vibe_focus' and 'aesthetic_anchors' you declared above.
 - NO META-COMMENTARY: Do NOT talk about the user. Describe the media itself as if it were a real movie/show.
-\${soulGraphSection}
+${soulGraphSection}
 
 Return ONLY a JSON object:
 {
   "selected_vibe_focus": "The declared facet",
+  "inspiration_anchor_title": "The selected loved title from loved_titles_in_category",
   "aesthetic_anchors": {
     "era": "",
     "cultural_origin": "",

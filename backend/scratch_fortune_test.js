@@ -31,122 +31,86 @@ if (!fs.existsSync(NEIGHBORHOOD_CACHE_DIR)) {
   fs.mkdirSync(NEIGHBORHOOD_CACHE_DIR, { recursive: true });
 }
 
-/**
- * Replicated helper for stress test to ensure test results match production
- */
-async function getOrBuildNeighborhoodPool(userId, lovedTitles, mediaType) {
-  if (!userId) return [];
-  const cachePath = path.join(NEIGHBORHOOD_CACHE_DIR, `${userId}_${mediaType}.json`);
-  const sortedLoved = [...lovedTitles].sort();
+// ── Content Guardrail Blocklists & Helpers ──────────────────────────────────
+const CONTENT_SIGNAL_BLOCKLISTS = [
+  {
+    signals: ['christian', 'religious', 'faith-based', 'faith based', 'wholesome', 'family-friendly', 'family friendly', 'clean content', 'no adult', 'no explicit', 'no sexual', 'no 18+', 'no mature content'],
+    blocked: ['erotica', 'erotic', 'eroge', 'adult', '18+', 'hentai', 'explicit', 'sexual content', 'nudity', 'ecchi', 'sexually explicit', 'pornographic', 'nsfw', 'eroticism', 'softcore', 'hardcore', 'adult content']
+  },
+  {
+    signals: ['no gore', 'no violence', 'no guro', 'avoid violence', 'avoid gore', 'no graphic violence', 'no blood'],
+    blocked: ['gore', 'guro', 'graphic violence', 'extreme violence', 'body horror', 'torture', 'snuff', 'splatter']
+  },
+  {
+    signals: ['no horror', 'avoid horror', 'not horror'],
+    blocked: ['horror', 'psychological horror', 'survival horror', 'terror', 'disturbing']
+  },
+  {
+    signals: ['no ntr', 'no cheating', 'no netorare', 'avoid ntr'],
+    blocked: ['ntr', 'netorare', 'netori', 'cheating', 'cuckold']
+  },
+  {
+    signals: ['no bl', 'no yaoi', 'no boys love', 'no boyslove', 'no male romance'],
+    blocked: ['bl', 'yaoi', 'boys love', 'male x male', 'shounen ai', 'shounen-ai']
+  },
+  {
+    signals: ['no gl', 'no yuri', 'no girls love', 'no girlslove', 'no female romance'],
+    blocked: ['gl', 'yuri', 'girls love', 'shoujo ai', 'shoujo-ai']
+  },
+];
+
+const DEFAULT_BLOCKED_TERMS = [
+  'erotica', 'erotic', 'eroge', 'adult', '18+', 'hentai', 'explicit', 'sexual content', 'nudity', 'ecchi', 'sexually explicit', 'pornographic', 'nsfw', 'eroticism', 'softcore', 'hardcore', 'adult content'
+];
+
+const tagMatchesBlockedTerm = (tag, blockedTerm) => {
+  if (tag === blockedTerm) return true;
+  if (!tag.includes(blockedTerm)) return false;
+  let pos = tag.indexOf(blockedTerm);
+  while (pos !== -1) {
+    const charBefore = pos > 0 ? tag[pos - 1] : '';
+    const charAfter = pos + blockedTerm.length < tag.length ? tag[pos + blockedTerm.length] : '';
+    const isBeforeAlphanumeric = /[a-z0-9\-]/i.test(charBefore);
+    const isAfterAlphanumeric = /[a-z0-9\-]/i.test(charAfter);
+    if (!isBeforeAlphanumeric && !isAfterAlphanumeric) return true;
+    pos = tag.indexOf(blockedTerm, pos + 1);
+  }
+  return false;
+};
+
+const filterCandidatesBySafetyAndGuardrails = (candidates, guardrailsString) => {
+  const activeBlockedTerms = new Set(DEFAULT_BLOCKED_TERMS);
   
-  if (fs.existsSync(cachePath)) {
-    try {
-      const cacheData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
-      const cacheSortedLoved = (cacheData.lovedTitles || []).sort();
-      if (JSON.stringify(sortedLoved) === JSON.stringify(cacheSortedLoved)) {
-        console.log(`[LNR Cache] HIT for user ${userId} (${mediaType}). Using cached pool of ${cacheData.candidates.length} items.`);
-        return cacheData.candidates;
-      }
-      console.log(`[LNR Cache] MISS (Loved list changed). Rebuilding pool for user ${userId} (${mediaType}).`);
-    } catch (e) {
-      console.warn(`[LNR Cache] Failed to read cache for ${userId}:`, e.message);
-    }
-  } else {
-    console.log(`[LNR Cache] MISS (No cache file). Building pool for user ${userId} (${mediaType}).`);
-  }
-
-  const qdrantMediaType = mediaType === 'visualNovel' ? 'visual novel' : mediaType;
-  const filter = { must: [{ key: "media_type", match: { value: qdrantMediaType } }] };
-
-  const lovedIds = await qdrantService.findIdsByTitles('media_brain', lovedTitles);
-  let lovedVectors = [];
-  if (lovedIds.length > 0) {
-    try {
-      const lovedPoints = await qdrantService.client.retrieve('media_brain', {
-        ids: lovedIds,
-        with_payload: false,
-        with_vector: true
-      });
-      lovedVectors = lovedPoints.map(p => p.vector).filter(Boolean);
-    } catch(e) {
-      console.warn("[LNR Cache] Failed to fetch loved vectors:", e.message);
-      return [];
-    }
-  }
-
-  if (lovedVectors.length === 0) return [];
-
-  // Batch search for top 20 nearest neighbors (chunked & retried to avoid flakiness)
-  const batchResults = [];
-  const chunkSize = 5;
-  for (let i = 0; i < lovedVectors.length; i += chunkSize) {
-    const chunk = lovedVectors.slice(i, i + chunkSize);
-    const searches = chunk.map(vector => ({
-      vector: vector,
-      limit: 20,
-      filter: filter,
-      with_payload: true,
-      with_vector: true
-    }));
-    
-    let chunkResults = null;
-    let retries = 5;
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        chunkResults = await qdrantService.client.searchBatch('media_brain', { searches });
-        break; // Succeeded!
-      } catch(e) {
-        console.warn(`[LNR Cache] searchBatch chunk attempt ${attempt}/${retries} failed: ${e.message}`);
-        if (attempt === retries) {
-          throw e; // Fail fast and bubble up
+  if (guardrailsString) {
+    const guardrailsLower = guardrailsString.toLowerCase();
+    for (const rule of CONTENT_SIGNAL_BLOCKLISTS) {
+      const signalTriggered = rule.signals.some(sig => guardrailsLower.includes(sig));
+      if (signalTriggered) {
+        for (const term of rule.blocked) {
+          activeBlockedTerms.add(term.toLowerCase());
         }
-        await new Promise(r => setTimeout(r, 1000 * attempt)); // wait 1s, 2s, 3s...
       }
-    }
-
-    if (chunkResults) {
-      batchResults.push(...chunkResults);
-    }
-    
-    if (i + chunkSize < lovedVectors.length) {
-      await new Promise(r => setTimeout(r, 100));
     }
   }
 
-  const candidateMap = new Map();
-  batchResults.forEach((resultsForTitle, idx) => {
-    const sourceLovedTitle = lovedTitles[idx] || 'unknown';
-    resultsForTitle.forEach(point => {
-      if (!point.payload || !point.payload.title) return;
-      const title = point.payload.title;
-      const normalizedTitle = title.toLowerCase().replace(/^the\s+/, '').trim();
-      
-      if (lovedTitles.map(t => t.toLowerCase()).includes(title.toLowerCase())) return;
+  return candidates.filter(candidate => {
+    const payload = candidate.payload || {};
+    const allTags = [
+      ...(payload.genres || []),
+      ...(payload.tags || []),
+    ].map(t => (t || '').toLowerCase());
 
-      if (!candidateMap.has(normalizedTitle)) {
-        candidateMap.set(normalizedTitle, {
-          id: point.id,
-          payload: point.payload,
-          vector: point.vector,
-          lovedScores: {}
-        });
-      }
-      const cand = candidateMap.get(normalizedTitle);
-      cand.lovedScores[sourceLovedTitle.toLowerCase()] = point.score;
+    const blocked = allTags.find(tag => {
+      return [...activeBlockedTerms].some(blockedTerm => tagMatchesBlockedTerm(tag, blockedTerm));
     });
+
+    if (blocked) {
+      console.log(`[SafetyFilter] ✗ Dropping "${payload.title}" — tag/genre "${blocked}" violates guardrails.`);
+      return false;
+    }
+    return true;
   });
-
-  const candidates = Array.from(candidateMap.values());
-
-  try {
-    fs.writeFileSync(cachePath, JSON.stringify({ lovedTitles: sortedLoved, candidates }, null, 2), 'utf8');
-    console.log(`[LNR Cache] Saved ${candidates.length} candidates for user ${userId} (${mediaType}).`);
-  } catch(e) {
-    console.warn(`[LNR Cache] Failed to write cache for ${userId}:`, e.message);
-  }
-
-  return candidates;
-}
+};
 
 async function runE2ETest() {
   console.log('--- STARTING FORTUNE 10-BATCH E2E TEST ---');
@@ -211,53 +175,15 @@ async function runE2ETest() {
     const queryVector = await embeddingService.embed(search_brief);
     const filter = { must: [{ key: "media_type", match: { value: mediaType } }] };
     
-    // ── Local Neighborhood Resonance (LNR) Pipeline ──
-    let rawResults = [];
-    let isLnrUsed = false;
-    const lovedTitles = fetchedSoul.permanent_soul?.loved_titles || [];
+    // ── Global Vector Search (No Net) ──
+    console.log(`[Pipeline] Running global search on media_brain for: ${mediaType}...`);
+    let rawResults = await qdrantService.search('media_brain', queryVector, 150, filter, true);
 
-    if (lovedTitles.length > 0) {
-      try {
-        const lnrPool = await getOrBuildNeighborhoodPool(userId, lovedTitles, mediaType);
-        if (lnrPool.length > 0) {
-          const maxOverlap = Math.max(...lnrPool.map(c => Object.keys(c.lovedScores).length), 1);
-          
-          rawResults = lnrPool.map(c => {
-            const scores = Object.values(c.lovedScores);
-            const overlapCount = scores.length;
-            const maxSimilarity = Math.max(...scores);
-            
-            let vibeSimilarity = 0;
-            if (c.vector && queryVector) {
-              for (let i = 0; i < 1536; i++) {
-                vibeSimilarity += c.vector[i] * queryVector[i];
-              }
-            }
-            
-            const score = (vibeSimilarity * 0.4) + (maxSimilarity * 0.3) + ((overlapCount / maxOverlap) * 0.3);
-            
-            return {
-              id: c.id,
-              payload: c.payload,
-              vector: c.vector,
-              score: score
-            };
-          });
-          
-          rawResults.sort((a, b) => b.score - a.score);
-          isLnrUsed = true;
-          console.log(`[LNR Pipeline] Successfully scored ${rawResults.length} candidates using Local Neighborhood Resonance.`);
-        }
-      } catch(e) {
-        console.warn("[LNR Pipeline] Failed to use LNR. Falling back to standard vector search.", e.message);
-      }
-    }
-
-    if (!isLnrUsed) {
-      console.log("[LNR Pipeline] Running fallback standard vector search...");
-      rawResults = await qdrantService.search('media_brain', queryVector, 150, filter, true);
-    }
+    // Apply content safety/NSFW filtering by default and based on user guardrails
+    const guardrailsList = fetchedSoul.permanent_soul?.soul_graph?.guardrails || [];
+    rawResults = filterCandidatesBySafetyAndGuardrails(rawResults, guardrailsList.join(', '));
     
+    // Slice top 30 after safety filtering
     rawResults = rawResults.slice(0, 30);
     
     const recentlyRecommended = fetchedSoul.transient_memory?.recentlyRecommended || [];
