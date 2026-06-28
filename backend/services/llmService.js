@@ -776,14 +776,14 @@ const harmonizeAllMemory = async (currentMemory) => {
   const prioritizedTitles = Array.from(uniqueTitles);
   console.log("Prioritized media titles for harmonization research (Loved > Seen > Watchlist):", prioritizedTitles);
   
-  // Limit to top 5 titles to avoid API / search rate limits
-  let titlesToResearch = prioritizedTitles.slice(0, 5);
+  // Use ALL titles for a complete, deep harmonization (no slice limit)
+  let titlesToResearch = prioritizedTitles;
   
   // Fallback to LLM parser if empty
   if (titlesToResearch.length === 0 && currentMemory) {
     console.log("Prioritized list empty, falling back to LLM title extraction...");
     const fallbackTitles = await extractTitlesFromMemory(currentMemory);
-    titlesToResearch = fallbackTitles.slice(0, 5);
+    titlesToResearch = fallbackTitles;
   }
 
   // ── CHANGE 1: Media Brain First Lookup ────────────────────────────────────
@@ -822,8 +822,13 @@ const harmonizeAllMemory = async (currentMemory) => {
     if (yahooFallbackTitles.length > 0) {
       console.log(`Researching themes and community feedback for: ${yahooFallbackTitles.join(', ')}`);
       try {
-        const researchPromises = yahooFallbackTitles.map(title => researchMediaThemes(title));
-        const researchResults = await Promise.all(researchPromises);
+        const researchResults = [];
+        // Process in chunks of 3 to avoid rate limits
+        for (let i = 0; i < yahooFallbackTitles.length; i += 3) {
+          const chunk = yahooFallbackTitles.slice(i, i + 3);
+          const chunkResults = await Promise.all(chunk.map(title => researchMediaThemes(title)));
+          researchResults.push(...chunkResults);
+        }
         if (researchResults.some(r => r)) {
           researchContext += `=== COMMUNITY RESEARCH (FALLBACK — titles not yet in Media Brain) ===\n\n`;
           yahooFallbackTitles.forEach((title, idx) => {
@@ -1750,15 +1755,17 @@ While the user's highest-scoring dimensions represent their core tastes, do NOT 
   // ── Surface recently targeted vibes so the LLM drifts away from them ──
   const recentVibes = soul.transient_memory?.recentVibes || [];
   const rotationSection = recentVibes.length > 0 ? `
-INSTRUCTION FOR VARIETY (ROTATION):
-To avoid repeating similar setups, steer away from the exact vibe focuses and tropes targeted in recent runs.
-RECENTLY TARGETED VIBES (AVOID SUBSTANTIALLY REPEATING THESE EXACT ANGLES):
+INSTRUCTION FOR DYNAMIC ROTATION (RESPONSE TO SKIPS):
+The user is asking for a new recommendation, which implies they skipped the previous suggestions. 
+To prevent a stagnant feed, you MUST actively pivot and target a DIFFERENT aesthetic, atmosphere, or look from their Soul Graph.
+DO NOT repeat the vibe of the recent runs. The new Phantom Document must feel like a deliberate, fresh shift to a different side of their core tastes.
+RECENTLY TARGETED VIBES (DO NOT REPEAT THESE EXACT ANGLES):
 ${recentVibes.map((v, i) => `${i + 1}. ${v}`).join('\n')}
 
 GUIDELINES FOR VARIETY WITH SOUL-GROUNDING:
-1. Always stay grounded in the user's Soul Graph and core tastes. Never fabricate random genres, eras, or settings that are completely alien to their profile.
-2. For variety, rotate to a *different facet* of their taste profile, or combine their core interests in a novel way. E.g., if we recently did modern romantic dramas, try a retro slice-of-life, a bittersweet coming-of-age, or a quiet psychological mystery that also features their preferred emotional resonances.
-3. Do not over-rotate into completely unrelated genres (like high-octane action, survival horror, or hard sci-fi) if the user has no history of liking them. Variety should feel like a fresh, authentic extension of their identity, not a random leap.
+1. Always stay grounded in the user's Soul Graph. Never fabricate random genres or settings that are completely alien to their profile.
+2. For variety, rotate to a *different facet* of their taste profile. E.g., if we recently did modern romantic dramas, pivot hard to a retro slice-of-life, a bittersweet coming-of-age, or a quiet psychological mystery that also features their preferred emotional resonances.
+3. Variety should feel like a fresh, authentic extension of their identity, not a random leap.
 ` : '';
 
   // ── "THE NOW" CONTEXT (DJ Logic) ──
@@ -1807,21 +1814,15 @@ Before writing the search brief, lock in specific concrete anchors that ground t
 - cultural_origin: a specific country/culture (e.g. "Japanese", "American/Western", or leave empty/broad). Do NOT choose foreign-language or obscure cultures (like French or Iranian) unless the user's soul graph or history shows a clear preference for them.
 - visual_style: a specific visual or tonal quality (e.g. "soft, dreamlike, film-grain", "cold neon-drenched", "raw handheld intimacy", "lush and saturated")
 - genre_footprint: a specific genre or subgenre footprint (e.g. "quiet domestic drama", "90s detective noir", "psychological coming-of-age", "surrealist literary adaptation")
-- style_adjacency: a specific creator, trope, movement, or feeling this should feel adjacent to (e.g. "Murakami-esque", "90s cyberpunk underground", "the 'manic pixie dream girl' trope flipped on its head"). DO NOT hardcode this to a creator unless it fits. Let Coda judge what the best adjacency anchor is for this specific vibe.
-These anchors must be honest and specific. If an anchor isn't clear from the user's profile, leave it as an empty string rather than guessing.
+- style_adjacency: a specific creator, trope, movement, or feeling this should feel adjacent to (e.g. "Murakami-esque", "90s cyberpunk underground", "the 'manic pixie dream girl' trope flipped on its head"). DO NOT hardcode this to a creator unless it fits. Let Coda judge what the best adjSTEP 3 — WRITE the "Phantom Document" (search_brief):
+To perform a surgically precise vector search against the Media Brain, we must synthesize the "Phantom Media" — the perfect, ideal, hypothetical piece of media that satisfies the user right now. 
+The Media Brain documents are structured with 9 specific semantic headers. You will generate a JSON object containing these EXACT same 9 headers. By matching the structure of the database exactly, the vector similarity math will perfectly align.
 
-STEP 3 — WRITE the search_brief:
-A structured, literal search query designed to map precisely to a specific vector in the database. DO NOT write a flowery, poetic, or marketing-style paragraph (e.g., avoid "weaves a whimsical tale" or "captivating exploration"). 
-
-This text will be embedded as a vector to search the Media Brain. The Media Brain maps semantics based on literal tropes, themes, and concrete descriptors. If your brief is full of generic adjectives, it will create a "muddy" vector that accidentally pulls in completely unrelated or inappropriate genres just because they share flowery adjectives.
-
-CRITICAL RULES FOR THE BRIEF:
-- SURGICAL & LITERAL: State exactly what the work is, its themes, plot focus, and tone directly.
-- AVOID "ADJECTIVE SOUP": Do NOT use words like "poignant", "whimsical", "captivating", "beautiful", or "heart-wrenching" excessively. Use concrete nouns and direct tropes.
-- FORMAT: Write it as a dense block of clear parameters (e.g. "A Japanese 2010s psychological drama. Themes: existential dread, isolation. Plot focus: a protagonist navigating a strange urban landscape while dealing with the burden of memory. Tone: melancholic, slow-burn, gritty realism. Relational dynamic: found-family built from broken people.").
-- Do NOT mention the user. Describe the media itself.
-- Ensure the brief is specific enough that it firmly anchors the search in the correct thematic space, eliminating generic noise or unrelated mature content that might share vague adjectives.
-${soulGraphSection}
+CRITICAL RULES FOR THE PHANTOM DOCUMENT:
+- SURGICAL & LITERAL: Write dense, descriptive, emotionally honest sentences. Do NOT use flowery "adjective soup" (e.g., avoid "weaves a whimsical tale"). Use concrete nouns and direct tropes.
+- ALIGNMENT: Ensure the phantom document explicitly embodies the 'selected_vibe_focus' and 'aesthetic_anchors' you declared above.
+- NO META-COMMENTARY: Do NOT talk about the user. Describe the media itself as if it were a real movie/show.
+\${soulGraphSection}
 
 Return ONLY a JSON object:
 {
@@ -1833,7 +1834,17 @@ Return ONLY a JSON object:
     "genre_footprint": "",
     "style_adjacency": ""
   },
-  "search_brief": "The dense, opinionated specimen paragraph here"
+  "phantom_media": {
+    "setting_and_subculture": "The physical and cultural setting of the media (e.g., Early 2010s Akihabara otaku culture, A dystopian cyberpunk slum)",
+    "visual_tone_and_feel": "Deeply describe the aesthetic, visual tone, and feel (e.g., gritty, neon-drenched, cozy, muted, surreal)",
+    "pacing_and_structure": "How the pacing structurally functions (e.g., A slow slice-of-life start designed to build deep character attachment)",
+    "atmosphere_and_mood": "The overarching mood and emotional weather (e.g., suffocating tension, dreamlike and melancholic)",
+    "themes_and_messages": "What the media actually conveys, the underlying psychological or philosophical messages",
+    "character_relationships": "The interpersonal dynamics (e.g., toxic vs healing, found-family)",
+    "lead_character_type": "Who is the protagonist? (e.g., an unreliable narrator, burnt-out detective)",
+    "story_and_plot_type": "The narrative structure (e.g., non-linear mystery, character-study)",
+    "emotional_evocation": "A raw, visceral description of what this media actually does to a person emotionally (e.g., Leaves you feeling utterly hollow and staring at the ceiling for an hour)"
+  }
 }
 `;
 
@@ -1847,6 +1858,7 @@ Return ONLY a JSON object:
 
   const parsed = JSON.parse(responseJson);
   const anchors = parsed.aesthetic_anchors || {};
+  const phantom = parsed.phantom_media || {};
   
   const anchorParts = [];
   if (anchors.era) anchorParts.push(`[Era: ${anchors.era}]`);
@@ -1855,7 +1867,20 @@ Return ONLY a JSON object:
   if (anchors.genre_footprint) anchorParts.push(`[Genre: ${anchors.genre_footprint}]`);
   
   const anchorString = anchorParts.length > 0 ? anchorParts.join(' ') + ' ' : '';
-  const injectedBrief = `${anchorString}${parsed.search_brief || ''}`.trim();
+  
+  // Construct the search brief identically to the database schema
+  const injectedBrief = `
+${anchorString}
+[Setting & Subculture]: ${phantom.setting_and_subculture || ''}
+[Visual Tone & Feel]: ${phantom.visual_tone_and_feel || ''}
+[Pacing & Structure]: ${phantom.pacing_and_structure || ''}
+[Atmosphere & Mood]: ${phantom.atmosphere_and_mood || ''}
+[Themes & Messages]: ${phantom.themes_and_messages || ''}
+[Character Relationships]: ${phantom.character_relationships || ''}
+[Lead Character Type]: ${phantom.lead_character_type || ''}
+[Story & Plot Type]: ${phantom.story_and_plot_type || ''}
+[Emotional Evocation (Consensus)]: ${phantom.emotional_evocation || ''}
+  `.trim();
 
   return {
     selected_vibe_focus: parsed.selected_vibe_focus || '',
@@ -1892,7 +1917,7 @@ CURRENT AMBIENT CONTEXT ("THE NOW"):
   const recentContext = soul.transient_memory?.recentContext || null;
   const blurbRule = recentContext
     ? `CRITICAL: Since the user specifically asked for "${recentContext}", the coda_blurb MUST serve as a direct, contextual answer to their request (e.g. "Since you wanted something to make you cry, I promise you'll be staring at the ceiling after this one.").`
-    : `CRITICAL: The coda_blurb MUST sound like a human text message from a friend. DO NOT use flowery openers like "A haunting..." or "A surreal...". DO NOT fall into the trap of starting every blurb with "You'll...". Use extreme unpredictability in your tone. Sometimes say "Trust me on this one." Sometimes: "Don't watch this unless you're ready." Sometimes: "I have a feeling you'll adore this." Sometimes: "This is one of those films people spend years chasing again." Sometimes: "I almost didn't recommend this... but I think you're exactly the right person." Keep it wildly unpredictable and alive.`;
+    : `CRITICAL GRAMMAR RULE: The coda_blurb MUST sound like a human text message from a friend. You are STRICTLY FORBIDDEN from starting the blurb with the subjects "This", "It", "A", "The", or "You" (or any variations like "This one", "You'll", etc.). You MUST start the blurb with an imperative verb (e.g., "Trust me...", "Drop everything..."), a personal observation (e.g., "I almost didn't..."), or a raw emotional statement (e.g., "Nothing will prepare you..."). Keep it wildly unpredictable, pithy, and alive.`;
 
   const guardrails = soul.permanent_soul?.guardrails || [];
   const safetyInstructions = typeof buildDynamicGuardrailInstructions === 'function' ? buildDynamicGuardrailInstructions(guardrails) : '';
