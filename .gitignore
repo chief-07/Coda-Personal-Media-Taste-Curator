@@ -30,7 +30,8 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+/build/*
+!/build/web/
 /coverage/
 
 # Symbolication related
@@ -50,6 +51,7 @@ node_modules/
 # Environment files
 assets/.env
 assets/env.local
+**/env.local
 backend/.env
 
 # Coda agent brain and log dumps
@@ -62,7 +64,6 @@ backend/scratch/
 scratch/
 *.log
 android/build/
-
 
 backend/certs/
 backend/archive_legacy_qdrant/
