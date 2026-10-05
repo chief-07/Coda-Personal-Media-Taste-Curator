@@ -10,63 +10,28 @@ function getGroqClient() {
   }
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
-const callOpenAI = async (messages, responseFormat = null, modelOverride = null, retries = 2) => {
-  const executeCall = async () => {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) throw new Error("Missing OPENROUTER_API_KEY");
+const { callGeminiChat } = require('./geminiClient');
 
-    // Safeguard: Truncate excessively long inputs to prevent token bleed
-    const safeMessages = messages.map(m => ({
-      ...m,
-      content: typeof m.content === 'string' && m.content.length > 250000 
-        ? m.content.substring(0, 250000) + '...[TRUNCATED]' 
-        : m.content
-    }));
+const callGemini = async (messages, responseFormat = null, modelOverride = null, retries = 2) => {
+  // Safeguard: Truncate excessively long inputs to prevent token bleed
+  const safeMessages = messages.map(m => ({
+    ...m,
+    content: typeof m.content === 'string' && m.content.length > 250000 
+      ? m.content.substring(0, 250000) + '...[TRUNCATED]' 
+      : m.content
+  }));
 
-    const payload = {
-      model: modelOverride === 'gpt-4o-mini' || !modelOverride ? 'openai/gpt-4o-mini' : modelOverride,
-      messages: safeMessages,
-      temperature: 0.4, // increased from 0.2 to 0.4 for diverse recommendations
-    };
-    
-    if (responseFormat) {
-      payload.response_format = responseFormat;
-    }
+  const responseData = await callGeminiChat({
+    messages: safeMessages,
+    responseFormat: responseFormat,
+    temperature: 0.4,
+    model: 'gemini-3.1-flash-lite',
+    retries,
+  });
 
-    const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://coda.app',
-        'X-Title': 'Coda Media Brain'
-      },
-      timeout: 60000 // 60 seconds timeout
-    });
-
-    return response.data.choices[0].message.content;
-  };
-
-  for (let attempt = 1; attempt <= retries + 1; attempt++) {
-    try {
-      return await executeCall();
-    } catch (e) {
-      const errorCode = e.code || (e.response && e.response.status) || 'unknown';
-      const isNetworkError = 
-        e.code === 'ENOTFOUND' || 
-        e.code === 'ETIMEDOUT' || 
-        e.code === 'ECONNRESET' || 
-        e.code === 'EPIPE' || 
-        e.message?.includes('timeout') || 
-        (e.response && e.response.status >= 500);
-
-      if (attempt > retries || !isNetworkError) {
-        throw e;
-      }
-      console.warn(`[OpenAI Call] Attempt ${attempt} failed with error ${errorCode}. Retrying in 1s...`);
-      await new Promise(r => setTimeout(r, 1000));
-    }
-  }
+  return responseData.choices[0].message.content;
 };
+const callOpenAI = callGemini;
 
 const normalizeMediaType = (type) => {
   if (!type) return 'anime';
@@ -752,7 +717,6 @@ const extractLovedTitles = (currentMemory) => {
 
 const harmonizeAllMemory = async (currentMemory) => {
   console.log("Starting global harmonization pass...");
-  const qdrantService = require('./qdrantService');
   
   // 1. Extract specifically marked Loved, Seen, and Watchlist titles directly
   const lovedTitles = extractLovedTitles(currentMemory);
@@ -786,80 +750,27 @@ const harmonizeAllMemory = async (currentMemory) => {
     titlesToResearch = fallbackTitles;
   }
 
-  // ── CHANGE 1: Media Brain First Lookup ────────────────────────────────────
-  // For each loved title, try Qdrant first. It has rich structured enrichment.
-  // Fall back to Yahoo only for titles not yet in the Brain.
+  // Research themes and community sentiment for prioritized titles
   let researchContext = "";
-  const mediaBrainHits = [];
-  const yahooFallbackTitles = [];
-
   if (titlesToResearch.length > 0) {
-    console.log(`[Soul Graph] Checking Media Brain for enriched titles: ${titlesToResearch.join(', ')}`);
-    let enrichedTitles = [];
-    let missingTitles = [...titlesToResearch];
-      
+    console.log(`Researching themes and community feedback for: ${titlesToResearch.join(', ')}`);
     try {
-      const ids = await qdrantService.findIdsByTitles('media_brain', titlesToResearch);
-      if (ids.length > 0) {
-        const points = await qdrantService.client.retrieve('media_brain', {
-          ids: ids,
-          with_payload: true,
-          with_vector: false
-        });
-        enrichedTitles = points.map(p => p.payload);
-        
-        // Rebuild missing titles correctly
-        const foundTitles = enrichedTitles.map(p => p.title.toLowerCase());
-        missingTitles = titlesToResearch.filter(t => !foundTitles.includes(t.toLowerCase()));
-        
-        console.log(`[Soul Graph] Media Brain HIT for ${enrichedTitles.length} titles. MISS for ${missingTitles.length} titles.`);
+      const researchResults = [];
+      for (let i = 0; i < titlesToResearch.length; i += 3) {
+        const chunk = titlesToResearch.slice(i, i + 3);
+        const chunkResults = await Promise.all(chunk.map(title => researchMediaThemes(title)));
+        researchResults.push(...chunkResults);
       }
-    } catch(e) {
-      console.warn(`[Soul Graph] Media Brain batch fetch failed:`, e.message);
-    }
-
-    enrichedTitles.forEach(hit => {
-      mediaBrainHits.push({
-        title: hit.title,
-        media_type: hit.media_type,
-        genres: hit.genres,
-        tags: hit.tags,
-        summary: hit.semantic_description ? hit.semantic_description.substring(0, 450) + '...' : ''
-      });
-    });
-    
-    missingTitles.forEach(t => {
-      yahooFallbackTitles.push(t);
-    });
-
-    // Build research context — Media Brain entries first (highest quality)
-    if (mediaBrainHits.length > 0) {
-      researchContext += `=== ENRICHED TITLES FROM MEDIA BRAIN (HIGHEST QUALITY — use these as primary fuel) ===\n\n`;
-      for (const hit of mediaBrainHits) {
-        researchContext += `Title: ${hit.title} (${hit.media_type || 'unknown'})\nGenres: ${(hit.genres || []).join(', ')}\nTags: ${(hit.tags || []).join(', ')}\nSummary: ${hit.summary}\n\n---\n\n`;
-      }
-    }
-
-    // Yahoo fallback for titles not yet in the Brain
-    if (yahooFallbackTitles.length > 0) {
-      console.log(`Researching themes and community feedback for: ${yahooFallbackTitles.join(', ')}`);
-      try {
-        const researchResults = [];
-        // Process in chunks of 3 to avoid rate limits
-        for (let i = 0; i < yahooFallbackTitles.length; i += 3) {
-          const chunk = yahooFallbackTitles.slice(i, i + 3);
-          const chunkResults = await Promise.all(chunk.map(title => researchMediaThemes(title)));
-          researchResults.push(...chunkResults);
-        }
-        if (researchResults.some(r => r)) {
-          researchContext += `=== COMMUNITY RESEARCH (FALLBACK — titles not yet in Media Brain) ===\n\n`;
-          yahooFallbackTitles.forEach((title, idx) => {
+      if (researchResults.some(r => r)) {
+        researchContext += `=== MEDIA TASTE RESEARCH ===\n\n`;
+        titlesToResearch.forEach((title, idx) => {
+          if (researchResults[idx]) {
             researchContext += `Title: ${title}\nResearch:\n${researchResults[idx]}\n\n---\n\n`;
-          });
-        }
-      } catch (e) {
-        console.error("Error researching media themes during harmonization:", e);
+          }
+        });
       }
+    } catch (e) {
+      console.error("Error researching media themes during harmonization:", e);
     }
   } else {
     researchContext = "No specific favorite titles mentioned yet.";
@@ -1101,7 +1012,7 @@ Respond with EXACTLY "TRUE" or "FALSE" (no other text).
   }
 };
 
-const discussRecommendation = async (memory, title, mediaType, codaBlurb, pitchParagraphs, chatHistory, userMessage) => {
+const discussRecommendation = async (memory, title, mediaType, codaBlurb, pitchParagraphs, chatHistory, userMessage, walrusMemories = []) => {
   let scrapedContext = "";
   
   const needsSearch = await checkIfSearchNeeded(userMessage, title, mediaType);
@@ -1131,6 +1042,9 @@ Here is what you told them when you recommended it:
 - Your detailed pitch:
 ${pitchParagraphs.map(p => `  - "${p}"`).join('\n')}
 
+USER WALRUS PROTOCOL MEMORIES (Authentic Decentralized Taste Anchors):
+${walrusMemories && walrusMemories.length > 0 ? walrusMemories.map(m => `- [${m.category || m.namespace}]: "${m.text || m.content || JSON.stringify(m)}"`).join('\n') : 'No explicit memories recorded on Walrus yet.'}
+
 USER PROFILE CONTEXT:
 - Core identity & tastes: ${JSON.stringify(memory.globalIdentity || [])}
 - Category profiles: ${JSON.stringify(memory.categoryProfiles || {})}
@@ -1140,16 +1054,31 @@ USER PROFILE CONTEXT:
 COMMUNITY TALK & FACTS (from web search):
 ${scrapedContext || 'No additional community threads retrieved.'}
 
+If the user asks why you recommended this, why you thought they would like it, or about their taste, you MUST directly reference their authentic Walrus Protocol taste anchors and preferences above.
+
 Your job is to talk with the user about "${title}":
 1. Speak with high warmth, enthusiasm, and companionable excitement. Share your own favorite moments, ask them how they felt about key events/scenes, and use exclamation marks where natural.
 2. Avoid typical robotic AI transitions, bulleted lists, and formal summaries. Talk like an excited friend texting or chatting over coffee.
 3. If the scraped context does not have the exact answer, use your pre-trained knowledge about "${title}" but remain accurate and honest.
 4. Do NOT self-censor or restrict discussions of mature themes, adult/eroge visual novels, horror/gore elements, or tragedy. Address them openly and naturally as a companion.
-5. Analyze the conversation history and the user's new message to identify if they express new tastes, likes/dislikes, or dealbreakers/guardrails:
-   - Extract these new preference statements into the "memory_updates" JSON object.
-   - For example: if they say "I hate visual novels with bad endings", add "No visual novels with bad endings" to "guardrails_appends".
-   - CRITICAL: If the user explicitly states they loved or hated this media and provides a reason, summarize their subjective review into ONE sentence and add it to "media_reflections_appends" (e.g. "[Media Name]: Loved the dark aesthetic but hated the slow pacing").
-   - Valid category keys in "category_appends" are: "anime", "movies", "tv_shows", "visual_novels", "books", "games", "manga", "youtube", "music".
+5. CONTINUOUS WALRUS MEMORY EXTRACTION (STRICT FIRST-PERSON AFFIRMATION ONLY):
+   CRITICAL ANTI-HALLUCINATION / FALSE-POSITIVE RULE:
+   - Clarifying, curious, or exploratory questions are NOT endorsements or preferences!
+   - If the user asks questions such as "Why did you pick this?", "Why do you think I'd like it?", "Who directed this?", "What is this about?", "Is it scary?", "Where can I stream it?", or makes casual remarks ("cool", "okay", "tell me more"):
+     YOU MUST SET ALL ARRAYS IN "memory_updates" TO EMPTY ([] or {}).
+   - NEVER assume, infer, or hallucinate that the user likes the media, director, studio, or genre simply because they asked a question about it or because you recommended it!
+   
+   ONLY extract into "memory_updates" when the user EXPLICITLY declares a personal taste, opinion, or experience in their own words:
+   - DIRECTORS, CREATORS & AUTEURS: ONLY if the user explicitly says they love, admire, or follow a creator (e.g. "I love Christopher Nolan", "Denis Villeneuve is my favorite director"), extract into "category_appends".
+   - THEMES, VIBES & AESTHETIC TASTE: ONLY if the user explicitly says they love a theme or pacing style (e.g. "I love slow-burn atmospheric tension", "I really enjoy non-linear mysteries"), extract into "category_appends" and "global_identity_appends".
+   - FAVORITE MEDIA & INSPIRATION ANCHORS: ONLY if the user explicitly names media they loved, cherished, or compare things to, extract into "category_appends".
+   - HARD DEALBREAKERS & DISLIKES: ONLY if the user explicitly states a dislike or dealbreaker (e.g. "I hate jump scares", "no heavy gore", "no love triangles"), extract into "guardrails_appends" (e.g. "Avoid/Dealbreaker: Jump scares").
+   - FINISHED / SEEN MEDIA: ONLY if the user explicitly confirms they finished or saw it (e.g. "I finished it", "I watched it last night"), add to "seen_appends".
+   - DROPPED / NOT FOR ME: ONLY if the user explicitly says they dropped or hated it, add to "not_for_me_appends".
+   - REVIEWS / REFLECTIONS: ONLY if they provide their own subjective review/takeaway, add to "media_reflections_appends".
+   - Valid category keys in "category_appends" are: "anime", "movie", "tv", "visualnovel", "book", "game", "manga", "youtube", "music".
+   
+   IF THE USER DID NOT EXPLICITLY STATE A PERSONAL PREFERENCE OR EXPERIENCE, LEAVE "memory_updates" COMPLETELY EMPTY!
 6. Generate or update a "one_line_summary" summarizing their overall experience with this media so far based on their chat responses (e.g. "Loved the characters but felt the pacing dragged in the middle", or "Cried for three days straight at the ending").
 
 Respond ONLY with a JSON object:
@@ -1159,10 +1088,10 @@ Respond ONLY with a JSON object:
   "memory_updates": {
     "global_identity_appends": ["Any new broad identity traits if applicable"],
     "category_appends": {
-      "media_type_key": ["Any new media type specific preferences if applicable"]
+      "media_type_key": ["Any new media type specific preferences, favorite directors, or loved anchors if applicable"]
     },
     "recent_context_overwrite": "Any new active direction if applicable",
-    "guardrails_appends": ["Any new negative dealbreakers if applicable"],
+    "guardrails_appends": ["Any new negative dealbreakers or dislikes if applicable"],
     "media_reflections_appends": ["One-sentence subjective review of this media if provided"],
     "seen_appends": ["Title of this media if they indicated they finished or saw it"],
     "not_for_me_appends": ["Title of this media if they explicitly hated or dropped it"]
@@ -1193,14 +1122,14 @@ Respond ONLY with a JSON object:
   } catch (e) {
     console.error('[Discuss Chat LLM Parse Error]:', e.message);
     return {
-      message: "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
+      message: `[LLM Error]: ${e.message || e}`,
       one_line_summary: "Chatting about " + title,
       memory_updates: {}
     };
   }
 };
 
-const handleAskChat = async (memory, chatHistory, userMessage, watchlistOnly = false) => {
+const handleAskChat = async (memory, chatHistory, userMessage, watchlistOnly = false, walrusMemories = []) => {
   const intro = [
     "Tell me what you're looking for. Your favorites, Something you can't stop thinking about.",
     "Something you wish you could experience again for the first time.",
@@ -1212,6 +1141,9 @@ const handleAskChat = async (memory, chatHistory, userMessage, watchlistOnly = f
 You are Coda. 
 You are a close friend with impeccable, artistic taste in books, anime, movies, games, and music.
 You are chatting with the user in the "Ask Coda" section to understand their current mood, craving, or general request, so you can recommend the perfect media work.
+
+USER WALRUS PROTOCOL MEMORIES (Authentic Decentralized Taste Anchors):
+${walrusMemories && walrusMemories.length > 0 ? walrusMemories.map(m => `- [${m.category || m.namespace}]: "${m.text || m.content || JSON.stringify(m)}"`).join('\n') : 'No explicit memories recorded on Walrus yet.'}
 
 USER PROFILE CONTEXT:
 - Core identity: ${JSON.stringify(memory.globalIdentity || [])}
@@ -1248,7 +1180,15 @@ YOUR DIRECTIVE / FIRST MESSAGE (what you previously showed the user as an intro)
         - In "recommendation_query", write a highly descriptive search query that captures their craving (e.g. "intricate time-travel anime with emotional romance like Steins Gate" or "slow-burn visual novel set in school with gothic tragedy"). This query will be used to scrape actual recommendation threads.
         - In "similar_to_title", if the user explicitly asks for recommendations similar to a specific media work (e.g., "something like Interstellar" or "manga similar to Berserk") with no complex modifiers, output the clean proper title of that reference work here (e.g., "Interstellar", "Berserk"). If they mention multiple titles, or if the similarity request contains complex modifiers/constraints that alter the vibe (e.g., "like Interstellar but more funny"), set this to null.
         - In "hard_constraints", output an array of strings representing any strict constraints the user mentioned (e.g., ["Android only", "eroge / adult content", "male protagonist with female heroines", "no NTR", "web browser only"]). If no strict constraints are requested, output an empty array [].
-6. Banned: When first generating a recommendation (setting "status": "success"), do NOT name or recommend the pick directly in the chat text! Keep the title a surprise for the homescreen. Once the recommendation has been made and the user is asking questions about it, this ban no longer applies.
+7. CONTINUOUS WALRUS MEMORY EXTRACTION (STRICT FIRST-PERSON AFFIRMATION ONLY):
+   CRITICAL ANTI-HALLUCINATION / FALSE-POSITIVE RULE:
+   - Asking general questions, asking for recommendations, or asking about a title (e.g. "recommend me something", "what should I watch?", "is Dune good?", "why?", "tell me about it") is NOT a permanent taste declaration.
+   - NEVER extract a memory update unless the user explicitly and unambiguously declares their personal taste, creator admiration, or dealbreaker in their own words.
+   - ONLY extract into "memory_updates" when the user explicitly declares:
+     - Creator admiration (e.g. "Denis Villeneuve is my favorite director"): extract to "category_appends".
+     - Dealbreaker (e.g. "I hate jump scares", "no body horror"): extract to "guardrails_appends".
+     - Deep aesthetic preference (e.g. "I love non-linear philosophical sci-fi"): extract to "global_identity_appends".
+   - Otherwise, leave "memory_updates" completely empty: { "guardrails_appends": [], "category_appends": {}, "global_identity_appends": [] }.
 
 Respond ONLY with a JSON object in this format:
 {
@@ -1258,7 +1198,12 @@ Respond ONLY with a JSON object in this format:
   "match_target": null | "Specific Title to check",
   "recommendation_query": null | "descriptive search query here",
   "similar_to_title": null | "Title of reference media",
-  "hard_constraints": []
+  "hard_constraints": [],
+  "memory_updates": {
+    "guardrails_appends": [],
+    "category_appends": {},
+    "global_identity_appends": []
+  }
 }
 `;
 
@@ -1799,18 +1744,24 @@ While the user's highest-scoring dimensions represent their core tastes, do NOT 
 
   // ── Surface recently targeted vibes so the LLM drifts away from them ──
   const recentVibes = soul.transient_memory?.recentVibes || [];
-  const rotationSection = recentVibes.length > 0 ? `
+  const recentAnchors = soul.transient_memory?.recentAnchors || [];
+  const rotationSection = (recentVibes.length > 0 || recentAnchors.length > 0) ? `
 INSTRUCTION FOR DYNAMIC ROTATION (RESPONSE TO SKIPS):
 The user is asking for a new recommendation, which implies they skipped the previous suggestions. 
 To prevent a stagnant feed, you MUST actively pivot and target a DIFFERENT aesthetic, atmosphere, or look from their Soul Graph.
-DO NOT repeat the vibe of the recent runs. The new Phantom Document must feel like a deliberate, fresh shift to a different side of their core tastes.
+DO NOT repeat the vibe or the inspiration anchors of the recent runs. The new Phantom Document must feel like a deliberate, fresh shift to a different side of their core tastes.
+
 RECENTLY TARGETED VIBES (DO NOT REPEAT THESE EXACT ANGLES):
 ${recentVibes.map((v, i) => `${i + 1}. ${v}`).join('\n')}
+
+RECENTLY USED INSPIRATION ANCHORS (DO NOT CHOOSE THESE AS YOUR INSPIRATION ANCHOR):
+${recentAnchors.map((a, i) => `${i + 1}. ${a}`).join('\n')}
 
 GUIDELINES FOR VARIETY WITH SOUL-GROUNDING:
 1. Always stay grounded in the user's Soul Graph. Never fabricate random genres or settings that are completely alien to their profile.
 2. For variety, rotate to a *different facet* of their taste profile. E.g., if we recently did modern romantic dramas, pivot hard to a retro slice-of-life, a bittersweet coming-of-age, or a quiet psychological mystery that also features their preferred emotional resonances.
-3. Variety should feel like a fresh, authentic extension of their identity, not a random leap.
+3. Choose an Inspiration Anchor that has not been recently used.
+4. Variety should feel like a fresh, authentic extension of their identity, not a random leap.
 ` : '';
 
   // ── "THE NOW" CONTEXT (DJ Logic) ──
@@ -1835,6 +1786,7 @@ Your job has THREE distinct steps:
 
 STEP 1 — CHOOSE AN INSPIRATION ANCHOR:
 Look at the array "media_profiles.${requestedMediaType}.loved_titles_in_category". You MUST pick exactly ONE loved title from this list to act as your "Inspiration Anchor" for this run. Write a brief specifically targeting the aesthetic, atmospheric, and emotional depth of that one inspiration anchor. Do NOT try to average their entire list of loved titles. Pick one, and declare it under "inspiration_anchor_title".
+CRITICAL ROTATION RULE: You MUST NOT pick any title listed under "RECENTLY USED INSPIRATION ANCHORS" above, unless all loved titles in the category have been recently used. Rotate through the user's loved list to explore different facets of their taste.
 
 STEP 2 — DECLARE a selected_vibe_focus:
 Choose ONE specific facet, feeling, or atmosphere to target, inspired directly by the chosen Inspiration Anchor. Be specific and evocative. Examples:
@@ -1927,6 +1879,7 @@ ${anchorString}
 
   return {
     selected_vibe_focus: parsed.selected_vibe_focus || '',
+    inspiration_anchor_title: parsed.inspiration_anchor_title || '',
     aesthetic_anchors: anchors,
     search_brief: injectedBrief
   };
@@ -2071,7 +2024,20 @@ Return ONLY a JSON object:
     }
   });
 
-  return JSON.parse(responseJson);
+  const res = JSON.parse(responseJson);
+  const cleanStr = (s) => (s ? String(s).replace(/\*\*/g, '').replace(/\*/g, '').trim() : s);
+  if (res.top_pick) {
+    if (res.top_pick.coda_blurb) res.top_pick.coda_blurb = cleanStr(res.top_pick.coda_blurb);
+    if (Array.isArray(res.top_pick.pitch_paragraphs)) {
+      res.top_pick.pitch_paragraphs = res.top_pick.pitch_paragraphs.map(p => cleanStr(p));
+    }
+  }
+  if (Array.isArray(res.runner_ups)) {
+    res.runner_ups.forEach(ru => {
+      if (ru.coda_blurb) ru.coda_blurb = cleanStr(ru.coda_blurb);
+    });
+  }
+  return res;
 };
 
 const evaluateMatch = async (candidate, soul, vectorSimilarity = null) => {
@@ -2184,5 +2150,7 @@ module.exports = {
   synthesizeSearchBrief,
   evaluateCandidates,
   fallbackAskChat,
-  extractLovedTitles
+  extractLovedTitles,
+  callGemini,
+  callOpenAI
 };

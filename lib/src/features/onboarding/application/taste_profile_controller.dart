@@ -114,7 +114,11 @@ class TasteProfileController extends Notifier<TasteProfileState> {
       if (response.status == 'success' && response.message != null) {
         final showBtn = response.showButtons ?? false;
         final withCodaResponse = List<ChatMessage>.from(nextTabState.messages)
-          ..add(ChatMessage(text: response.message, isUser: false));
+          ..add(ChatMessage(
+            text: response.message,
+            isUser: false,
+            memoryUpdates: response.memoryUpdates,
+          ));
 
         final updatedTabState = nextTabState.copyWith(
           messages: withCodaResponse,
@@ -127,7 +131,11 @@ class TasteProfileController extends Notifier<TasteProfileState> {
         );
       } else if (response.status == 'need_more' && response.message != null) {
         final withCodaResponse = List<ChatMessage>.from(nextTabState.messages)
-          ..add(ChatMessage(text: response.message, isUser: false));
+          ..add(ChatMessage(
+            text: response.message,
+            isUser: false,
+            memoryUpdates: response.memoryUpdates,
+          ));
 
         final updatedTabState = nextTabState.copyWith(
           messages: withCodaResponse,
@@ -146,7 +154,12 @@ class TasteProfileController extends Notifier<TasteProfileState> {
     } catch (e) {
       print('TasteProfileController error: $e');
       final nextTabState = getTabState(tab);
-      final updatedTabState = nextTabState.copyWith(isLoading: false);
+      final withErrResponse = List<ChatMessage>.from(nextTabState.messages)
+        ..add(ChatMessage(text: "[Debug Error (TasteProfile Controller)]: $e", isUser: false));
+      final updatedTabState = nextTabState.copyWith(
+        messages: withErrResponse,
+        isLoading: false,
+      );
       state = state.copyWith(
         tabs: Map<String, TasteProfileTabState>.from(state.tabs)..[cleanTab] = updatedTabState,
       );
@@ -159,9 +172,9 @@ class TasteProfileController extends Notifier<TasteProfileState> {
     String codaGreeting;
     
     if (tabName == 'you') {
-      codaGreeting = "Tell me about you. What moves you? What stage of life are you in? What kind of stories are you always looking for?";
+      codaGreeting = "Tell me about you. What moves you? What kind of stories are you always drawn to? Tell me whatever comes to mind — or just say hello.";
     } else {
-      codaGreeting = "Tell me about your taste in $tab. The stories you love, specific titles you recommend, or characters you connected with.";
+      codaGreeting = "Tell me about your taste in $tab. The stories you love, specific titles that stayed with you, or what you're craving right now.";
     }
 
     return TasteProfileTabState(

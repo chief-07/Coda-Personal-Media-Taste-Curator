@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
@@ -11,6 +12,7 @@ import 'package:coda/src/core/providers/api_config.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coda/src/core/providers/watchlist_mode_provider.dart';
+import 'package:coda/src/core/providers/memories_mode_provider.dart';
 
 final selectedMediaTypeProvider =
     NotifierProvider<SelectedMediaType, MediaType>(SelectedMediaType.new);
@@ -73,6 +75,16 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
   final Map<MediaType, bool> _isRefilling = {};
   final Map<MediaType, bool> _isPreWarming = {};
   final Set<MediaType> _initialBatchComplete = {};
+  int _modeEpoch = 0;
+
+  String _resolveCORSUrl(String url) {
+    if (url.startsWith('/')) {
+      return '${getApiBaseUrl()}$url';
+    } else if (kIsWeb && url.startsWith('http') && !url.contains('/api/recommend/proxy-image')) {
+      return '${getApiBaseUrl()}/api/recommend/proxy-image?url=${Uri.encodeComponent(url)}';
+    }
+    return url;
+  }
 
   String _getAmbientContext() {
     final hour = DateTime.now().hour;
@@ -88,7 +100,7 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
       return;
     }
     try {
-      final resolvedUrl = posterUrl.startsWith('/') ? '${getApiBaseUrl()}$posterUrl' : posterUrl;
+      final resolvedUrl = _resolveCORSUrl(posterUrl);
       final ImageProvider provider = resolvedUrl.startsWith('assets/')
           ? AssetImage(resolvedUrl)
           : NetworkImage(resolvedUrl);
@@ -115,7 +127,7 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     ImageStream? stream;
     ImageStreamListener? listener;
     try {
-      final resolvedUrl = url.startsWith('/') ? '${getApiBaseUrl()}$url' : url;
+      final resolvedUrl = _resolveCORSUrl(url);
       final ImageProvider provider = resolvedUrl.startsWith('assets/')
           ? AssetImage(resolvedUrl)
           : NetworkImage(resolvedUrl);
@@ -155,6 +167,10 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
   }
 
   bool _isExcluded(String title, LivingMemory memory) {
+    // In Amnesia Mode (Memories OFF), Coda has zero memory of what the user has seen or rejected!
+    if (!ref.read(memoriesModeProvider)) {
+      return false;
+    }
     final cleanTitle = title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
     final isSeen = memory.seen.any((t) => t.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '') == cleanTitle);
     final isNotForMe = memory.notForMe.any((t) => t.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '') == cleanTitle);
@@ -169,12 +185,12 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     final activeTypes = ref.watch(activeMediaTypesProvider);
     final prefs = ref.watch(sharedPreferencesProvider);
 
-    // One-time cache migration: Clear stale recommendation cache that has missing/null trailerUrl
-    const migrationKey = 'coda_recommendation_cache_migrated_v4';
+    // One-time cache migration: Clear stale recommendation cache
+    const migrationKey = 'coda_recommendation_cache_migrated_v5';
     final hasMigrated = prefs.getBool(migrationKey) ?? false;
     if (!hasMigrated) {
-      print('[Cache Migration] Clearing stale recommendation cache (active picks & queues) for v4 updates...');
-      for (final type in MediaType.values) {
+      print('[Cache Migration] Clearing stale recommendation cache (active picks & queues) for v5 updates...');
+      for (final type in {...MediaType.values, ...activeTypes}) {
         await prefs.remove('coda_active_pick_${type.name}');
         await prefs.remove('coda_recommendation_queue_${type.name}');
       }
@@ -269,11 +285,13 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
   }
 
   void _startBackgroundTasksForActiveTab(LivingMemory memory, MediaType selectedType, List<MediaType> activeTypes) {
+    final epoch = _modeEpoch;
     Future.microtask(() async {
+      if (epoch != _modeEpoch) return;
       // 1. If queue is low, trigger background refill immediately (no delay!)
       final currentQueue = _queues[selectedType] ?? [];
       if (currentQueue.length < 3) {
-        _refillQueue(memory, selectedType);
+        _refillQueue(memory, selectedType, epoch: epoch);
       }
 
       // 2. Lazy-fetch the pitch paragraphs for the active card (does not block showing card)
@@ -281,14 +299,16 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
 
       // 3. Wait 2 seconds before pre-warming other tabs sequentially
       await Future.delayed(const Duration(milliseconds: 2000));
+      if (epoch != _modeEpoch) return;
       if (selectedType != ref.read(selectedMediaTypeProvider)) return;
-      _scheduleStaggeredPreWarming(memory, selectedType, activeTypes);
+      _scheduleStaggeredPreWarming(memory, selectedType, activeTypes, epoch: epoch);
     });
   }
 
   Future<void> fetchPitchForActivePick(MediaType type) async {
     final active = _activePicks[type];
     if (active == null || active.pitch.isNotEmpty) return;
+    final epoch = _modeEpoch;
 
     try {
       final memory = ref.read(livingMemoryProvider);
@@ -297,7 +317,9 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
         memory: memory,
         title: active.title,
         mediaType: type.name,
+        memoriesEnabled: ref.read(memoriesModeProvider),
       );
+      if (epoch != _modeEpoch) return;
 
       final pitchParagraphs = pitchData['pitch_paragraphs'] as List<String>? ?? [];
       final codaBlurb = pitchData['coda_blurb'] as String? ?? '';
@@ -320,6 +342,10 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
           ostUrl: active.ostUrl,
           trailerUrl: active.trailerUrl,
           studio: active.studio,
+          recalledMemories: active.recalledMemories,
+          queryUsed: active.queryUsed,
+          moodAngle: active.moodAngle,
+          attributedMemory: active.attributedMemory,
         );
         _activePicks[type] = updated;
 
@@ -340,7 +366,8 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     }
   }
 
-  void _scheduleStaggeredPreWarming(LivingMemory memory, MediaType selectedType, List<MediaType> activeTypes) {
+  void _scheduleStaggeredPreWarming(LivingMemory memory, MediaType selectedType, List<MediaType> activeTypes, {int? epoch}) {
+    final targetEpoch = epoch ?? _modeEpoch;
     final otherTypes = activeTypes.where((type) {
       if (type == selectedType) return false;
       if (_activePicks.containsKey(type) && _activePicks[type] != null) return false;
@@ -349,25 +376,28 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     }).toList();
 
     if (otherTypes.isNotEmpty) {
-      _staggeredPreWarm(otherTypes, memory);
+      _staggeredPreWarm(otherTypes, memory, targetEpoch);
     }
   }
 
-  Future<void> _staggeredPreWarm(List<MediaType> types, LivingMemory memory) async {
+  Future<void> _staggeredPreWarm(List<MediaType> types, LivingMemory memory, int epoch) async {
     for (final type in types) {
+      if (epoch != _modeEpoch) return;
       // Re-read selected type to ensure the user hasn't switched to this tab in the meantime
       final currentSelected = ref.read(selectedMediaTypeProvider);
       if (type == currentSelected) continue;
 
       if (_activePicks[type] == null && _isPreWarming[type] != true) {
-        await _preWarmTab(memory, type);
-        // Wait 1.5 seconds sequentially between pre-warming different tabs
-        await Future.delayed(const Duration(milliseconds: 1500));
+        await _preWarmTab(memory, type, epoch: epoch);
+        // Wait 2.0 seconds sequentially between pre-warming different tabs to prevent backend burst
+        await Future.delayed(const Duration(milliseconds: 2000));
       }
     }
   }
 
-  Future<void> _preWarmTab(LivingMemory memory, MediaType type) async {
+  Future<void> _preWarmTab(LivingMemory memory, MediaType type, {int? epoch}) async {
+    final targetEpoch = epoch ?? _modeEpoch;
+    if (targetEpoch != _modeEpoch) return;
     final selectedType = ref.read(selectedMediaTypeProvider);
     if (type == selectedType || _isPreWarming[type] == true || _activePicks[type] != null) {
       return;
@@ -380,7 +410,7 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
       
       // 1. Check SharedPreferences active pick
       final savedJson = prefs.getString(key);
-      if (savedJson != null) {
+      if (savedJson != null && targetEpoch == _modeEpoch) {
         try {
           final rec = Recommendation.fromJson(jsonDecode(savedJson));
           if (!_isExcluded(rec.title, memory)) {
@@ -392,7 +422,7 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
             
             final queue = _queues[type] ?? [];
             if (queue.length < 2) {
-              await _refillQueue(memory, type);
+              await _refillQueue(memory, type, epoch: targetEpoch);
             }
             return;
           } else {
@@ -407,7 +437,7 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
       _queues[type] = validPicks;
       await _saveQueue(type);
 
-      if (validPicks.isNotEmpty) {
+      if (validPicks.isNotEmpty && targetEpoch == _modeEpoch) {
         final first = validPicks.removeAt(0);
         _activePicks[type] = first;
         await prefs.setString(key, jsonEncode(first.toJson()));
@@ -421,6 +451,7 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
 
       // 3. Fetch recommendations from backend
       final recs = await _fetchNewRecommendations(memory, type);
+      if (targetEpoch != _modeEpoch) return;
       if (recs.isNotEmpty) {
         final active = recs.removeAt(0);
         _activePicks[type] = active;
@@ -432,16 +463,20 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     } catch (e) {
       print('Error pre-warming tab ${type.name}: $e');
     } finally {
-      _isPreWarming[type] = false;
+      if (targetEpoch == _modeEpoch) {
+        _isPreWarming[type] = false;
+      }
     }
   }
 
-  Future<void> _refillQueue(LivingMemory memory, MediaType type) async {
+  Future<void> _refillQueue(LivingMemory memory, MediaType type, {int? epoch}) async {
+    final targetEpoch = epoch ?? _modeEpoch;
+    if (targetEpoch != _modeEpoch) return;
     if (_isRefilling[type] == true) return;
     _isRefilling[type] = true;
 
     try {
-      while (true) {
+      while (targetEpoch == _modeEpoch) {
         final currentSelected = ref.read(selectedMediaTypeProvider);
         final targetLimit = (type == currentSelected) ? 3 : 2;
 
@@ -450,11 +485,15 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
           break;
         }
 
+        final memoriesEnabled = ref.read(memoriesModeProvider);
         final queueTitles = currentQueue.map((r) => r.title).toList();
         final activeTitle = _activePicks[type]?.title;
-        final exclusions = [...queueTitles, if (activeTitle != null) activeTitle];
+        // In Amnesia Mode, allow repeats across cards so Coda visibly forgets what it just showed
+        final exclusions = memoriesEnabled
+            ? [...queueTitles, if (activeTitle != null) activeTitle]
+            : <String>[];
 
-        print('[Queue Refill] Fetching 1 background recommendation for ${type.name} to refill queue...');
+        print('[Queue Refill] Fetching 1 background recommendation for ${type.name} to refill queue (memories=$memoriesEnabled)...');
         final service = ref.read(recommendationServiceProvider);
         final isWatchlistMode = ref.read(watchlistModeProvider);
         final ambientContext = _initialBatchComplete.contains(type) ? null : _getAmbientContext();
@@ -464,8 +503,10 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
           additionalExclusions: exclusions,
           limit: 1,
           watchlistOnly: isWatchlistMode,
+          memoriesEnabled: memoriesEnabled,
           ambientContext: ambientContext,
         );
+        if (targetEpoch != _modeEpoch) break;
 
         if (results.isEmpty) {
           print('[Queue Refill] No recommendations returned for ${type.name}. Stopping refill.');
@@ -483,11 +524,13 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
           }
         }
         
-        if (newRecs.isNotEmpty) {
+        if (newRecs.isNotEmpty && targetEpoch == _modeEpoch) {
           _queues[type] = [..._queues[type] ?? [], ...newRecs];
           await _saveQueue(type);
           _precachePoster(newRecs.first.posterUrl);
           print('[Queue Refill] Successfully added "${newRecs.first.title}" to ${type.name} queue. Current size: ${_queues[type]?.length}');
+          // Pause 1.5s between background refills to avoid rate-limiting upstream LLM and asset services
+          await Future.delayed(const Duration(milliseconds: 1500));
         } else {
           break;
         }
@@ -495,7 +538,9 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     } catch (e) {
       print('[Queue Refill Error] Failed for ${type.name}: $e');
     } finally {
-      _isRefilling[type] = false;
+      if (targetEpoch == _modeEpoch) {
+        _isRefilling[type] = false;
+      }
     }
   }
 
@@ -511,7 +556,8 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
   }
 
   Future<List<Recommendation>> _fetchNewRecommendations(LivingMemory memory, MediaType selectedType, {int limit = 1}) async {
-    if (memory.globalIdentity.isEmpty && memory.categoryProfiles.isEmpty && memory.recentContext.isEmpty) {
+    final memoriesEnabled = ref.read(memoriesModeProvider);
+    if (memoriesEnabled && memory.globalIdentity.isEmpty && memory.categoryProfiles.isEmpty && memory.recentContext.isEmpty) {
       return [];
     }
 
@@ -520,7 +566,14 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     final ambientContext = _initialBatchComplete.contains(selectedType) ? null : _getAmbientContext();
     
     try {
-      final results = await service.fetchRecommendations(memory, selectedType, limit: limit, watchlistOnly: isWatchlistMode, ambientContext: ambientContext);
+      final results = await service.fetchRecommendations(
+        memory, 
+        selectedType, 
+        limit: limit, 
+        watchlistOnly: isWatchlistMode, 
+        memoriesEnabled: memoriesEnabled,
+        ambientContext: ambientContext
+      );
       _initialBatchComplete.add(selectedType);
       final recs = results
           .map((r) => r.toDomain())
@@ -540,6 +593,7 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
           }
         }
       }
+
       return recs;
     } catch (e) {
       print('Error fetching recommendations: $e');
@@ -573,20 +627,78 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
       state = AsyncValue.data(nextRec);
       _startBackgroundTasksForActiveTab(memory, selectedType, activeTypes);
     } else {
+      for (int attempt = 1; attempt <= 2; attempt++) {
+        final recs = await _fetchNewRecommendations(memory, selectedType);
+        if (recs.isNotEmpty) {
+          final active = recs.removeAt(0);
+          _activePicks[selectedType] = active;
+          await prefs.setString(activeKey, jsonEncode(active.toJson()));
+
+          _queues[selectedType] = recs;
+          await _saveQueue(selectedType);
+
+          state = AsyncValue.data(active);
+          _startBackgroundTasksForActiveTab(memory, selectedType, activeTypes);
+          return;
+        }
+        if (attempt < 2) {
+          await Future.delayed(const Duration(seconds: 1));
+        }
+      }
+      state = const AsyncValue.data(null);
+    }
+  }
+
+  Future<void> reloadFresh({bool clearAll = false}) async {
+    _modeEpoch++;
+    final currentEpoch = _modeEpoch;
+    state = const AsyncValue.loading();
+    final prefs = ref.read(sharedPreferencesProvider);
+    final selectedType = ref.read(selectedMediaTypeProvider);
+    final activeTypes = ref.read(activeMediaTypesProvider);
+    final memory = ref.read(livingMemoryProvider);
+
+    if (clearAll) {
+      _activePicks.clear();
+      _queues.clear();
+      _isRefilling.clear();
+      _isPreWarming.clear();
+      _initialBatchComplete.clear();
+      for (final type in {...MediaType.values, ...activeTypes}) {
+        await prefs.remove('coda_active_pick_${type.name}');
+        await prefs.remove('coda_recommendation_queue_${type.name}');
+      }
+    } else {
+      _activePicks.remove(selectedType);
+      _queues.remove(selectedType);
+      _isRefilling.remove(selectedType);
+      _isPreWarming.remove(selectedType);
+      await prefs.remove('coda_active_pick_${selectedType.name}');
+      await prefs.remove('coda_recommendation_queue_${selectedType.name}');
+    }
+
+    for (int attempt = 1; attempt <= 2; attempt++) {
+      if (currentEpoch != _modeEpoch) return;
       final recs = await _fetchNewRecommendations(memory, selectedType);
+      if (currentEpoch != _modeEpoch) return;
       if (recs.isNotEmpty) {
         final active = recs.removeAt(0);
         _activePicks[selectedType] = active;
-        await prefs.setString(activeKey, jsonEncode(active.toJson()));
+        await prefs.setString('coda_active_pick_${selectedType.name}', jsonEncode(active.toJson()));
 
         _queues[selectedType] = recs;
         await _saveQueue(selectedType);
 
         state = AsyncValue.data(active);
         _startBackgroundTasksForActiveTab(memory, selectedType, activeTypes);
-      } else {
-        state = const AsyncValue.data(null);
+        return;
       }
+      if (attempt < 2) {
+        await Future.delayed(const Duration(seconds: 1));
+      }
+    }
+    if (currentEpoch == _modeEpoch) {
+      state = const AsyncValue.data(null);
     }
   }
 
@@ -609,12 +721,14 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
   }
 
   Future<void> clearActivePick() async {
+    _modeEpoch++;
     final prefs = ref.read(sharedPreferencesProvider);
+    final activeTypes = ref.read(activeMediaTypesProvider);
     _activePicks.clear();
     _queues.clear();
     _isRefilling.clear();
     _isPreWarming.clear();
-    for (final type in MediaType.values) {
+    for (final type in {...MediaType.values, ...activeTypes}) {
       await prefs.remove('coda_active_pick_${type.name}');
       await prefs.remove('coda_recommendation_queue_${type.name}');
     }

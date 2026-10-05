@@ -3,15 +3,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 String getApiBaseUrl() {
-  final envUrl = dotenv.env['CODA_API_URL'];
+  const defineUrl = String.fromEnvironment('CODA_API_URL');
+  final envUrl = defineUrl.isNotEmpty ? defineUrl : dotenv.env['CODA_API_URL'];
   if (envUrl != null && envUrl.isNotEmpty) {
     if (kIsWeb) {
       final uri = Uri.base;
-      if (uri.host == 'localhost' || uri.host == '127.0.0.1') {
+      if (uri.host == 'localhost' || uri.host == '127.0.0.1' || RegExp(r'^\d+\.\d+\.\d+\.\d+$').hasMatch(uri.host)) {
         if (uri.port != 8080 && uri.port != 8443) {
           final targetPort = uri.scheme == 'https' ? 8443 : 8080;
           return '${uri.scheme}://${uri.host}:$targetPort';
         }
+        return uri.origin;
+      }
+      if (uri.host.endsWith('.onrender.com')) {
         return uri.origin;
       }
     }

@@ -56,8 +56,8 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
   @override
   AudioPlayerState build() {
     final prefs = ref.watch(sharedPreferencesProvider);
-    final autoplay = prefs.getBool(_autoplayPrefsKey) ?? false;
-    final isMuted = !autoplay; // If autoplay is off, we start muted (silent)
+    final autoplay = prefs.getBool(_autoplayPrefsKey) ?? true;
+    final isMuted = !autoplay; // Defaults to false (audio plays by default)
 
     ref.listen(homeRecommendationProvider, (previous, next) {
       final rec = next.value;

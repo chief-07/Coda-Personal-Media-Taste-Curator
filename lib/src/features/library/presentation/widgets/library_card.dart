@@ -14,6 +14,8 @@ import 'package:coda/src/features/session/application/archived_sessions_controll
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
 import 'package:coda/src/core/providers/watchlist_mode_provider.dart';
+import 'package:coda/src/core/providers/memories_mode_provider.dart';
+import 'package:coda/src/core/providers/audio_enabled_provider.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 
 class LibraryCard extends ConsumerStatefulWidget {
@@ -70,6 +72,44 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
     super.dispose();
   }
 
+  Widget _buildFadedContent(Widget child) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final height = constraints.maxHeight;
+        double stopStart = 0.75;
+        double stopEnd = 0.95;
+
+        if (height > 0 && !height.isInfinite) {
+          final safeBottom = MediaQuery.of(context).padding.bottom;
+          final bottomPadding = safeBottom + 83.0;
+          final double fadeEnd = height - bottomPadding;
+          final double fadeStart = fadeEnd - 80.0;
+
+          stopStart = (fadeStart / height).clamp(0.0, 1.0);
+          stopEnd = (fadeEnd / height).clamp(0.0, 1.0);
+        }
+
+        return ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: const [
+                Colors.white,
+                Colors.white,
+                Colors.transparent,
+                Colors.transparent,
+              ],
+              stops: [0.0, stopStart, stopEnd, 1.0],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.dstIn,
+          child: child,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -111,14 +151,16 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
                           child: Container(color: Colors.black.withValues(alpha: 0.01)),
                         ),
                         Positioned.fill(
-                          child: _CardLayout(
-                            isKnockoutLayer: true,
-                            scrollController: _maskScrollController,
-                            themeValue: _themeEnabled,
-                            audioValue: _audioEnabled,
-                            reduceAnimationsValue: _reduceAnimationsEnabled,
-                            currentTab: widget.tab,
-                            horizontalControllerProvider: _getHorizontalController,
+                          child: _buildFadedContent(
+                            _CardLayout(
+                              isKnockoutLayer: true,
+                              scrollController: _maskScrollController,
+                              themeValue: _themeEnabled,
+                              audioValue: _audioEnabled,
+                              reduceAnimationsValue: _reduceAnimationsEnabled,
+                              currentTab: widget.tab,
+                              horizontalControllerProvider: _getHorizontalController,
+                            ),
                           ),
                         ),
                         if (widget.tab == LibraryTab.lists)
@@ -141,21 +183,23 @@ class _LibraryCardState extends ConsumerState<LibraryCard> {
 
                 // ── Layer 2: Normal Elements ────────────────────────────────
                 Positioned.fill(
-                  child: _CardLayout(
-                    isKnockoutLayer: false,
-                    scrollController: _topScrollController,
-                    themeValue: _themeEnabled,
-                    audioValue: _audioEnabled,
-                    reduceAnimationsValue: _reduceAnimationsEnabled,
-                    currentTab: widget.tab,
-                    horizontalControllerProvider: _getHorizontalController,
-                    onThemeChanged: (val) => setState(() => _themeEnabled = val),
-                    onAudioChanged: (val) async {
-                      final prefs = ref.read(sharedPreferencesProvider);
-                      await prefs.setBool('coda_autoplay_audio', val);
-                      setState(() => _audioEnabled = val);
-                    },
-                    onReduceAnimationsChanged: (val) => setState(() => _reduceAnimationsEnabled = val),
+                  child: _buildFadedContent(
+                    _CardLayout(
+                      isKnockoutLayer: false,
+                      scrollController: _topScrollController,
+                      themeValue: _themeEnabled,
+                      audioValue: _audioEnabled,
+                      reduceAnimationsValue: _reduceAnimationsEnabled,
+                      currentTab: widget.tab,
+                      horizontalControllerProvider: _getHorizontalController,
+                      onThemeChanged: (val) => setState(() => _themeEnabled = val),
+                      onAudioChanged: (val) async {
+                        final prefs = ref.read(sharedPreferencesProvider);
+                        await prefs.setBool('coda_autoplay_audio', val);
+                        setState(() => _audioEnabled = val);
+                      },
+                      onReduceAnimationsChanged: (val) => setState(() => _reduceAnimationsEnabled = val),
+                    ),
                   ),
                 ),
                 if (widget.tab == LibraryTab.lists)
@@ -334,18 +378,10 @@ class _CardLayout extends ConsumerWidget {
             ),
             const SizedBox(height: 48),
             _buildSettingsRow(
-              'Coda Plus',
-              onTap: () => context.push('/support-coda'),
-            ),
-            const SizedBox(height: 48),
-            _buildSettingsRow(
               'Memories',
-              onTap: () => context.push('/memories?tab=0'),
-            ),
-            const SizedBox(height: 48),
-            _buildSettingsRow(
-              'Manage Guardrails',
-              onTap: () => context.push('/memories?tab=2'),
+              hasToggle: true,
+              toggleValue: ref.watch(memoriesModeProvider),
+              onToggle: (val) => ref.read(memoriesModeProvider.notifier).toggle(),
             ),
             const SizedBox(height: 48),
             _buildSettingsRow(
@@ -358,11 +394,9 @@ class _CardLayout extends ConsumerWidget {
             _buildSettingsRow(
               'Audio',
               hasToggle: true,
-              toggleValue: audioValue,
-              onToggle: onAudioChanged,
+              toggleValue: ref.watch(audioEnabledProvider),
+              onToggle: (val) => ref.read(audioEnabledProvider.notifier).toggle(),
             ),
-            const SizedBox(height: 48),
-            _buildSettingsRow('Privacy policy'),
             const SizedBox(height: 64),
           ],
 
@@ -799,147 +833,6 @@ class _CardLayout extends ConsumerWidget {
     }
   }
 
-  Future<void> _showVibeCheckOverlay(BuildContext context, WidgetRef ref, String title) async {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.8),
-      builder: (context) {
-        return Center(
-          child: TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOutBack,
-            builder: (context, val, child) {
-              return Transform.scale(
-                scale: val,
-                child: Opacity(
-                  opacity: val.clamp(0.0, 1.0),
-                  child: child,
-                ),
-              );
-            },
-            child: Material(
-              color: Colors.transparent,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(28),
-                child: BackdropFilter(
-                  filter: dart_ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.85,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(28),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white30, width: 1.5),
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/coda_logo.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Checking the vibes...',
-                          style: GoogleFonts.inter(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        FutureBuilder<VibeCheckResult>(
-                          future: ref.read(recommendationServiceProvider).vibeCheck(
-                            title: title,
-                            memory: ref.read(livingMemoryProvider),
-                          ),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 20),
-                                child: CircularProgressIndicator(color: Colors.white),
-                              );
-                            }
-                            if (snapshot.hasError || !snapshot.hasData) {
-                              return Text(
-                                "I couldn't check this one right now.",
-                                style: GoogleFonts.inter(color: Colors.white, fontSize: 16),
-                              );
-                            }
-                            final result = snapshot.data!;
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  result.isMatch == true
-                                      ? "IT'S A MATCH!"
-                                      : result.isMatch == false
-                                          ? "MAYBE NOT"
-                                          : "UNKNOWN",
-                                  style: GoogleFonts.inter(
-                                    color: result.isMatch == true ? Colors.greenAccent : (result.isMatch == false ? Colors.orangeAccent : Colors.white),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.0,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  '"${result.convictionStatement}"',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.inter(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    fontStyle: FontStyle.italic,
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white.withValues(alpha: 0.1),
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            minimumSize: const Size(double.infinity, 48),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                            ),
-                          ),
-                          child: Text(
-                            'Got it',
-                            style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildListItemRow(
     String title,
     List<String> tags,
@@ -948,7 +841,6 @@ class _CardLayout extends ConsumerWidget {
     VoidCallback? onDelete,
     VoidCallback? onLongPress,
     VoidCallback? onTap,
-    VoidCallback? onVibeCheck,
   }) {
     final rowContent = Padding(
       padding: const EdgeInsets.only(left: 24, right: 12),
@@ -1027,33 +919,6 @@ class _CardLayout extends ConsumerWidget {
                         padding: const EdgeInsets.only(right: 8),
                         child: _buildTagPill(tag),
                       )),
-                      if (onVibeCheck != null && !isKnockoutLayer)
-                        GestureDetector(
-                          onTap: onVibeCheck,
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: ShapeDecoration(
-                              color: Colors.white.withValues(alpha: 0.1),
-                              shape: const StadiumBorder(),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(PhosphorIconsBold.magicWand, size: 12, color: Colors.white),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Is this for me?',
-                                  style: GoogleFonts.inter(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ),
@@ -1197,98 +1062,6 @@ class _CardLayout extends ConsumerWidget {
     );
   }
 
-  void _showResetProfileDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.5),
-      builder: (dialogCtx) => BackdropFilter(
-        filter: dart_ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: const Color(0xFF16181C).withValues(alpha: 0.85),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
-                width: 1.5,
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Reset Account?',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'This will permanently wipe your profile, recommendations, seen list, and not interested list.\n\nThis cannot be undone.',
-                  style: GoogleFonts.inter(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(dialogCtx).pop(),
-                      child: Text(
-                        'Cancel',
-                        style: GoogleFonts.inter(
-                          color: Colors.white54,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF3B5C),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      ),
-                      onPressed: () async {
-                        Navigator.of(dialogCtx).pop();
-                        await ref.read(livingMemoryProvider.notifier).clearMemory();
-                        if (context.mounted) {
-                          context.go('/onboarding');
-                        }
-                      },
-                      child: Text(
-                        'Reset Everything',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildSettingsRow(
     String label, {
     bool hasToggle = false,
@@ -1362,44 +1135,75 @@ class _KnockoutToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final toggleUi = Container(
-      width: 58,
-      height: 32,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: isKnockout ? Border.all(color: Colors.black, width: 2) : null,
-      ),
-      child: AnimatedAlign(
+    if (isKnockout) {
+      // ── Knockout Mask Layer ──
+      // OFF: Border is cutout (Colors.black), thumb circle on left is cutout (Colors.black) with a clean gap between them.
+      // ON: Entire oval track is cutout (Colors.black filled), punching out the glowing pill.
+      return AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
-        alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: isKnockout
-              ? Container(
-                  width: 28,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                )
-              : const SizedBox(width: 28, height: 24),
+        width: 54,
+        height: 30,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: value ? Colors.black : Colors.transparent,
+          border: value
+              ? null
+              : Border.all(
+                  color: Colors.black, // Punches cutout glowing border
+                  width: 1.5,
+                ),
         ),
-      ),
-    );
-
-    if (isKnockout) {
-      return toggleUi;
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: value
+                ? const SizedBox(width: 24, height: 24)
+                : Container(
+                    width: 24,
+                    height: 24,
+                    decoration: const BoxDecoration(
+                      color: Colors.black, // Punches cutout glowing thumb circle
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+          ),
+        ),
+      );
     } else {
+      // ── Normal Overlay Layer ──
+      // OFF: Transparent (the cutout border and thumb glow through from knockout layer).
+      // ON: Thumb is the same semi-transparent black as the rest of the page (Color(0xFF16181C).withValues(alpha: 0.85)).
       return GestureDetector(
         onTap: () {
           if (onChanged != null) onChanged!(!value);
         },
         behavior: HitTestBehavior.opaque,
-        child: Opacity(
-          opacity: 0,
-          child: toggleUi,
+        child: Container(
+          width: 54,
+          height: 30,
+          color: Colors.transparent,
+          child: AnimatedAlign(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(3.0),
+              child: value
+                  ? Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF16181C).withValues(alpha: 0.85), // Same semi-transparent black as page
+                        shape: BoxShape.circle,
+                      ),
+                    )
+                  : const SizedBox(width: 24, height: 24),
+            ),
+          ),
         ),
       );
     }

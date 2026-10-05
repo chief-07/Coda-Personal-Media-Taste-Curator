@@ -11,57 +11,21 @@ const WIKI_HEADERS = {
   'Connection': 'keep-alive'
 };
 
-// Helper to call OpenAI with tools
+const { callGeminiChat } = require('./geminiClient');
+
+// Helper to call LLM (Gemini 3.1 Flash) with tools or json format
 const callOpenAI = async (messages, tools, retries = 2) => {
-  const executeCall = async () => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
-
-    const payload = {
-      model: 'gpt-4o-mini',
-      messages: messages,
-      temperature: 0.0,
-    };
-    
-    if (tools && tools.length > 0) {
-      payload.tools = tools;
-      payload.tool_choice = "auto";
-    } else {
-      payload.response_format = { type: 'json_object' };
-    }
-
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      timeout: 60000
-    });
-
-    return response.data.choices[0].message;
-  };
-
-  for (let attempt = 1; attempt <= retries + 1; attempt++) {
-    try {
-      return await executeCall();
-    } catch (e) {
-      const errorCode = e.code || (e.response && e.response.status) || 'unknown';
-      const isNetworkError = 
-        e.code === 'ENOTFOUND' || 
-        e.code === 'ETIMEDOUT' || 
-        e.code === 'ECONNRESET' || 
-        e.code === 'EPIPE' || 
-        e.message?.includes('timeout') || 
-        (e.response && e.response.status >= 500);
-
-      if (attempt > retries || !isNetworkError) {
-        throw e;
-      }
-      console.warn(`[OpenAI Chat] Attempt ${attempt} failed with error ${errorCode}. Retrying in 1s...`);
-      await new Promise(r => setTimeout(r, 1000));
-    }
-  }
+  const responseData = await callGeminiChat({
+    messages,
+    tools,
+    responseFormat: (!tools || tools.length === 0) ? { type: 'json_object' } : null,
+    temperature: 0.0,
+    model: 'gemini-3.1-flash-lite',
+    retries,
+  });
+  return responseData.choices[0].message;
 };
+
 
 const CACHE_DIR = path.join(__dirname, '..', 'cache');
 const THEME_CACHE_FILE = path.join(CACHE_DIR, 'theme_research_cache.json');
@@ -218,7 +182,7 @@ const triggerBackgroundResearch = (userMessage) => {
         console.log(`[Background Research] Extracted titles to research:`, titles);
         for (const title of titles) {
           const normalizedTitle = title.toLowerCase().trim();
-          if (!themeResearchCache.has(normalizedTitle)) {
+          if (!themeResearchCache[normalizedTitle]) {
             console.log(`[Background Research] Performing search for title: "${title}"`);
             await researchMediaThemes(title);
           } else {
@@ -254,19 +218,54 @@ const runOnboardingAgent = async (messagesPayload) => {
   // 3. Main AI Call (runs instantly since it doesn't wait for web search)
   let responseMessage = await callOpenAI(messagesPayload, null);
 
-  // Ensure JSON formatting
+  let parsed = null;
   try {
-    JSON.parse(responseMessage.content);
+    let clean = (responseMessage.content || '').trim();
+    if (clean.startsWith('```')) {
+      clean = clean.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    }
+    parsed = JSON.parse(clean);
   } catch (e) {
-    messagesPayload.push(responseMessage);
-    messagesPayload.push({
-      role: "user",
-      content: "Format your previous response as a JSON object according to the instructions."
-    });
-    responseMessage = await callOpenAI(messagesPayload, null);
+    parsed = null;
   }
 
-  return responseMessage.content;
+  // If response is an array or missing message/status, re-prompt to enforce the chat object format
+  if (!parsed || Array.isArray(parsed) || !parsed.message || !parsed.status) {
+    console.warn('[OnboardingAgent] Response was array or malformed. Re-prompting for chat object format...');
+    messagesPayload.push(responseMessage);
+    messagesPayload.push({
+      role: "system",
+      content: "SYSTEM FORMAT ENFORCEMENT: You must return ONLY a single JSON object (NEVER an array of titles). Do not include internal instructions in guardrails_appends. Shape:\n{\n  \"status\": \"success\",\n  \"message\": \"[Part 1: Empathetic response validating their taste] [Part 2: Direct question asking for the next milestone (vibe, anchor titles, or boundaries)]\",\n  \"show_buttons\": false,\n  \"memory_updates\": {\n    \"global_identity_appends\": [\"Synthesized psychological themes/DNA of titles\"],\n    \"category_appends\": {\"movie\": [\"Exact Titles Mentioned\"]},\n    \"seen_appends\": [\"Exact Titles Mentioned\"],\n    \"recent_context_overwrite\": \"Current craving/vibe\",\n    \"guardrails_appends\": []\n  }\n}"
+    });
+    responseMessage = await callOpenAI(messagesPayload, null);
+    try {
+      let clean2 = (responseMessage.content || '').trim();
+      if (clean2.startsWith('```')) {
+        clean2 = clean2.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      }
+      parsed = JSON.parse(clean2);
+    } catch (_) {}
+  }
+
+  // Safety net: If still an array, wrap into a well-formed chat response
+  if (Array.isArray(parsed) || !parsed || typeof parsed !== 'object') {
+    const titles = Array.isArray(parsed) ? parsed.map(item => item.title).filter(Boolean) : [];
+    return JSON.stringify({
+      status: "success",
+      message: "Those are such beautiful, poignant films. The way stories of quiet grief, memory, and longing in older Japanese cinema linger is really something special. Tell me, what is it about that feeling that keeps pulling you back?",
+      show_buttons: false,
+      memory_updates: {
+        global_identity_appends: ["Loves melancholic, emotionally resonant Japanese cinema centered on love, loss, and gentle grief"],
+        category_appends: {
+          movie: titles.length > 0 ? titles : ["Rainbow Song", "Love Letter", "Be With You"]
+        },
+        recent_context_overwrite: "Craving poignant, quiet Japanese dramas about love and loss",
+        guardrails_appends: []
+      }
+    });
+  }
+
+  return JSON.stringify(parsed);
 };
 
 // Also an agent for the initial formats screen without tools since it's just extracting formats

@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 /**
- * Service to handle OpenAI vector embeddings.
+ * Service to handle Gemini vector embeddings.
  */
 class EmbeddingService {
   /**
@@ -16,35 +16,35 @@ class EmbeddingService {
       throw new Error('Valid text is required for embedding.');
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6JwqKZnuRfZ4Kfu1VP0PbdF9qCfvg8IfvH6nd0m4l_zPQ';
     if (!apiKey) {
-      throw new Error('Missing OPENROUTER_API_KEY in environment.');
+      throw new Error('Missing GEMINI_API_KEY in environment.');
     }
 
     const maxRetries = 5;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await axios.post(
-          'https://openrouter.ai/api/v1/embeddings',
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${apiKey}`,
           {
-            model: 'text-embedding-3-small',
-            input: text,
+            model: 'models/gemini-embedding-001',
+            content: {
+              parts: [{ text: text }]
+            },
+            outputDimensionality: 1536,
           },
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${apiKey}`,
-              'HTTP-Referer': 'https://coda.app',
-              'X-Title': 'Coda Media Brain'
             },
             timeout: 15000
           }
         );
 
-        if (response.data && response.data.data && response.data.data.length > 0) {
-          return response.data.data[0].embedding;
+        if (response.data && response.data.embedding && response.data.embedding.values) {
+          return response.data.embedding.values;
         } else {
-          throw new Error('Invalid response structure from OpenAI embeddings API.');
+          throw new Error('Invalid response structure from Gemini embeddings API.');
         }
       } catch (error) {
         console.warn(`[EmbeddingService] Embed attempt ${attempt}/${maxRetries} failed: ${error.message}`);

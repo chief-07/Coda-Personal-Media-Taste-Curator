@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "@google-cloud/vision": "^5.3.7",
+    "@mysten-incubation/memwal": "^0.1.8",
     "@qdrant/js-client-rest": "^1.18.0",
     "axios": "^1.16.1",
     "cheerio": "^1.2.0",

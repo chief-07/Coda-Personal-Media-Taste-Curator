@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: coda-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /ping
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: WALRUS_MEMORY_KEY
+        sync: false
+      - key: WALRUS_MEMORY_ACCOUNT_ID
+        sync: false
+      - key: WALRUS_MEMORY_RELAYER_URL
+        value: https://relayer.memory.walrus.xyz
+      - key: TMDB_API_KEY
+        sync: false
+      - key: OMDB_API_KEY
+        sync: false

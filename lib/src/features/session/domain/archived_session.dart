@@ -1,3 +1,4 @@
+import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 
 class ArchivedSession {
@@ -30,6 +31,8 @@ class ArchivedSession {
                   'text': m.text,
                   'chips': m.chips,
                   'isUser': m.isUser,
+                  'savedMemory': m.memoryUpdates?.savedMemory,
+                  'recalledMemory': m.recalledMemory,
                 })
             .toList(),
         'archivedAt': archivedAt.toIso8601String(),
@@ -45,10 +48,16 @@ class ArchivedSession {
       chatHistory: (json['chatHistory'] as List<dynamic>?)
               ?.map((e) {
                 final map = e as Map<String, dynamic>;
+                final savedMem = map['savedMemory'] as String?;
+                final recalledMem = map['recalledMemory'] as String?;
                 return ChatMessage(
                   text: map['text'] as String?,
                   chips: map['chips'] != null ? List<String>.from(map['chips']) : null,
                   isUser: map['isUser'] as bool? ?? map['is_user'] as bool? ?? false,
+                  memoryUpdates: savedMem != null && savedMem.isNotEmpty
+                      ? MemoryUpdates(savedMemory: savedMem)
+                      : null,
+                  recalledMemory: recalledMem,
                 );
               })
               .toList() ??

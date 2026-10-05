@@ -11,6 +11,8 @@ import 'package:coda/src/features/onboarding/application/onboarding_controller.d
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/core/providers/api_config.dart';
 import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
+import 'package:coda/src/features/home/presentation/widgets/walrus_memory_sheet.dart';
+import 'package:coda/src/core/memory/living_memory.dart';
 
 class TasteProfileTabNotifier extends Notifier<String> {
   @override
@@ -53,56 +55,60 @@ class TasteProfileScreen extends ConsumerWidget {
         children: [
           // ── Background ────────────────────────────
           Positioned.fill(
-            child: Transform.scale(
-              scale: 1.2,
-              child: ImageFiltered(
-                imageFilter: dart_ui.ImageFilter.blur(
-                  sigmaX: 80,
-                  sigmaY: 80,
-                  tileMode: TileMode.mirror,
-                ),
-                child: const Image(
-                  image: AssetImage('assets/images/default_bg.jpg'),
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
+            child: RepaintBoundary(
+              child: Transform.scale(
+                scale: 1.2,
+                child: ImageFiltered(
+                  imageFilter: dart_ui.ImageFilter.blur(
+                    sigmaX: 80,
+                    sigmaY: 80,
+                    tileMode: TileMode.mirror,
+                  ),
+                  child: const Image(
+                    image: AssetImage('assets/images/default_bg.jpg'),
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
                 ),
               ),
             ),
           ),
           if (activeRec != null && activeRec.posterUrl != null && !activeRec.posterUrl!.startsWith('holder:'))
             Positioned.fill(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 600),
-                child: Transform.scale(
-                  scale: 1.2,
-                  key: ValueKey(activeRec.posterUrl),
-                  child: ImageFiltered(
-                    imageFilter: dart_ui.ImageFilter.blur(
-                      sigmaX: 80,
-                      sigmaY: 80,
-                      tileMode: TileMode.mirror,
-                    ),
-                    child: Image(
-                      image: activeRec.posterUrl!.startsWith('assets/')
-                          ? AssetImage(activeRec.posterUrl!)
-                          : NetworkImage(
-                              activeRec.posterUrl!.startsWith('/')
-                                  ? '${getApiBaseUrl()}${activeRec.posterUrl!}'
-                                  : activeRec.posterUrl!,
-                            ) as ImageProvider,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                        if (wasSynchronouslyLoaded) return child;
-                        return AnimatedOpacity(
-                          opacity: frame == null ? 0.0 : 1.0,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeOut,
-                          child: child,
-                        );
-                      },
+              child: RepaintBoundary(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 600),
+                  child: Transform.scale(
+                    scale: 1.2,
+                    key: ValueKey(activeRec.posterUrl),
+                    child: ImageFiltered(
+                      imageFilter: dart_ui.ImageFilter.blur(
+                        sigmaX: 80,
+                        sigmaY: 80,
+                        tileMode: TileMode.mirror,
+                      ),
+                      child: Image(
+                        image: activeRec.posterUrl!.startsWith('assets/')
+                            ? AssetImage(activeRec.posterUrl!)
+                            : NetworkImage(
+                                activeRec.posterUrl!.startsWith('/')
+                                    ? '${getApiBaseUrl()}${activeRec.posterUrl!}'
+                                    : activeRec.posterUrl!,
+                              ) as ImageProvider,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                          if (wasSynchronouslyLoaded) return child;
+                          return AnimatedOpacity(
+                            opacity: frame == null ? 0.0 : 1.0,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeOut,
+                            child: child,
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -408,6 +414,28 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
     );
   }
 
+  MediaType _resolveTargetMediaType(String tab, List<MediaType> activeTypes) {
+    if (tab.toLowerCase() == 'you') {
+      return activeTypes.isNotEmpty ? activeTypes.first : MediaType.movie;
+    }
+    final normalized = tab.replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
+    for (final type in activeTypes) {
+      final typeNorm = type.name.replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
+      final labelNorm = type.label.replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
+      if (typeNorm == normalized || labelNorm == normalized || '${normalized}s' == labelNorm || '${labelNorm}s' == normalized) {
+        return type;
+      }
+    }
+    for (final type in MediaType.values) {
+      final typeNorm = type.name.replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
+      final labelNorm = type.label.replaceAll(RegExp(r'[\s_\-]'), '').toLowerCase();
+      if (typeNorm == normalized || labelNorm == normalized || '${normalized}s' == labelNorm || '${labelNorm}s' == normalized) {
+        return type;
+      }
+    }
+    return MediaType.custom(tab);
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isLastTab = widget.tab == widget.tabsList.last;
@@ -424,64 +452,67 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
             children: [
               // ── Layer 1: Full-screen Knockout mask ──────────────────────
               Positioned.fill(
-                child: ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withValues(alpha: 0.75),
-                        Colors.black.withValues(alpha: 0.75),
-                      ],
-                    ).createShader(bounds);
-                  },
-                  blendMode: BlendMode.srcOut,
-                  child: Container(
-                    color: Colors.black.withValues(alpha: 0.01),
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: _buildFadedContent(
-                            _CardLayout(
-                              isKnockoutLayer: true,
-                              scrollController: _maskScrollController,
-                              messages: messages,
-                              showButtons: showButtons,
-                              isLoading: isLoading,
-                              tab: widget.tab,
-                              onTellMeMore: () async {
-                                final currentIndex = widget.tabsList.indexOf(widget.tab);
-                                if (currentIndex >= 0 && currentIndex < widget.tabsList.length - 1) {
-                                  await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
-                                  ref.read(tasteProfileTabProvider.notifier).setTab(widget.tabsList[currentIndex + 1]);
-                                }
-                              },
-                              onLater: () async {
-                                  await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
-                                  await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
-                                  if (isLastTab) {
-                                    await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
+                child: RepaintBoundary(
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.75),
+                          Colors.black.withValues(alpha: 0.75),
+                        ],
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.srcOut,
+                    child: Container(
+                      color: Colors.black.withValues(alpha: 0.01),
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: _buildFadedContent(
+                              _CardLayout(
+                                isKnockoutLayer: true,
+                                scrollController: _maskScrollController,
+                                messages: messages,
+                                showButtons: showButtons,
+                                isLoading: isLoading,
+                                tab: widget.tab,
+                                onTellMeMore: () async {
+                                  final currentIndex = widget.tabsList.indexOf(widget.tab);
+                                  if (currentIndex >= 0 && currentIndex < widget.tabsList.length - 1) {
+                                    await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
+                                    ref.read(tasteProfileTabProvider.notifier).setTab(widget.tabsList[currentIndex + 1]);
                                   }
-                                  final customType = MediaType.custom(widget.tab);
-                                  ref.read(selectedMediaTypeProvider.notifier).select(customType);
-                                  if (context.mounted) context.go('/home');
                                 },
-                              isLastTab: isLastTab,
+                                onLater: () async {
+                                    await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
+                                    await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
+                                    if (isLastTab) {
+                                      await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
+                                    }
+                                    final activeTypes = ref.read(activeMediaTypesProvider);
+                                    final targetType = _resolveTargetMediaType(widget.tab, activeTypes);
+                                    ref.read(selectedMediaTypeProvider.notifier).select(targetType);
+                                    if (context.mounted) context.go('/home');
+                                  },
+                                isLastTab: isLastTab,
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: _PromptBar(
-                            isKnockoutLayer: true,
-                            chatController: _chatController,
-                            chatFocusNode: _chatFocusNode,
-                            onSend: () {},
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: _PromptBar(
+                              isKnockoutLayer: true,
+                              chatController: _chatController,
+                              chatFocusNode: _chatFocusNode,
+                              onSend: () {},
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -489,50 +520,53 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
 
               // ── Layer 2: Normal visible elements (overlay + real pills) ───
               Positioned.fill(
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: _buildFadedContent(
-                        _CardLayout(
-                          isKnockoutLayer: false,
-                          scrollController: _topScrollController,
-                          messages: messages,
-                          showButtons: showButtons,
-                          isLoading: isLoading,
-                          tab: widget.tab,
-                          onTellMeMore: () async {
-                            final currentIndex = widget.tabsList.indexOf(widget.tab);
-                            if (currentIndex >= 0 && currentIndex < widget.tabsList.length - 1) {
-                              await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
-                              ref.read(tasteProfileTabProvider.notifier).setTab(widget.tabsList[currentIndex + 1]);
-                            }
-                          },
-                          onLater: () async {
-                                 await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
-                                 await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
-                                 if (isLastTab) {
-                                   await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
-                                 }
-                                 final customType = MediaType.custom(widget.tab);
-                                 ref.read(selectedMediaTypeProvider.notifier).select(customType);
-                                 if (context.mounted) context.go('/home');
-                               },
-                          isLastTab: isLastTab,
+                child: RepaintBoundary(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: _buildFadedContent(
+                          _CardLayout(
+                            isKnockoutLayer: false,
+                            scrollController: _topScrollController,
+                            messages: messages,
+                            showButtons: showButtons,
+                            isLoading: isLoading,
+                            tab: widget.tab,
+                            onTellMeMore: () async {
+                              final currentIndex = widget.tabsList.indexOf(widget.tab);
+                              if (currentIndex >= 0 && currentIndex < widget.tabsList.length - 1) {
+                                await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
+                                ref.read(tasteProfileTabProvider.notifier).setTab(widget.tabsList[currentIndex + 1]);
+                              }
+                            },
+                            onLater: () async {
+                                  await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
+                                  await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
+                                  if (isLastTab) {
+                                    await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
+                                  }
+                                  final activeTypes = ref.read(activeMediaTypesProvider);
+                                  final targetType = _resolveTargetMediaType(widget.tab, activeTypes);
+                                  ref.read(selectedMediaTypeProvider.notifier).select(targetType);
+                                  if (context.mounted) context.go('/home');
+                                },
+                            isLastTab: isLastTab,
+                          ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: _PromptBar(
-                        isKnockoutLayer: false,
-                        chatController: _chatController,
-                        chatFocusNode: _chatFocusNode,
-                        onSend: _sendMessage,
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: _PromptBar(
+                          isKnockoutLayer: false,
+                          chatController: _chatController,
+                          chatFocusNode: _chatFocusNode,
+                          onSend: _sendMessage,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -582,8 +616,7 @@ class _CardLayout extends StatelessWidget {
         "I would love to know who you are.",
         "The things that stay with you. The stories you love. The ones you didn't. The ones you couldn't stop thinking about.",
         "Tell me what moves you. What bores you. What you're always looking for.",
-        "What stage of life you're in. How life's been treating you lately. There's no right answer.",
-        "Just tell me whatever comes to mind.",
+        "Just tell me whatever comes to mind — or just say hello.",
         "The more I get to know you, the better I'll get at finding things you'll genuinely connect with.",
       ];
     } else {
@@ -669,7 +702,7 @@ class _CardLayout extends StatelessWidget {
                     child: _buildChatBubble(messages[i].text ?? ""),
                   ),
                 )
-              else if (messages[i].text != null)
+              else if (messages[i].text != null) ...[
                 Padding(
                   padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
                   child: isKnockoutLayer
@@ -679,6 +712,15 @@ class _CardLayout extends StatelessWidget {
                           child: _buildBodyText(messages[i].text!, Colors.white),
                         ),
                 ),
+                if (messages[i].memoryUpdates != null && _hasMemories(messages[i].memoryUpdates!))
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: _buildWalrusMemoryBadge(context, messages[i].memoryUpdates!),
+                    ),
+                  ),
+              ],
             ],
 
             if (isLoading)
@@ -709,7 +751,7 @@ class _CardLayout extends StatelessWidget {
                     : Row(
                         children: [
                           Expanded(
-                            flex: 6,
+                            flex: 5,
                             child: _buildActionButton(
                               "Tell me more",
                               onTap: isKnockoutLayer ? null : onTellMeMore,
@@ -717,10 +759,11 @@ class _CardLayout extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            flex: 4,
+                            flex: 5,
                             child: _buildActionButton(
-                              "Later",
+                              "See my pick",
                               onTap: isKnockoutLayer ? null : onLater,
+                              showArrow: true,
                             ),
                           ),
                         ],
@@ -840,6 +883,112 @@ class _CardLayout extends StatelessWidget {
             ),
     );
   }
+
+  bool _hasMemories(MemoryUpdates u) {
+    final hasGlobal = u.globalIdentityAppends.isNotEmpty ||
+        (u.globalIdentityOverwrite != null && u.globalIdentityOverwrite!.isNotEmpty);
+    final hasCategory = u.categoryAppends.values.any((list) => list.isNotEmpty) ||
+        (u.categoryProfilesOverwrite != null &&
+            u.categoryProfilesOverwrite!.values.any((l) => l.isNotEmpty));
+    final hasSeen = u.seenAppends.isNotEmpty;
+    final hasGuardrails = u.guardrailsAppends.isNotEmpty;
+    final hasReflections = u.mediaReflectionsAppends.isNotEmpty;
+    return hasGlobal || hasCategory || hasSeen || hasGuardrails || hasReflections;
+  }
+
+  Widget _buildWalrusMemoryBadge(BuildContext context, MemoryUpdates updates) {
+    if (isKnockoutLayer) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: Colors.black, // Punches out the border
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '🦭',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(width: 7),
+            Text(
+              'Saved to Walrus Memory',
+              style: GoogleFonts.inter(
+                color: Colors.black, // Punches out the text
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+              size: 12,
+              color: Colors.black, // Punches out the caret
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () => _showWalrusMemorySheet(context, updates),
+      behavior: HitTestBehavior.opaque,
+      child: Opacity(
+        opacity: 0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: Colors.black,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '🦭',
+                style: TextStyle(fontSize: 13),
+              ),
+              const SizedBox(width: 7),
+              Text(
+                'Saved to Walrus Memory',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Icon(
+                PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+                size: 12,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showWalrusMemorySheet(BuildContext context, MemoryUpdates updates) {
+    showWalrusMemorySheet(
+      context: context,
+      isSaved: true,
+      memoryUpdates: updates,
+      walrusWrites: updates.walrusWrites,
+      category: updates.categoryAppends.keys.firstOrNull ?? 'core',
+    );
+  }
 }
 
 class _PromptBar extends StatelessWidget {
@@ -910,11 +1059,15 @@ class _PromptBar extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: onSend,
-                  child: Icon(
-                    PhosphorIconsFill.paperPlaneTilt,
-                    color: Colors.black.withValues(alpha: 0.7),
-                    size: 20,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    child: Icon(
+                      PhosphorIconsFill.paperPlaneTilt,
+                      color: Colors.black.withValues(alpha: 0.8),
+                      size: 32,
+                    ),
                   ),
                 ),
               ],

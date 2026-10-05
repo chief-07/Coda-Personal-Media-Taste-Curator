@@ -19,6 +19,10 @@ class Recommendation {
     this.ostUrl,
     this.trailerUrl,
     this.pitch = const [],
+    this.recalledMemories = const [],
+    this.queryUsed,
+    this.moodAngle,
+    this.attributedMemory,
   });
 
   final String id;
@@ -65,6 +69,18 @@ class Recommendation {
   /// Conversational pitch paragraphs shown on the pitch screen.
   final List<String> pitch;
 
+  /// Walrus memories that directly synthesized this recommendation.
+  final List<Map<String, dynamic>> recalledMemories;
+
+  /// Dynamic scout query dispatched to Walrus Protocol for this recommendation.
+  final String? queryUsed;
+
+  /// Curatorial mood angle decided by Coda.
+  final String? moodAngle;
+
+  /// Attributed memory anchor that tipped the recommendation.
+  final String? attributedMemory;
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
@@ -82,10 +98,14 @@ class Recommendation {
         'releaseYear': releaseYear,
         'studio': studio,
         'pitch': pitch,
+        'recalledMemories': recalledMemories,
+        'queryUsed': queryUsed,
+        'moodAngle': moodAngle,
+        'attributedMemory': attributedMemory,
       };
 
   factory Recommendation.fromJson(Map<String, dynamic> json) {
-    final mediaTypeName = json['mediaType'] as String;
+    final mediaTypeName = json['mediaType'] as String? ?? json['media_type'] as String? ?? 'movie';
     final typeEnum = MediaType.values.firstWhere(
       (e) => e.name == mediaTypeName,
       orElse: () {
@@ -97,13 +117,25 @@ class Recommendation {
       },
     );
 
+    final rawBlurb = (json['codaBlurb'] as String? ?? json['coda_blurb'] as String? ?? '');
+    final cleanBlurb = rawBlurb.replaceAll('**', '').replaceAll('*', '').trim();
+
+    final rawPitch = (json['pitch'] as List<dynamic>? ?? json['pitch_paragraphs'] as List<dynamic>? ?? []);
+    final cleanPitch = rawPitch.map((e) => e.toString().replaceAll('**', '').replaceAll('*', '').trim()).where((s) => s.isNotEmpty).toList();
+
+    final rawRecalled = (json['recalledMemories'] as List<dynamic>? ?? json['recalled_memories'] as List<dynamic>? ?? []);
+    final cleanRecalled = rawRecalled
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+
     return Recommendation(
-      id: json['id'] as String,
-      title: json['title'] as String,
+      id: json['id'] as String? ?? '',
+      title: (json['title'] as String? ?? '').replaceAll('**', '').replaceAll('*', '').trim(),
       mediaType: typeEnum,
-      codaBlurb: json['codaBlurb'] as String,
-      codaNote: json['codaNote'] as String,
-      description: json['description'] as String,
+      codaBlurb: cleanBlurb,
+      codaNote: json['codaNote'] as String? ?? '',
+      description: (json['description'] as String? ?? '').replaceAll('**', '').replaceAll('*', '').trim(),
       genres: List<String>.from(json['genres'] ?? []),
       tags: List<String>.from(json['tags'] ?? []),
       fitSignals: List<String>.from(json['fitSignals'] ?? []),
@@ -116,7 +148,11 @@ class Recommendation {
       trailerUrl: json['trailerUrl'] as String? ?? json['trailer_url'] as String?,
       releaseYear: json['releaseYear'] as String? ?? json['release_year'] as String? ?? '',
       studio: json['studio'] as String? ?? '',
-      pitch: List<String>.from(json['pitch'] ?? []),
+      pitch: cleanPitch,
+      recalledMemories: cleanRecalled,
+      queryUsed: json['queryUsed'] as String? ?? json['query_used'] as String?,
+      moodAngle: json['moodAngle'] as String? ?? json['mood_angle'] as String?,
+      attributedMemory: json['attributedMemory'] as String? ?? json['attributed_memory'] as String?,
     );
   }
 }

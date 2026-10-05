@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:coda/src/core/providers/api_config.dart';
 
@@ -36,7 +37,7 @@ class _FallbackImageState extends State<FallbackImage> {
 
   @override
   Widget build(BuildContext context) {
-    final defaultError = widget.errorWidget ?? Container(color: Colors.grey.shade900);
+    final defaultError = widget.errorWidget ?? Container(color: const Color(0xFF16181C));
 
     if (widget.url == null || widget.url!.isEmpty) {
       return defaultError;
@@ -51,10 +52,13 @@ class _FallbackImageState extends State<FallbackImage> {
     // Resolve relative proxy paths first
     if (currentUrl.startsWith('/')) {
       currentUrl = '${getApiBaseUrl()}$currentUrl';
+    } else if (kIsWeb && currentUrl.startsWith('http') && !currentUrl.contains('/api/recommend/proxy-image')) {
+      // Force all direct external HTTP images through backend proxy on Web to prevent WebGL canvas tainting & blank white crash
+      currentUrl = '${getApiBaseUrl()}/api/recommend/proxy-image?url=${Uri.encodeComponent(currentUrl)}';
     }
 
-    if (_useFallback) {
-      // Always fully resolve the URL before parsing so query params are accessible
+    // On native platforms only, we can safely attempt raw unproxied fallback if the proxy fails
+    if (!kIsWeb && _useFallback) {
       final fullUrl = widget.url!.startsWith('/')
           ? '${getApiBaseUrl()}${widget.url!}'
           : widget.url!;
@@ -77,7 +81,7 @@ class _FallbackImageState extends State<FallbackImage> {
       width: widget.width,
       height: widget.height,
       errorBuilder: (context, error, stackTrace) {
-        if (!_useFallback && widget.url!.contains('/api/recommend/proxy-image?url=')) {
+        if (!kIsWeb && !_useFallback && widget.url!.contains('/api/recommend/proxy-image?url=')) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               setState(() {

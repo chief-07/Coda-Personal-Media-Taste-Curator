@@ -41,6 +41,26 @@ class QdrantService {
   }
 
   /**
+   * Fast probe to verify if Qdrant is actually reachable.
+   * Results are cached for 30 seconds so we don't spam the cluster.
+   */
+  async isAvailable() {
+    if (!this.isInitialized || !this.client) return false;
+    if (this._isAvailable !== undefined && Date.now() - (this._lastCheck || 0) < 30000) {
+      return this._isAvailable;
+    }
+    try {
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500));
+      await Promise.race([this.client.getCollections(), timeoutPromise]);
+      this._isAvailable = true;
+    } catch (_) {
+      this._isAvailable = false;
+    }
+    this._lastCheck = Date.now();
+    return this._isAvailable;
+  }
+
+  /**
    * Ensures the required collections exist in Qdrant.
    * If they don't, it creates them.
    */
@@ -320,7 +340,11 @@ class QdrantService {
           return point.payload;
         }
       } catch (e) {
-        console.error(`[Qdrant Queue] Error popping tier ${tier}:`, e.message);
+        if (!this._lastQueueErrorLogged || Date.now() - this._lastQueueErrorLogged > 60000) {
+          console.warn(`[Qdrant Queue] Host unreachable or error: ${e.message} (suppressing logs for 60s)`);
+          this._lastQueueErrorLogged = Date.now();
+        }
+        break;
       }
     }
     return null;

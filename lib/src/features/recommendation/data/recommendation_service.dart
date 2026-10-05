@@ -21,6 +21,10 @@ class RecommendationResult {
   final List<String> tags;
   final String releaseYear;
   final String studio;
+  final List<Map<String, dynamic>> recalledMemories;
+  final String? queryUsed;
+  final String? moodAngle;
+  final String? attributedMemory;
 
   RecommendationResult({
     required this.title,
@@ -35,6 +39,10 @@ class RecommendationResult {
     required this.tags,
     required this.releaseYear,
     required this.studio,
+    this.recalledMemories = const [],
+    this.queryUsed,
+    this.moodAngle,
+    this.attributedMemory,
   });
 
   factory RecommendationResult.fromJson(Map<String, dynamic> json) {
@@ -43,19 +51,36 @@ class RecommendationResult {
       final baseHost = getApiBaseUrl();
       rawPoster = '$baseHost$rawPoster';
     }
+
+    final rawBlurb = (json['coda_blurb'] ?? json['codaBlurb'] ?? '') as String;
+    final cleanBlurb = rawBlurb.replaceAll('**', '').replaceAll('*', '').trim();
+
+    final rawPitch = (json['pitch_paragraphs'] ?? json['pitch'] ?? []) as List<dynamic>;
+    final cleanPitch = rawPitch.map((e) => e.toString().replaceAll('**', '').replaceAll('*', '').trim()).where((s) => s.isNotEmpty).toList();
+
+    final rawRecalled = (json['recalled_memories'] ?? json['recalledMemories'] ?? []) as List<dynamic>;
+    final cleanRecalled = rawRecalled
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+
     return RecommendationResult(
-      title: json['title'] ?? 'Unknown',
+      title: ((json['title'] ?? 'Unknown') as String).replaceAll('**', '').replaceAll('*', '').trim(),
       mediaType: json['media_type'] ?? 'unknown',
-      codaBlurb: json['coda_blurb'] ?? '',
-      pitchParagraphs: List<String>.from(json['pitch_paragraphs'] ?? []),
+      codaBlurb: cleanBlurb,
+      pitchParagraphs: cleanPitch,
       posterUrl: rawPoster,
       ostUrl: json['ost_url'] ?? '',
       trailerUrl: json['trailer_url'] ?? '',
-      description: json['description'] ?? '',
+      description: ((json['description'] ?? '') as String).replaceAll('**', '').replaceAll('*', '').trim(),
       genres: List<String>.from(json['genres'] ?? []),
       tags: List<String>.from(json['tags'] ?? []),
       releaseYear: json['release_year'] ?? '',
       studio: json['studio'] ?? '',
+      recalledMemories: cleanRecalled,
+      queryUsed: (json['query_used'] ?? json['queryUsed']) as String?,
+      moodAngle: (json['mood_angle'] ?? json['moodAngle']) as String?,
+      attributedMemory: (json['attributed_memory'] ?? json['attributedMemory']) as String?,
     );
   }
 
@@ -92,6 +117,10 @@ class RecommendationResult {
       posterGradient: [const Color(0xFF2B5876), const Color(0xFF4E4376)],
       releaseYear: releaseYear,
       studio: studio,
+      recalledMemories: recalledMemories,
+      queryUsed: queryUsed,
+      moodAngle: moodAngle,
+      attributedMemory: attributedMemory,
     );
   }
 }
@@ -115,23 +144,33 @@ class RecommendationService {
     List<String> additionalExclusions = const [],
     int limit = 1,
     bool watchlistOnly = false,
+    bool memoriesEnabled = true,
     String? ambientContext,
   }) async {
-    // Build seen list including exclusions
-    final finalSeen = List<String>.from(memory.seen);
-    for (final title in additionalExclusions) {
-      if (!finalSeen.contains(title)) finalSeen.add(title);
+    // Build seen list including exclusions only when memories are enabled
+    Map<String, dynamic> fallbackMemory;
+    if (memoriesEnabled) {
+      final finalSeen = List<String>.from(memory.seen);
+      for (final title in additionalExclusions) {
+        if (!finalSeen.contains(title)) finalSeen.add(title);
+      }
+      fallbackMemory = memory.toJson();
+      fallbackMemory['seen'] = finalSeen;
+    } else {
+      // Amnesia mode: zero user memory, zero seen exclusions (only watchlist if watchlist mode is explicitly on)
+      fallbackMemory = watchlistOnly
+          ? {'watchlist': memory.toJson()['watchlist'] ?? {}}
+          : <String, dynamic>{};
     }
-    final fallbackMemory = memory.toJson();
-    fallbackMemory['seen'] = finalSeen;
 
     final payload = {
-      'userId': userId,
+      'userId': memoriesEnabled ? userId : null,
       'requested_media_type': selectedMediaType.name, // The user explicitly tapped this tab
       'current_memory': fallbackMemory,
-      if (ambientContext != null) 'contextualState': ambientContext,
+      if (ambientContext != null && memoriesEnabled) 'contextualState': ambientContext,
       'limit': limit,
       'watchlist_only': watchlistOnly,
+      'memories_enabled': memoriesEnabled,
     };
 
 
@@ -200,6 +239,7 @@ class RecommendationService {
     required LivingMemory memory,
     required String title,
     required String mediaType,
+    bool memoriesEnabled = true,
   }) async {
     try {
       final response = await http.post(
@@ -208,7 +248,8 @@ class RecommendationService {
         body: jsonEncode({
           'title': title,
           'requested_media_type': mediaType,
-          'userId': memory.globalIdentity.isNotEmpty ? 'coda_user' : null,
+          'userId': memoriesEnabled ? userId : null,
+          'memories_enabled': memoriesEnabled,
         }),
       );
 
@@ -235,6 +276,7 @@ class RecommendationService {
     required List<Map<String, dynamic>> chatHistory,
     required String userMessage,
     bool watchlistOnly = false,
+    bool memoriesEnabled = true,
   }) async {
     final payload = {
       'userId': userId,
@@ -242,6 +284,7 @@ class RecommendationService {
       'chat_history': chatHistory,
       'user_message': userMessage,
       'watchlist_only': watchlistOnly,
+      'memories_enabled': memoriesEnabled,
     };
 
     final targetUrl = '${getApiBaseUrl()}/api/recommend/ask';
@@ -256,13 +299,13 @@ class RecommendationService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body) as Map<String, dynamic>;
       } else {
-        throw Exception('Ask Coda failed: ${response.statusCode}');
+        throw Exception('Ask Coda HTTP ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print("Ask Coda network error: $e");
       return {
         'status': 'chatting',
-        'message': "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
+        'message': "[Debug Error (Ask Coda)]: $e",
         'recommendation': null,
       };
     }
@@ -277,6 +320,7 @@ class RecommendationService {
     required List<String> pitchParagraphs,
     required List<Map<String, dynamic>> chatHistory,
     required String userMessage,
+    bool memoriesEnabled = true,
   }) async {
     final payload = {
       'userId': userId,
@@ -287,6 +331,7 @@ class RecommendationService {
       'pitch_paragraphs': pitchParagraphs,
       'chat_history': chatHistory,
       'user_message': userMessage,
+      'memories_enabled': memoriesEnabled,
     };
 
     final targetUrl = '${getApiBaseUrl()}/api/recommend/chat';
@@ -302,11 +347,11 @@ class RecommendationService {
         final data = jsonDecode(response.body);
         return data['message'] ?? "I'm not sure how to respond to that.";
       } else {
-        throw Exception('Failed to get chat response: ${response.statusCode}');
+        throw Exception('Discuss HTTP ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print("Chat network error: $e");
-      return "Hmm, I'm having trouble connecting right now. Let's try again in a bit.";
+      return "[Debug Error (Discuss)]: $e";
     }
   }
 
@@ -319,6 +364,7 @@ class RecommendationService {
     required List<String> pitchParagraphs,
     required List<Map<String, dynamic>> chatHistory,
     required String userMessage,
+    bool memoriesEnabled = true,
   }) async {
     final payload = {
       'userId': userId,
@@ -329,6 +375,7 @@ class RecommendationService {
       'pitch_paragraphs': pitchParagraphs,
       'chat_history': chatHistory,
       'user_message': userMessage,
+      'memories_enabled': memoriesEnabled,
     };
 
     final targetUrl = '${getApiBaseUrl()}/api/recommend/chat';
@@ -346,21 +393,65 @@ class RecommendationService {
         final oneLineSummary = data['one_line_summary'] as String?;
         final updatesJson = data['memory_updates'];
         final memoryUpdates = updatesJson != null ? MemoryUpdates.fromJson(updatesJson) : null;
+        final savedMemory = data['saved_memory'] as String?;
+        final recalledMemory = data['recalled_memory'] as String?;
+        final rawRecalled = (data['recalled_memories'] as List?)
+                ?.whereType<Map>()
+                .map((e) => Map<String, dynamic>.from(e))
+                .toList() ??
+            const [];
+        final rawWrites = (data['walrus_writes'] as List?)
+                ?.whereType<Map>()
+                .map((e) => Map<String, dynamic>.from(e))
+                .toList() ??
+            const [];
+        final queryUsed = data['query_used'] as String?;
 
         return DiscussResult(
           message: message,
           oneLineSummary: oneLineSummary,
           memoryUpdates: memoryUpdates,
+          savedMemory: savedMemory,
+          recalledMemory: recalledMemory,
+          recalledMemories: rawRecalled,
+          walrusWrites: rawWrites,
+          queryUsed: queryUsed,
         );
       } else {
-        throw Exception('Failed to get chat response: ${response.statusCode}');
+        throw Exception('Discuss HTTP ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print("Chat network error: $e");
       return DiscussResult(
-        message: "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
+        message: "[Debug Error (Discuss Refinements)]: $e",
       );
     }
+  }
+
+  /// Fetches live Walrus Protocol state (account object ID, namespaces, pending write job resolutions, and live recalled/recorded blobs)
+  Future<Map<String, dynamic>> fetchWalrusLive({
+    List<String> jobIds = const [],
+    String? query,
+    String? category,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${getApiBaseUrl()}/api/recommend/walrus-live'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'userId': userId,
+          'job_ids': jobIds,
+          if (query != null && query.isNotEmpty) 'query': query,
+          if (category != null && category.isNotEmpty) 'category': category,
+        }),
+      );
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+    } catch (e) {
+      print("Walrus live fetch error: $e");
+    }
+    return <String, dynamic>{};
   }
 }
 
@@ -368,11 +459,21 @@ class DiscussResult {
   final String message;
   final String? oneLineSummary;
   final MemoryUpdates? memoryUpdates;
+  final String? savedMemory;
+  final String? recalledMemory;
+  final List<Map<String, dynamic>> recalledMemories;
+  final List<Map<String, dynamic>> walrusWrites;
+  final String? queryUsed;
 
   DiscussResult({
     required this.message,
     this.oneLineSummary,
     this.memoryUpdates,
+    this.savedMemory,
+    this.recalledMemory,
+    this.recalledMemories = const [],
+    this.walrusWrites = const [],
+    this.queryUsed,
   });
 }
 
@@ -416,13 +517,13 @@ extension RecommendationServiceMatch on RecommendationService {
       if (response.statusCode == 200) {
         return VibeCheckResult.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception('Vibe check failed: ${response.statusCode}');
+        throw Exception('Vibe check HTTP ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print("Vibe check error: $e");
-      return const VibeCheckResult(
+      return VibeCheckResult(
         isMatch: null,
-        convictionStatement: "I'm having trouble connecting right now. Let's try again in a bit.",
+        convictionStatement: "[Debug Error (Vibe Check)]: $e",
       );
     }
   }
@@ -460,12 +561,12 @@ extension RecommendationServiceMatch on RecommendationService {
     }
   }
 
-  Future<void> submitSwipe({
+  Future<String?> submitSwipe({
     required String title,
     required String action, // 'loved', 'not_for_me', 'seen'
   }) async {
     try {
-      await http.post(
+      final response = await http.post(
         Uri.parse('${getApiBaseUrl()}/api/recommend/swipe'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
@@ -474,8 +575,13 @@ extension RecommendationServiceMatch on RecommendationService {
           'action': action,
         }),
       );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['saved_memory'] as String?;
+      }
     } catch (e) {
       print("Submit swipe error: $e");
     }
+    return null;
   }
 }

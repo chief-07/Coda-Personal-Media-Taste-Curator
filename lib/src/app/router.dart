@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:ui' as dart_ui;
 import 'package:coda/src/features/ask/presentation/ask_coda_screen.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
@@ -30,21 +29,13 @@ final codaRouter = GoRouter(
     try {
       final container = ProviderScope.containerOf(context);
       final prefs = container.read(sharedPreferencesProvider);
-      final hasMemory = prefs.getString('living_memory_v1') != null;
 
-      // Backward-compat: users who onboarded before the coda_onboarding_completed flag existed
-      // still have living_memory_v1. Treat them as completed and lazily backfill the flag.
-      final flagExplicitlySet = prefs.getBool('coda_onboarding_completed') == true;
+      final onboardingCompleted = prefs.getBool('coda_onboarding_completed') == true;
       final isGoingToOnboarding = state.matchedLocation == '/onboarding' || state.matchedLocation == '/taste-profile';
-      final onboardingCompleted = flagExplicitlySet || (hasMemory && !isGoingToOnboarding);
-      // Backfill for existing users so the flag is set going forward
-      if (hasMemory && !flagExplicitlySet) {
-        scheduleMicrotask(() => prefs.setBool('coda_onboarding_completed', true));
-      }
       final isGoingToShareReceive = state.matchedLocation == '/share-receive';
       
-      // New users without any memory: send to onboarding
-      if (!hasMemory && !isGoingToOnboarding && !isGoingToShareReceive) {
+      // If user has not completed onboarding, keep them in onboarding
+      if (!onboardingCompleted && !isGoingToOnboarding && !isGoingToShareReceive) {
         return '/onboarding';
       }
       // Fully onboarded user trying to access onboarding screens: send to home (or session if active)

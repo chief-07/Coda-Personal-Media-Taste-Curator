@@ -16,9 +16,9 @@ const selfsigned = require('selfsigned');
 const projectRoot = path.join(__dirname, '..');
 require('./loadEnv');
 
-// Initialize database connections
-const qdrantService = require('./services/qdrantService');
-qdrantService.init();
+// Qdrant database decommissioned — pure Walrus Memory protocol used
+// const qdrantService = require('./services/qdrantService');
+// qdrantService.init();
 
 const app = express();
 
@@ -35,6 +35,7 @@ const detectRouter = require('./routes/detect');
 const chatRouter = require('./routes/chat');
 const visualizeRouter = require('./routes/visualize');
 const enrichRouter = require('./routes/enrich');
+const memoryRouter = require('./routes/memory');
 
 // Mounting Routes
 app.use('/api/soul', soulRouter);
@@ -45,6 +46,7 @@ app.use('/api/detect', detectRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/visualize', visualizeRouter);
 app.use('/api/enrich', enrichRouter);
+app.use('/api/memory', memoryRouter);
 app.use('/share', detectRouter); // Mount PWA share target at root /share
 
 // Serve static Flutter web files
@@ -75,10 +77,8 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Coda Backend (HTTP)  → http://0.0.0.0:${PORT}`);
   
-  // ── Launch Background Worker ──
-  // Boot up the infinite queue polling loop in the background.
-  // It runs concurrently without blocking HTTP requests.
-  require('./worker');
+  // ── Launch Background Worker (Decommissioned with Qdrant) ──
+  // require('./worker');
 });
 
 // ── HTTPS server (LAN microphone access) ─────────────────────────────────────
@@ -111,13 +111,15 @@ async function loadOrGenerateCert() {
   return { cert: pems.cert, key: pems.private };
 }
 
-(async () => {
-  try {
-    const { cert, key } = await loadOrGenerateCert();
-    https.createServer({ cert, key }, app).listen(HTTPS_PORT, '0.0.0.0', () => {
-      console.log(`Coda Backend (HTTPS) → https://0.0.0.0:${HTTPS_PORT}`);
-    });
-  } catch (err) {
-    console.error('HTTPS: Failed to start server:', err);
-  }
-})();
+if (!process.env.RENDER) {
+  (async () => {
+    try {
+      const { cert, key } = await loadOrGenerateCert();
+      https.createServer({ cert, key }, app).listen(HTTPS_PORT, '0.0.0.0', () => {
+        console.log(`Coda Backend (HTTPS) → https://0.0.0.0:${HTTPS_PORT}`);
+      });
+    } catch (err) {
+      console.error('HTTPS: Failed to start server:', err);
+    }
+  })();
+}

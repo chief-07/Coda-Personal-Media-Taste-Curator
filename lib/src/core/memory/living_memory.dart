@@ -143,6 +143,9 @@ class MemoryUpdates {
   final List<String> notForMeAppends;
   final List<WatchlistItem> watchlistAppends;
   final List<String> watchlistRemoves;
+  final String? savedMemory;
+  final List<Map<String, dynamic>> walrusWrites;
+  final String? userId;
 
   MemoryUpdates({
     this.globalIdentityAppends = const [],
@@ -156,24 +159,55 @@ class MemoryUpdates {
     this.notForMeAppends = const [],
     this.watchlistAppends = const [],
     this.watchlistRemoves = const [],
+    this.savedMemory,
+    this.walrusWrites = const [],
+    this.userId,
   });
 
   factory MemoryUpdates.fromJson(Map<String, dynamic> json) {
+    final Map<String, List<String>> parsedCatAppends = {};
+    final rawCat = json['categoryAppends'] ?? json['category_appends'];
+    if (rawCat is Map) {
+      rawCat.forEach((k, v) {
+        if (v is List) {
+          parsedCatAppends[k.toString()] = v.map((item) => item.toString()).toList();
+        } else if (v is String) {
+          parsedCatAppends[k.toString()] = [v];
+        }
+      });
+    }
+
+    final Map<String, List<String>>? parsedCatOverwrite;
+    final rawOverwrite = json['category_profiles_overwrite'];
+    if (rawOverwrite is Map) {
+      parsedCatOverwrite = {};
+      rawOverwrite.forEach((k, v) {
+        if (v is List) {
+          parsedCatOverwrite![k.toString()] = v.map((item) => item.toString()).toList();
+        } else if (v is String) {
+          parsedCatOverwrite![k.toString()] = [v];
+        }
+      });
+    } else {
+      parsedCatOverwrite = null;
+    }
+
+    final rawWrites = (json['walrus_writes'] ?? json['walrusWrites'] ?? []) as List<dynamic>;
+    final parsedWrites = rawWrites
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+
     return MemoryUpdates(
       globalIdentityAppends: List<String>.from(json['globalIdentityAppends'] ?? json['global_identity_appends'] ?? []),
-      categoryAppends: (json['categoryAppends'] ?? json['category_appends'] as Map<String, dynamic>?)?.map(
-            (k, e) => MapEntry(k, List<String>.from(e)),
-          ) ??
-          {},
+      categoryAppends: parsedCatAppends,
       recentContextOverwrite: json['recentContextOverwrite'] as String? ?? json['recent_context_overwrite'] as String?,
       guardrailsAppends: List<String>.from(json['guardrailsAppends'] ?? json['guardrails_appends'] ?? []),
       mediaReflectionsAppends: List<String>.from(json['mediaReflectionsAppends'] ?? json['media_reflections_appends'] ?? []),
       globalIdentityOverwrite: json['global_identity_overwrite'] != null
           ? List<String>.from(json['global_identity_overwrite'])
           : null,
-      categoryProfilesOverwrite: (json['category_profiles_overwrite'] as Map<String, dynamic>?)?.map(
-            (k, e) => MapEntry(k, List<String>.from(e)),
-          ),
+      categoryProfilesOverwrite: parsedCatOverwrite,
       seenAppends: List<String>.from(json['seen_appends'] ?? json['seen'] ?? []),
       notForMeAppends: List<String>.from(json['not_for_me_appends'] ?? json['not_for_me'] ?? []),
       watchlistAppends: (json['watchlist_appends'] as List<dynamic>?)
@@ -181,6 +215,9 @@ class MemoryUpdates {
               .toList() ??
           [],
       watchlistRemoves: List<String>.from(json['watchlist_removes'] ?? []),
+      savedMemory: json['saved_memory'] as String? ?? json['savedMemory'] as String?,
+      walrusWrites: parsedWrites,
+      userId: json['user_id'] as String? ?? json['userId'] as String?,
     );
   }
 }

@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/api_config.dart';
 import 'package:coda/src/core/providers/watchlist_mode_provider.dart';
+import 'package:coda/src/core/providers/memories_mode_provider.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/media_type.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
@@ -21,6 +22,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:coda/src/features/ask/presentation/web_recorder_stub.dart'
     if (dart.library.html) 'package:coda/src/features/ask/presentation/web_recorder_web.dart';
 import 'dart:ui' as dart_ui;
+import 'package:coda/src/core/theme/ambient_bloom.dart';
+import 'package:coda/src/features/home/presentation/widgets/walrus_memory_sheet.dart';
 import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
 import 'package:coda/src/features/shell/presentation/coda_shell.dart';
 import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
@@ -34,11 +37,15 @@ class AskChatMessage {
   final bool isUser;
   /// If non-null, this Coda message came with a completed recommendation
   final Recommendation? recommendation;
+  final String? savedMemory;
+  final String? recalledMemory;
 
   AskChatMessage({
     required this.text,
     required this.isUser,
     this.recommendation,
+    this.savedMemory,
+    this.recalledMemory,
   });
 }
 
@@ -379,13 +386,58 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
 
   void _showErrorSnackBar(String message) {
     if (!mounted) return;
+    ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: const TextStyle(color: Colors.white)),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        backgroundColor: Colors.white.withValues(alpha: 0.15),
-        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.zero,
+        duration: const Duration(seconds: 4),
+        content: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: BackdropFilter(
+            filter: dart_ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.22),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Text('⚠️ ', style: TextStyle(fontSize: 16)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      message,
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -416,11 +468,13 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
     try {
       final memory = ref.read(livingMemoryProvider);
       final isWatchlistMode = ref.read(watchlistModeProvider);
+      final isMemoriesEnabled = ref.read(memoriesModeProvider);
       final response = await ref.read(recommendationServiceProvider).sendAskChatMessage(
         memory: memory,
         chatHistory: chatHistory,
         userMessage: text,
         watchlistOnly: isWatchlistMode,
+        memoriesEnabled: isMemoriesEnabled,
       );
 
       if (!mounted) return;
@@ -444,6 +498,8 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
           text: message,
           isUser: false,
           recommendation: recommendation,
+          savedMemory: isMemoriesEnabled ? response['saved_memory'] as String? : null,
+          recalledMemory: isMemoriesEnabled ? response['recalled_memory'] as String? : null,
         ),
       );
       setState(() {
@@ -454,7 +510,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
       if (!mounted) return;
       ref.read(askChatSessionProvider.notifier).addMessage(
         AskChatMessage(
-          text: "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
+          text: "[Debug Error (Ask Chat)]: $e",
           isUser: false,
         ),
       );
@@ -615,6 +671,9 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
                   child: Container(color: Colors.white.withValues(alpha: 0.05)),
                 ),
 
+                // ── Screen-Wide Ambient Glow Bloom & Breathing Pulse ─────────
+                const AmbientBloomLayer(),
+
                 // ── Layer 1: Full-screen Knockout mask ──────────────────────
                 Positioned.fill(
                   child: ShaderMask(
@@ -763,7 +822,7 @@ class _AskCodaScreenState extends ConsumerState<AskCodaScreen> {
 // ═══════════════════════════════════════════════════════════════════════
 // Pitch Layout — used for both knockout and visible layers
 // ═══════════════════════════════════════════════════════════════════════
-class _PitchLayout extends StatelessWidget {
+class _PitchLayout extends ConsumerWidget {
   const _PitchLayout({
     required this.recommendation,
     required this.isKnockoutLayer,
@@ -781,7 +840,7 @@ class _PitchLayout extends StatelessWidget {
   final void Function(Recommendation rec) onSeeThePick;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = keyboardHeight > 0;
     final safeBottom = MediaQuery.of(context).padding.bottom;
@@ -872,6 +931,17 @@ class _PitchLayout extends StatelessWidget {
                           child: _buildBodyText(msg.text, Colors.white),
                         ),
                 ),
+                // Inline Walrus Memory pills
+                if (ref.watch(memoriesModeProvider) && msg.recalledMemory != null && msg.recalledMemory!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+                    child: _buildMemoryProvenancePill(context, msg.recalledMemory!, isSaved: false, rec: msg.recommendation),
+                  ),
+                if (ref.watch(memoriesModeProvider) && msg.savedMemory != null && msg.savedMemory!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+                    child: _buildMemoryProvenancePill(context, msg.savedMemory!, isSaved: true),
+                  ),
                 // "See the Pick" button if recommendation is ready
                 if (msg.recommendation != null)
                   Padding(
@@ -954,6 +1024,116 @@ class _PitchLayout extends StatelessWidget {
                 height: 1.4,
               ),
             ),
+    );
+  }
+
+  Widget _buildMemoryProvenancePill(BuildContext context, String memoryText, {required bool isSaved, Recommendation? rec}) {
+    final label = isSaved ? 'Saved to Walrus Memory' : 'Recalled from Walrus Memory';
+
+    if (isKnockoutLayer) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: Colors.black,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '🦭',
+              style: TextStyle(fontSize: 14, color: Colors.black),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                color: Colors.black,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+              size: 13,
+              color: Colors.black,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        if (rec != null) {
+          showWalrusMemorySheet(
+            context: context,
+            isSaved: isSaved,
+            queryUsed: rec.queryUsed,
+            moodAngle: rec.moodAngle ?? 'Situational Resonance',
+            memories: rec.recalledMemories.isNotEmpty
+                ? rec.recalledMemories
+                : [
+                    {
+                      'category': 'Taste Anchor',
+                      'text': memoryText,
+                      'namespace': 'core'
+                    }
+                  ],
+            attributedMemory: rec.attributedMemory ?? memoryText,
+            mediaTitle: rec.title,
+            category: rec.mediaType.name,
+          );
+        } else {
+          showWalrusMemorySheet(
+            context: context,
+            isSaved: isSaved,
+            activeMemories: [memoryText],
+            category: 'session',
+          );
+        }
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Opacity(
+        opacity: 0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: Colors.black,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🦭', style: TextStyle(fontSize: 14)),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  color: Colors.black,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+                size: 13,
+                color: Colors.black,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

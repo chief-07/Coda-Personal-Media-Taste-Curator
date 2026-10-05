@@ -77,40 +77,41 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Stack(
               children: [
-                // ── Layer 1: Knockout Mask ──────────────────────────────────
+                // ── Cutout Brightening Tint (matches Ask Coda) ──────────────
                 Positioned.fill(
-                  child: ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(
-                            alpha: 0.75,
-                          ), // Solid black at top
-                          Colors.black.withValues(
-                            alpha: 0.75,
-                          ), // Stays solid for text
-                          Colors.black.withValues(
-                            alpha: 0.50,
-                          ), // Fades to 50% transparent at bottom
-                        ],
-                        stops: const [0.0, 0.65, 1.0],
-                      ).createShader(bounds);
-                    },
-                    blendMode: BlendMode.srcOut,
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: Container(color: Colors.black.withValues(alpha: 0.01)),
+                  child: Container(color: Colors.white.withValues(alpha: 0.05)),
+                ),
+
+                // ── Layer 1: Knockout Mask (matches Ask Coda) ───────────────
+                Positioned.fill(
+                  child: RepaintBoundary(
+                    child: ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.75),
+                            Colors.black.withValues(alpha: 0.75),
+                          ],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.srcOut,
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.01),
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: _CardLayout(
+                                recommendation: widget.recommendation,
+                                isKnockoutLayer: true,
+                                scrollController: _horizontalScrollController,
+                                isPlayingTrailer: false,
+                              ),
+                            ),
+                          ],
                         ),
-                        _CardLayout(
-                          recommendation: widget.recommendation,
-                          isKnockoutLayer: true,
-                          scrollController: _horizontalScrollController,
-                          isPlayingTrailer: false,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -299,10 +300,11 @@ class _CardLayout extends ConsumerWidget {
   }
 
   Widget _buildHeroText(Color color) {
+    final cleanBlurb = recommendation.codaBlurb.replaceAll('**', '').replaceAll('*', '').trim();
     return Text.rich(
       TextSpan(
         children: [
-          TextSpan(text: recommendation.codaBlurb),
+          TextSpan(text: cleanBlurb),
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
             child: Padding(
@@ -481,10 +483,7 @@ class _PosterWithTrailerState extends State<_PosterWithTrailer> with SingleTicke
   @override
   Widget build(BuildContext context) {
     if (widget.isKnockoutLayer) {
-      return Opacity(
-        opacity: 0,
-        child: _buildBasePoster(isHero: false),
-      );
+      return const SizedBox.expand();
     }
 
     final hasTrailer = widget.recommendation.trailerUrl != null &&

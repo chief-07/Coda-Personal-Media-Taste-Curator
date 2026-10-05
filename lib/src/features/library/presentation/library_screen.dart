@@ -16,7 +16,7 @@ import 'package:coda/src/core/providers/api_config.dart';
 
 class LibraryTabNotifier extends Notifier<LibraryTab> {
   @override
-  LibraryTab build() => LibraryTab.lists;
+  LibraryTab build() => LibraryTab.archive;
   
   void setTab(LibraryTab tab) => state = tab;
 }

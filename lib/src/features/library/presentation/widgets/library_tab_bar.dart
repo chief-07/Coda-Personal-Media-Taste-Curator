@@ -24,8 +24,8 @@ class _LibraryTabBarState extends State<LibraryTabBar> {
 
   final List<LibraryTab> _types = [
     LibraryTab.settings,
-    LibraryTab.lists,
     LibraryTab.archive,
+    LibraryTab.lists,
     LibraryTab.seen,
   ];
 

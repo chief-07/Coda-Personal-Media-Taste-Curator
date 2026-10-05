@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/features/session/application/archived_sessions_controller.dart';
 import 'package:coda/src/features/session/domain/archived_session.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/recommendation/data/recommendation_service.dart';
+import 'package:coda/src/core/providers/memories_mode_provider.dart';
 
 class SessionChatState {
   final List<ChatMessage> messages;
@@ -102,6 +102,7 @@ class SessionChatController extends Notifier<SessionChatState> {
           .toList();
 
       final service = ref.read(recommendationServiceProvider);
+      final isMemoriesEnabled = ref.read(memoriesModeProvider);
       final discussResult = await service.discussRecommendationWithRefinements(
         memory: memory,
         title: session.title,
@@ -110,15 +111,25 @@ class SessionChatController extends Notifier<SessionChatState> {
         pitchParagraphs: [],
         chatHistory: historyPayload,
         userMessage: text,
+        memoriesEnabled: isMemoriesEnabled,
       );
 
-      // Apply memory updates dynamically if harvested
-      if (discussResult.memoryUpdates != null) {
+      // Apply memory updates dynamically if harvested and enabled
+      if (discussResult.memoryUpdates != null && isMemoriesEnabled) {
         await ref.read(livingMemoryProvider.notifier).applyUpdates(discussResult.memoryUpdates!);
         ref.read(homeRecommendationProvider.notifier).reload();
       }
 
-      final codaReply = ChatMessage(text: discussResult.message, isUser: false);
+      final codaReply = ChatMessage(
+        text: discussResult.message,
+        isUser: false,
+        memoryUpdates: isMemoriesEnabled
+            ? ((discussResult.savedMemory != null && discussResult.savedMemory!.isNotEmpty)
+                ? (discussResult.memoryUpdates ?? MemoryUpdates(savedMemory: discussResult.savedMemory))
+                : discussResult.memoryUpdates)
+            : null,
+        recalledMemory: isMemoriesEnabled ? discussResult.recalledMemory : null,
+      );
       final finalSession = ArchivedSession(
         id: session.id,
         title: session.title,

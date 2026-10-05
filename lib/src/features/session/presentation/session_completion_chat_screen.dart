@@ -12,7 +12,10 @@ import 'package:coda/src/features/onboarding/application/onboarding_controller.d
 import 'package:coda/src/features/session/application/session_chat_controller.dart';
 import 'package:coda/src/features/session/application/archived_sessions_controller.dart';
 import 'package:coda/src/features/session/domain/archived_session.dart';
+import 'package:coda/src/core/theme/ambient_bloom.dart';
+import 'package:coda/src/features/home/presentation/widgets/walrus_memory_sheet.dart';
 import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
+import 'package:coda/src/core/providers/memories_mode_provider.dart';
 
 class SessionCompletionChatScreen extends ConsumerStatefulWidget {
   const SessionCompletionChatScreen({super.key, this.sessionId});
@@ -275,6 +278,9 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
               child: Container(color: Colors.white.withValues(alpha: 0.15)),
             ),
 
+            // ── Screen-Wide Ambient Glow Bloom & Breathing Pulse ─────────
+            const AmbientBloomLayer(),
+
             // ── Layer 1: Full-screen Knockout mask ──────────────────────
             Positioned.fill(
               child: ShaderMask(
@@ -387,7 +393,7 @@ class _SessionCompletionChatScreenState extends ConsumerState<SessionCompletionC
   }
 }
 
-class _PitchLayout extends StatelessWidget {
+class _PitchLayout extends ConsumerWidget {
   const _PitchLayout({
     required this.recommendation,
     required this.isKnockoutLayer,
@@ -403,7 +409,7 @@ class _PitchLayout extends StatelessWidget {
   final bool isLoading;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final bottomPadding = 180.0 + keyboardHeight;
 
@@ -484,8 +490,31 @@ class _PitchLayout extends StatelessWidget {
                     child: _buildChatBubble(messages[i].text ?? ''),
                   ),
                 )
-              else
+              else ...[
                 _buildCodaMessage(messages[i].text ?? ''),
+                if (ref.watch(memoriesModeProvider) &&
+                    messages[i].recalledMemory != null &&
+                    messages[i].recalledMemory!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+                    child: _buildMemoryProvenancePill(
+                      context,
+                      messages[i].recalledMemory!,
+                      isSaved: false,
+                    ),
+                  ),
+                if (ref.watch(memoriesModeProvider) &&
+                    messages[i].memoryUpdates?.savedMemory != null &&
+                    messages[i].memoryUpdates!.savedMemory!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                    child: _buildMemoryProvenancePill(
+                      context,
+                      messages[i].memoryUpdates!.savedMemory!,
+                      isSaved: true,
+                    ),
+                  ),
+              ],
             ],
 
             if (isLoading)
@@ -574,6 +603,95 @@ class _PitchLayout extends StatelessWidget {
                 height: 1.4,
               ),
             ),
+    );
+  }
+
+  Widget _buildMemoryProvenancePill(BuildContext context, String memoryText, {bool isSaved = true}) {
+    final label = isSaved ? 'Saved to Walrus Memory' : 'Recalled from Walrus Memory';
+
+    if (isKnockoutLayer) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: Colors.black,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '🦭',
+              style: TextStyle(fontSize: 14, color: Colors.black),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                color: Colors.black,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+              size: 13,
+              color: Colors.black,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        showWalrusMemorySheet(
+          context: context,
+          isSaved: isSaved,
+          activeMemories: [memoryText],
+          category: recommendation?.mediaType.name ?? 'session',
+        );
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Opacity(
+        opacity: 0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: Colors.black,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🦭', style: TextStyle(fontSize: 14)),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  color: Colors.black,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+                size: 13,
+                color: Colors.black,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

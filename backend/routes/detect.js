@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const multer = require('multer');
-const { callOpenAI } = require('../services/llmService');
+const { callGemini } = require('../services/llmService');
 const mediaService = require('../services/mediaService');
 
 const upload = multer({
@@ -83,7 +83,7 @@ Respond ONLY with a JSON object:
   "coda_blurb": "An 8-12 word casual friend-like recommendation blurb in Coda's subjective voice (first-person, casual, direct, no clichés like 'dive into', no third-party citations)."
 }`;
   try {
-    const response = await callOpenAI([
+    const response = await callGemini([
       { role: 'user', content: prompt }
     ], { type: "json_object" });
     return JSON.parse(response);
@@ -101,7 +101,7 @@ Respond ONLY with a JSON object:
 async function processMediaDetection(file) {
   console.log(`[Detect Media Core] Processing image file: ${file.originalname || 'upload'} (${file.size} bytes)`);
 
-  // Define trace.moe background check (runs in parallel with OpenAI Vision)
+  // Define trace.moe background check (runs in parallel with Gemini Vision)
   const traceMoePromise = (async () => {
     try {
       console.log('[Detect Media Core] Querying trace.moe API in background...');
@@ -132,10 +132,10 @@ async function processMediaDetection(file) {
     return null;
   })();
 
-  // Define OpenAI Vision API check (runs in parallel with trace.moe)
+  // Define Gemini Vision API check (runs in parallel with trace.moe)
   const visionPromise = (async () => {
     try {
-      console.log('[Detect Media Core] Querying OpenAI Vision API...');
+      console.log('[Detect Media Core] Querying Gemini Vision API...');
       const googleHints = await getGoogleVisionHints(file);
       const base64Image = file.buffer.toString('base64');
       let mimeType = file.mimetype;
@@ -212,18 +212,18 @@ Respond ONLY with a JSON object containing a "detected_items" array:
         });
       }
 
-      const responseText = await callOpenAI([
+      const responseText = await callGemini([
         { role: 'system', content: systemPrompt },
         {
           role: 'user',
           content: userContent
         }
-      ], { type: "json_object" }, 'gpt-4o');
+      ], { type: "json_object" });
 
       const parsedVision = JSON.parse(responseText);
       return parsedVision.detected_items || [];
     } catch (err) {
-      console.error('[Detect Media Core - OpenAI Vision promise failed]:', err.message);
+      console.error('[Detect Media Core - Gemini Vision promise failed]:', err.message);
       return [];
     }
   })();

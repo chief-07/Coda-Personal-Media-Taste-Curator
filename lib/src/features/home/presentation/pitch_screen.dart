@@ -1,4 +1,5 @@
 import 'dart:ui' as dart_ui;
+import 'package:coda/src/core/theme/ambient_bloom.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/home/domain/recommendation.dart';
 import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
@@ -10,12 +11,29 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
+import 'package:coda/src/features/home/presentation/widgets/walrus_memory_sheet.dart';
+import 'package:coda/src/core/providers/memories_mode_provider.dart';
 
 class _PitchChatMessage {
   final String text;
   final bool isUser;
+  final String? savedMemory;
+  final String? recalledMemory;
+  final List<Map<String, dynamic>> recalledMemories;
+  final List<Map<String, dynamic>> walrusWrites;
+  final String? queryUsed;
+  final MemoryUpdates? memoryUpdates;
 
-  _PitchChatMessage({required this.text, required this.isUser});
+  _PitchChatMessage({
+    required this.text,
+    required this.isUser,
+    this.savedMemory,
+    this.recalledMemory,
+    this.recalledMemories = const [],
+    this.walrusWrites = const [],
+    this.queryUsed,
+    this.memoryUpdates,
+  });
 }
 
 class PitchScreen extends ConsumerStatefulWidget {
@@ -117,16 +135,26 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
         pitchParagraphs: widget.recommendation.pitch,
         chatHistory: chatHistory,
         userMessage: text,
+        memoriesEnabled: ref.read(memoriesModeProvider),
       );
 
       // If there are memory updates (like they loved a new aspect), apply them locally
-      if (response.memoryUpdates != null) {
+      if (response.memoryUpdates != null && ref.read(memoriesModeProvider)) {
         ref.read(livingMemoryProvider.notifier).applyUpdates(response.memoryUpdates!);
       }
 
       if (mounted) {
         setState(() {
-          _messages.add(_PitchChatMessage(text: response.message, isUser: false));
+          _messages.add(_PitchChatMessage(
+            text: response.message,
+            isUser: false,
+            savedMemory: response.savedMemory ?? response.memoryUpdates?.savedMemory,
+            recalledMemory: response.recalledMemory,
+            recalledMemories: response.recalledMemories,
+            walrusWrites: response.walrusWrites,
+            queryUsed: response.queryUsed,
+            memoryUpdates: response.memoryUpdates,
+          ));
           _isLoading = false;
         });
         _scrollToBottom();
@@ -135,7 +163,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
       if (mounted) {
         setState(() {
           _messages.add(_PitchChatMessage(
-            text: "Hmm, I'm having trouble connecting right now. Let's try again in a bit.",
+            text: "[Debug Error (Pitch Chat)]: $e",
             isUser: false,
           ));
           _isLoading = false;
@@ -240,6 +268,9 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
                 height: screenHeight,
                 child: Container(color: Colors.white.withValues(alpha: 0.05)),
               ),
+
+              // ── Screen-Wide Ambient Glow Bloom & Breathing Pulse ─────────
+              const AmbientBloomLayer(),
 
               // ── Layer 1: Full-screen Knockout mask ──────────────────────
               Positioned.fill(
@@ -372,7 +403,7 @@ class _PitchScreenState extends ConsumerState<PitchScreen> with SingleTickerProv
 // ═══════════════════════════════════════════════════════════════════════
 // Pitch Layout — used for both knockout and visible layers
 // ═══════════════════════════════════════════════════════════════════════
-class _PitchLayout extends StatefulWidget {
+class _PitchLayout extends ConsumerStatefulWidget {
   const _PitchLayout({
     required this.recommendation,
     required this.isKnockoutLayer,
@@ -388,11 +419,10 @@ class _PitchLayout extends StatefulWidget {
   final bool isLoading;
 
   @override
-  State<_PitchLayout> createState() => _PitchLayoutState();
+  ConsumerState<_PitchLayout> createState() => _PitchLayoutState();
 }
 
-class _PitchLayoutState extends State<_PitchLayout> with SingleTickerProviderStateMixin {
-
+class _PitchLayoutState extends ConsumerState<_PitchLayout> with SingleTickerProviderStateMixin {
   late final AnimationController _shimmerController;
 
   @override
@@ -410,12 +440,178 @@ class _PitchLayoutState extends State<_PitchLayout> with SingleTickerProviderSta
     super.dispose();
   }
 
+  List<Map<String, dynamic>> _getEffectiveRecalledMemories() {
+    if (!ref.read(memoriesModeProvider)) {
+      return const [];
+    }
+    if (widget.recommendation.recalledMemories.isNotEmpty) {
+      return widget.recommendation.recalledMemories;
+    }
+    final memory = ref.read(livingMemoryProvider);
+    final mediaTypeName = widget.recommendation.mediaType.name.toLowerCase();
+    final profile = memory.categoryProfiles[mediaTypeName];
+
+    final List<Map<String, dynamic>> fallback = [];
+    if (profile != null && profile.isNotEmpty) {
+      fallback.add({
+        'category': 'Taste Anchor',
+        'text': profile.first,
+        'namespace': mediaTypeName,
+        'paragraph_index': 0,
+      });
+      if (profile.length > 1) {
+        fallback.add({
+          'category': 'Thematic Resonance',
+          'text': profile[1],
+          'namespace': mediaTypeName,
+          'paragraph_index': 1,
+        });
+      }
+    }
+    if (memory.guardrails.isNotEmpty) {
+      fallback.add({
+        'category': 'Dealbreakers & Guardrails',
+        'text': 'Active guardrails respected: ${memory.guardrails.take(3).join(", ")}',
+        'namespace': 'guardrails',
+        'paragraph_index': 1,
+      });
+    }
+    if (fallback.isEmpty) {
+      fallback.add({
+        'category': 'Core Resonance',
+        'text': 'High-conviction resonance for thoughtful, visionary ${widget.recommendation.mediaType.label} storytelling',
+        'namespace': mediaTypeName,
+        'paragraph_index': 0,
+      });
+    }
+    return fallback;
+  }
+
+  Widget _buildEndWalrusMemoryBadge(BuildContext context, List<Map<String, dynamic>> memories) {
+    if (widget.isKnockoutLayer) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: Colors.black, // Punches out the border
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '🦭',
+              style: TextStyle(fontSize: 14, color: Colors.black),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Recalled from Walrus Memory',
+              style: GoogleFonts.inter(
+                color: Colors.black, // Punches out the text
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+              size: 13,
+              color: Colors.black, // Punches out the caret
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () => _showWalrusRecalledSheet(context, memories),
+      behavior: HitTestBehavior.opaque,
+      child: Opacity(
+        opacity: 0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: Colors.black,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🦭', style: TextStyle(fontSize: 14)),
+              const SizedBox(width: 8),
+              Text(
+                'Recalled from Walrus Memory',
+                style: GoogleFonts.inter(
+                  color: Colors.black,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+                size: 13,
+                color: Colors.black,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showWalrusRecalledSheet(
+    BuildContext context,
+    List<Map<String, dynamic>> memories,
+  ) {
+    final rec = widget.recommendation;
+    final hour = DateTime.now().hour;
+    final timeLabel = (hour >= 5 && hour < 12)
+        ? 'morning'
+        : (hour >= 12 && hour < 17)
+            ? 'afternoon'
+            : (hour >= 17 && hour < 21)
+                ? 'evening'
+                : 'late night';
+    final dynamicFallbackQuery =
+        'What type of ${rec.mediaType.label.toLowerCase()} to experience this $timeLabel based on favorite ${rec.mediaType.label.toLowerCase()} anchors and themes?';
+
+    final rawQuery = rec.queryUsed ??
+        (memories.isNotEmpty ? memories.first['query']?.toString() : null);
+    final queryText = (rawQuery != null &&
+            rawQuery.isNotEmpty &&
+            rawQuery != 'atmospheric storytelling and resonant pacing')
+        ? rawQuery
+        : dynamicFallbackQuery;
+    final angle = rec.moodAngle ?? 'Situational Resonance';
+    final attributedMem = rec.attributedMemory ?? (memories.isNotEmpty ? memories.first['text']?.toString() : null);
+
+    showWalrusMemorySheet(
+      context: context,
+      queryUsed: queryText,
+      moodAngle: angle,
+      memories: memories,
+      attributedMemory: attributedMem,
+      mediaTitle: rec.title,
+      category: rec.mediaType.name,
+      isSaved: false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final recommendation = widget.recommendation;
     final isKnockoutLayer = widget.isKnockoutLayer;
     final messages = widget.messages;
     final isLoading = widget.isLoading;
+    final effectiveMemories = _getEffectiveRecalledMemories();
 
     return SingleChildScrollView(
       controller: widget.scrollController,
@@ -433,85 +629,103 @@ class _PitchLayoutState extends State<_PitchLayout> with SingleTickerProviderSta
           children: [
             const SizedBox(height: 80),
 
-          // ── Coda Avatar ──────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: isKnockoutLayer
-                ? Container(
-                    width: 45,
-                    height: 45,
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                      shape: BoxShape.circle,
-                    ),
-                  )
-                : Image.asset(
-                    'assets/images/coda_logo.png',
-                    width: 45,
-                    height: 45,
-                    fit: BoxFit.contain,
-                  ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // ── Hero Text ────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.only(left: 24, right: 55),
-            child: isKnockoutLayer
-                ? _buildHeroText(Colors.black)
-                : Opacity(opacity: 0, child: _buildHeroText(Colors.white)),
-          ),
-
-          const SizedBox(height: 28),
-
-          // ── Body Paragraphs ──────────────────────────────────────
-          if (recommendation.pitch.isEmpty)
+            // ── Coda Avatar ──────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-              child: _buildShimmerSkeleton(isKnockoutLayer),
-            )
-          else
-            ...recommendation.pitch.map(
-              (paragraph) => Padding(
-                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-                child: isKnockoutLayer
-                    ? _buildBodyText(paragraph, Colors.black)
-                    : Opacity(
-                        opacity:
-                            0, // No longer needed, background is brightened globally
-                        child: _buildBodyText(paragraph, Colors.white),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: isKnockoutLayer
+                  ? Container(
+                      width: 45,
+                      height: 45,
+                      decoration: const BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
                       ),
-              ),
+                    )
+                  : Image.asset(
+                      'assets/images/coda_logo.png',
+                      width: 45,
+                      height: 45,
+                      fit: BoxFit.contain,
+                    ),
             ),
-          // ── Messages List ────────────────────────────────────────
-          for (var i = 0; i < messages.length; i++) ...[
-            if (messages[i].isUser)
+
+            const SizedBox(height: 16),
+
+            // ── Hero Text ────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.only(left: 24, right: 55),
+              child: isKnockoutLayer
+                  ? _buildHeroText(Colors.black)
+                  : Opacity(opacity: 0, child: _buildHeroText(Colors.white)),
+            ),
+
+            const SizedBox(height: 14),
+
+            // ── Walrus Memory Provenance Pill (Above Subtext, Below Header) ─
+            if (ref.watch(memoriesModeProvider) && effectiveMemories.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: _buildChatBubble(messages[i].text),
-                ),
+                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                child: _buildEndWalrusMemoryBadge(context, effectiveMemories),
+              ),
+
+            // ── Body Paragraphs ──────────────────────────────────────
+            if (recommendation.pitch.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                child: _buildShimmerSkeleton(isKnockoutLayer),
               )
             else
-              _buildCodaMessage(messages[i].text),
-          ],
+              ...recommendation.pitch.map(
+                (paragraph) => Padding(
+                  padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                  child: isKnockoutLayer
+                      ? _buildBodyText(paragraph, Colors.black)
+                      : Opacity(
+                          opacity: 0,
+                          child: _buildBodyText(paragraph, Colors.white),
+                        ),
+                ),
+              ),
 
-          if (isLoading)
-            Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
-              child: isKnockoutLayer
-                  ? Icon(
-                      PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
-                      color: Colors.black,
-                      size: 28,
-                    )
-                  : const SparkleLoader(
-                      color: Colors.white,
-                      size: 28,
-                    ),
-            ),
+            // ── Messages List ────────────────────────────────────────
+            for (var i = 0; i < messages.length; i++) ...[
+              if (messages[i].isUser)
+                Padding(
+                  padding: const EdgeInsets.only(left: 48, right: 24, bottom: 20),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: _buildChatBubble(messages[i].text),
+                  ),
+                )
+              else ...[
+                _buildCodaMessage(messages[i].text),
+                if (ref.watch(memoriesModeProvider) && messages[i].recalledMemory != null && messages[i].recalledMemory!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+                    child: _buildMemoryProvenancePill(context, messages[i], isSaved: false),
+                  ),
+                if (ref.watch(memoriesModeProvider) && messages[i].savedMemory != null && messages[i].savedMemory!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                    child: _buildMemoryProvenancePill(context, messages[i], isSaved: true),
+                  ),
+              ],
+            ],
+
+            if (isLoading)
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+                child: isKnockoutLayer
+                    ? Icon(
+                        PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
+                        color: Colors.black,
+                        size: 28,
+                      )
+                    : const SparkleLoader(
+                        color: Colors.white,
+                        size: 28,
+                      ),
+              ),
           ],
         ),
       ),
@@ -519,8 +733,9 @@ class _PitchLayoutState extends State<_PitchLayout> with SingleTickerProviderSta
   }
 
   Widget _buildHeroText(Color color) {
+    final cleanBlurb = widget.recommendation.codaBlurb.replaceAll('**', '').replaceAll('*', '').trim();
     return Text(
-      widget.recommendation.codaBlurb,
+      cleanBlurb,
       style: GoogleFonts.inter(
         color: color,
         fontSize: 30,
@@ -532,8 +747,9 @@ class _PitchLayoutState extends State<_PitchLayout> with SingleTickerProviderSta
   }
 
   Widget _buildBodyText(String text, Color color) {
+    final cleanText = text.replaceAll('**', '').replaceAll('*', '').trim();
     return Text(
-      text,
+      cleanText,
       style: GoogleFonts.inter(
         color: color,
         fontSize: 18,
@@ -626,6 +842,100 @@ class _PitchLayoutState extends State<_PitchLayout> with SingleTickerProviderSta
     );
   }
 
+  Widget _buildMemoryProvenancePill(BuildContext context, _PitchChatMessage msg, {required bool isSaved}) {
+    final label = isSaved ? 'Saved to Walrus Memory' : 'Recalled from Walrus Memory';
+    final memoryText = isSaved ? (msg.savedMemory ?? '') : (msg.recalledMemory ?? '');
+
+    if (widget.isKnockoutLayer) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: Colors.black,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '🦭',
+              style: TextStyle(fontSize: 14, color: Colors.black),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                color: Colors.black,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+              size: 13,
+              color: Colors.black,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        showWalrusMemorySheet(
+          context: context,
+          isSaved: isSaved,
+          queryUsed: msg.queryUsed ?? widget.recommendation.queryUsed,
+          memories: msg.recalledMemories,
+          walrusWrites: msg.walrusWrites,
+          memoryUpdates: isSaved ? msg.memoryUpdates : null,
+          activeMemories: memoryText.isNotEmpty ? [memoryText] : null,
+          category: widget.recommendation.mediaType.name,
+        );
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Opacity(
+        opacity: 0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: Colors.black,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🦭', style: TextStyle(fontSize: 14)),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  color: Colors.black,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                PhosphorIcons.caretRight(PhosphorIconsStyle.bold),
+                size: 13,
+                color: Colors.black,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildChatBubble(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -698,7 +1008,7 @@ class _BottomPills extends StatelessWidget {
               builder: (context, child) {
                 final t = animation.value;
                 final totalWidth = constraints.maxWidth;
-                final initialBtnWidth = (totalWidth - 12) / 2;
+                final initialThisIsItWidth = ((totalWidth - 12) * 0.46).clamp(146.0, 165.0);
 
                 // Text Opacity
                 double textOpacity = 1.0;
@@ -711,12 +1021,12 @@ class _BottomPills extends StatelessWidget {
                 }
 
                 // This Is It Width and Gap
-                double thisIsItWidth = initialBtnWidth;
+                double thisIsItWidth = initialThisIsItWidth;
                 double gap = 12.0;
                 
                 if (t > 0.1 && t <= 0.6) {
                   final progress = (t - 0.1) / 0.5;
-                  thisIsItWidth = dart_ui.lerpDouble(initialBtnWidth, 51.0, progress) ?? 51.0;
+                  thisIsItWidth = dart_ui.lerpDouble(initialThisIsItWidth, 51.0, progress) ?? 51.0;
                 } else if (t > 0.6 && t <= 0.9) {
                   final progress = (t - 0.6) / 0.3;
                   thisIsItWidth = dart_ui.lerpDouble(51.0, 0.0, progress) ?? 0.0;
@@ -756,10 +1066,18 @@ class _BottomPills extends StatelessWidget {
                         child: Opacity(
                           opacity: isKnockoutLayer ? 0.0 : textOpacity,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             alignment: Alignment.centerLeft,
                             child: Row(
                               children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: Icon(
+                                    PhosphorIcons.chatCircleDots(PhosphorIconsStyle.bold),
+                                    color: Colors.black.withValues(alpha: 0.7),
+                                    size: 19,
+                                  ),
+                                ),
                                 Expanded(
                                   child: TextField(
                                     controller: isKnockoutLayer ? null : chatController,
@@ -767,14 +1085,14 @@ class _BottomPills extends StatelessWidget {
                                     enabled: !isKnockoutLayer,
                                     style: GoogleFonts.inter(
                                       color: Colors.black.withValues(alpha: 0.8),
-                                      fontSize: 18,
+                                      fontSize: 17,
                                       fontWeight: FontWeight.w900,
                                     ),
                                     decoration: InputDecoration(
                                       hintText: "Let's Talk",
                                       hintStyle: GoogleFonts.inter(
                                         color: Colors.black.withValues(alpha: 0.7),
-                                        fontSize: 18,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.w900,
                                       ),
                                       border: InputBorder.none,
@@ -826,26 +1144,26 @@ class _BottomPills extends StatelessWidget {
                               scrollDirection: Axis.horizontal,
                               physics: const NeverScrollableScrollPhysics(),
                               child: SizedBox(
-                                width: initialBtnWidth,
+                                width: initialThisIsItWidth,
                                 child: Opacity(
                                   opacity: isKnockoutLayer ? 0.0 : textOpacity,
                                   child: Container(
-                                    padding: const EdgeInsets.only(left: 20, right: 32),
-                                    alignment: Alignment.centerLeft,
+                                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                                    alignment: Alignment.center,
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Icon(
                                           Icons.play_arrow_rounded,
                                           color: Colors.black.withValues(alpha: 0.7),
-                                          size: 24,
+                                          size: 22,
                                         ),
                                         const SizedBox(width: 3),
                                         Text(
                                           'This is it',
                                           style: GoogleFonts.inter(
                                             color: Colors.black.withValues(alpha: 0.7),
-                                            fontSize: 18,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.w900,
                                           ),
                                         ),

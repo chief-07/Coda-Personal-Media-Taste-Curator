@@ -64,3 +64,6 @@ scratch/
 android/build/
 
 
+backend/certs/
+backend/archive_legacy_qdrant/
+e2e_test_report.md

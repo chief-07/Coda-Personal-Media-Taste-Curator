@@ -23,7 +23,7 @@ router.post('/update-summary', async (req, res) => {
       updatedMemory.soul_graph.coda_summary = summaryText;
     }
 
-    // Sync to Qdrant
+    // Sync living memory
     await userSoulService.syncLivingMemory(userId, updatedMemory);
 
     res.json({ status: "success", updatedMemory });

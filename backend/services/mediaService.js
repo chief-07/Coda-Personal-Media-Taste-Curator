@@ -112,6 +112,7 @@ const getWikipediaImage = async (title, mediaType) => {
               if (src.toLowerCase().endsWith('.svg')) continue;
               if (src.startsWith('//')) src = 'https:' + src;
               if (src.includes('/thumb/')) {
+                src = src.replace('https://thumb.wikimedia.org/', 'https://upload.wikimedia.org/');
                 const parts = src.split('/');
                 const thumbIdx = parts.indexOf('thumb');
                 if (thumbIdx !== -1) {
@@ -750,6 +751,43 @@ Respond with ONLY a JSON object:
   }
 };
 
+function isReasonableMatch(targetSong, targetArtist, resultTrack, resultArtist) {
+  if (!resultTrack) return false;
+  const s1 = (targetSong || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const s2 = (resultTrack || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const a1 = (targetArtist || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const a2 = (resultArtist || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  if (!s1 || !s2) return false;
+  // If either contains the other
+  if (s1.includes(s2) || s2.includes(s1)) return true;
+  // If song names have a 4-char prefix match
+  if (s1.length >= 4 && s2.length >= 4 && (s1.startsWith(s2.slice(0, 4)) || s2.startsWith(s1.slice(0, 4)))) return true;
+  // If artist matches and there's some title overlap
+  if (a1 && a2 && (a1.includes(a2) || a2.includes(a1))) {
+    const words1 = (targetSong || '').toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    const words2 = (resultTrack || '').toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    if (words1.some(w => words2.includes(w))) return true;
+  }
+  return false;
+}
+
+function getDefaultAudioFallback() {
+  if (process.env.DEFAULT_CODA_AUDIO_URL) {
+    return process.env.DEFAULT_CODA_AUDIO_URL;
+  }
+  try {
+    const configPath = path.join(__dirname, '..', 'data', 'default_audio.json');
+    if (fs.existsSync(configPath)) {
+      const cfg = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      if (cfg.enabled && cfg.default_audio_url) {
+        return cfg.default_audio_url;
+      }
+    }
+  } catch (_) {}
+  return 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3';
+}
+
 const fetchDeezerPreview = async (songTitle, artistName) => {
   try {
     const query = artistName ? `${artistName} - ${songTitle}` : songTitle;
@@ -757,9 +795,9 @@ const fetchDeezerPreview = async (songTitle, artistName) => {
     const url = `https://api.deezer.com/search?q=${encodeURIComponent(query)}`;
     const response = await axios.get(url, { timeout: 15000 });
     const tracks = response.data?.data || [];
-    const match = tracks.find(t => t.preview);
+    const match = tracks.find(t => t.preview && isReasonableMatch(songTitle, artistName, t.title, t.artist?.name));
     if (match) {
-      console.log(`[Deezer OST] ✅ Found track preview: "${match.title}" by ${match.artist?.name} - ${match.preview}`);
+      console.log(`[Deezer OST] ✅ Found verified track preview: "${match.title}" by ${match.artist?.name} - ${match.preview}`);
       return match.preview;
     }
   } catch (e) {
@@ -793,9 +831,9 @@ const fetchOST = async (title, mediaType) => {
       const itunesQuery = `${song_title} ${artist}`;
       const itunesRes = await axios.get(`https://itunes.apple.com/search?term=${encodeURIComponent(itunesQuery)}&media=music&entity=song&limit=5`, { timeout: 15000 }).catch(() => null);
       const itunesTracks = itunesRes?.data?.results || [];
-      const itunesMatch = itunesTracks.find(r => r.previewUrl);
+      const itunesMatch = itunesTracks.find(r => r.previewUrl && isReasonableMatch(song_title, artist, r.trackName, r.artistName));
       if (itunesMatch) {
-        console.log(`[OST] ✅ Found iTunes track: "${itunesMatch.trackName}" by ${itunesMatch.artistName} - ${itunesMatch.previewUrl}`);
+        console.log(`[OST] ✅ Found verified iTunes track: "${itunesMatch.trackName}" by ${itunesMatch.artistName} - ${itunesMatch.previewUrl}`);
         return itunesMatch.previewUrl;
       }
 
@@ -808,14 +846,13 @@ const fetchOST = async (title, mediaType) => {
       console.log(`[OST] LLM determined no iconic track exists or returned null for "${title}"`);
     }
 
-
-
   } catch (e) {
     console.warn(`[OST] Failed to resolve soundtrack for "${title}":`, e.message);
   }
 
-  console.warn(`[OST] ❌ No soundtrack found for "${title}". Returning empty string (silent).`);
-  return '';
+  const fallbackAudio = getDefaultAudioFallback();
+  console.log(`[OST] 🎵 Using curated ambient fallback audio for "${title}": ${fallbackAudio}`);
+  return fallbackAudio;
 };
 
 const extractYoutubeId = (url) => {
@@ -909,6 +946,11 @@ const fetchAssets = async (title, mediaType) => {
   
   let assets = assetCache[key];
   if (assets && assets.trailer_url !== undefined) {
+    if (assets.poster_url && assets.poster_url.startsWith('http') && !assets.poster_url.includes('/api/recommend/proxy-image')) {
+      assets.poster_url = `/api/recommend/proxy-image?url=${encodeURIComponent(assets.poster_url)}`;
+      assetCache[key] = assets;
+      saveAssetCache();
+    }
     console.log(`[Asset Cache Hit] serving cached assets for: "${title}" (${mediaType})`);
     return assets;
   }
@@ -916,11 +958,16 @@ const fetchAssets = async (title, mediaType) => {
   // Parallelize all three independent asset fetches for maximum speed.
   // poster_url and ost_url may already be cached individually; trailer_url is always re-fetched
   // until it lands in the full-cache check above.
-  const [poster_url, ost_url, trailer_url] = await Promise.all([
+  const [raw_poster_url, ost_url, trailer_url] = await Promise.all([
     assets ? Promise.resolve(assets.poster_url) : fetchPoster(title, mediaType),
     assets ? Promise.resolve(assets.ost_url)    : fetchOST(title, mediaType),
     fetchYoutubeTrailer(title, mediaType),
   ]);
+
+  let poster_url = raw_poster_url || '';
+  if (poster_url && poster_url.startsWith('http') && !poster_url.includes('/api/recommend/proxy-image')) {
+    poster_url = `/api/recommend/proxy-image?url=${encodeURIComponent(poster_url)}`;
+  }
   
   assets = { poster_url, ost_url, trailer_url };
   assetCache[key] = assets;

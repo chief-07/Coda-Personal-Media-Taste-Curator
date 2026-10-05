@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
+import 'package:coda/src/core/theme/ambient_bloom.dart';
 import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
 
 const _askRecommendation = Recommendation(
@@ -27,7 +28,7 @@ const _askRecommendation = Recommendation(
   releaseYear: '2026',
   pitch: [
     "Tell me the kinds of stories, worlds, and experiences you enjoy.",
-    "Movies, anime, books, games, manga, visual novels, YouTube — whatever you're into.",
+    "Movies, anime, books, games, manga, visual novels — tell me what formats belong in your world so I know what to find for you.",
     "The more I understand what you love, the better I'll get at finding things you'll genuinely connect with.",
   ],
 );
@@ -175,89 +176,96 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           children: [
             // ── Layer 0: Global Background ────────────────────────────
             Positioned.fill(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 600),
-                child: activeRec != null && activeRec.posterUrl != null && activeRec.posterUrl!.isNotEmpty
-                    ? Transform.scale(
-                        scale: 1.2,
-                        child: ImageFiltered(
-                          key: ValueKey(activeRec.posterUrl),
-                          imageFilter: dart_ui.ImageFilter.blur(
-                            sigmaX: 80,
-                            sigmaY: 80,
-                            tileMode: TileMode.mirror,
+              child: RepaintBoundary(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 600),
+                  child: activeRec != null && activeRec.posterUrl != null && activeRec.posterUrl!.isNotEmpty
+                      ? Transform.scale(
+                          scale: 1.2,
+                          child: ImageFiltered(
+                            key: ValueKey(activeRec.posterUrl),
+                            imageFilter: dart_ui.ImageFilter.blur(
+                              sigmaX: 80,
+                              sigmaY: 80,
+                              tileMode: TileMode.mirror,
+                            ),
+                            child: FallbackImage(
+                              url: activeRec.posterUrl,
+                              fit: BoxFit.cover,
+                              errorWidget: const SizedBox.shrink(),
+                            ),
                           ),
-                          child: FallbackImage(
-                            url: activeRec.posterUrl,
-                            fit: BoxFit.cover,
-                            errorWidget: const SizedBox.shrink(),
+                        )
+                      : Transform.scale(
+                          scale: 1.2,
+                          key: const ValueKey('default_bg'),
+                          child: ImageFiltered(
+                            imageFilter: dart_ui.ImageFilter.blur(
+                              sigmaX: 80,
+                              sigmaY: 80,
+                              tileMode: TileMode.mirror,
+                            ),
+                            child: const Image(
+                              image: AssetImage('assets/images/default_bg.jpg'),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
                           ),
                         ),
-                      )
-                    : Transform.scale(
-                        scale: 1.2,
-                        key: const ValueKey('default_bg'),
-                        child: ImageFiltered(
-                          imageFilter: dart_ui.ImageFilter.blur(
-                            sigmaX: 80,
-                            sigmaY: 80,
-                            tileMode: TileMode.mirror,
-                          ),
-                          child: const Image(
-                            image: AssetImage('assets/images/default_bg.jpg'),
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
-                        ),
-                      ),
+                ),
               ),
             ),
             Positioned.fill(
               child: Container(color: Colors.white.withValues(alpha: 0.15)),
             ),
 
+            // ── Screen-Wide Ambient Glow Bloom & Breathing Pulse ─────────
+            const AmbientBloomLayer(),
+
             // ── Layer 1: Full-screen Knockout mask ──────────────────────
             Positioned.fill(
-              child: ShaderMask(
-                shaderCallback: (Rect bounds) {
-                  return LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.75),
-                      Colors.black.withValues(alpha: 0.75),
-                    ],
-                  ).createShader(bounds);
-                },
-                blendMode: BlendMode.srcOut,
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.01),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: _buildFadedContent(
-                          _PitchLayout(
-                            recommendation: rec,
-                            isKnockoutLayer: true,
-                            scrollController: _maskScrollController,
-                            messages: messages,
-                            isLoading: isLoading,
+              child: RepaintBoundary(
+                child: ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.75),
+                        Colors.black.withValues(alpha: 0.75),
+                      ],
+                    ).createShader(bounds);
+                  },
+                  blendMode: BlendMode.srcOut,
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.01),
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: _buildFadedContent(
+                            _PitchLayout(
+                              recommendation: rec,
+                              isKnockoutLayer: true,
+                              scrollController: _maskScrollController,
+                              messages: messages,
+                              isLoading: isLoading,
+                            ),
                           ),
                         ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: _PromptBar(
-                          isKnockoutLayer: true,
-                          chatController: _chatController,
-                          chatFocusNode: _chatFocusNode,
-                          onSend: () {},
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: _PromptBar(
+                            isKnockoutLayer: true,
+                            chatController: _chatController,
+                            chatFocusNode: _chatFocusNode,
+                            onSend: () {},
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -265,14 +273,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
             // ── Layer 2: Normal visible elements (overlay + real pills) ───
             Positioned.fill(
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: _buildFadedContent(
-                      _PitchLayout(
-                        recommendation: rec,
-                        isKnockoutLayer: false,
-                        scrollController: _topScrollController,
+              child: RepaintBoundary(
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: _buildFadedContent(
+                        _PitchLayout(
+                          recommendation: rec,
+                          isKnockoutLayer: false,
+                          scrollController: _topScrollController,
                         messages: messages,
                         isLoading: isLoading,
                       ),
@@ -292,6 +301,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ],
               ),
             ),
+          ),
           ],
         ),
       ),
@@ -642,11 +652,15 @@ class _PromptBar extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: onSend,
-                  child: Icon(
-                    PhosphorIconsFill.paperPlaneTilt,
-                    color: Colors.black.withValues(alpha: 0.7),
-                    size: 20,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    child: Icon(
+                      PhosphorIconsFill.paperPlaneTilt,
+                      color: Colors.black.withValues(alpha: 0.8),
+                      size: 32,
+                    ),
                   ),
                 ),
               ],

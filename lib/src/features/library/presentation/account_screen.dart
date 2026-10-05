@@ -8,6 +8,7 @@ import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/recommendation/application/audio_player_controller.dart';
 import 'package:coda/src/features/home/presentation/widgets/fallback_image.dart';
+import 'package:coda/src/core/providers/user_id_provider.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {
   const AccountScreen({super.key});
@@ -38,9 +39,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     super.dispose();
   }
 
-
-
-  void _showResetProfileDialog(BuildContext context, WidgetRef ref) {
+  void _showCreateAccountDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
@@ -52,10 +51,10 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF16181C).withValues(alpha: 0.85),
+              color: const Color(0xFF16181C).withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
             ),
@@ -64,7 +63,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Logout & Reset Profile?',
+                  'Create New Account?',
                   style: GoogleFonts.inter(
                     color: Colors.white,
                     fontSize: 20,
@@ -74,7 +73,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'This will permanently wipe your profile, recommendations, seen list, and not interested list.\n\nThis cannot be undone.',
+                  'This will generate a fresh account ID and an isolated Walrus Protocol memory namespace partition.\n\nYou will be redirected to onboarding to curate your taste anchors from scratch.',
                   style: GoogleFonts.inter(
                     color: Colors.white70,
                     fontSize: 14,
@@ -100,21 +99,103 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                     TextButton(
                       onPressed: () async {
                         Navigator.pop(dialogCtx);
-                        // 1. Wipe local memory
+                        await ref.read(userIdProvider.notifier).createNewAccount();
                         await ref.read(livingMemoryProvider.notifier).clearMemory();
-                        // 2. Pause audio
                         ref.read(audioPlayerControllerProvider.notifier).pause();
-                        // 3. Clear active recommendation cache
                         await ref.read(homeRecommendationProvider.notifier).clearActivePick();
-                        // 3.5 Clear active session recommendation
                         ref.read(activeSessionProvider.notifier).clear();
-                        // 4. Redirect to onboarding
                         if (context.mounted) {
                           context.go('/onboarding');
                         }
                       },
                       child: Text(
-                        'Reset',
+                        'Create',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
+      builder: (dialogCtx) => BackdropFilter(
+        filter: dart_ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF16181C).withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Logout?',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Logging out will reset the local session cache and return you to onboarding.',
+                  style: GoogleFonts.inter(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogCtx),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.inter(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () async {
+                        Navigator.pop(dialogCtx);
+                        await ref.read(livingMemoryProvider.notifier).clearMemory();
+                        ref.read(audioPlayerControllerProvider.notifier).pause();
+                        await ref.read(homeRecommendationProvider.notifier).clearActivePick();
+                        ref.read(activeSessionProvider.notifier).clear();
+                        if (context.mounted) {
+                          context.go('/onboarding');
+                        }
+                      },
+                      child: Text(
+                        'Logout',
                         style: GoogleFonts.inter(
                           color: const Color(0xFFE03E3E),
                           fontWeight: FontWeight.w900,
@@ -134,6 +215,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     final activeRec = ref.watch(homeRecommendationProvider).value;
+    final userId = ref.watch(userIdProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -205,6 +287,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 child: _buildScrollableBody(
                   isKnockoutLayer: true,
                   scrollController: _maskScrollController,
+                  userId: userId,
                 ),
               ),
             ),
@@ -215,6 +298,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
             child: _buildScrollableBody(
               isKnockoutLayer: false,
               scrollController: _topScrollController,
+              userId: userId,
             ),
           ),
         ],
@@ -225,6 +309,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   Widget _buildScrollableBody({
     required bool isKnockoutLayer,
     required ScrollController scrollController,
+    required String userId,
   }) {
     return SafeArea(
       child: Column(
@@ -290,36 +375,25 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               physics: isKnockoutLayer ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
               padding: const EdgeInsets.only(bottom: 64),
               children: [
-                // Logout/Reset Row
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: isKnockoutLayer
-                      ? Text(
-                          'LOGOUT & RESET PROFILE',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.black,
-                            letterSpacing: 1.5,
-                          ),
-                        )
-                      : Opacity(
-                          opacity: 0.6,
-                          child: Text(
-                            'LOGOUT & RESET PROFILE',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                        ),
-                ),
-
-                _buildResetRow(
+                _buildSectionHeader('ACCOUNT IDENTITY', isKnockoutLayer),
+                _buildInfoRow('Account', '@coda', isKnockoutLayer),
+                _buildInfoRow('User ID', userId, isKnockoutLayer),
+                _buildInfoRow('Walrus Partition', 'coda_${userId}_*', isKnockoutLayer),
+                
+                const SizedBox(height: 24),
+                _buildSectionHeader('ACTIONS', isKnockoutLayer),
+                _buildActionRow(
+                  'Create New Account',
+                  PhosphorIconsBold.userPlus,
                   isKnockoutLayer,
-                  onTap: () => _showResetProfileDialog(context, ref),
+                  onTap: () => _showCreateAccountDialog(context, ref),
+                ),
+                _buildActionRow(
+                  'Logout',
+                  PhosphorIconsBold.signOut,
+                  isKnockoutLayer,
+                  isDestructive: true,
+                  onTap: () => _showLogoutDialog(context, ref),
                 ),
               ],
             ),
@@ -329,22 +403,106 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     );
   }
 
+  Widget _buildSectionHeader(String title, bool isKnockoutLayer) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 20, bottom: 8),
+      child: isKnockoutLayer
+          ? Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                color: Colors.black,
+                letterSpacing: 1.5,
+              ),
+            )
+          : Opacity(
+              opacity: 0.5,
+              child: Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
+    );
+  }
 
-
-  Widget _buildResetRow(
-    bool isKnockoutLayer, {
-    VoidCallback? onTap,
-  }) {
-    final rowContent = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+  Widget _buildInfoRow(String label, String value, bool isKnockoutLayer) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           isKnockoutLayer
               ? Text(
-                  'Logout & Reset',
+                  label,
                   style: GoogleFonts.inter(
-                    fontSize: 22,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black,
+                    letterSpacing: 0.3,
+                  ),
+                )
+              : Opacity(
+                  opacity: 0,
+                  child: Text(
+                    label,
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+          Flexible(
+            child: isKnockoutLayer
+                ? Text(
+                    value,
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.spaceMono(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  )
+                : Text(
+                    value,
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.spaceMono(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionRow(
+    String label, 
+    IconData icon, 
+    bool isKnockoutLayer, {
+    bool isDestructive = false, 
+    VoidCallback? onTap
+  }) {
+    final rowContent = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          isKnockoutLayer
+              ? Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
                     color: Colors.black,
                     letterSpacing: 0.5,
@@ -353,9 +511,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               : Opacity(
                   opacity: 0,
                   child: Text(
-                    'Logout & Reset',
+                    label,
                     style: GoogleFonts.inter(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.5,
                     ),
@@ -363,10 +521,10 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 ),
           isKnockoutLayer
               ? const SizedBox(width: 24, height: 24)
-              : const Icon(
-                  PhosphorIconsBold.signOut,
-                  color: Color(0xFFE03E3E),
-                  size: 24,
+              : Icon(
+                  icon,
+                  color: isDestructive ? const Color(0xFFE03E3E) : Colors.white,
+                  size: 22,
                 ),
         ],
       ),

@@ -6,17 +6,17 @@ const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post('/transcribe', upload.single('file'), async (req, res) => {
-  const apiKey = process.env.OPENAI_API_KEY || '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';
+  const apiKey = process.env.GROQ_API_KEY;
   
   if (!apiKey) {
-    return res.status(500).json({ error: 'API Key not configured on proxy server' });
+    return res.status(500).json({ error: 'GROQ_API_KEY not configured on server' });
   }
 
   if (!req.file) {
     return res.status(400).json({ error: 'No audio file provided' });
   }
 
-  console.log(`[STT Proxy] Transcribing audio with length ${req.file.size} bytes`);
+  console.log(`[STT Proxy] Transcribing audio with length ${req.file.size} bytes via Groq Whisper`);
 
   try {
     const boundary = '----WebKitFormBoundary' + Math.random().toString(36).substring(2);
@@ -27,7 +27,7 @@ router.post('/transcribe', upload.single('file'), async (req, res) => {
     // 1. Model parameter
     chunks.push(Buffer.from(`--${boundary}\r\n`));
     chunks.push(Buffer.from('Content-Disposition: form-data; name="model"\r\n\r\n'));
-    chunks.push(Buffer.from('whisper-1\r\n'));
+    chunks.push(Buffer.from('whisper-large-v3\r\n'));
     
     // 2. File parameter
     const filename = req.file.originalname || 'audio.m4a';
@@ -40,7 +40,7 @@ router.post('/transcribe', upload.single('file'), async (req, res) => {
     
     const bodyBuffer = Buffer.concat(chunks);
     
-    const response = await axios.post('https://api.openai.com/v1/audio/transcriptions', bodyBuffer, {
+    const response = await axios.post('https://api.groq.com/openai/v1/audio/transcriptions', bodyBuffer, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': `multipart/form-data; boundary=${boundary}`
@@ -62,24 +62,40 @@ router.post('/transcribe', upload.single('file'), async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
-  const apiKey = process.env.OPENAI_API_KEY || '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';
-  
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API Key not configured on proxy server' });
-  }
+const { callGeminiChat } = require('../services/geminiClient');
 
-  console.log(`[Chat Proxy] Routing request to OpenAI`);
+router.post('/', async (req, res) => {
+  console.log(`[Chat Proxy] Routing request to Gemini 3.1 Flash`);
 
   try {
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', req.body, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      timeout: 60000
+    const { messages, tools, response_format, temperature } = req.body;
+    const response = await callGeminiChat({
+      messages,
+      tools,
+      responseFormat: response_format,
+      temperature: temperature !== undefined ? temperature : 0.2,
+      model: 'gemini-3.1-flash-lite',
     });
-    res.json(response.data);
+
+const walrus = require('../services/walrusMemoryService');
+
+    if (response && response.choices && response.choices[0] && response.choices[0].message) {
+      let content = (response.choices[0].message.content || '').trim();
+      if (content.startsWith('```')) {
+        content = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+        response.choices[0].message.content = content;
+      }
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed && parsed.memory_updates) {
+          const userId = req.body.userId || 'demo_user';
+          walrus.routeAndSaveLivingMemory(userId, parsed.memory_updates).catch(err => {
+            console.error('[Walrus Auto-Save Error]:', err.message);
+          });
+        }
+      } catch (_) {}
+    }
+    res.json(response);
   } catch (e) {
     console.error('[Chat Proxy Error]:', e.message);
     if (e.response) {

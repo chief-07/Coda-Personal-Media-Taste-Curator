@@ -32,7 +32,8 @@ class _CodaShellState extends ConsumerState<CodaShell> with TickerProviderStateM
   bool _isAnalyzingSharedImage = false;
   
   late final AnimationController _branchAnimationController;
-  late int _visibleIndex;
+  late final AnimationController _pulseController;
+  late final Animation<double> _pulseAnimation;
   bool _isTransitioning = false;
   int? _targetIndex;
 
@@ -46,11 +47,20 @@ class _CodaShellState extends ConsumerState<CodaShell> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _visibleIndex = widget.navigationShell.currentIndex;
     _branchAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
       value: 1.0,
+    );
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3200),
+    )..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _pulseController,
+        curve: Curves.easeInOutSine,
+      ),
     );
     // Branch order mirrors router.dart: 0=Library, 1=Home
     // Ask (index 2) is pushed as a root route, not a shell branch
@@ -80,18 +90,12 @@ class _CodaShellState extends ConsumerState<CodaShell> with TickerProviderStateM
   @override
   void didUpdateWidget(covariant CodaShell oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.navigationShell.currentIndex != oldWidget.navigationShell.currentIndex) {
-      if (!_isTransitioning) {
-        setState(() {
-          _visibleIndex = widget.navigationShell.currentIndex;
-        });
-      }
-    }
   }
 
   @override
   void dispose() {
     _intentSub?.cancel();
+    _pulseController.dispose();
     _branchAnimationController.dispose();
     super.dispose();
   }
@@ -166,7 +170,7 @@ class _CodaShellState extends ConsumerState<CodaShell> with TickerProviderStateM
     if (index == widget.navigationShell.currentIndex) return;
 
     if (index == 0) {
-      ref.read(libraryTabProvider.notifier).setTab(LibraryTab.lists);
+      ref.read(libraryTabProvider.notifier).setTab(LibraryTab.archive);
     }
 
     final fromIndex = widget.navigationShell.currentIndex;
@@ -176,7 +180,6 @@ class _CodaShellState extends ConsumerState<CodaShell> with TickerProviderStateM
     setState(() {
       _fromIndex = fromIndex;
       _toIndex = toIndex;
-      _visibleIndex = toIndex;
       _targetIndex = toIndex;
       _isTransitioning = true;
     });
@@ -219,63 +222,101 @@ class _CodaShellState extends ConsumerState<CodaShell> with TickerProviderStateM
         children: [
           // ── Global Background ────────────────────────────
           Positioned.fill(
-            child: Transform.scale(
-              scale: 1.2,
-              child: ImageFiltered(
-                imageFilter: ImageFilter.blur(
-                  sigmaX: 80,
-                  sigmaY: 80,
-                  tileMode: TileMode.mirror,
-                ),
-                child: const Image(
-                  image: AssetImage('assets/images/default_bg.jpg'),
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
+            child: RepaintBoundary(
+              child: Transform.scale(
+                scale: 1.2,
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(
+                    sigmaX: 80,
+                    sigmaY: 80,
+                    tileMode: TileMode.mirror,
+                  ),
+                  child: const Image(
+                    image: AssetImage('assets/images/default_bg.jpg'),
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
                 ),
               ),
             ),
           ),
           if (rec != null && rec.posterUrl != null && rec.posterUrl!.isNotEmpty && !rec.posterUrl!.startsWith('holder:'))
             Positioned.fill(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 600),
-                child: Transform.scale(
-                  scale: 1.2,
-                  key: ValueKey(rec.posterUrl),
-                  child: ImageFiltered(
-                    imageFilter: ImageFilter.blur(
-                      sigmaX: 80,
-                      sigmaY: 80,
-                      tileMode: TileMode.mirror,
-                    ),
-                    child: FallbackImage(
-                      url: rec.posterUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      errorWidget: const SizedBox.shrink(),
+              child: RepaintBoundary(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 600),
+                  child: Transform.scale(
+                    scale: 1.2,
+                    key: ValueKey(rec.posterUrl),
+                    child: ImageFiltered(
+                      imageFilter: ImageFilter.blur(
+                        sigmaX: 80,
+                        sigmaY: 80,
+                        tileMode: TileMode.mirror,
+                      ),
+                      child: FallbackImage(
+                        url: rec.posterUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        errorWidget: const SizedBox.shrink(),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          TweenAnimationBuilder<double>(
-            key: ValueKey(rec?.id ?? 'default_bg'),
-            tween: Tween<double>(begin: 0.0, end: 0.05),
-            duration: const Duration(milliseconds: 1500),
-            curve: Curves.easeOutCubic,
-            builder: (context, value, child) {
-              return Positioned.fill(
-                child: Container(color: Colors.white.withValues(alpha: value)),
-              );
-            },
+          // ── Screen-Wide Ambient Glow Bloom & Breathing Pulse ──────────────────
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _pulseAnimation,
+              builder: (context, _) {
+                final double progress = _pulseAnimation.value;
+                // Bloom scale: gently expands across the whole canvas
+                final double scale = 1.0 + (progress * 0.22);
+                // Luminous opacities designed to shine through the dark card's 75% mask
+                final double bloomCoreOpacity = 0.12 + (progress * 0.48);
+                final double bloomMidOpacity = 0.06 + (progress * 0.28);
+                final double bloomEdgeOpacity = 0.02 + (progress * 0.14);
+                final double washOpacity = 0.04 + (progress * 0.14);
+
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Full-screen ambient wash
+                    Container(
+                      color: Colors.white.withValues(alpha: washOpacity),
+                    ),
+                    // Screen-spanning radial bloom
+                    Transform.scale(
+                      scale: scale,
+                      alignment: const Alignment(0, -0.05),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            center: const Alignment(0, -0.05),
+                            radius: 1.35,
+                            colors: [
+                              Colors.white.withValues(alpha: bloomCoreOpacity),
+                              Colors.white.withValues(alpha: bloomMidOpacity),
+                              Colors.white.withValues(alpha: bloomEdgeOpacity),
+                              Colors.transparent,
+                            ],
+                            stops: const [0.0, 0.40, 0.85, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
           AnimatedBuilder(
             animation: _branchAnimationController,
             builder: (context, _) {
               final double t = _branchAnimationController.value;
-              final double cardTopOffset = (mediaQuery?.padding.top ?? 0) + 81.0;
 
               Widget finalWidget;
 

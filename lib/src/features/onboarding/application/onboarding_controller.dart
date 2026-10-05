@@ -2,17 +2,20 @@ import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/features/onboarding/data/coda_ai_service.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 
 class ChatMessage {
   final String? text;
   final List<String>? chips;
   final bool isUser;
+  final MemoryUpdates? memoryUpdates;
+  final String? recalledMemory;
 
   ChatMessage({
     this.text,
     this.chips,
     required this.isUser,
+    this.memoryUpdates,
+    this.recalledMemory,
   }) : assert(text != null || chips != null);
 }
 
@@ -94,7 +97,6 @@ class OnboardingController extends Notifier<OnboardingState> {
 
       if (response.memoryUpdates != null) {
         await ref.read(livingMemoryProvider.notifier).applyUpdates(response.memoryUpdates!);
-        ref.read(homeRecommendationProvider.notifier).reload();
       }
 
       if (response.message != null) {
@@ -103,6 +105,7 @@ class OnboardingController extends Notifier<OnboardingState> {
             text: response.message,
             chips: response.status == 'success' ? response.chips : null,
             isUser: false,
+            memoryUpdates: response.memoryUpdates,
           ));
 
         state = state.copyWith(
@@ -131,7 +134,15 @@ class OnboardingController extends Notifier<OnboardingState> {
       }
     } catch (e) {
       print('OnboardingController error: $e');
-      state = state.copyWith(isLoading: false);
+      final errorMessages = List<ChatMessage>.from(state.messages)
+        ..add(ChatMessage(
+          text: "[Debug Controller Error]: $e",
+          isUser: false,
+        ));
+      state = state.copyWith(
+        messages: errorMessages,
+        isLoading: false,
+      );
     }
   }
 }

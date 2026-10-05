@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
@@ -17,14 +15,29 @@ class GroqResponse {
 
   GroqResponse({required this.status, this.chips, this.message, this.showButtons, this.memoryUpdates});
 
-  factory GroqResponse.fromJson(Map<String, dynamic> json) {
+  factory GroqResponse.fromJson(dynamic rawJson) {
+    if (rawJson is List) {
+      return GroqResponse(
+        status: 'success',
+        message: "I hear you! Those are wonderful choices. Tell me more about what you love about them.",
+      );
+    }
+    if (rawJson is! Map) {
+      return GroqResponse(
+        status: 'need_more',
+        message: rawJson?.toString() ?? "Could you tell me a bit more?",
+      );
+    }
+    final json = Map<String, dynamic>.from(rawJson);
     return GroqResponse(
-      status: json['status'] as String,
-      chips: json['chips'] != null ? List<String>.from(json['chips']) : null,
+      status: (json['status'] as String?) ?? 'success',
+      chips: json['chips'] != null && json['chips'] is List 
+          ? List<String>.from(json['chips']) 
+          : null,
       message: json['message'] as String?,
       showButtons: json['show_buttons'] as bool?,
-      memoryUpdates: json['memory_updates'] != null 
-          ? MemoryUpdates.fromJson(json['memory_updates']) 
+      memoryUpdates: json['memory_updates'] != null && json['memory_updates'] is Map
+          ? MemoryUpdates.fromJson(Map<String, dynamic>.from(json['memory_updates'])) 
           : null,
     );
   }
@@ -41,8 +54,6 @@ class CodaAiService {
 
   CodaAiService({required this.userId});
 
-  static const String _baseUrl = 'https://api.openai.com/v1/chat/completions';
-
   String _buildSystemPrompt(List<String> currentChips) {
     final chipsStr = currentChips.isEmpty ? 'None' : currentChips.join(', ');
     return '''
@@ -56,9 +67,16 @@ Your job in this onboarding conversation is to learn what kinds of broad media l
 
 The currently selected media categories are: $chipsStr.
 
-Based on the user's latest message:
 1. Update the media categories list:
-   - **ALLOWED CATEGORY VALUES**: You can only add or use category names that match these exact strings: "Anime", "Movies", "TV Shows", "Visual Novels", "Manga", "Games", "YouTube", "Books", "Music". Do not use any other name.
+   - **ALLOWED CATEGORY VALUES**: You can only add or use category names that match these exact strings: "Anime", "Movies", "TV Shows", "Visual Novels", "Manga", "Games", "Books", "Music". Do not use any other name.
+   - **FLEXIBLE SYNONYM MAPPING**:
+     * "films", "cinema", "motion picture", "film" -> "Movies"
+     * "series", "shows", "television", "tv" -> "TV Shows"
+     * "novels", "reading", "literature", "novel" -> "Books"
+     * "comics", "manhwa", "manhua" -> "Manga"
+     * "videogames", "gaming", "pc games", "playstation", "switch", "game" -> "Games"
+     * "vn", "vns", "eroge" -> "Visual Novels"
+     * "songs", "tracks", "albums", "listening" -> "Music"
    - **STRICT SEPARATION**: "Visual Novels" and "Games" are separate categories. Do NOT collapse "Visual Novels" (or "VNs") into "Games". If the user mentions visual novels, eroge, or visual novel titles, add "Visual Novels" to the category list (NOT "Games").
    - If they mention new formats from the allowed list, add them. Only extract broad formats, not specific titles or genres.
    - If they mention removing/replacing some formats, update the list accordingly.
@@ -103,7 +121,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
       // Initial greeting Coda sent
       {
         'role': 'assistant',
-        'content': "Tell me the kinds of stories, worlds, and experiences you enjoy. Movies, anime, books, games, manga, visual novels, YouTube — whatever you're into."
+        'content': "Tell me the kinds of stories, worlds, and experiences you enjoy. Movies, anime, books, games, manga, visual novels — tell me what formats belong in your world so I know what to find for you."
       },
       // Include past history (last 6 messages)
       ...chatHistory.skip(chatHistory.length > 6 ? chatHistory.length - 6 : 0).map((msg) {
@@ -119,7 +137,8 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
     ];
 
     final body = jsonEncode({
-      'model': 'gpt-4o-mini',
+      'userId': userId,
+      'model': 'gemini-3.1-flash-lite',
       'messages': messagesPayload,
       'temperature': 0.0,
       'response_format': {'type': 'json_object'},
@@ -127,26 +146,49 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
 
     final targetUrl = '${getApiBaseUrl()}/api/chat';
 
-    try {
-      final response = await http.post(Uri.parse(targetUrl), headers: headers, body: body);
+    String? lastErrorMsg;
+    for (int attempt = 1; attempt <= 2; attempt++) {
+      try {
+        final response = await http
+            .post(Uri.parse(targetUrl), headers: headers, body: body)
+            .timeout(const Duration(seconds: 30));
 
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        final content = jsonResponse['choices'][0]['message']['content'] as String;
-        final Map<String, dynamic> parsedJson = jsonDecode(content);
-        return GroqResponse.fromJson(parsedJson);
-      } else {
-        print("OpenAI HTTP error: ${response.statusCode} - ${response.body}");
-        throw Exception('Failed to connect to OpenAI: ${response.statusCode}');
+        if (response.statusCode == 200) {
+          final jsonResponse = jsonDecode(response.body);
+          String content = jsonResponse['choices'][0]['message']['content'] as String;
+          content = content.trim();
+          if (content.startsWith('```')) {
+            content = content.replaceAll(RegExp(r'^```(?:json)?\s*|\s*```$', caseSensitive: false), '').trim();
+          }
+          final Map<String, dynamic> parsedJson = jsonDecode(content);
+          return GroqResponse.fromJson(parsedJson);
+        } else {
+          lastErrorMsg = 'Server status ${response.statusCode}: ${response.body}';
+          print("OpenAI HTTP error: $lastErrorMsg");
+          if (attempt < 2) {
+            await Future.delayed(const Duration(milliseconds: 1500));
+            continue;
+          }
+          throw Exception(lastErrorMsg);
+        }
+      } catch (e) {
+        lastErrorMsg = e.toString();
+        if (attempt < 2) {
+          await Future.delayed(const Duration(milliseconds: 1500));
+          continue;
+        }
+        print("OpenAI network/parsing error: $e");
+        return GroqResponse(
+          status: 'need_more',
+          message: "[Debug Error]: $lastErrorMsg",
+        );
       }
-    } catch (e) {
-      print("OpenAI network/parsing error: $e");
-      // Fallback response so the app doesn't crash on connection issues
-      return GroqResponse(
-        status: 'need_more',
-        message: "Hmm, I'm having trouble connecting right now. Could you try telling me again?",
-      );
     }
+
+    return GroqResponse(
+      status: 'need_more',
+      message: "[Debug Error]: ${lastErrorMsg ?? 'Unknown connection failure'}",
+    );
   }
 
   Future<GroqResponse> processTasteProfileMessage({
@@ -174,23 +216,43 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
 
     final targetUrl = '${getApiBaseUrl()}/api/onboarding/profile';
 
-    try {
-      final response = await http.post(Uri.parse(targetUrl), headers: headers, body: body);
+    String? lastErrorMsg;
+    for (int attempt = 1; attempt <= 2; attempt++) {
+      try {
+        final response = await http
+            .post(Uri.parse(targetUrl), headers: headers, body: body)
+            .timeout(const Duration(seconds: 30));
 
-      if (response.statusCode == 200) {
-        final parsedJson = jsonDecode(response.body);
-        return GroqResponse.fromJson(parsedJson);
-      } else {
-        print("Backend HTTP error: ${response.statusCode} - ${response.body}");
-        throw Exception('Failed to connect to backend: ${response.statusCode}');
+        if (response.statusCode == 200) {
+          final parsedJson = jsonDecode(response.body);
+          return GroqResponse.fromJson(parsedJson);
+        } else {
+          lastErrorMsg = 'Server status ${response.statusCode}: ${response.body}';
+          print("Backend HTTP error: $lastErrorMsg");
+          if (attempt < 2) {
+            await Future.delayed(const Duration(milliseconds: 1500));
+            continue;
+          }
+          throw Exception(lastErrorMsg);
+        }
+      } catch (e) {
+        lastErrorMsg = e.toString();
+        if (attempt < 2) {
+          await Future.delayed(const Duration(milliseconds: 1500));
+          continue;
+        }
+        print("Backend network/parsing error: $e");
+        return GroqResponse(
+          status: 'need_more',
+          message: "[Debug Error]: $lastErrorMsg",
+        );
       }
-    } catch (e) {
-      print("Backend network/parsing error: $e");
-      return GroqResponse(
-        status: 'need_more',
-        message: "Hmm, I'm having trouble connecting right now. Could you try telling me again?",
-      );
     }
+
+    return GroqResponse(
+      status: 'need_more',
+      message: "[Debug Error]: ${lastErrorMsg ?? 'Unknown connection failure'}",
+    );
   }
 
   Future<MemoryUpdates?> harmonizeTabMemory({

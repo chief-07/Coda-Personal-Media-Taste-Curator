@@ -18,6 +18,8 @@ import 'package:go_router/go_router.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/core/providers/watchlist_mode_provider.dart';
+import 'package:coda/src/core/providers/audio_enabled_provider.dart';
+import 'package:coda/src/core/providers/memories_mode_provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -126,6 +128,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
+  void _showGlassSnackBar(BuildContext context, String message, {String icon = '🦭 '}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.zero,
+        duration: const Duration(seconds: 4),
+        content: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.22),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Text(icon, style: const TextStyle(fontSize: 16)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      message,
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _performDeleteType(MediaType type) async {
     final prefs = ref.read(sharedPreferencesProvider);
     final currentChips = prefs.getStringList('coda_onboarding_chips') ?? [];
@@ -145,12 +205,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     if (updatedChips.isEmpty) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('You must keep at least one category.'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        _showGlassSnackBar(context, 'You must keep at least one category.', icon: '⚠️ ');
       }
       return;
     }
@@ -170,13 +225,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
     
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Removed "${type == MediaType.visualNovel ? "Visual Novel" : type.label}" category.'),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      _showGlassSnackBar(context, 'Removed "${type == MediaType.visualNovel ? "Visual Novel" : type.label}" category.', icon: '🗑️ ');
     }
   }
 
@@ -194,6 +243,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       _isAnimatingOut = false;
       _isDeepSwipeAnimating = false;
     });
+    if (!ref.read(memoriesModeProvider)) {
+      ref.read(homeRecommendationProvider.notifier).reload();
+      _showGlassSnackBar(
+        context,
+        'Walrus Memory is OFF — skipped "${rec.title}" without learning why (feedback not saved)',
+        icon: '🧠 ',
+      );
+      return;
+    }
     _showFeedbackSheet(rec);
   }
 
@@ -206,35 +264,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     });
     await Future.delayed(const Duration(milliseconds: 280));
     if (!mounted) return;
+
+    ref.read(homeRecommendationProvider.notifier).reload();
+
     setState(() {
       _dragOffset = 0;
       _isAnimatingOut = false;
       _isDeepSwipeAnimating = false;
     });
 
+    final memoriesEnabled = ref.read(memoriesModeProvider);
+    if (!memoriesEnabled) {
+      if (mounted) {
+        _showGlassSnackBar(
+          context,
+          'Walrus Memory is OFF — skipped "${rec.title}" (rejection not saved to memory)',
+          icon: '🧠 ',
+        );
+      }
+      return;
+    }
+
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Got it — skipping "${rec.title}"'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          backgroundColor: Colors.white.withValues(alpha: 0.12),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      _showGlassSnackBar(context, 'Got it — skipping "${rec.title}"', icon: '⏭️ ');
     }
 
-    try {
-      final updates = MemoryUpdates(
-        guardrailsAppends: ['Avoid: ${rec.title} (rejected)'],
-        notForMeAppends: [rec.title],
-      );
-      await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
-    } catch (e) {
-      debugPrint('Error updating rejected list: $e');
-    }
-
-    ref.read(homeRecommendationProvider.notifier).reload();
+    unawaited(() async {
+      try {
+        final updates = MemoryUpdates(
+          guardrailsAppends: ['Avoid: ${rec.title} (rejected)'],
+          notForMeAppends: [rec.title],
+        );
+        await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
+      } catch (e) {
+        debugPrint('Error updating rejected list: $e');
+      }
+    }());
   }
 
   // RIGHT SWIPE (MODERATE) — "Already watched/played this" quick seen skip
@@ -246,35 +311,52 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     });
     await Future.delayed(const Duration(milliseconds: 280));
     if (!mounted) return;
+
+    // Immediately reload & advance next card so it never bounces back
+    ref.read(homeRecommendationProvider.notifier).reload();
+
     setState(() {
       _dragOffset = 0;
       _isAnimatingOut = false;
       _isDeepSwipeAnimating = false;
     });
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Got it — marked "${rec.title}" as seen'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          backgroundColor: Colors.white.withValues(alpha: 0.12),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+    final memoriesEnabled = ref.read(memoriesModeProvider);
+    if (!memoriesEnabled) {
+      if (mounted) {
+        _showGlassSnackBar(
+          context,
+          'Walrus Memory is OFF — "${rec.title}" was not saved as watched (may be recommended again)',
+          icon: '🧠 ',
+        );
+      }
+      return;
     }
 
-    try {
-      final updates = MemoryUpdates(
-        guardrailsAppends: ['Already watched: ${rec.title}'],
-        seenAppends: [rec.title],
-      );
-      await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
-    } catch (e) {
-      debugPrint('Error updating seen list: $e');
-    }
+    // Run Walrus persistence and SnackBar in background
+    unawaited(() async {
+      try {
+        final updates = MemoryUpdates(
+          guardrailsAppends: ['Already watched: ${rec.title}'],
+          seenAppends: [rec.title],
+        );
+        await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
 
-    ref.read(homeRecommendationProvider.notifier).reload();
+        final savedMem = await ref.read(recommendationServiceProvider).submitSwipe(
+          title: rec.title,
+          action: 'seen',
+        );
+
+        if (mounted) {
+          _showGlassSnackBar(
+            context,
+            savedMem != null ? 'Saved to Walrus: $savedMem' : 'Marked "${rec.title}" as seen in Walrus guardrails',
+          );
+        }
+      } catch (e) {
+        debugPrint('Error updating seen list: $e');
+      }
+    }());
   }
 
   // RIGHT SWIPE (DEEP) — "Loved it" + positive taste reinforcement
@@ -286,44 +368,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     });
     await Future.delayed(const Duration(milliseconds: 280));
     if (!mounted) return;
+
+    // Immediately reload & advance next card so it never bounces back
+    ref.read(homeRecommendationProvider.notifier).reload();
+
     setState(() {
       _dragOffset = 0;
       _isAnimatingOut = false;
       _isDeepSwipeAnimating = false;
     });
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Loved "${rec.title}"! Coda reinforced your tastes ❤️'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          backgroundColor: Colors.white.withValues(alpha: 0.15),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+    final memoriesEnabled = ref.read(memoriesModeProvider);
+    if (!memoriesEnabled) {
+      if (mounted) {
+        _showGlassSnackBar(
+          context,
+          'Walrus Memory is OFF — Loved "${rec.title}", but taste memory was not saved',
+          icon: '🧠 ',
+        );
+      }
+      return;
     }
 
-    try {
-      final updates = MemoryUpdates(
-        globalIdentityAppends: ['Highly values: ${rec.title} (loved work)'],
-        categoryAppends: {
-          rec.mediaType.name: ['Loved: ${rec.title} (excellent match)'],
-        },
-        seenAppends: [rec.title],
-      );
-      await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
-      
-      // Async submit to backend to update permanent soul & trigger enrichment if needed
-      unawaited(ref.read(recommendationServiceProvider).submitSwipe(
-        title: rec.title,
-        action: 'loved',
-      ));
-    } catch (e) {
-      debugPrint('Error updating loved taste memory: $e');
-    }
+    // Run Walrus persistence and SnackBar in background
+    unawaited(() async {
+      try {
+        final updates = MemoryUpdates(
+          globalIdentityAppends: ['Highly values: ${rec.title} (loved work)'],
+          categoryAppends: {
+            rec.mediaType.name: ['Loved: ${rec.title} (excellent match)'],
+          },
+          seenAppends: [rec.title],
+        );
+        await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
+        
+        final savedMem = await ref.read(recommendationServiceProvider).submitSwipe(
+          title: rec.title,
+          action: 'loved',
+        );
 
-    ref.read(homeRecommendationProvider.notifier).reload();
+        if (mounted) {
+          _showGlassSnackBar(
+            context,
+            savedMem != null ? 'Saved to Walrus: $savedMem' : 'Loved "${rec.title}"! Coda reinforced your tastes ❤️',
+          );
+        }
+      } catch (e) {
+        debugPrint('Error updating loved taste memory: $e');
+      }
+    }());
   }
 
   Future<void> _runBackgroundRefinement(Recommendation rec, String reason) async {
@@ -345,17 +438,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           recentContextOverwrite: updates.recentContextOverwrite,
           guardrailsAppends: [
             ...updates.guardrailsAppends,
-            'Avoid: ${rec.title} (rejected)',
+            'Avoid: ${rec.title} ($reason)',
           ],
           seenAppends: updates.seenAppends,
           notForMeAppends: [
             ...updates.notForMeAppends,
             rec.title,
           ],
+          savedMemory: updates.savedMemory,
         );
 
         await ref.read(livingMemoryProvider.notifier).applyUpdates(finalUpdates);
         debugPrint('Successfully completed background taste refinement for "${rec.title}"');
+
+        if (mounted) {
+          _showGlassSnackBar(
+            context,
+            updates.savedMemory != null
+                ? 'Saved to Walrus: ${updates.savedMemory}'
+                : 'Avoided "${rec.title}" in Walrus guardrails',
+          );
+        }
       }
     } catch (e) {
       debugPrint('Background taste refinement failed: $e');
@@ -363,6 +466,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   void _showFeedbackSheet(Recommendation rec) {
+    if (!ref.read(memoriesModeProvider)) {
+      _showGlassSnackBar(
+        context,
+        'Walrus Memory is OFF — cannot refine taste without memory',
+        icon: '🧠 ',
+      );
+      return;
+    }
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -376,19 +487,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           await ref.read(homeRecommendationProvider.notifier).clearActivePickQueue(rec.mediaType);
 
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Coda is refining your taste memory...'),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                backgroundColor: Colors.white.withValues(alpha: 0.12),
-                duration: const Duration(seconds: 4),
-              ),
-            );
+            _showGlassSnackBar(context, 'Coda is refining your taste memory...', icon: '🦭 ');
           }
 
           final localUpdates = MemoryUpdates(
-            guardrailsAppends: ['Avoid: ${rec.title} (rejected)'],
+            guardrailsAppends: ['Avoid: ${rec.title} ($reason)'],
             notForMeAppends: [rec.title],
           );
           
@@ -455,7 +558,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         },
                       ),
                     ),
-                    const _MusicTogglePill(),
+                    if (ref.watch(audioEnabledProvider)) const _MusicTogglePill(),
                     const SizedBox(width: 16),
                   ],
                 ),
@@ -487,12 +590,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               child: Consumer(
                                 builder: (context, ref, child) {
                                   final isWatchlistMode = ref.watch(watchlistModeProvider);
-                                  return Text(
-                                    isWatchlistMode
-                                        ? 'Nothing in your list'
-                                        : 'No recommendation for ${selectedType.label} yet.',
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.4),
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                                    child: Text(
+                                      isWatchlistMode
+                                          ? 'No media in the watchlist. Add media or turn off Watchlist Mode.'
+                                          : 'No recommendation for ${selectedType.label} yet.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.4),
+                                      ),
                                     ),
                                   );
                                 },
@@ -501,7 +608,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           );
                         }
 
-                        if (data.mediaType != selectedType) {
+                        final bool isSameType = data.mediaType == selectedType ||
+                            data.mediaType.name.toLowerCase() == selectedType.name.toLowerCase() ||
+                            data.mediaType.label.toLowerCase() == selectedType.label.toLowerCase();
+                        if (!isSameType) {
                           return StaticCardFrame(
                             key: ValueKey('${selectedType.name}_thinking'),
                             child: Center(
@@ -628,28 +738,30 @@ class StaticCardFrame extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: ShaderMask(
-              shaderCallback: (Rect bounds) {
-                return LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.75),
-                    Colors.black.withValues(alpha: 0.75),
-                    Colors.black.withValues(alpha: 0.50),
-                  ],
-                  stops: const [0.0, 0.65, 1.0],
-                ).createShader(bounds);
-              },
-              blendMode: BlendMode.srcOut,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Container(
-                      color: Colors.black.withValues(alpha: 0.01),
+            child: RepaintBoundary(
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.75),
+                      Colors.black.withValues(alpha: 0.75),
+                      Colors.black.withValues(alpha: 0.50),
+                    ],
+                    stops: const [0.0, 0.65, 1.0],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.srcOut,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.01),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -962,7 +1074,6 @@ class _FeedbackSheet extends StatefulWidget {
 class _FeedbackSheetState extends State<_FeedbackSheet> {
   String? _selectedReason;
   final _customController = TextEditingController();
-  bool _showCustomInput = false;
 
   static const _reasons = [
     ('already_seen', 'Already seen / played this'),
@@ -970,7 +1081,6 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
     ('too_mainstream', "Too mainstream / popular"),
     ('wrong_tone', "Wrong tone — not in the mood"),
     ('not_my_style', "Just not my style"),
-    ('other', "Something else..."),
   ];
 
   @override
@@ -981,18 +1091,30 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
 
   void _onReasonTap(String key) {
     setState(() {
-      _selectedReason = key;
-      _showCustomInput = key == 'other';
+      if (_selectedReason == key) {
+        _selectedReason = null;
+      } else {
+        _selectedReason = key;
+      }
     });
-    if (key != 'other') {
-      HapticFeedback.selectionClick();
-    }
+    HapticFeedback.selectionClick();
   }
 
   void _submit() {
-    final reason = _selectedReason == 'other'
-        ? _customController.text.trim()
-        : _reasons.firstWhere((r) => r.$1 == _selectedReason).$2;
+    String reason = '';
+    final customText = _customController.text.trim();
+    final selectedChip = _selectedReason != null
+        ? _reasons.firstWhere((r) => r.$1 == _selectedReason, orElse: () => ('', '')).$2
+        : '';
+
+    if (selectedChip.isNotEmpty && customText.isNotEmpty) {
+      reason = '$selectedChip — $customText';
+    } else if (customText.isNotEmpty) {
+      reason = customText;
+    } else if (selectedChip.isNotEmpty) {
+      reason = selectedChip;
+    }
+
     if (reason.isNotEmpty) {
       widget.onFeedbackSubmitted(reason);
     } else {
@@ -1049,7 +1171,7 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
               ),
               const SizedBox(height: 6),
               Text(
-                "This helps Coda learn your taste.",
+                "This updates your decentralized Walrus taste memory.",
                 style: GoogleFonts.inter(
                   color: Colors.white.withValues(alpha: 0.45),
                   fontSize: 13,
@@ -1099,30 +1221,46 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
                 }).toList(),
               ),
 
-              // Custom input if "other" selected
-              if (_showCustomInput) ...[
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _customController,
-                  autofocus: true,
-                  style: GoogleFonts.inter(
-                      color: Colors.white, fontSize: 14),
-                  cursorColor: Colors.white,
-                  decoration: InputDecoration(
-                    hintText: 'Tell Coda why...',
-                    hintStyle: GoogleFonts.inter(
-                        color: Colors.white38, fontSize: 14),
-                    filled: true,
-                    fillColor: Colors.white.withValues(alpha: 0.06),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
+              const SizedBox(height: 16),
+
+              // Custom input always available
+              TextField(
+                controller: _customController,
+                style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
+                cursorColor: Colors.white,
+                decoration: InputDecoration(
+                  hintText: 'Or tell Coda specifically what didn\'t fit...',
+                  hintStyle: GoogleFonts.inter(
+                    color: Colors.white.withValues(alpha: 0.38),
+                    fontSize: 13,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white.withValues(alpha: 0.06),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.12),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.12),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.35),
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
                   ),
                 ),
-              ],
+                onSubmitted: (_) => _submit(),
+              ),
 
               const SizedBox(height: 24),
 
