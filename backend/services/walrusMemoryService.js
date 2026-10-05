@@ -38,34 +38,47 @@ function normalizeCategory(category) {
 }
 
 /**
+ * Strict tenant ID sanitizer to guarantee namespace isolation across users.
+ * Strips colons, wildcards, whitespace, and control characters so a userId
+ * can never escape its `coda:<userId>:<segment>` partition.
+ */
+function sanitizeUserId(userId) {
+  if (!userId || typeof userId !== 'string') return 'anon';
+  const cleaned = userId.trim().replace(/[^a-zA-Z0-9_-]/g, '');
+  return cleaned || 'anon';
+}
+
+/**
  * Standard Walrus Memory namespace formatter following the official multi-tenant pattern:
  * coda:{userId}:{category}
  */
 function formatNamespace(userId, category) {
+  const safeUser = sanitizeUserId(userId);
   const normCategory = normalizeCategory(category);
-  return `coda:${userId || 'anon'}:${normCategory}`;
+  return `coda:${safeUser}:${normCategory}`;
 }
 
 const recentWritesByUser = new Map(); // userId -> Array<{ job_id, status, blob_id, text, namespace, category, created_at }>
 
 function recordUserWrite(userId, entry) {
   if (!userId || !entry) return;
-  const list = recentWritesByUser.get(userId) || [];
+  const safeUser = sanitizeUserId(userId);
+  const list = recentWritesByUser.get(safeUser) || [];
   const filtered = list.filter(x => !(x.namespace === entry.namespace && x.text === entry.text));
   filtered.unshift(entry);
-  recentWritesByUser.set(userId, filtered.slice(0, 50));
+  recentWritesByUser.set(safeUser, filtered.slice(0, 50));
 }
 
 function extractUserIdFromNamespace(namespace) {
   if (!namespace) return 'anon';
   if (namespace.includes(':')) {
     const parts = namespace.split(':');
-    return parts.length >= 2 ? parts[1] : 'anon';
+    return parts.length >= 2 ? sanitizeUserId(parts[1]) : 'anon';
   }
   if (namespace.startsWith('coda_')) {
     const parts = namespace.split('_');
     if (parts.length >= 3) {
-      return parts.slice(1, -1).join('_');
+      return sanitizeUserId(parts.slice(1, -1).join('_'));
     }
   }
   return 'anon';
@@ -128,7 +141,8 @@ async function rememberFact(text, namespace, retries = 2, categoryLabel = null) 
  */
 async function resolvePendingWriteJobs(userId, extraJobIds = []) {
   const client = await getClient();
-  const userWrites = recentWritesByUser.get(userId) || [];
+  const safeUser = sanitizeUserId(userId);
+  const userWrites = recentWritesByUser.get(safeUser) || [];
   const pendingIds = new Set(extraJobIds.filter(Boolean));
 
   for (const w of userWrites) {
@@ -142,7 +156,8 @@ async function resolvePendingWriteJobs(userId, extraJobIds = []) {
 
   try {
     const bulkRes = await client.getRememberBulkStatus(idsArray);
-    const jobs = bulkRes?.jobs || [];
+    // @mysten-incubation/memwal returns { results: [...] } for /api/remember/bulk/status
+    const jobs = bulkRes?.results || bulkRes?.jobs || [];
     const jobMap = new Map(jobs.map(j => [j.job_id, j]));
 
     for (const w of userWrites) {
@@ -629,7 +644,7 @@ async function recallForRecommendation(userId, mediaType, contextualQuery = null
  */
 async function inspectLiveWalrus({ userId, jobIds = [], query = null, category = null }) {
   const client = await getClient();
-  const activeUserId = userId || 'demo_user';
+  const activeUserId = sanitizeUserId(userId || 'demo_user');
   const normCat = category ? normalizeCategory(category) : 'movie';
 
   // 1. Resolve any pending write jobs so we get fresh blob_ids
