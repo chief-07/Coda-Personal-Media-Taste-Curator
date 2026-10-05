@@ -212,10 +212,7 @@ const runOnboardingAgent = async (messagesPayload) => {
     });
   }
 
-  // 2. Spawn async background research task for the message (do not await)
-  triggerBackgroundResearch(userMessage);
-
-  // 3. Main AI Call (runs instantly since it doesn't wait for web search)
+  // 2. Main AI Call (1 LLM call per message, no background title-extractor LLM call)
   let responseMessage = await callOpenAI(messagesPayload, null);
 
   let parsed = null;
@@ -235,7 +232,7 @@ const runOnboardingAgent = async (messagesPayload) => {
     messagesPayload.push(responseMessage);
     messagesPayload.push({
       role: "system",
-      content: "SYSTEM FORMAT ENFORCEMENT: You must return ONLY a single JSON object (NEVER an array of titles). Do not include internal instructions in guardrails_appends. Shape:\n{\n  \"status\": \"success\",\n  \"message\": \"[Part 1: Empathetic response validating their taste] [Part 2: Direct question asking for the next milestone (vibe, anchor titles, or boundaries)]\",\n  \"show_buttons\": false,\n  \"memory_updates\": {\n    \"global_identity_appends\": [\"Synthesized psychological themes/DNA of titles\"],\n    \"category_appends\": {\"movie\": [\"Exact Titles Mentioned\"]},\n    \"seen_appends\": [\"Exact Titles Mentioned\"],\n    \"recent_context_overwrite\": \"Current craving/vibe\",\n    \"guardrails_appends\": []\n  }\n}"
+      content: "SYSTEM FORMAT ENFORCEMENT: You must return ONLY a single JSON object (NEVER an array of titles). Never write 'Part 1' or 'Part 2' in the message. Shape:\n{\n  \"status\": \"success\",\n  \"message\": \"Warm empathetic response validating their taste followed by a natural question asking for the next milestone.\",\n  \"show_buttons\": false,\n  \"memory_updates\": {\n    \"global_identity_appends\": [\"Synthesized psychological themes/DNA of titles\"],\n    \"category_appends\": {\"movie\": [\"Title (brief genre and emotional themes)\"]},\n    \"seen_appends\": [\"Exact Titles Mentioned\"],\n    \"recent_context_overwrite\": \"Current craving/vibe\",\n    \"guardrails_appends\": []\n  }\n}"
     });
     responseMessage = await callOpenAI(messagesPayload, null);
     try {

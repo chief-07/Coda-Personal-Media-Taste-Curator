@@ -13,6 +13,7 @@ import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 import 'package:coda/src/core/theme/ambient_bloom.dart';
 import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
+import 'package:coda/src/features/recommendation/application/audio_player_controller.dart';
 
 const _askRecommendation = Recommendation(
   id: 'ask-coda',
@@ -50,6 +51,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(audioPlayerControllerProvider.notifier).setHomeActive(false);
       final hasMemory = ref.read(sharedPreferencesProvider).getString('living_memory_v1') != null;
       if (!hasMemory) {
         ref.read(livingMemoryProvider.notifier).clearMemory();

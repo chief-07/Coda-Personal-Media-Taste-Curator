@@ -38,6 +38,26 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
   Duration? _currentDuration;
   StreamSubscription? _positionSubscription;
   StreamSubscription? _durationSubscription;
+  bool _isHomeActive = false;
+
+  Future<void> setHomeActive(bool active) async {
+    _isHomeActive = active;
+    if (!active) {
+      await pause();
+    } else if (!state.isMuted && state.currentUrl != null && !state.isPlaying) {
+      final url = state.currentUrl!;
+      try {
+        await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+        await _audioPlayer.setVolume(0.0);
+        final source = _cachedSources[url] ?? UrlSource(url);
+        await _audioPlayer.setSource(source);
+        await _audioPlayer.resume();
+        state = state.copyWith(isPlaying: true);
+      } catch (e) {
+        print('[AudioPlayer Error] Failed to start on Home activation: $e');
+      }
+    }
+  }
 
   Future<void> precacheAudio(String url) async {
     if (url.isEmpty || _cachedSources.containsKey(url)) return;
@@ -116,9 +136,15 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
   }
 
   Future<void> _handleNewTrack(String url) async {
-    if (state.currentUrl == url) return;
+    if (state.currentUrl == url && (state.isPlaying || !_isHomeActive)) return;
 
     state = state.copyWith(currentUrl: url);
+
+    // Never start audio playback while the user is in onboarding
+    if (!_isHomeActive) {
+      state = state.copyWith(isPlaying: false);
+      return;
+    }
 
     try {
       await _audioPlayer.stop();
@@ -156,16 +182,16 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
     // Unconditionally update UI state first so the button is always responsive
     state = state.copyWith(
       isMuted: newMute,
-      isPlaying: newMute ? false : (state.currentUrl != null),
+      isPlaying: newMute ? false : (state.currentUrl != null && _isHomeActive),
     );
 
     // Session override only - we no longer save to SharedPreferences here.
-    // The settings menu 'coda_autoplay_audio' governs the default launch state.    // Control audio player safely
+    // The settings menu 'coda_autoplay_audio' governs the default launch state.
     try {
       if (newMute) {
         await _audioPlayer.setVolume(0.0);
         await _audioPlayer.pause();
-      } else {
+      } else if (_isHomeActive) {
         await _audioPlayer.setVolume(0.06);
         if (state.currentUrl != null) {
           // Re-set source to force load under active user interaction context to bypass browser autoplay blocks
@@ -190,7 +216,7 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
   }
 
   Future<void> resume() async {
-    if (state.isPlaying || state.isMuted || state.currentUrl == null) return;
+    if (!_isHomeActive || state.isPlaying || state.isMuted || state.currentUrl == null) return;
     try {
       await _audioPlayer.resume();
       state = state.copyWith(isPlaying: true);
@@ -200,6 +226,7 @@ class AudioPlayerController extends Notifier<AudioPlayerState> {
   }
 }
 
-final audioPlayerControllerProvider = NotifierProvider<AudioPlayerController, AudioPlayerState>(
+final audioPlayerControllerProvider =
+    NotifierProvider<AudioPlayerController, AudioPlayerState>(
   AudioPlayerController.new,
 );

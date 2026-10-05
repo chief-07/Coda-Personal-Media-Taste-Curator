@@ -9,11 +9,14 @@ const httpsAgent = new https.Agent({
   keepAliveMsecs: 5000,
 });
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-const DEFAULT_MODEL = 'gemini-2.5-flash';
+const activeGeminiKey = process.env.GEMINI_API_KEY || '';
 
-// Track if the configured GEMINI_API_KEY is missing, an unsupported AQ.* token, or returned 401/403
-let geminiKeyInvalid = !GEMINI_API_KEY || GEMINI_API_KEY.startsWith('AQ.');
+const DEFAULT_MODEL = 'gemini-3.1-flash-lite';
+
+function stripThinkingTags(content) {
+  if (typeof content !== 'string') return content;
+  return content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+}
 
 async function callGroqFallback({ messages, tools, responseFormat = null, temperature = 0.2 }) {
   const groqKey = process.env.GROQ_API_KEY;
@@ -23,54 +26,64 @@ async function callGroqFallback({ messages, tools, responseFormat = null, temper
   const Groq = require('groq-sdk');
   const groq = new Groq({ apiKey: groqKey });
 
-  const modelsToTry = ['qwen/qwen3.8-27b'];
-  let lastErr = null;
-
-  for (const groqModel of modelsToTry) {
-    try {
-      const safeMessages = Array.isArray(messages) ? messages.map(m => ({ ...m })) : [];
-      if (responseFormat && safeMessages.length > 0) {
-        const hasJsonWord = safeMessages.some(m => typeof m.content === 'string' && /json/i.test(m.content));
-        if (!hasJsonWord) {
-          const lastIdx = safeMessages.length - 1;
-          safeMessages[lastIdx].content = `${safeMessages[lastIdx].content || ''}\nRespond in valid JSON format.`;
-        }
-      }
-
-      const groqPayload = {
-        model: groqModel,
-        messages: safeMessages,
-        temperature: temperature,
-      };
-      if (responseFormat) {
-        groqPayload.response_format = responseFormat.type === 'json_schema'
-          ? { type: 'json_object' }
-          : responseFormat;
-      }
-      if (tools && tools.length > 0) {
-        groqPayload.tools = tools;
-        groqPayload.tool_choice = 'auto';
-      }
-
-      const res = await groq.chat.completions.create(groqPayload);
-      return res;
-    } catch (err) {
-      lastErr = err;
-      console.warn(`[Groq Engine] Model ${groqModel} warning (${err.status || err.message}), trying next model...`);
+  const groqModel = 'qwen/qwen3.8-27b';
+  const safeMessages = Array.isArray(messages) ? messages.map(m => ({ ...m })) : [];
+  if (responseFormat && safeMessages.length > 0) {
+    const hasJsonWord = safeMessages.some(m => typeof m.content === 'string' && /json/i.test(m.content));
+    if (!hasJsonWord) {
+      const lastIdx = safeMessages.length - 1;
+      safeMessages[lastIdx].content = `${safeMessages[lastIdx].content || ''}\nRespond in valid JSON format.`;
     }
   }
 
-  throw lastErr;
+  const buildPayload = (includeResponseFormat) => {
+    const groqPayload = {
+      model: groqModel,
+      messages: safeMessages,
+      temperature: temperature,
+      max_tokens: 700,
+    };
+    if (includeResponseFormat && responseFormat) {
+      groqPayload.response_format = responseFormat.type === 'json_schema'
+        ? { type: 'json_object' }
+        : responseFormat;
+    }
+    if (tools && tools.length > 0) {
+      groqPayload.tools = tools;
+      groqPayload.tool_choice = 'auto';
+    }
+    return groqPayload;
+  };
+
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await groq.chat.completions.create(buildPayload(attempt === 1));
+      if (res?.choices?.[0]?.message?.content) {
+        res.choices[0].message.content = stripThinkingTags(res.choices[0].message.content);
+      }
+      return res;
+    } catch (err) {
+      const status = err.status || err.response?.status;
+      // If 400 on json_object validation (e.g. due to Qwen <think> blocks), immediately retry without response_format
+      if (status === 400 && attempt === 1) {
+        console.warn(`[Groq Engine] Retrying ${groqModel} without strict response_format...`);
+        continue;
+      }
+      if (status === 429 && attempt === 1) {
+        console.warn(`[Groq Engine] Rate limited (429) on ${groqModel}, waiting 3s before retry...`);
+        await new Promise(r => setTimeout(r, 3000));
+        continue;
+      }
+      throw err;
+    }
+  }
 }
 
 async function callGeminiChat({ messages, tools, responseFormat = null, temperature = 0.2, model = DEFAULT_MODEL, retries = 2 }) {
-  // If GEMINI_API_KEY is not a valid AIza* key or previously returned 401/403, route directly to Groq
-  if (geminiKeyInvalid) {
-    return await callGroqFallback({ messages, tools, responseFormat, temperature });
-  }
+  const targetModel = (!model || model === 'gemini-2.5-flash') ? DEFAULT_MODEL : model;
 
   const payload = {
-    model: model === 'gemini-3.1-flash-lite' ? 'gemini-2.5-flash' : model,
+    model: targetModel,
     messages: messages,
     temperature: temperature,
   };
@@ -91,22 +104,19 @@ async function callGeminiChat({ messages, tools, responseFormat = null, temperat
         payload,
         {
           headers: {
-            'Authorization': `Bearer ${GEMINI_API_KEY}`,
+            'Authorization': `Bearer ${activeGeminiKey}`,
             'Content-Type': 'application/json',
           },
           httpsAgent: httpsAgent,
-          timeout: 30000,
+          timeout: 25000,
         }
       );
       return response.data;
     } catch (e) {
       const status = e.response?.status;
-      if (status === 401 || status === 403 || status === 400) {
-        geminiKeyInvalid = true;
-      }
 
-      // Failover to Groq on ANY Gemini HTTP or network error (401, 403, 404, 429, 5xx, timeout)
-      console.warn(`[GeminiClient] Gemini returned HTTP ${status || e.code}. Failing over to Groq...`);
+      // Failover to Groq backup if Gemini fails or times out
+      console.warn(`[GeminiClient] Gemini returned HTTP ${status || e.code}. Failing over to Groq backup...`);
       try {
         const fallbackData = await callGroqFallback({ messages, tools, responseFormat, temperature });
         return fallbackData;
@@ -122,6 +132,6 @@ async function callGeminiChat({ messages, tools, responseFormat = null, temperat
 
 module.exports = {
   callGeminiChat,
-  GEMINI_API_KEY,
+  GEMINI_API_KEY: activeGeminiKey,
   DEFAULT_MODEL,
 };

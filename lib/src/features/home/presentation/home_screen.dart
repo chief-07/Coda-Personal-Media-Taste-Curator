@@ -36,6 +36,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   bool _isDeepSwipeAnimating = false;
   static const double _swipeThreshold = 110;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(audioPlayerControllerProvider.notifier).setHomeActive(true);
+      ref.read(homeRecommendationProvider.notifier).ensureBackgroundTasksForHome();
+    });
+  }
+
   int _calculateSwipeLevel(double offset) {
     final absOffset = offset.abs();
     if (absOffset >= 160) return 2;

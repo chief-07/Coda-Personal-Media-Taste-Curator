@@ -601,6 +601,38 @@ class HomeRecommendationNotifier extends AsyncNotifier<Recommendation?> {
     }
   }
 
+  /// Lightweight single-pick refresh used during onboarding chat turns:
+  /// - Fetches ONLY 1 recommendation so the blurred background poster color morphs
+  ///   smoothly on every turn AND the user's #1 pick is ready in 0ms upon entering Home.
+  /// - Does NOT flash state to loading (preserving smooth AnimatedSwitcher transitions).
+  /// - Does NOT trigger queue refills, lazy pitch fetches, or multi-tab pre-warming
+  ///   until the user actually enters HomeScreen.
+  Future<void> refreshOnboardingPreview() async {
+    final memory = ref.read(livingMemoryProvider);
+    final selectedType = ref.read(selectedMediaTypeProvider);
+    final prefs = ref.read(sharedPreferencesProvider);
+    final activeKey = 'coda_active_pick_${selectedType.name}';
+
+    final recs = await _fetchNewRecommendations(memory, selectedType, limit: 1);
+    if (recs.isNotEmpty) {
+      final active = recs.first;
+      _activePicks[selectedType] = active;
+      await prefs.setString(activeKey, jsonEncode(active.toJson()));
+      state = AsyncValue.data(active);
+    }
+  }
+
+  /// Starts queue refills, pitch check, and multi-tab pre-warming once the user
+  /// enters HomeScreen after onboarding.
+  void ensureBackgroundTasksForHome() {
+    final memory = ref.read(livingMemoryProvider);
+    final selectedType = ref.read(selectedMediaTypeProvider);
+    final activeTypes = ref.read(activeMediaTypesProvider);
+    if (_activePicks[selectedType] != null) {
+      _startBackgroundTasksForActiveTab(memory, selectedType, activeTypes);
+    }
+  }
+
   Future<void> reload() async {
     state = const AsyncValue.loading();
     final memory = ref.read(livingMemoryProvider);

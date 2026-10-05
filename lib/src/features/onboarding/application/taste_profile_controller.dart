@@ -108,7 +108,7 @@ class TasteProfileController extends Notifier<TasteProfileState> {
 
       if (response.memoryUpdates != null) {
         await ref.read(livingMemoryProvider.notifier).applyUpdates(response.memoryUpdates!);
-        ref.read(homeRecommendationProvider.notifier).reload();
+        ref.read(homeRecommendationProvider.notifier).refreshOnboardingPreview();
       }
 
       if (response.status == 'success' && response.message != null) {

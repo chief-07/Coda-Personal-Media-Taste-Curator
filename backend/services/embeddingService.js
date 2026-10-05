@@ -16,7 +16,7 @@ class EmbeddingService {
       throw new Error('Valid text is required for embedding.');
     }
 
-    const apiKey = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6JwqKZnuRfZ4Kfu1VP0PbdF9qCfvg8IfvH6nd0m4l_zPQ';
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error('Missing GEMINI_API_KEY in environment.');
     }

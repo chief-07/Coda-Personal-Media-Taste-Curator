@@ -23,9 +23,9 @@ NEVER recommend anything in the chat. Your only job is to get to know them.
 The user has selected the following media formats of interest: ${selectedCategories && selectedCategories.length > 0 ? selectedCategories.join(', ') : 'None'}.
 
 MANDATORY MESSAGE STRUCTURE (TURNS 1-3):
-Every single response from Coda prior to the final button reveal MUST follow this exact two-part formula:
-1. [PART 1: ACKNOWLEDGE & CONNECT] (1-2 sentences): Respond with genuine warmth, humor, or artistic empathy to whatever the user just said. If they named titles or vibes, validate why those hit home.
-2. [PART 2: THE FORWARD BRIDGE] (1 clear, natural question): Seamlessly transition into the next unanswered milestone below. NEVER stop at Part 1!
+Every single response from Coda prior to the final button reveal MUST smoothly combine two elements in natural prose (NEVER write the words "Part 1" or "Part 2" in your output):
+- First (1-2 sentences): Respond with genuine warmth, humor, or artistic empathy to whatever the user just said. If they named titles or vibes, validate why those hit home.
+- Second (1 clear, natural question): Seamlessly transition into the next unanswered milestone below. Always end with a question before Milestone 4!
 
 THE 4 ONBOARDING MILESTONES:
 1. GREETING & VIBE (Milestone 1):
@@ -54,9 +54,9 @@ SMART PROGRESSION & ANTI-STALL RULES:
 The user is refining their taste specifically for the category: "${tabName}".
 
 MANDATORY MESSAGE STRUCTURE (TURNS 1-2):
-Every response prior to Milestone 3 MUST follow the two-part formula:
-1. [PART 1: ACKNOWLEDGE & CONNECT] (1-2 sentences): Enthusiastically validate their picks or preferences in ${tabName}.
-2. [PART 2: THE FORWARD BRIDGE] (1 clear question): Advance to the next milestone below.
+Every response prior to Milestone 3 MUST smoothly combine two elements in natural prose (NEVER write the words "Part 1" or "Part 2" in your output):
+- First (1-2 sentences): Enthusiastically validate their picks or preferences in ${tabName}.
+- Second (1 clear question): Advance to the next milestone below.
 
 THE 3 MILESTONES FOR ${tabName.toUpperCase()}:
 1. TOUCHSTONES & ERAS (Milestone 1):
@@ -79,18 +79,18 @@ SMART PROGRESSION & ANTI-STALL RULES:
 ${basePersona}
 ${approach}
 
-Rule 1: Always respond with a JSON object in this format:
+Rule 1: Always respond with a JSON object in this format (NEVER include literal "Part 1" or "Part 2" labels in "message"):
 {
   "status": "success",
-  "message": "Part 1: Empathetic reaction validating their taste in 1-2 sentences. Part 2: A clear, conversational question leading directly to the next milestone (e.g. asking for anchor titles, or asking for dealbreakers/boundaries).",
+  "message": "Your natural, warm conversational reply (1-2 sentences validating their taste, followed seamlessly by a clear question for the next milestone).",
   "show_buttons": false,
   "memory_updates": {
     "global_identity_appends": ["[Synthesized core aesthetic and emotional themes, e.g. 'Drawn to quiet bittersweet melancholy']"],
-    "category_appends": {"${tabName.toLowerCase() === 'you' ? 'movie' : tabName.toLowerCase()}": ["[Exact titles and specific tropes, e.g. 'Love Letter']"]},
+    "category_appends": {"${tabName.toLowerCase() === 'you' ? 'movie' : tabName.toLowerCase()}": ["[Title with brief semantic genre/theme context, e.g. 'Love Letter (poignant Japanese romantic drama about memory, grief, and unspoken longing)']"]},
     "recent_context_overwrite": "[Extract current mood/craving or late-night vibe here]",
     "guardrails_appends": ["[Extract explicit dealbreakers/platforms here, e.g. 'No gore', 'Must be on Netflix']"],
     "thematic_connections_appends": ["[Deep psychological themes, e.g. 'Unspoken grief and persistent longing']"],
-    "seen_appends": ["[Exact titles mentioned by user as watched/read/known, e.g. 'Love Letter', 'Rainbow Song']"]
+    "seen_appends": ["[Clean exact titles mentioned by user as watched/read/known, e.g. 'Love Letter', 'Rainbow Song']"]
   }
 }
 
@@ -104,8 +104,8 @@ When the user lists or mentions specific titles (e.g. "Rainbow Song, Love Letter
 Use your cultural and artistic knowledge of those works to synthesize their underlying emotional, aesthetic, and psychological DNA:
 - What common thread connects them? (e.g. "Drawn to bittersweet Japanese romantic nostalgia, unspoken longing, quiet grief, and tender melancholy")
 - Put that synthesized thematic insight into "global_identity_appends" or "thematic_connections_appends".
-- Add the titles to "category_appends" under the appropriate category key.
-- ALWAYS also add every title the user mentions having experienced into "seen_appends". This ensures Coda records them as already watched/read to avoid recommending them again!
+- Add the titles with their brief semantic genre/emotional essence into "category_appends" under the appropriate category key (e.g. "movie", "anime", "book").
+- ALWAYS also add the clean title name of every work the user mentions having experienced into "seen_appends". This ensures Coda records them as already watched/read to avoid recommending them again!
 
 CRITICAL RULE: HARVEST EMOTIONAL RESPONSES & TRIGGERS: Actively listen for how the user reacted emotionally to works they liked or mentioned (e.g. "made me cry", "existential dread", "gave me chills", "comfort show", "felt lonely"). Extract these emotional reactions, triggers, and psychological needs, and append them as descriptive statements to "global_identity_appends" or "thematic_connections_appends".
 CRITICAL RULE: NEVER place prompt rules, system instructions, or positive preferences into "guardrails_appends". "guardrails_appends" is strictly and solely for USER-SPECIFIED NEGATIVE constraints (e.g. "Hates Mecha", "No jumpscares", "No gore") or REQUIRED PLATFORMS. If the user did not specify a negative boundary, keep "guardrails_appends": [].
@@ -172,6 +172,15 @@ router.post('/profile', async (req, res) => {
         memory_updates: {}
       };
     }
+
+    // Strip any accidentally leaked "Part 1:" / "Part 2:" markers from message
+    if (parsedResponse && typeof parsedResponse.message === 'string') {
+      parsedResponse.message = parsedResponse.message
+        .replace(/\[?\bPart\s*1(?:\s*:[^\]]*)?\]?\s*:?\s*/gi, '')
+        .replace(/\[?\bPart\s*2(?:\s*:[^\]]*)?\]?\s*:?\s*/gi, ' ')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    }
     
     // Defensive memory sanitization
     if (parsedResponse.memory_updates && typeof parsedResponse.memory_updates === 'object') {
@@ -185,7 +194,7 @@ router.post('/profile', async (req, res) => {
           return !systemKeywords.some(kw => lower.includes(kw));
         });
       }
-      // 2. Ensure seen_appends collects all titles mentioned in category_appends
+      // 2. Ensure seen_appends collects clean base titles mentioned in category_appends
       if (!Array.isArray(mu.seen_appends)) {
         mu.seen_appends = [];
       }
@@ -193,8 +202,11 @@ router.post('/profile', async (req, res) => {
         for (const titles of Object.values(mu.category_appends)) {
           if (Array.isArray(titles)) {
             for (const t of titles) {
-              if (typeof t === 'string' && t.trim() && !mu.seen_appends.includes(t.trim())) {
-                mu.seen_appends.push(t.trim());
+              if (typeof t === 'string' && t.trim()) {
+                const baseTitle = t.split(/\s*(?:\(|—)\s*/)[0].trim();
+                if (baseTitle && !mu.seen_appends.includes(baseTitle)) {
+                  mu.seen_appends.push(baseTitle);
+                }
               }
             }
           }
@@ -208,8 +220,8 @@ router.post('/profile', async (req, res) => {
         // Remove seen_appends that are NOT mentioned in the current user message
         if (Array.isArray(mu.seen_appends)) {
           mu.seen_appends = mu.seen_appends.filter(title => {
-            const tLower = title.toLowerCase();
-            return currentMsgLower.includes(tLower);
+            const baseTitle = title.split(/\s*(?:\(|—)\s*/)[0].trim().toLowerCase();
+            return baseTitle && currentMsgLower.includes(baseTitle);
           });
         }
         
@@ -217,7 +229,10 @@ router.post('/profile', async (req, res) => {
         if (mu.category_appends && typeof mu.category_appends === 'object') {
           for (const [cat, titles] of Object.entries(mu.category_appends)) {
             if (Array.isArray(titles)) {
-              mu.category_appends[cat] = titles.filter(t => currentMsgLower.includes(t.toLowerCase()));
+              mu.category_appends[cat] = titles.filter(t => {
+                const baseTitle = String(t).split(/\s*(?:\(|—)\s*/)[0].trim().toLowerCase();
+                return baseTitle && currentMsgLower.includes(baseTitle);
+              });
               if (mu.category_appends[cat].length === 0) {
                 delete mu.category_appends[cat];
               }

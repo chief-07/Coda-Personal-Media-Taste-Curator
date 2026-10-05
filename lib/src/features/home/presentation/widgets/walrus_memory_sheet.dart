@@ -593,7 +593,7 @@ class _WalrusMemorySheetContentState
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
         child: Container(
           width: double.infinity,
           constraints: BoxConstraints(
@@ -601,11 +601,11 @@ class _WalrusMemorySheetContentState
           ),
           padding: EdgeInsets.fromLTRB(20, 12, 20, 28 + bottomPad),
           decoration: BoxDecoration(
-            color: const Color(0xFF0E1117).withValues(alpha: 0.72),
+            color: Colors.white.withValues(alpha: 0.07),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             border: Border(
               top: BorderSide(
-                color: Colors.white.withValues(alpha: 0.16),
+                color: Colors.white.withValues(alpha: 0.12),
                 width: 1,
               ),
             ),
@@ -846,10 +846,10 @@ class _WalrusMemorySheetContentState
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.13),
+          color: Colors.white.withValues(alpha: 0.12),
         ),
       ),
       child: Column(
@@ -922,7 +922,7 @@ class _WalrusMemorySheetContentState
             child: Divider(
               height: 1,
               thickness: 1,
-              color: Colors.white.withValues(alpha: 0.08),
+              color: Colors.white.withValues(alpha: 0.10),
             ),
           ),
 
@@ -932,7 +932,7 @@ class _WalrusMemorySheetContentState
               Icon(
                 PhosphorIcons.folders(PhosphorIconsStyle.bold),
                 size: 11,
-                color: Colors.white.withValues(alpha: 0.50),
+                color: Colors.white.withValues(alpha: 0.55),
               ),
               const SizedBox(width: 5),
               Expanded(
@@ -940,7 +940,7 @@ class _WalrusMemorySheetContentState
                   'PARTITIONED USER NAMESPACES (${effectiveNs.length})',
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    color: Colors.white.withValues(alpha: 0.50),
+                    color: Colors.white.withValues(alpha: 0.55),
                     fontSize: 9.5,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.6,
@@ -963,7 +963,7 @@ class _WalrusMemorySheetContentState
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4.5),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.25),
+                    color: Colors.white.withValues(alpha: 0.07),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.14),
@@ -1005,7 +1005,7 @@ class _WalrusMemorySheetContentState
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF7CE8FF).withValues(alpha: 0.06),
+        color: const Color(0xFF7CE8FF).withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: const Color(0xFF7CE8FF).withValues(alpha: 0.22),
@@ -1151,7 +1151,7 @@ class _WalrusMemorySheetContentState
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isGuardrail
@@ -1277,10 +1277,10 @@ class _WalrusMemorySheetContentState
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.28),
+              color: Colors.white.withValues(alpha: 0.07),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: Colors.white.withValues(alpha: 0.12),
               ),
             ),
             child: Column(

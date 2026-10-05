@@ -961,7 +961,7 @@ const fetchAssets = async (title, mediaType) => {
   const [raw_poster_url, ost_url, trailer_url] = await Promise.all([
     assets ? Promise.resolve(assets.poster_url) : fetchPoster(title, mediaType),
     assets ? Promise.resolve(assets.ost_url)    : fetchOST(title, mediaType),
-    fetchYoutubeTrailer(title, mediaType),
+    Promise.resolve(''),
   ]);
 
   let poster_url = raw_poster_url || '';

@@ -102,7 +102,7 @@ function extractCategoryFromNamespace(namespace) {
  * Uses async remember so the user is not blocked waiting for on-chain block confirmation,
  * and records the job_id for live blob_id resolution via Walrus relayer.
  */
-async function rememberFact(text, namespace, retries = 2, categoryLabel = null) {
+async function rememberFact(text, namespace, retries = 1, categoryLabel = null) {
   if (!text || !text.trim()) return null;
   const cleanText = text.trim();
   const client = await getClient();
@@ -125,8 +125,13 @@ async function rememberFact(text, namespace, retries = 2, categoryLabel = null) 
       console.log(`[Walrus Memory] Stored memory in '${namespace}': ${cleanText.substring(0, 60)}... (job: ${result.job_id})`);
       return writeRecord;
     } catch (err) {
+      const isRateLimit = err.message && (err.message.includes('429') || err.message.toLowerCase().includes('rate limit'));
+      if (isRateLimit) {
+        console.warn(`[Walrus Memory] Rate limit (429) on '${namespace}', skipping immediate retry to preserve quota.`);
+        return null;
+      }
       if (attempt <= retries) {
-        await new Promise(r => setTimeout(r, 350 * attempt));
+        await new Promise(r => setTimeout(r, 400 * attempt));
         continue;
       }
       console.error(`[Walrus Memory Error] Failed to remember in '${namespace}':`, err.message);
@@ -180,11 +185,12 @@ async function resolvePendingWriteJobs(userId, extraJobIds = []) {
  * Supports maxDistance to filter out weak/irrelevant matches and provides
  * bidirectional fallback between 'coda:user:category' and legacy 'coda_user_category'.
  */
-async function recallMemories({ query, namespace, limit = 5, maxDistance = null, sort = 'similarity' }) {
+async function recallMemories({ query, namespace, limit = 5, maxDistance = null, sort = 'relevance' }) {
   if (!query || !namespace) return [];
   const client = await getClient();
+  const safeSort = (!sort || sort === 'similarity') ? 'relevance' : sort;
   try {
-    const opts = { query, namespace, limit, sort };
+    const opts = { query, namespace, limit, sort: safeSort };
     if (maxDistance !== null && maxDistance !== undefined) {
       opts.maxDistance = maxDistance;
     }
@@ -229,148 +235,128 @@ async function recallMemories({ query, namespace, limit = 5, maxDistance = null,
  * Smart router: Distributes memory_updates from conversation to domain-specific namespaces
  * using context-rich, retrieval-optimized phrasing so semantic vector search matches
  * situational queries (time of day, mood, category, themes, and guardrails).
- * Uses official coda:{userId}:{category} naming convention.
+ * Consolidates updates by target namespace so we NEVER make more than 1 write trip
+ * to the same namespace in a single turn.
  */
 async function routeAndSaveLivingMemory(userId, memoryUpdates) {
   if (!userId || !memoryUpdates) return [];
-  const tasks = [];
   const ambient = getLiveAmbientContext();
+  const writesByNamespace = new Map(); // ns -> { factParts: [], rawParts: [], category: string }
 
-  // 1. Core personality & emotional identity -> coda:{userId}:core
+  const addNamespaceEntry = (ns, factText, rawText, category) => {
+    if (!ns || !factText || !factText.trim()) return;
+    const existing = writesByNamespace.get(ns) || { factParts: [], rawParts: [], category };
+    const cleanFact = factText.trim();
+    if (!existing.factParts.some(p => p.toLowerCase() === cleanFact.toLowerCase())) {
+      existing.factParts.push(cleanFact);
+    }
+    if (rawText && rawText.trim() && !existing.rawParts.includes(rawText.trim())) {
+      existing.rawParts.push(rawText.trim());
+    }
+    writesByNamespace.set(ns, existing);
+  };
+
+  // 1. Core personality, emotional identity & thematic connections -> coda:{userId}:core (1 consolidated write)
+  const coreFacts = [];
+  const coreRaw = [];
   if (Array.isArray(memoryUpdates.global_identity_appends)) {
     for (const fact of memoryUpdates.global_identity_appends) {
       if (typeof fact === 'string' && fact.trim()) {
-        const clean = fact.trim();
-        const contextualFact = clean.startsWith('[')
-          ? clean
-          : `[Core Taste & Emotional DNA] When choosing what to watch, read, or play, the user resonates with: ${clean}`;
-        tasks.push({
-          fact: contextualFact,
-          rawFact: clean,
-          ns: formatNamespace(userId, 'core'),
-          category: 'Aesthetic & Emotional DNA'
-        });
+        coreFacts.push(fact.trim());
+        coreRaw.push(fact.trim());
       }
     }
   }
-
-  // 2. Guardrails & dealbreakers -> coda:{userId}:guardrails
-  if (Array.isArray(memoryUpdates.guardrails_appends)) {
-    for (const rule of memoryUpdates.guardrails_appends) {
-      if (typeof rule === 'string' && rule.trim()) {
-        const clean = rule.trim();
-        const contextualRule = clean.toLowerCase().startsWith('avoid') || clean.startsWith('[')
-          ? clean
-          : `[Dealbreaker & Content Boundary] Avoid recommending works with: ${clean}`;
-        tasks.push({
-          fact: contextualRule,
-          rawFact: clean,
-          ns: formatNamespace(userId, 'guardrails'),
-          category: 'Guardrail Protocol'
-        });
-      }
-    }
-  }
-
-  // 2b. Already seen / experienced titles -> coda:{userId}:guardrails
-  if (Array.isArray(memoryUpdates.seen_appends)) {
-    for (const title of memoryUpdates.seen_appends) {
-      if (typeof title === 'string' && title.trim()) {
-        tasks.push({
-          fact: `Already watched/seen: "${title.trim()}" (do not recommend again)`,
-          rawFact: `Already watched: ${title.trim()}`,
-          ns: formatNamespace(userId, 'guardrails'),
-          category: 'Already Seen'
-        });
-      }
-    }
-  }
-
-  // 2c. Deep psychological / thematic connections -> coda:{userId}:core
   if (Array.isArray(memoryUpdates.thematic_connections_appends)) {
     for (const theme of memoryUpdates.thematic_connections_appends) {
       if (typeof theme === 'string' && theme.trim()) {
-        const clean = theme.trim();
-        tasks.push({
-          fact: clean.startsWith('[') ? clean : `[Thematic & Psychological Resonance] Deeply drawn to stories exploring: ${clean}`,
-          rawFact: clean,
-          ns: formatNamespace(userId, 'core'),
-          category: 'Thematic Resonance'
-        });
+        coreFacts.push(theme.trim());
+        coreRaw.push(theme.trim());
       }
     }
   }
+  if (coreFacts.length > 0) {
+    const coreNs = formatNamespace(userId, 'core');
+    const combinedCore = `[Core Taste & Emotional DNA] When choosing what to watch, read, or play, the user resonates with: ${coreFacts.join(' | ')}`;
+    addNamespaceEntry(coreNs, combinedCore, coreRaw.join('; '), 'Aesthetic & Emotional DNA');
+  }
 
-  // 3. Category-specific taste -> coda:{userId}:{category}
+  // 2. Category-specific taste anchors -> coda:{userId}:{category} (1 consolidated write per media category)
   if (memoryUpdates.category_appends && typeof memoryUpdates.category_appends === 'object') {
     for (const [category, facts] of Object.entries(memoryUpdates.category_appends)) {
       const normalized = normalizeCategory(category);
       const namespace = formatNamespace(userId, normalized);
-      const titleList = Array.isArray(facts) ? facts : [facts];
-      for (const rawFact of titleList) {
-        if (typeof rawFact === 'string' && rawFact.trim()) {
-          const clean = rawFact.trim();
-          let enrichedFact = clean;
-          if (!clean.toLowerCase().includes('loved') && !clean.toLowerCase().includes('favorite') && !clean.startsWith('[') && clean.split(' ').length <= 6) {
-            try {
-              const { enrichTitleThematicContext } = require('../scripts/enrich_stored_memories');
-              const resonance = await enrichTitleThematicContext(clean, normalized);
-              enrichedFact = `[${normalized.toUpperCase()} Taste Anchor] Favorite ${normalized} benchmark: "${clean}" — ${resonance}. Recommend ${normalized} works matching this tone, pacing, and emotional depth.`;
-            } catch (_) {
-              enrichedFact = `[${normalized.toUpperCase()} Taste Anchor] Favorite ${normalized} benchmark: "${clean}" (cherished reference for ${normalized} recommendations).`;
-            }
-          }
-          tasks.push({
-            fact: enrichedFact,
-            rawFact: clean,
-            ns: namespace,
-            category: `${normalized.toUpperCase()} Anchor`
-          });
-        }
+      const titleList = (Array.isArray(facts) ? facts : [facts])
+        .filter(f => typeof f === 'string' && f.trim())
+        .map(f => f.trim());
+      if (titleList.length > 0) {
+        const joinedTitles = titleList.join('; ');
+        const enrichedFact = `[${normalized.toUpperCase()} Taste Anchor] Favorite ${normalized} benchmark${titleList.length > 1 ? 's' : ''}: ${joinedTitles}. Recommend ${normalized} works matching this tone, pacing, and emotional depth.`;
+        addNamespaceEntry(namespace, enrichedFact, joinedTitles, `${normalized.toUpperCase()} Anchor`);
       }
     }
   }
 
-  // 4. Temporary session context / current craving -> coda:{userId}:session
-  if (memoryUpdates.recent_context_overwrite && typeof memoryUpdates.recent_context_overwrite === 'string' && memoryUpdates.recent_context_overwrite.trim()) {
-    const cleanCraving = memoryUpdates.recent_context_overwrite.trim();
-    tasks.push({
-      fact: cleanCraving.startsWith('[')
-        ? cleanCraving
-        : `[Active Mood & Situational Craving (${ambient.time_of_day})] Right now the user wants to watch or experience: ${cleanCraving}`,
-      rawFact: cleanCraving,
-      ns: formatNamespace(userId, 'session'),
-      category: 'Active Craving'
-    });
+  // 3. Guardrails, dealbreakers & seen titles -> coda:{userId}:guardrails (1 consolidated write)
+  const guardrailRules = [];
+  const seenTitles = [];
+  if (Array.isArray(memoryUpdates.guardrails_appends)) {
+    for (const rule of memoryUpdates.guardrails_appends) {
+      if (typeof rule === 'string' && rule.trim()) {
+        guardrailRules.push(rule.trim());
+      }
+    }
+  }
+  if (Array.isArray(memoryUpdates.seen_appends)) {
+    for (const title of memoryUpdates.seen_appends) {
+      if (typeof title === 'string' && title.trim()) {
+        seenTitles.push(title.trim());
+      }
+    }
+  }
+  if (guardrailRules.length > 0 || seenTitles.length > 0) {
+    const guardrailNs = formatNamespace(userId, 'guardrails');
+    const parts = [];
+    const rawParts = [];
+    if (guardrailRules.length > 0) {
+      parts.push(`[Dealbreaker & Content Boundary] Avoid recommending works with: ${guardrailRules.join('; ')}`);
+      rawParts.push(guardrailRules.join('; '));
+    }
+    if (seenTitles.length > 0) {
+      parts.push(`Already watched/seen: ${seenTitles.map(t => `"${t}"`).join(', ')} (do not recommend again)`);
+      rawParts.push(`Already watched: ${seenTitles.join(', ')}`);
+    }
+    const categoryLabel = guardrailRules.length > 0 ? 'Guardrail Protocol' : 'Already Seen';
+    addNamespaceEntry(guardrailNs, parts.join(' | '), rawParts.join(' | '), categoryLabel);
   }
 
-  // Deduplicate tasks
-  const uniqueTasks = [];
-  const taskKeySet = new Set();
-  for (const t of tasks) {
-    const key = `${t.ns}:::${t.fact.trim().toLowerCase()}`;
-    if (!taskKeySet.has(key)) {
-      taskKeySet.add(key);
-      uniqueTasks.push(t);
-    }
+  // 4. Temporary session context / current craving -> coda:{userId}:session (1 write)
+  if (memoryUpdates.recent_context_overwrite && typeof memoryUpdates.recent_context_overwrite === 'string' && memoryUpdates.recent_context_overwrite.trim()) {
+    const cleanCraving = memoryUpdates.recent_context_overwrite.trim();
+    const sessionNs = formatNamespace(userId, 'session');
+    const sessionFact = cleanCraving.startsWith('[')
+      ? cleanCraving
+      : `[Active Mood & Situational Craving (${ambient.time_of_day})] Right now the user wants to watch or experience: ${cleanCraving}`;
+    addNamespaceEntry(sessionNs, sessionFact, cleanCraving, 'Active Craving');
   }
 
   invalidateUserRecallCache(userId);
 
-  // Throttled sequential execution to strictly respect Walrus 60 req/min limit
+  // Execute strictly 1 write per distinct namespace
   const results = [];
-  for (const t of uniqueTasks) {
+  for (const [ns, entry] of writesByNamespace.entries()) {
+    const finalFact = entry.factParts.join(' | ');
+    const finalRaw = entry.rawParts.join('; ') || finalFact;
     try {
-      const res = await rememberFact(t.fact, t.ns, 2, t.category);
+      const res = await rememberFact(finalFact, ns, 1, entry.category);
       if (res) {
         results.push({
           ...res,
-          raw_text: t.rawFact || t.fact,
+          raw_text: finalRaw,
         });
       }
-      await new Promise(r => setTimeout(r, 250));
     } catch (err) {
-      console.warn(`[Walrus Throttler] Skipped write to ${t.ns}:`, err.message);
+      console.warn(`[Walrus Throttler] Skipped write to ${ns}:`, err.message);
     }
   }
 
@@ -425,6 +411,7 @@ const recentQueriesByUser = new Map();
  * Synthesizes a concrete, situational semantic query against the user's Walrus Memory
  * asking what specific type of film/anime/book/show/game to watch or experience right now
  * (this morning/afternoon/evening/late night) given their stored taste anchors and mood.
+ * Runs instantaneously with zero extra LLM latency.
  */
 async function generateDynamicMemoryQuery({ userId, mediaType, contextualState, recentContext }) {
   const ambient = getLiveAmbientContext(contextualState);
@@ -446,74 +433,25 @@ async function generateDynamicMemoryQuery({ userId, mediaType, contextualState, 
     ? 'read'
     : (normalizedCategory === 'game' ? 'play' : 'watch');
 
-  const explicitCraving = recentContext ? `Active user craving/mood: "${recentContext}"` : '';
+  const cravingSuffix = recentContext && recentContext.trim()
+    ? ` matching "${recentContext.trim().slice(0, 60)}"`
+    : '';
 
-  const prompt = `
-You are the Coda Memory Scout querying a user's decentralized Walrus Memory vector store.
-We need a concrete, natural, situational search query to retrieve the most relevant memories for what ${categoryNoun} the user should ${actionVerb} right now.
+  const dynamicTemplates = [
+    `What type of ${categoryNoun} to ${actionVerb} this ${ambient.day_of_week} ${ambient.time_of_day} given their favorite ${normalizedCategory} anchors and emotional themes${cravingSuffix}?`,
+    `Which favorite ${normalizedCategory} benchmarks, directors, and emotional moods match a ${ambient.day_of_week} ${ambient.time_of_day} session${cravingSuffix}?`,
+    `What kind of ${categoryNoun} fits their core taste DNA and active craving this ${ambient.time_of_day}${cravingSuffix}?`,
+    `What cherished ${normalizedCategory} touchstones and psychological themes should guide today's ${ambient.time_of_day} recommendation${cravingSuffix}?`
+  ];
 
-Live Situational Context:
-- Media Format: ${normalizedCategory} (${categoryNoun})
-- Current Moment: ${ambient.day_of_week} ${ambient.time_of_day} (${ambient.formatted_time})
-- Ambient Vibe: ${ambient.time_of_day === 'afternoon' ? 'engaged afternoon viewing, immersive storytelling, distinct mood' : ambient.time_of_day === 'morning' ? 'fresh morning focus, inspiring orabsorbing narrative' : ambient.time_of_day === 'evening' ? 'evening immersion, emotionally gripping, rich cinema' : 'late-night introspection, intimate, haunting'}
-${explicitCraving}
-${previousQueries.length > 0 ? `PREVIOUSLY RUN QUERIES (DO NOT REPEAT THESE ANGLES): ${previousQueries.slice(-4).map(q => `"${q}"`).join(', ')}` : ''}
+  const chosen = dynamicTemplates[previousQueries.length % dynamicTemplates.length];
+  const updated = [...previousQueries, chosen].slice(-6);
+  recentQueriesByUser.set(userKey, updated);
 
-TASK:
-Write ONE specific, natural search question (10-16 words) querying their Walrus Memory for what type of ${categoryNoun} to ${actionVerb} this ${ambient.day_of_week} ${ambient.time_of_day}, referencing favorite genres/types, emotional themes, or benchmark anchors.
-Do NOT use generic filler like "atmospheric storytelling and resonant pacing". Ask a real, practical curation question!
-Examples:
-- "What type of film to watch this ${ambient.day_of_week} ${ambient.time_of_day} based on favorite movie anchors and themes?"
-- "What ${normalizedCategory} genres, emotional moods, and benchmark titles fit a ${ambient.time_of_day} session?"
-- "Which cherished ${normalizedCategory} touchstones and psychological themes should guide this ${ambient.time_of_day}'s pick?"
-- "What kind of ${categoryNoun} matches their current craving and emotional DNA this ${ambient.time_of_day}?"
-
-Return strictly JSON:
-{
-  "query": "What type of ...",
-  "angle": "Brief 3-word situational angle, e.g. ${ambient.day_of_week} ${ambient.time_of_day[0].toUpperCase() + ambient.time_of_day.slice(1)} Pick"
-}
-`;
-
-  try {
-    const { callGeminiChat } = require('./geminiClient');
-    const response = await callGeminiChat({
-      messages: [
-        { role: 'system', content: 'You are the Coda Memory Scout. Return strictly JSON.' },
-        { role: 'user', content: prompt }
-      ],
-      responseFormat: { type: 'json_object' },
-      temperature: 0.75,
-    });
-
-    let raw = response.choices[0].message.content.trim();
-    if (raw.startsWith('```json')) raw = raw.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-    else if (raw.startsWith('```')) raw = raw.replace(/^```\s*/, '').replace(/\s*```$/, '');
-    const data = JSON.parse(raw);
-    const query = data.query || `What type of ${categoryNoun} to ${actionVerb} this ${ambient.day_of_week} ${ambient.time_of_day} based on favorite taste anchors and emotional themes?`;
-    
-    const updated = [...previousQueries, query].slice(-6);
-    recentQueriesByUser.set(userKey, updated);
-    return {
-      query,
-      angle: data.angle || `${ambient.day_of_week} ${ambient.time_of_day[0].toUpperCase() + ambient.time_of_day.slice(1)}`
-    };
-  } catch (err) {
-    console.warn('[Memory Scout] Dynamic fallback query used:', err.message);
-    const dynamicFallbacks = [
-      `What type of ${categoryNoun} to ${actionVerb} this ${ambient.day_of_week} ${ambient.time_of_day} given their favorite ${normalizedCategory} anchors and emotional themes?`,
-      `Which favorite ${normalizedCategory} types, directors, and emotional moods match a ${ambient.day_of_week} ${ambient.time_of_day} session?`,
-      `What kind of ${categoryNoun} fits their core taste DNA and active craving this ${ambient.time_of_day}?`,
-      `What cherished ${normalizedCategory} benchmarks and story themes should guide today's ${ambient.time_of_day} recommendation?`
-    ];
-    const chosen = dynamicFallbacks[previousQueries.length % dynamicFallbacks.length];
-    const updated = [...previousQueries, chosen].slice(-6);
-    recentQueriesByUser.set(userKey, updated);
-    return {
-      query: chosen,
-      angle: `${ambient.day_of_week} ${ambient.time_of_day[0].toUpperCase() + ambient.time_of_day.slice(1)}`
-    };
-  }
+  return {
+    query: chosen,
+    angle: `${ambient.day_of_week} ${ambient.time_of_day[0].toUpperCase() + ambient.time_of_day.slice(1)}`
+  };
 }
 
 /**
@@ -561,7 +499,7 @@ async function recallForRecommendation(userId, mediaType, contextualQuery = null
   const [coreHits, categoryHits, guardrailHits, sessionHits] = await Promise.all([
     recallMemories({ query: coreQuery, namespace: coreNs, limit: 4, maxDistance: 0.82 }).catch(() => []),
     recallMemories({ query: categoryQuery, namespace: primaryNs, limit: 5, maxDistance: 0.82 }).catch(() => []),
-    recallMemories({ query: guardrailQuery, namespace: guardrailNs, limit: 5, maxDistance: 0.88 }).catch(() => []),
+    recallMemories({ query: guardrailQuery, namespace: guardrailNs, limit: 15, maxDistance: 0.88 }).catch(() => []),
     recallMemories({ query: sessionQuery, namespace: sessionNs, limit: 2, maxDistance: 0.82 }).catch(() => []),
   ]);
 
@@ -801,26 +739,26 @@ async function curateWithWalrusMemory({
     queryUsed = recallResult.queryUsed;
     moodAngle = recallResult.moodAngle;
 
-    if (userId) {
-      try {
-        const rawGuardrails = await recallMemories({
-          query: 'Already watched seen excluded avoid disliked dealbreakers not for me',
-          namespace: formatNamespace(userId, 'guardrails'),
-          limit: 30
-        });
-        for (const item of rawGuardrails) {
-          const text = item.text || item.content || '';
-          const seenMatch = text.match(/Already watched(?:\/seen)?:\s*"?([^"(]+)"?/i);
-          if (seenMatch && seenMatch[1]) {
-            walrusSeen.push(seenMatch[1].trim());
-          } else if (text.toLowerCase().includes('not for me') || text.toLowerCase().includes('rejected')) {
-            walrusNotForMe.push(text.trim());
-          } else if (text.trim()) {
-            walrusGuardrails.push(text.trim());
+    const rawGuardrails = recallResult.guardrailHits || [];
+    for (const item of rawGuardrails) {
+      const text = item.text || item.content || '';
+      const segments = text.split(' | ');
+      for (const seg of segments) {
+        if (/Already watched(?:\/seen)?:/i.test(seg)) {
+          const quotedMatches = [...seg.matchAll(/"([^"]+)"/g)];
+          if (quotedMatches.length > 0) {
+            for (const m of quotedMatches) {
+              if (m[1] && m[1].trim()) walrusSeen.push(m[1].trim());
+            }
+          } else {
+            const singleMatch = seg.match(/Already watched(?:\/seen)?:\s*([^"(]+)/i);
+            if (singleMatch && singleMatch[1]) walrusSeen.push(singleMatch[1].trim());
           }
+        } else if (seg.toLowerCase().includes('not for me') || seg.toLowerCase().includes('rejected')) {
+          walrusNotForMe.push(seg.trim());
+        } else if (seg.trim()) {
+          walrusGuardrails.push(seg.trim());
         }
-      } catch (err) {
-        console.warn('[Walrus Guardrails Recall] Warning:', err.message);
       }
     }
   } else {
