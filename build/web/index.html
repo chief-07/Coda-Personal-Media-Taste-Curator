@@ -1,51 +1,199 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Coda — Intentional personal media taste curator powered by decentralized Walrus Memory.">
+  <meta name="theme-color" content="#0A0A0C">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="coda">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Coda">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>coda</title>
+  <title>Coda — Personal Media Taste Curator</title>
   <link rel="manifest" href="manifest.json">
   <style>
     html, body {
       background-color: #0A0A0C !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    #coda-pwa-banner {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%) translateY(140%);
+      z-index: 999999;
+      width: calc(100% - 32px);
+      max-width: 420px;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border-radius: 22px;
+      background: rgba(18, 21, 28, 0.82);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      color: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    }
+
+    #coda-pwa-banner.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #coda-pwa-banner img {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      flex-shrink: 0;
+    }
+
+    .coda-pwa-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .coda-pwa-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      letter-spacing: 0.1px;
+      margin: 0 0 2px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .coda-pwa-sub {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.65);
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    #coda-pwa-install-btn {
+      background: #ffffff;
+      color: #0A0A0C;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 15px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    #coda-pwa-install-btn:active {
+      transform: scale(0.95);
+    }
+
+    #coda-pwa-close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
     }
   </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="coda-pwa-banner" role="dialog" aria-label="Install Coda App">
+    <img src="icons/Icon-192.png" alt="Coda" />
+    <div class="coda-pwa-text">
+      <div class="coda-pwa-title">Install Coda App</div>
+      <div class="coda-pwa-sub" id="coda-pwa-subtext">Add to your device for the full-screen experience</div>
+    </div>
+    <button id="coda-pwa-install-btn" type="button">Install</button>
+    <button id="coda-pwa-close-btn" type="button" aria-label="Dismiss">✕</button>
+  </div>
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <script>
+    (function() {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      if (isStandalone || sessionStorage.getItem('coda_pwa_dismissed') === '1') return;
+
+      const banner = document.getElementById('coda-pwa-banner');
+      const installBtn = document.getElementById('coda-pwa-install-btn');
+      const closeBtn = document.getElementById('coda-pwa-close-btn');
+      const subText = document.getElementById('coda-pwa-subtext');
+      let deferredPrompt = null;
+
+      function hideBanner() {
+        banner.classList.remove('visible');
+        sessionStorage.setItem('coda_pwa_dismissed', '1');
+      }
+
+      closeBtn.addEventListener('click', hideBanner);
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        setTimeout(() => {
+          if (sessionStorage.getItem('coda_pwa_dismissed') !== '1') {
+            banner.classList.add('visible');
+          }
+        }, 3200);
+      });
+
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) {
+          hideBanner();
+          return;
+        }
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        hideBanner();
+      });
+
+      window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        hideBanner();
+      });
+
+      // iOS Safari hint fallback
+      const ua = window.navigator.userAgent.toLowerCase();
+      const isIos = /iphone|ipad|ipod/.test(ua);
+      const isSafari = isIos && /safari/.test(ua) && !/crios|fxios/.test(ua);
+      if (isSafari && !isStandalone) {
+        installBtn.style.display = 'none';
+        subText.textContent = 'Tap Share ↑ then "Add to Home Screen" for full-screen Coda';
+        setTimeout(() => {
+          if (sessionStorage.getItem('coda_pwa_dismissed') !== '1') {
+            banner.classList.add('visible');
+          }
+        }, 4000);
+      }
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

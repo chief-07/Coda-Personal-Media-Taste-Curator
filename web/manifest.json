@@ -1,11 +1,12 @@
 {
-    "name": "coda",
-    "short_name": "coda",
-    "start_url": ".",
+    "name": "Coda — Personal Media Taste Curator",
+    "short_name": "Coda",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#0A0A0C",
     "theme_color": "#0A0A0C",
-    "description": "A new Flutter project.",
+    "description": "Intentional personal media taste curator powered by decentralized Walrus Memory.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "share_target": {
