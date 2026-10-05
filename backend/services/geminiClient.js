@@ -23,18 +23,29 @@ async function callGroqFallback({ messages, tools, responseFormat = null, temper
   const Groq = require('groq-sdk');
   const groq = new Groq({ apiKey: groqKey });
 
-  const modelsToTry = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+  const modelsToTry = ['qwen/qwen3.8-27b'];
   let lastErr = null;
 
   for (const groqModel of modelsToTry) {
     try {
+      const safeMessages = Array.isArray(messages) ? messages.map(m => ({ ...m })) : [];
+      if (responseFormat && safeMessages.length > 0) {
+        const hasJsonWord = safeMessages.some(m => typeof m.content === 'string' && /json/i.test(m.content));
+        if (!hasJsonWord) {
+          const lastIdx = safeMessages.length - 1;
+          safeMessages[lastIdx].content = `${safeMessages[lastIdx].content || ''}\nRespond in valid JSON format.`;
+        }
+      }
+
       const groqPayload = {
         model: groqModel,
-        messages: messages,
+        messages: safeMessages,
         temperature: temperature,
       };
       if (responseFormat) {
-        groqPayload.response_format = responseFormat;
+        groqPayload.response_format = responseFormat.type === 'json_schema'
+          ? { type: 'json_object' }
+          : responseFormat;
       }
       if (tools && tools.length > 0) {
         groqPayload.tools = tools;
