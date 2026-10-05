@@ -9,37 +9,57 @@ const httpsAgent = new https.Agent({
   keepAliveMsecs: 5000,
 });
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6JwqKZnuRfZ4Kfu1VP0PbdF9qCfvg8IfvH6nd0m4l_zPQ';
-const DEFAULT_MODEL = 'gemini-3.1-flash-lite';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const DEFAULT_MODEL = 'gemini-2.5-flash';
+
+// Track if the configured GEMINI_API_KEY is missing, an unsupported AQ.* token, or returned 401/403
+let geminiKeyInvalid = !GEMINI_API_KEY || GEMINI_API_KEY.startsWith('AQ.');
 
 async function callGroqFallback({ messages, tools, responseFormat = null, temperature = 0.2 }) {
-  if (!process.env.GROQ_API_KEY) {
+  const groqKey = process.env.GROQ_API_KEY;
+  if (!groqKey) {
     throw new Error('GROQ_API_KEY not configured for failover');
   }
   const Groq = require('groq-sdk');
-  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-  
-  const groqPayload = {
-    model: 'llama-3.3-70b-versatile',
-    messages: messages,
-    temperature: temperature,
-  };
-  if (responseFormat) {
-    groqPayload.response_format = responseFormat;
+  const groq = new Groq({ apiKey: groqKey });
+
+  const modelsToTry = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+  let lastErr = null;
+
+  for (const groqModel of modelsToTry) {
+    try {
+      const groqPayload = {
+        model: groqModel,
+        messages: messages,
+        temperature: temperature,
+      };
+      if (responseFormat) {
+        groqPayload.response_format = responseFormat;
+      }
+      if (tools && tools.length > 0) {
+        groqPayload.tools = tools;
+        groqPayload.tool_choice = 'auto';
+      }
+
+      const res = await groq.chat.completions.create(groqPayload);
+      return res;
+    } catch (err) {
+      lastErr = err;
+      console.warn(`[Groq Engine] Model ${groqModel} warning (${err.status || err.message}), trying next model...`);
+    }
   }
-  if (tools && tools.length > 0) {
-    groqPayload.tools = tools;
-    groqPayload.tool_choice = 'auto';
-  }
-  
-  console.log('[GeminiClient -> Groq Failover] Calling Groq with model llama-3.3-70b-versatile...');
-  const res = await groq.chat.completions.create(groqPayload);
-  return res;
+
+  throw lastErr;
 }
 
 async function callGeminiChat({ messages, tools, responseFormat = null, temperature = 0.2, model = DEFAULT_MODEL, retries = 2 }) {
+  // If GEMINI_API_KEY is not a valid AIza* key or previously returned 401/403, route directly to Groq
+  if (geminiKeyInvalid) {
+    return await callGroqFallback({ messages, tools, responseFormat, temperature });
+  }
+
   const payload = {
-    model: model,
+    model: model === 'gemini-3.1-flash-lite' ? 'gemini-2.5-flash' : model,
     messages: messages,
     temperature: temperature,
   };
@@ -70,27 +90,21 @@ async function callGeminiChat({ messages, tools, responseFormat = null, temperat
       return response.data;
     } catch (e) {
       const status = e.response?.status;
-      const isRateLimit = status === 429;
-      const isRetryable = e.code === 'ECONNRESET' || e.code === 'ETIMEDOUT' || (e.response && (status === 429 || status >= 500));
+      if (status === 401 || status === 403 || status === 400) {
+        geminiKeyInvalid = true;
+      }
 
-      // Instant failover to Groq if Gemini hits 429 (rate limit) or 5xx server error
-      if ((isRateLimit || (status && status >= 500)) && process.env.GROQ_API_KEY) {
-        console.warn(`[GeminiClient] Gemini returned HTTP ${status}. Triggering instant failover to Groq...`);
-        try {
-          const fallbackData = await callGroqFallback({ messages, tools, responseFormat, temperature });
-          console.log('[GeminiClient] ✅ Groq failover succeeded!');
-          return fallbackData;
-        } catch (groqErr) {
-          console.error('[GeminiClient] Groq failover failed:', groqErr.message);
+      // Failover to Groq on ANY Gemini HTTP or network error (401, 403, 404, 429, 5xx, timeout)
+      console.warn(`[GeminiClient] Gemini returned HTTP ${status || e.code}. Failing over to Groq...`);
+      try {
+        const fallbackData = await callGroqFallback({ messages, tools, responseFormat, temperature });
+        return fallbackData;
+      } catch (groqErr) {
+        console.error('[GeminiClient] Groq failover failed:', groqErr.message);
+        if (attempt > retries) {
+          throw groqErr;
         }
       }
-
-      if (attempt > retries || !isRetryable) {
-        throw e;
-      }
-      const delayMs = status === 429 ? (1500 * attempt) : 300;
-      console.warn(`[GeminiClient] Request attempt ${attempt} failed (${status || e.code}). Retrying in ${delayMs}ms...`);
-      await new Promise(r => setTimeout(r, delayMs));
     }
   }
 }

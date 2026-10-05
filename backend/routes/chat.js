@@ -89,9 +89,17 @@ const walrus = require('../services/walrusMemoryService');
         const parsed = JSON.parse(content);
         if (parsed && parsed.memory_updates) {
           const userId = req.body.userId || 'demo_user';
-          walrus.routeAndSaveLivingMemory(userId, parsed.memory_updates).catch(err => {
+          try {
+            const walrusWrites = await Promise.race([
+              walrus.routeAndSaveLivingMemory(userId, parsed.memory_updates),
+              new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
+            ]);
+            parsed.memory_updates.walrus_writes = walrusWrites || [];
+            parsed.memory_updates.user_id = walrus.sanitizeUserId(userId);
+            response.choices[0].message.content = JSON.stringify(parsed);
+          } catch (err) {
             console.error('[Walrus Auto-Save Error]:', err.message);
-          });
+          }
         }
       } catch (_) {}
     }
