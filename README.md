@@ -1,7 +1,9 @@
 # 🦭 Coda — Personal Media Taste Curator
 
 > **Built for the Walrus Memory Hackathon (Walrus Session 8: Chatbots That Remember)**  
-> **Tracks**: Build a Chatbot with Walrus Memory • Beyond the Big Two (Google Gemini + Groq) • Project Documentation & Technical Bug Findings
+> **Tracks**: Build a Chatbot with Walrus Memory • Beyond the Big Two (Google Gemini + Groq) • Project Documentation & Technical Bug Findings  
+> 🌐 **Live Web & PWA App (Cloudflare Pages)**: **[https://coda-88k.pages.dev](https://coda-88k.pages.dev)**  
+> ⚡ **Live Curation & Walrus Engine (Render)**: **[https://coda-personal-media-taste-curator.onrender.com](https://coda-personal-media-taste-curator.onrender.com)**
 
 **Coda** is an intentional, conversational media taste curator for **Movies, Anime, TV Shows, Video Games, Books, Visual Novels, and Manga**. Instead of burying you under soulless algorithmic grids, Coda acts like that one deeply perceptive friend who actually remembers who you are—delivering **one high-conviction pick at a time**, complete with its atmospheric soundtrack playing softly in the background, a preview trailer, and an intimate pitch grounded in your decentralized **Walrus Protocol Memory**.
 
