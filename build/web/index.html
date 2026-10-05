@@ -28,169 +28,357 @@
       padding: 0;
     }
 
-    #coda-pwa-banner {
+    /* Frosted Glass PWA Modal Backdrop & Sheet */
+    #coda-pwa-overlay {
       position: fixed;
-      left: 50%;
-      bottom: 22px;
-      transform: translateX(-50%) translateY(140%);
+      inset: 0;
       z-index: 999999;
-      width: calc(100% - 32px);
-      max-width: 420px;
-      box-sizing: border-box;
-      padding: 12px 14px;
-      border-radius: 22px;
-      background: rgba(18, 21, 28, 0.82);
-      backdrop-filter: blur(24px) saturate(160%);
-      -webkit-backdrop-filter: blur(24px) saturate(160%);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.55);
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-      color: #ffffff;
+      align-items: flex-end;
+      justify-content: center;
       opacity: 0;
       pointer-events: none;
-      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+      transition: opacity 0.32s ease;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
     }
 
-    #coda-pwa-banner.visible {
-      transform: translateX(-50%) translateY(0);
+    #coda-pwa-overlay.visible {
       opacity: 1;
       pointer-events: auto;
     }
 
-    #coda-pwa-banner img {
-      width: 38px;
-      height: 38px;
-      border-radius: 11px;
+    #coda-pwa-sheet {
+      width: 100%;
+      max-width: 460px;
+      box-sizing: border-box;
+      background: rgba(20, 23, 31, 0.78);
+      backdrop-filter: blur(28px) saturate(165%);
+      -webkit-backdrop-filter: blur(28px) saturate(165%);
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
+      border-left: 1px solid rgba(255, 255, 255, 0.10);
+      border-right: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 32px 32px 0 0;
+      padding: 14px 22px calc(26px + env(safe-area-inset-bottom, 0px)) 22px;
+      color: #ffffff;
+      box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.65);
+      transform: translateY(105%);
+      transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #coda-pwa-overlay.visible #coda-pwa-sheet {
+      transform: translateY(0);
+    }
+
+    .coda-sheet-handle {
+      width: 40px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.24);
+      margin: 0 auto 18px auto;
+    }
+
+    .coda-sheet-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .coda-sheet-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
       flex-shrink: 0;
     }
 
-    .coda-pwa-text {
+    .coda-sheet-title-wrap {
       flex: 1;
       min-width: 0;
     }
 
-    .coda-pwa-title {
-      font-size: 13.5px;
+    .coda-sheet-title {
+      font-size: 18px;
       font-weight: 800;
-      letter-spacing: 0.1px;
-      margin: 0 0 2px 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      margin: 0 0 4px 0;
+      line-height: 1.2;
+      color: #ffffff;
     }
 
-    .coda-pwa-sub {
-      font-size: 11.5px;
+    .coda-sheet-subtitle {
+      font-size: 12.5px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 0.65);
+      color: rgba(255, 255, 255, 0.62);
       margin: 0;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
-    #coda-pwa-install-btn {
-      background: #ffffff;
-      color: #0A0A0C;
-      border: none;
-      border-radius: 999px;
-      padding: 8px 15px;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
-
-    #coda-pwa-install-btn:active {
-      transform: scale(0.95);
-    }
-
-    #coda-pwa-close-btn {
-      background: rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      width: 26px;
-      height: 26px;
+    .coda-sheet-close {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: rgba(255, 255, 255, 0.75);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 13px;
       cursor: pointer;
       flex-shrink: 0;
       padding: 0;
     }
+
+    .coda-steps-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .coda-step-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .coda-step-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #7CE8FF;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .coda-step-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.90);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .coda-step-text strong {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .coda-inline-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(124, 232, 255, 0.12);
+      border: 1px solid rgba(124, 232, 255, 0.28);
+      color: #7CE8FF;
+      font-size: 11.5px;
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    .coda-primary-btn {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.18s ease, transform 0.15s ease;
+      margin-bottom: 8px;
+    }
+
+    .coda-primary-btn:active {
+      transform: scale(0.98);
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    .coda-secondary-btn {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 14px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.52);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <div id="coda-pwa-banner" role="dialog" aria-label="Install Coda App">
-    <img src="icons/Icon-192.png" alt="Coda" />
-    <div class="coda-pwa-text">
-      <div class="coda-pwa-title">Install Coda App</div>
-      <div class="coda-pwa-sub" id="coda-pwa-subtext">Add to your device for the full-screen experience</div>
+  <!-- Frosted Glass PWA Install Modal (iPhone / iPad + Android / Desktop) -->
+  <div id="coda-pwa-overlay" role="dialog" aria-modal="true" aria-label="Install Coda App">
+    <div id="coda-pwa-sheet">
+      <div class="coda-sheet-handle"></div>
+      <div class="coda-sheet-header">
+        <img src="icons/Icon-192.png" alt="Coda" class="coda-sheet-icon" />
+        <div class="coda-sheet-title-wrap">
+          <h3 class="coda-sheet-title" id="coda-modal-title">Install Coda on iPhone</h3>
+          <p class="coda-sheet-subtitle" id="coda-modal-subtitle">Add Coda to your Home Screen for the full-screen glass &amp; audio experience</p>
+        </div>
+        <button class="coda-sheet-close" id="coda-pwa-close" type="button" aria-label="Close">✕</button>
+      </div>
+
+      <!-- iOS Step-by-Step Instructions -->
+      <div class="coda-steps-box" id="coda-ios-steps">
+        <div class="coda-step-row">
+          <div class="coda-step-badge">
+            <!-- iOS Share Icon SVG -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7CE8FF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+              <polyline points="16 6 12 2 8 6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="coda-step-text">
+            <strong>1. Tap the Share button</strong>
+            <span class="coda-inline-pill">Share ↑</span> in the bottom (or top) bar of Safari.
+          </div>
+        </div>
+
+        <div class="coda-step-row">
+          <div class="coda-step-badge">
+            <!-- Plus in Square Icon SVG -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7CE8FF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
+              <line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+          </div>
+          <div class="coda-step-text">
+            <strong>2. Select "Add to Home Screen"</strong> from the share menu options.
+          </div>
+        </div>
+
+        <div class="coda-step-row">
+          <div class="coda-step-badge">3</div>
+          <div class="coda-step-text">
+            <strong>3. Tap "Add"</strong> in the top-right corner, then open <strong>Coda</strong> directly from your Home Screen.
+          </div>
+        </div>
+      </div>
+
+      <!-- Native Install Button (shown when browser supports beforeinstallprompt) -->
+      <button class="coda-primary-btn" id="coda-pwa-install-btn" type="button" style="display: none;">
+        Install Coda App
+      </button>
+
+      <!-- Dismiss / Continue Button -->
+      <button class="coda-primary-btn" id="coda-ios-got-it-btn" type="button">
+        Got it, I'll add it
+      </button>
+      <button class="coda-secondary-btn" id="coda-pwa-later-btn" type="button" style="display: none;">
+        Continue in browser for now
+      </button>
     </div>
-    <button id="coda-pwa-install-btn" type="button">Install</button>
-    <button id="coda-pwa-close-btn" type="button" aria-label="Dismiss">✕</button>
   </div>
 
   <script>
     (function() {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-      if (isStandalone || sessionStorage.getItem('coda_pwa_dismissed') === '1') return;
+      // Detect if already installed and running as a standalone PWA
+      const isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
 
-      const banner = document.getElementById('coda-pwa-banner');
+      if (isStandalone) return;
+
+      // Only show automatically once per first visit (persisted in localStorage)
+      const STORAGE_KEY = 'coda_pwa_modal_seen_v1';
+      if (localStorage.getItem(STORAGE_KEY) === '1') return;
+
+      const overlay = document.getElementById('coda-pwa-overlay');
+      const closeBtn = document.getElementById('coda-pwa-close');
       const installBtn = document.getElementById('coda-pwa-install-btn');
-      const closeBtn = document.getElementById('coda-pwa-close-btn');
-      const subText = document.getElementById('coda-pwa-subtext');
+      const gotItBtn = document.getElementById('coda-ios-got-it-btn');
+      const laterBtn = document.getElementById('coda-pwa-later-btn');
+      const iosSteps = document.getElementById('coda-ios-steps');
+      const modalTitle = document.getElementById('coda-modal-title');
+      const modalSubtitle = document.getElementById('coda-modal-subtitle');
+
       let deferredPrompt = null;
 
-      function hideBanner() {
-        banner.classList.remove('visible');
-        sessionStorage.setItem('coda_pwa_dismissed', '1');
+      function dismissModal() {
+        overlay.classList.remove('visible');
+        localStorage.setItem(STORAGE_KEY, '1');
       }
 
-      closeBtn.addEventListener('click', hideBanner);
-
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        setTimeout(() => {
-          if (sessionStorage.getItem('coda_pwa_dismissed') !== '1') {
-            banner.classList.add('visible');
-          }
-        }, 3200);
+      closeBtn.addEventListener('click', dismissModal);
+      gotItBtn.addEventListener('click', dismissModal);
+      laterBtn.addEventListener('click', dismissModal);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) dismissModal();
       });
 
-      installBtn.addEventListener('click', async () => {
-        if (!deferredPrompt) {
-          hideBanner();
-          return;
-        }
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        hideBanner();
-      });
-
-      window.addEventListener('appinstalled', () => {
-        deferredPrompt = null;
-        hideBanner();
-      });
-
-      // iOS Safari hint fallback
       const ua = window.navigator.userAgent.toLowerCase();
-      const isIos = /iphone|ipad|ipod/.test(ua);
-      const isSafari = isIos && /safari/.test(ua) && !/crios|fxios/.test(ua);
-      if (isSafari && !isStandalone) {
+      const isIos = /iphone|ipad|ipod/.test(ua) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      if (isIos) {
+        // Show the frosted-glass iPhone/iPad PWA installation modal on first visit
+        modalTitle.textContent = 'Install Coda on iPhone';
+        modalSubtitle.textContent = 'Add Coda to your Home Screen for the full-screen glass & soundtrack experience';
+        iosSteps.style.display = 'flex';
         installBtn.style.display = 'none';
-        subText.textContent = 'Tap Share ↑ then "Add to Home Screen" for full-screen Coda';
+        gotItBtn.style.display = 'block';
+        laterBtn.style.display = 'none';
+
         setTimeout(() => {
-          if (sessionStorage.getItem('coda_pwa_dismissed') !== '1') {
-            banner.classList.add('visible');
+          if (localStorage.getItem(STORAGE_KEY) !== '1') {
+            overlay.classList.add('visible');
           }
-        }, 4000);
+        }, 2400);
+      } else {
+        // Android / Desktop Chrome / Edge native beforeinstallprompt support
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          modalTitle.textContent = 'Install Coda App';
+          modalSubtitle.textContent = 'Install Coda as a standalone app for full-screen curation & instant access';
+          iosSteps.style.display = 'none';
+          installBtn.style.display = 'block';
+          gotItBtn.style.display = 'none';
+          laterBtn.style.display = 'block';
+
+          setTimeout(() => {
+            if (localStorage.getItem(STORAGE_KEY) !== '1') {
+              overlay.classList.add('visible');
+            }
+          }, 2600);
+        });
+
+        installBtn.addEventListener('click', async () => {
+          if (!deferredPrompt) {
+            dismissModal();
+            return;
+          }
+          deferredPrompt.prompt();
+          await deferredPrompt.userChoice;
+          deferredPrompt = null;
+          dismissModal();
+        });
+
+        window.addEventListener('appinstalled', () => {
+          deferredPrompt = null;
+          dismissModal();
+        });
       }
     })();
   </script>
