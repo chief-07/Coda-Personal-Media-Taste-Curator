@@ -14,7 +14,7 @@ const WIKI_HEADERS = {
 const { callGeminiChat } = require('./geminiClient');
 
 // Helper to call LLM (Gemini 3.1 Flash) with tools or json format
-const callOpenAI = async (messages, tools, retries = 2) => {
+const callGeminiAgent = async (messages, tools, retries = 2) => {
   const responseData = await callGeminiChat({
     messages,
     tools,
@@ -163,7 +163,7 @@ const runTitleExtractor = async (userMessage) => {
   const prompt = `Extract any specific media titles (movies, anime, games, books, etc.) mentioned in this message. Return ONLY a JSON array of strings. If none, return empty array. Message: "${userMessage}"`;
   const messages = [{ role: 'user', content: prompt }];
   try {
-    const res = await callOpenAI(messages, null);
+    const res = await callGeminiAgent(messages, null);
     const parsed = JSON.parse(res.content);
     if (Array.isArray(parsed)) return parsed;
     if (parsed.titles && Array.isArray(parsed.titles)) return parsed.titles;
@@ -213,7 +213,7 @@ const runOnboardingAgent = async (messagesPayload) => {
   }
 
   // 2. Main AI Call (1 LLM call per message, no background title-extractor LLM call)
-  let responseMessage = await callOpenAI(messagesPayload, null);
+  let responseMessage = await callGeminiAgent(messagesPayload, null);
 
   let parsed = null;
   try {
@@ -234,7 +234,7 @@ const runOnboardingAgent = async (messagesPayload) => {
       role: "system",
       content: "SYSTEM FORMAT ENFORCEMENT: You must return ONLY a single JSON object (NEVER an array of titles). Never write 'Part 1' or 'Part 2' in the message. Shape:\n{\n  \"status\": \"success\",\n  \"message\": \"Warm empathetic response validating their taste followed by a natural question asking for the next milestone.\",\n  \"show_buttons\": false,\n  \"memory_updates\": {\n    \"global_identity_appends\": [\"Synthesized psychological themes/DNA of titles\"],\n    \"category_appends\": {\"movie\": [\"Title (brief genre and emotional themes)\"]},\n    \"seen_appends\": [\"Exact Titles Mentioned\"],\n    \"recent_context_overwrite\": \"Current craving/vibe\",\n    \"guardrails_appends\": []\n  }\n}"
     });
-    responseMessage = await callOpenAI(messagesPayload, null);
+    responseMessage = await callGeminiAgent(messagesPayload, null);
     try {
       let clean2 = (responseMessage.content || '').trim();
       if (clean2.startsWith('```')) {
@@ -267,7 +267,7 @@ const runOnboardingAgent = async (messagesPayload) => {
 
 // Also an agent for the initial formats screen without tools since it's just extracting formats
 const runFormatsExtraction = async (messagesPayload) => {
-  const responseMessage = await callOpenAI(messagesPayload, null);
+  const responseMessage = await callGeminiAgent(messagesPayload, null);
   return responseMessage.content;
 };
 

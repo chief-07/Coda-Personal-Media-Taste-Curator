@@ -15,10 +15,39 @@ if (!fs.existsSync(IMAGE_CACHE_DIR)) {
   fs.mkdirSync(IMAGE_CACHE_DIR, { recursive: true });
 }
 
+function isSafeExternalImageUrl(rawUrl) {
+  try {
+    const parsed = new URL(rawUrl);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false;
+    const host = (parsed.hostname || '').toLowerCase();
+    if (!host) return false;
+    if (
+      host === 'localhost' ||
+      host === '0.0.0.0' ||
+      host === '::1' ||
+      host === '[::1]' ||
+      host.endsWith('.local') ||
+      host.endsWith('.internal') ||
+      /^127\./.test(host) ||
+      /^10\./.test(host) ||
+      /^192\.168\./.test(host) ||
+      /^169\.254\./.test(host) ||
+      /^172\.(1[6-9]|2\d|3[0-1])\./.test(host)
+    ) {
+      return false;
+    }
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 router.get('/proxy-image', async (req, res) => {
   let { url } = req.query;
   try {
-    if (!url) return res.status(400).send('Missing url parameter');
+    if (!url || !isSafeExternalImageUrl(url)) {
+      return res.status(400).send('Invalid or disallowed url parameter');
+    }
     if (url.includes('thumb.wikimedia.org') && !url.includes('/thumb/')) {
       url = url.replace('https://thumb.wikimedia.org/', 'https://upload.wikimedia.org/');
     }
@@ -235,19 +264,9 @@ router.post('/feedback', async (req, res) => {
   try {
     const { userId, current_memory, recommendation_title, media_type, feedback_reason } = req.body;
 
-    let authoritativeMemory = current_memory || {};
-    if (userId) {
-      try {
-        const freshSoul = await userSoulService.getUserMemory(userId);
-        authoritativeMemory = {
-          ...(freshSoul.permanent_soul || {}),
-          ...(freshSoul.transient_memory || {}),
-        };
-        console.log(`[Feedback Engine] Synchronizing feedback with memory for user ${userId}`);
-      } catch (e) {
-        console.warn('[Feedback Engine] Memory fetch warning:', e.message);
-      }
-    }
+    const authoritativeMemory = current_memory && typeof current_memory === 'object'
+      ? { ...current_memory }
+      : {};
 
     const updates = await llmService.refineTasteFromFeedback(
       authoritativeMemory, recommendation_title, media_type, feedback_reason
@@ -269,17 +288,30 @@ router.post('/feedback', async (req, res) => {
       if (updates.recent_context_overwrite) {
         authoritativeMemory.recentContext = updates.recent_context_overwrite;
       }
-      
-      await userSoulService.syncLivingMemory(userId, authoritativeMemory);
       console.log(`[Feedback Engine] Context shift applied for user ${userId}: "${updates.recent_context_overwrite || 'guardrail/identity update'}"`);
     }
 
-    // Persist directly to Walrus Protocol guardrails namespace
+    // Persist directly to Walrus Protocol guardrails & atomic namespaces
     let savedMemoryStr = `Avoided: "${recommendation_title}" (${feedback_reason})`;
+    let feedbackWalrusWrites = [];
     if (userId && recommendation_title && feedback_reason) {
       try {
-        const walrusRes = await walrusMemoryService.rememberFeedbackGuardrail(userId, recommendation_title, media_type, feedback_reason);
-        if (walrusRes?.savedMemory) savedMemoryStr = walrusRes.savedMemory;
+        const [guardrailRes, routedWrites] = await Promise.all([
+          walrusMemoryService.rememberFeedbackGuardrail(
+            userId,
+            recommendation_title,
+            media_type,
+            feedback_reason
+          ),
+          updates
+            ? walrusMemoryService.routeAndSaveLivingMemory(userId, updates).catch(() => [])
+            : Promise.resolve([]),
+        ]);
+        if (guardrailRes?.savedMemory) savedMemoryStr = guardrailRes.savedMemory;
+        feedbackWalrusWrites = [
+          ...(guardrailRes ? [guardrailRes] : []),
+          ...(Array.isArray(routedWrites) ? routedWrites : []),
+        ];
         console.log(`[Feedback Engine] Persisted guardrail to Walrus for user ${userId}: "${savedMemoryStr}"`);
       } catch (err) {
         console.warn('[Feedback Engine] Walrus guardrail save warning:', err.message);
@@ -288,7 +320,8 @@ router.post('/feedback', async (req, res) => {
 
     res.json({
       ...(updates || {}),
-      saved_memory: savedMemoryStr
+      saved_memory: savedMemoryStr,
+      walrus_writes: feedbackWalrusWrites,
     });
   } catch (error) {
     console.error('[Feedback Error]:', error);
@@ -407,13 +440,13 @@ router.post('/chat', async (req, res) => {
             query: chatRecallQuery,
             namespace: walrusMemoryService.formatNamespace(userId, normType),
             limit: 4,
-            maxDistance: 0.82
+            maxDistance: 0.74
           }).catch(() => []),
           walrusMemoryService.recallMemories({
             query: isWhyQuestion ? `${coda_blurb || ''} intellectual storytelling` : user_message,
             namespace: walrusMemoryService.formatNamespace(userId, 'core'),
             limit: 3,
-            maxDistance: 0.82
+            maxDistance: 0.74
           }).catch(() => []),
           walrusMemoryService.recallMemories({
             query: user_message,
@@ -533,13 +566,13 @@ router.post('/ask', async (req, res) => {
             query: user_message,
             namespace: walrusMemoryService.formatNamespace(userId, 'core'),
             limit: 3,
-            maxDistance: 0.82
+            maxDistance: 0.74
           }).catch(() => []),
           walrusMemoryService.recallMemories({
             query: user_message,
             namespace: walrusMemoryService.formatNamespace(userId, 'session'),
             limit: 2,
-            maxDistance: 0.82
+            maxDistance: 0.74
           }).catch(() => [])
         ]);
         walrusMemories = [...coreMem, ...sessionMem].map(m => ({

@@ -741,7 +741,7 @@ Respond with ONLY a JSON object:
 }`;
 
   try {
-    const responseJson = await llmService.callOpenAI([
+    const responseJson = await llmService.callGemini([
       { role: 'user', content: prompt }
     ], { type: 'json_object' });
     return JSON.parse(responseJson);

@@ -46,13 +46,20 @@ class GroqResponse {
 
 final codaAiServiceProvider = Provider<CodaAiService>((ref) {
   final userId = ref.watch(userIdProvider);
-  return CodaAiService(userId: userId);
+  final userToken = ref.watch(userTokenProvider);
+  return CodaAiService(userId: userId, userToken: userToken);
 });
 
 class CodaAiService {
   final String userId;
+  final String userToken;
 
-  CodaAiService({required this.userId});
+  CodaAiService({required this.userId, this.userToken = ''});
+
+  Map<String, String> get _headers => {
+        'Content-Type': 'application/json',
+        if (userToken.isNotEmpty) 'X-Coda-Token': userToken,
+      };
 
   String _buildSystemPrompt(List<String> currentChips) {
     final chipsStr = currentChips.isEmpty ? 'None' : currentChips.join(', ');
@@ -112,9 +119,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
     List<String> currentChips,
     List<ChatMessage> chatHistory,
   ) async {
-    final headers = {
-      'Content-Type': 'application/json',
-    };
+    final headers = _headers;
 
     final messagesPayload = <Map<String, String>>[
       {'role': 'system', 'content': _buildSystemPrompt(currentChips)},
@@ -164,7 +169,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
           return GroqResponse.fromJson(parsedJson);
         } else {
           lastErrorMsg = 'Server status ${response.statusCode}: ${response.body}';
-          print("OpenAI HTTP error: $lastErrorMsg");
+          print("Coda AI HTTP error: $lastErrorMsg");
           if (attempt < 2) {
             await Future.delayed(const Duration(milliseconds: 1500));
             continue;
@@ -177,7 +182,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
           await Future.delayed(const Duration(milliseconds: 1500));
           continue;
         }
-        print("OpenAI network/parsing error: $e");
+        print("Coda AI network/parsing error: $e");
         return GroqResponse(
           status: 'need_more',
           message: "[Debug Error]: $lastErrorMsg",
@@ -198,9 +203,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
     required List<ChatMessage> chatHistory,
     required List<String> selectedCategories,
   }) async {
-    final headers = {
-      'Content-Type': 'application/json',
-    };
+    final headers = _headers;
 
     final body = jsonEncode({
       'userId': userId,
@@ -260,9 +263,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
     required LivingMemory currentMemory,
     required String tabName,
   }) async {
-    final headers = {
-      'Content-Type': 'application/json',
-    };
+    final headers = _headers;
 
     final body = jsonEncode({
       'userId': userId,
@@ -293,9 +294,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
   }
 
   Future<MemoryUpdates?> harmonizeAllMemory(LivingMemory currentMemory) async {
-    final headers = {
-      'Content-Type': 'application/json',
-    };
+    final headers = _headers;
 
     final body = jsonEncode({
       'userId': userId,
@@ -321,9 +320,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
   }
 
   Future<void> updateSoulSummary(LivingMemory currentMemory, String summaryText) async {
-    final headers = {
-      'Content-Type': 'application/json',
-    };
+    final headers = _headers;
 
     final body = jsonEncode({
       'userId': userId,

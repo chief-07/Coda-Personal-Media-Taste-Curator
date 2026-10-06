@@ -1,7 +1,6 @@
-﻿/**
- * Legacy UserSoulService (Pruned).
- * The authoritative memory layer is now Walrus Protocol (see walrusMemoryService.js).
- * This stub maintains method parity so legacy endpoints can safely no-op without Qdrant errors.
+/**
+ * Legacy UserSoulService Stub.
+ * The authoritative memory layer is Walrus Protocol (see walrusMemoryService.js).
  */
 
 const crypto = require('crypto');

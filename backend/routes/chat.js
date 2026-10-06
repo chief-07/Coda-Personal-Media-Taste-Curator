@@ -87,8 +87,8 @@ const walrus = require('../services/walrusMemoryService');
       }
       try {
         const parsed = JSON.parse(content);
-        if (parsed && parsed.memory_updates) {
-          const userId = req.body.userId || 'demo_user';
+        const userId = req.body.userId;
+        if (parsed && parsed.memory_updates && userId) {
           try {
             const walrusWrites = await Promise.race([
               walrus.routeAndSaveLivingMemory(userId, parsed.memory_updates),

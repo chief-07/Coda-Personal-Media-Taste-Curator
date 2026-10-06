@@ -16,15 +16,12 @@ const selfsigned = require('selfsigned');
 const projectRoot = path.join(__dirname, '..');
 require('./loadEnv');
 
-// Qdrant database decommissioned — pure Walrus Memory protocol used
-// const qdrantService = require('./services/qdrantService');
-// qdrantService.init();
-
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+const { verifyUserIdentity } = require('./middleware/userAuth');
 
 // Routes
 const soulRouter = require('./routes/soul');
@@ -33,20 +30,16 @@ const onboardingRouter = require('./routes/onboarding');
 const matchRouter = require('./routes/match');
 const detectRouter = require('./routes/detect');
 const chatRouter = require('./routes/chat');
-const visualizeRouter = require('./routes/visualize');
-const enrichRouter = require('./routes/enrich');
 const memoryRouter = require('./routes/memory');
 
-// Mounting Routes
-app.use('/api/soul', soulRouter);
-app.use('/api/recommend', recommendRouter);
-app.use('/api/onboarding', onboardingRouter);
-app.use('/api/match', matchRouter);
+// Mounting Routes (with per-account token identity boundary on user-scoped routes)
+app.use('/api/soul', verifyUserIdentity, soulRouter);
+app.use('/api/recommend', verifyUserIdentity, recommendRouter);
+app.use('/api/onboarding', verifyUserIdentity, onboardingRouter);
+app.use('/api/match', verifyUserIdentity, matchRouter);
 app.use('/api/detect', detectRouter);
-app.use('/api/chat', chatRouter);
-app.use('/api/visualize', visualizeRouter);
-app.use('/api/enrich', enrichRouter);
-app.use('/api/memory', memoryRouter);
+app.use('/api/chat', verifyUserIdentity, chatRouter);
+app.use('/api/memory', verifyUserIdentity, memoryRouter);
 app.use('/share', detectRouter); // Mount PWA share target at root /share
 
 // Serve static Flutter web files
@@ -76,9 +69,6 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Coda Backend (HTTP)  → http://0.0.0.0:${PORT}`);
-  
-  // ── Launch Background Worker (Decommissioned with Qdrant) ──
-  // require('./worker');
 });
 
 // ── HTTPS server (LAN microphone access) ─────────────────────────────────────

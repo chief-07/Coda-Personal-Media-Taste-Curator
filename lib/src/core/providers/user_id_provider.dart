@@ -5,6 +5,7 @@ import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 
 class UserIdNotifier extends Notifier<String> {
   static const _key = 'coda_user_id';
+  static const _tokenKey = 'coda_user_token';
   static const _accountsListKey = 'coda_accounts_list';
   static const _creatingNewAccountKey = 'coda_creating_new_account';
   static const _previousAccountIdKey = 'coda_previous_account_id';
@@ -20,6 +21,30 @@ class UserIdNotifier extends Notifier<String> {
     'music',
   ];
 
+  String _generateToken() {
+    final random = Random();
+    final hex = List.generate(32, (_) => random.nextInt(16).toRadixString(16)).join('');
+    return 'tok_$hex';
+  }
+
+  String _ensureTokenForAccount(SharedPreferences prefs, String accountId) {
+    final snapKey = 'acct_${accountId}_$_tokenKey';
+    String? token = prefs.getString(snapKey);
+    if (token == null || token.isEmpty) {
+      final activeToken = prefs.getString(_tokenKey);
+      if (accountId == prefs.getString(_key) &&
+          activeToken != null &&
+          activeToken.isNotEmpty) {
+        token = activeToken;
+      } else {
+        token = _generateToken();
+      }
+      prefs.setString(snapKey, token);
+    }
+    prefs.setString(_tokenKey, token);
+    return token;
+  }
+
   @override
   String build() {
     final prefs = ref.watch(sharedPreferencesProvider);
@@ -32,6 +57,8 @@ class UserIdNotifier extends Notifier<String> {
       userId = 'user_${timestamp}_$randomPart';
       prefs.setString(_key, userId);
     }
+
+    _ensureTokenForAccount(prefs, userId);
 
     final isCreatingNew = prefs.getBool(_creatingNewAccountKey) == true;
     final accounts = List<String>.from(prefs.getStringList(_accountsListKey) ?? []);
@@ -104,6 +131,7 @@ class UserIdNotifier extends Notifier<String> {
     await saveKey('coda_onboarding_chips');
     await saveKey('coda_archived_sessions_v1');
     await saveKey('coda_onboarding_completed');
+    await saveKey(_tokenKey);
 
     final allTypes = _collectAllTypeNames(prefs, accountId);
     for (final type in allTypes) {
@@ -127,6 +155,8 @@ class UserIdNotifier extends Notifier<String> {
     await restoreKey('coda_onboarding_chips');
     await restoreKey('coda_archived_sessions_v1');
     await restoreKey('coda_onboarding_completed');
+    await restoreKey(_tokenKey);
+    _ensureTokenForAccount(prefs, accountId);
 
     for (final type in allTypes) {
       await restoreKey('coda_active_pick_$type');
@@ -143,6 +173,7 @@ class UserIdNotifier extends Notifier<String> {
     await prefs.remove('coda_onboarding_completed');
     await prefs.remove('coda_active_session_recommendation');
     await prefs.remove('coda_archived_sessions_v1');
+    await prefs.remove(_tokenKey);
     for (final type in allTypes) {
       await prefs.remove('coda_active_pick_$type');
       await prefs.remove('coda_buffer_pick_$type');
@@ -181,6 +212,9 @@ class UserIdNotifier extends Notifier<String> {
 
     await _clearWorkingStateForNewAccount(prefs);
     await prefs.setString(_key, newId);
+    final newToken = _generateToken();
+    await prefs.setString(_tokenKey, newToken);
+    await prefs.setString('acct_${newId}_$_tokenKey', newToken);
     state = newId;
     return newId;
   }
@@ -269,6 +303,14 @@ class UserIdNotifier extends Notifier<String> {
 
 final userIdProvider = NotifierProvider<UserIdNotifier, String>(() {
   return UserIdNotifier();
+});
+
+final userTokenProvider = Provider<String>((ref) {
+  final activeId = ref.watch(userIdProvider);
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return prefs.getString('acct_${activeId}_coda_user_token') ??
+      prefs.getString('coda_user_token') ??
+      '';
 });
 
 final userAccountsListProvider = Provider<List<String>>((ref) {

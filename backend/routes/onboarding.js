@@ -121,7 +121,7 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
 router.post('/profile', async (req, res) => {
   try {
     const { userMessage, tabName, isLastTab, chatHistory, selectedCategories, userId } = req.body;
-    const activeUserId = userId || 'demo_user';
+    const activeUserId = userId || null;
     
     const messagesPayload = [
       { role: 'system', content: buildTasteProfileSystemPrompt(tabName, isLastTab, selectedCategories) }

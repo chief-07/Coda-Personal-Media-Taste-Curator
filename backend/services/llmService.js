@@ -31,7 +31,6 @@ const callGemini = async (messages, responseFormat = null, modelOverride = null,
 
   return responseData.choices[0].message.content;
 };
-const callOpenAI = callGemini;
 
 const normalizeMediaType = (type) => {
   if (!type) return 'anime';
@@ -251,7 +250,7 @@ Respond ONLY with a JSON object:
 
   const userPrompt = JSON.stringify(payload, null, 2);
 
-  const responseJson = await callOpenAI([
+  const responseJson = await callGemini([
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt }
   ], { type: 'json_object' });
@@ -282,7 +281,7 @@ Respond ONLY with a JSON object:
 }
 `;
   try {
-    const responseJson = await callOpenAI([
+    const responseJson = await callGemini([
       { role: 'system', content: systemPrompt }
     ], { type: 'json_object' });
     const parsed = JSON.parse(responseJson);
@@ -384,7 +383,7 @@ Respond ONLY with a JSON object:
 }
 `;
 
-  const response = await callOpenAI([
+  const response = await callGemini([
     { role: 'system', content: systemPrompt }
   ], { type: "json_object" });
 
@@ -442,7 +441,7 @@ Respond ONLY with a JSON object:
 }
 `;
 
-  const response = await callOpenAI([
+  const response = await callGemini([
     { role: 'system', content: systemPrompt }
   ], { type: "json_object" });
 
@@ -538,7 +537,7 @@ Respond ONLY with a JSON object:
 }
 `;
 
-  const response = await callOpenAI([
+  const response = await callGemini([
     { role: 'system', content: systemPrompt }
   ], { type: "json_object" });
 
@@ -628,7 +627,7 @@ Respond ONLY with a JSON object:
     });
   }
 
-  const response = await callOpenAI(messagesPayload, { type: "json_object" });
+  const response = await callGemini(messagesPayload, { type: "json_object" });
   const parsedResponse = JSON.parse(response);
 
   // If we generated a soul graph, serialize it into global_identity_overwrite as expected by the client
@@ -651,7 +650,7 @@ Example output:
 ["Steins;Gate", "Monster", "Naruto"]`;
 
   try {
-    const response = await callOpenAI([
+    const response = await callGemini([
       { role: 'user', content: prompt }
     ], { type: "json_object" });
     const parsed = JSON.parse(response);
@@ -915,7 +914,7 @@ The JSON format must be EXACTLY:
 `;
 
 
-  const response = await callOpenAI([
+  const response = await callGemini([
     { role: 'system', content: systemPrompt }
   ], { type: "json_object" });
 
@@ -980,7 +979,7 @@ Respond ONLY with a JSON object:
 `;
 
   try {
-    const response = await callOpenAI([
+    const response = await callGemini([
       { role: 'system', content: systemPrompt }
     ], { type: "json_object" });
     return JSON.parse(response);
@@ -999,7 +998,7 @@ For all other messages—including any questions about the media, its plot, them
 Respond with EXACTLY "TRUE" or "FALSE" (no other text).
 `;
   try {
-    const response = await callOpenAI([
+    const response = await callGemini([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userMessage }
     ]);
@@ -1117,7 +1116,7 @@ Respond ONLY with a JSON object:
   messagesPayload.push({ role: 'user', content: userMessage });
 
   try {
-    const responseJson = await callOpenAI(messagesPayload, { type: 'json_object' });
+    const responseJson = await callGemini(messagesPayload, { type: 'json_object' });
     return JSON.parse(responseJson);
   } catch (e) {
     console.error('[Discuss Chat LLM Parse Error]:', e.message);
@@ -1223,7 +1222,7 @@ Respond ONLY with a JSON object in this format:
 
   messagesPayload.push({ role: 'user', content: userMessage });
 
-  const response = await callOpenAI(messagesPayload, { type: "json_object" });
+  const response = await callGemini(messagesPayload, { type: "json_object" });
   return JSON.parse(response);
 };
 
@@ -1242,7 +1241,7 @@ Respond with ONLY a JSON object in this format:
   "studio": "Studio name or developer or publisher or creator/director"
 }`;
   try {
-    const responseJson = await callOpenAI([
+    const responseJson = await callGemini([
       { role: 'user', content: prompt }
     ], { type: 'json_object' });
     return JSON.parse(responseJson);
@@ -1268,7 +1267,7 @@ Respond with ONLY a JSON object:
   "titles": ["Title 1", "Title 2"]
 }`;
   try {
-    const responseJson = await callOpenAI([
+    const responseJson = await callGemini([
       { role: 'user', content: prompt }
     ], { type: 'json_object' });
     const parsed = JSON.parse(responseJson);
@@ -1305,7 +1304,7 @@ Respond with ONLY a JSON object:
 }`;
 
   try {
-    const responseJson = await callOpenAI([
+    const responseJson = await callGemini([
       { role: 'system', content: `You are a professional recommender system for ${mediaType}.` },
       { role: 'user', content: prompt }
     ], { type: 'json_object' });
@@ -1380,7 +1379,7 @@ Respond with ONLY a valid JSON object matching the schema.
   }, null, 2);
 
   try {
-    const responseJson = await callOpenAI([
+    const responseJson = await callGemini([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt }
     ], { type: 'json_object' });
@@ -1435,7 +1434,7 @@ Respond with ONLY a valid JSON object matching the schema.
   }, null, 2);
 
   try {
-    const responseJson = await callOpenAI([
+    const responseJson = await callGemini([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt }
     ], { type: 'json_object' });
@@ -1480,7 +1479,7 @@ Respond with ONLY a JSON object:
   }, null, 2);
 
   try {
-    const responseJson = await callOpenAI([
+    const responseJson = await callGemini([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt }
     ], { type: 'json_object' });
@@ -1581,7 +1580,7 @@ Respond with ONLY a JSON object:
   }, null, 2);
 
   try {
-    const responseJson = await callOpenAI([
+    const responseJson = await callGemini([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt }
     ], { type: 'json_object' });
@@ -1649,7 +1648,7 @@ Respond with ONLY a JSON object:
   }, null, 2);
 
   try {
-    const responseJson = await callOpenAI([
+    const responseJson = await callGemini([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt }
     ], { type: 'json_object' });
@@ -1692,7 +1691,7 @@ Return ONLY a JSON object with these 13 exact keys.
 
   const userPrompt = JSON.stringify(mediaData, null, 2);
 
-  const responseJson = await callOpenAI([
+  const responseJson = await callGemini([
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt }
   ], { type: 'json_object' });
@@ -1846,7 +1845,7 @@ Return ONLY a JSON object:
 
   const userPrompt = JSON.stringify(soul, null, 2);
 
-  const responseJson = await callOpenAI([
+  const responseJson = await callGemini([
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt }
   ], { type: 'json_object' });
@@ -1986,7 +1985,7 @@ Return ONLY a JSON object:
     }))
   }, null, 2);
 
-  const responseJson = await callOpenAI([
+  const responseJson = await callGemini([
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt }
   ], {
@@ -2081,7 +2080,7 @@ Return ONLY a JSON object:
     }
   }, null, 2);
 
-  const responseJson = await callOpenAI([
+  const responseJson = await callGemini([
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt }
   ], { type: 'json_object' });
@@ -2125,7 +2124,7 @@ ${historyDump}
 };
 
 module.exports = {
-  callOpenAI,
+  callGemini,
   synthesizeAndRoute,
   extractCandidateTitles,
   scoreAndSelect,
@@ -2148,9 +2147,6 @@ module.exports = {
   synthesizeTargetSessionDNA,
   generateMediaDescription,
   synthesizeSearchBrief,
-  evaluateCandidates,
   fallbackAskChat,
-  extractLovedTitles,
-  callGemini,
-  callOpenAI
+  extractLovedTitles
 };

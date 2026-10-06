@@ -127,13 +127,20 @@ class RecommendationResult {
 
 final recommendationServiceProvider = Provider<RecommendationService>((ref) {
   final userId = ref.watch(userIdProvider);
-  return RecommendationService(userId: userId);
+  final userToken = ref.watch(userTokenProvider);
+  return RecommendationService(userId: userId, userToken: userToken);
 });
 
 class RecommendationService {
   final String userId;
+  final String userToken;
 
-  RecommendationService({required this.userId});
+  RecommendationService({required this.userId, this.userToken = ''});
+
+  Map<String, String> get authHeaders => {
+        'Content-Type': 'application/json',
+        if (userToken.isNotEmpty) 'X-Coda-Token': userToken,
+      };
 
   static String get _baseUrl => '${getApiBaseUrl()}/api/recommend';
 
@@ -179,7 +186,7 @@ class RecommendationService {
     try {
       final response = await http.post(
         Uri.parse(targetUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode(payload),
       );
 
@@ -220,7 +227,7 @@ class RecommendationService {
     try {
       final response = await http.post(
         Uri.parse(targetUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode(payload),
       );
 
@@ -244,7 +251,7 @@ class RecommendationService {
     try {
       final response = await http.post(
         Uri.parse('${getApiBaseUrl()}/api/recommend/pitch'),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode({
           'title': title,
           'requested_media_type': mediaType,
@@ -279,8 +286,12 @@ class RecommendationService {
     bool memoriesEnabled = true,
   }) async {
     final payload = {
-      'userId': userId,
-      'current_memory': memory.toJson(),
+      'userId': memoriesEnabled ? userId : null,
+      'current_memory': memoriesEnabled
+          ? memory.toJson()
+          : (watchlistOnly
+              ? {'watchlist': memory.toJson()['watchlist'] ?? []}
+              : <String, dynamic>{}),
       'chat_history': chatHistory,
       'user_message': userMessage,
       'watchlist_only': watchlistOnly,
@@ -292,7 +303,7 @@ class RecommendationService {
     try {
       final response = await http.post(
         Uri.parse(targetUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode(payload),
       );
 
@@ -323,8 +334,8 @@ class RecommendationService {
     bool memoriesEnabled = true,
   }) async {
     final payload = {
-      'userId': userId,
-      'current_memory': memory.toJson(),
+      'userId': memoriesEnabled ? userId : null,
+      'current_memory': memoriesEnabled ? memory.toJson() : <String, dynamic>{},
       'title': title,
       'media_type': mediaType,
       'coda_blurb': codaBlurb,
@@ -339,7 +350,7 @@ class RecommendationService {
     try {
       final response = await http.post(
         Uri.parse(targetUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode(payload),
       );
 
@@ -367,8 +378,8 @@ class RecommendationService {
     bool memoriesEnabled = true,
   }) async {
     final payload = {
-      'userId': userId,
-      'current_memory': memory.toJson(),
+      'userId': memoriesEnabled ? userId : null,
+      'current_memory': memoriesEnabled ? memory.toJson() : <String, dynamic>{},
       'title': title,
       'media_type': mediaType,
       'coda_blurb': codaBlurb,
@@ -383,7 +394,7 @@ class RecommendationService {
     try {
       final response = await http.post(
         Uri.parse(targetUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode(payload),
       );
 
@@ -437,7 +448,7 @@ class RecommendationService {
     try {
       final response = await http.post(
         Uri.parse('${getApiBaseUrl()}/api/recommend/walrus-live'),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode({
           'userId': userId,
           'job_ids': jobIds,
@@ -510,7 +521,7 @@ extension RecommendationServiceMatch on RecommendationService {
     try {
       final response = await http.post(
         Uri.parse(targetUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode(payload),
       );
 
@@ -542,7 +553,7 @@ extension RecommendationServiceMatch on RecommendationService {
     try {
       final response = await http.post(
         Uri.parse(targetUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode(payload),
       );
 
@@ -564,15 +575,17 @@ extension RecommendationServiceMatch on RecommendationService {
   Future<String?> submitSwipe({
     required String title,
     required String action, // 'loved', 'not_for_me', 'seen'
+    String? mediaType,
   }) async {
     try {
       final response = await http.post(
         Uri.parse('${getApiBaseUrl()}/api/recommend/swipe'),
-        headers: {'Content-Type': 'application/json'},
+        headers: authHeaders,
         body: jsonEncode({
           'userId': userId,
           'title': title,
           'action': action,
+          if (mediaType != null && mediaType.isNotEmpty) 'media_type': mediaType,
         }),
       );
       if (response.statusCode == 200) {

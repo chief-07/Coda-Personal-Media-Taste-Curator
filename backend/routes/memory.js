@@ -36,8 +36,14 @@ router.get('/health', async (req, res) => {
     const health = await client.health();
     res.json({
       status: 'connected',
-      accountId: process.env.MEMWAL_ACCOUNT_ID || '0x48b30fecc266bef51e01ae32c4f610bbe2910ed09a4c022e27383999aa331d55',
-      relayer: process.env.MEMWAL_SERVER_URL || 'https://relayer.memory.walrus.xyz',
+      accountId:
+        process.env.MEMWAL_ACCOUNT_ID ||
+        process.env.WALRUS_MEMORY_ACCOUNT_ID ||
+        null,
+      relayer:
+        process.env.MEMWAL_SERVER_URL ||
+        process.env.WALRUS_MEMORY_RELAYER_URL ||
+        'https://relayer.memory.walrus.xyz',
       health,
     });
   } catch (err) {

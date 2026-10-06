@@ -306,6 +306,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           notForMeAppends: [rec.title],
         );
         await ref.read(livingMemoryProvider.notifier).applyUpdates(updates);
+        await ref.read(recommendationServiceProvider).submitSwipe(
+          title: rec.title,
+          action: 'not_for_me',
+          mediaType: rec.mediaType.name,
+        );
       } catch (e) {
         debugPrint('Error updating rejected list: $e');
       }
@@ -355,6 +360,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         final savedMem = await ref.read(recommendationServiceProvider).submitSwipe(
           title: rec.title,
           action: 'seen',
+          mediaType: rec.mediaType.name,
         );
 
         if (mounted) {
@@ -415,6 +421,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         final savedMem = await ref.read(recommendationServiceProvider).submitSwipe(
           title: rec.title,
           action: 'loved',
+          mediaType: rec.mediaType.name,
         );
 
         if (mounted) {
@@ -446,15 +453,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           globalIdentityAppends: updates.globalIdentityAppends,
           categoryAppends: updates.categoryAppends,
           recentContextOverwrite: updates.recentContextOverwrite,
-          guardrailsAppends: [
-            ...updates.guardrailsAppends,
-            'Avoid: ${rec.title} ($reason)',
-          ],
+          guardrailsAppends: updates.guardrailsAppends,
           seenAppends: updates.seenAppends,
-          notForMeAppends: [
-            ...updates.notForMeAppends,
-            rec.title,
-          ],
+          notForMeAppends: updates.notForMeAppends,
           savedMemory: updates.savedMemory,
         );
 

@@ -4,16 +4,39 @@ if (dns.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 let memwalInstance = null;
 let initPromise = null;
 
+function getMemwalEnvConfig() {
+  const key = (
+    process.env.MEMWAL_PRIVATE_KEY ||
+    process.env.WALRUS_MEMORY_KEY ||
+    ''
+  ).trim();
+  const accountId = (
+    process.env.MEMWAL_ACCOUNT_ID ||
+    process.env.WALRUS_MEMORY_ACCOUNT_ID ||
+    ''
+  ).trim();
+  const serverUrl = (
+    process.env.MEMWAL_SERVER_URL ||
+    process.env.WALRUS_MEMORY_RELAYER_URL ||
+    'https://relayer.memory.walrus.xyz'
+  ).trim();
+  return { key, accountId, serverUrl };
+}
+
 async function getClient() {
   if (memwalInstance) return memwalInstance;
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
     const { MemWal } = await import('@mysten-incubation/memwal');
-    
-    const key = process.env.MEMWAL_PRIVATE_KEY || 'f04743303d3babe664d0a7ab410f03426a7ae61a09d81bded730d5118f0f3677';
-    const accountId = process.env.MEMWAL_ACCOUNT_ID || '0x48b30fecc266bef51e01ae32c4f610bbe2910ed09a4c022e27383999aa331d55';
-    const serverUrl = process.env.MEMWAL_SERVER_URL || 'https://relayer.memory.walrus.xyz';
+    const { key, accountId, serverUrl } = getMemwalEnvConfig();
+
+    if (!key || !accountId) {
+      initPromise = null;
+      throw new Error(
+        'Missing Walrus Memory credentials. Set MEMWAL_PRIVATE_KEY and MEMWAL_ACCOUNT_ID in environment variables.'
+      );
+    }
 
     memwalInstance = MemWal.create({
       key,
@@ -501,8 +524,8 @@ async function recallForRecommendation(userId, mediaType, contextualQuery = null
     ({ coreHitsRaw, categoryHitsRaw, guardrailHitsRaw, sessionHitsRaw } = cachedRaw.data);
   } else {
     [coreHitsRaw, categoryHitsRaw, guardrailHitsRaw, sessionHitsRaw] = await Promise.all([
-      recallMemories({ query: coreQuery, namespace: coreNs, limit: 8, maxDistance: 0.84 }).catch(() => []),
-      recallMemories({ query: categoryQuery, namespace: primaryNs, limit: 8, maxDistance: 0.84 }).catch(() => []),
+      recallMemories({ query: coreQuery, namespace: coreNs, limit: 8, maxDistance: 0.74 }).catch(() => []),
+      recallMemories({ query: categoryQuery, namespace: primaryNs, limit: 8, maxDistance: 0.74 }).catch(() => []),
       // Full namespace fetch for guardrails: sort by recent, limit 50, no maxDistance cutoff
       recallMemories({ query: guardrailQuery, namespace: guardrailNs, limit: 50, sort: 'recent' }).catch(() => []),
       recallMemories({ query: sessionQuery, namespace: sessionNs, limit: 3, maxDistance: 0.62 }).catch(() => []),
@@ -558,9 +581,9 @@ async function recallForRecommendation(userId, mediaType, contextualQuery = null
   const categoryHits = mergeUnindexedWrites(categoryHitsRaw, primaryNs, `${normalizedCategory.toUpperCase()} Taste Anchor`, categoryQuery);
   const guardrailHits = mergeUnindexedWrites(guardrailHitsRaw, guardrailNs, 'Guardrail Protocol', guardrailQuery);
 
-  // Only keep session hits if they are a genuine close semantic match (distance <= 0.62) or explicit contextualQuery
+  // Only keep session hits if they are a genuine close semantic match (distance <= 0.62) and either an explicit contextualQuery or situational probe is active
   const sessionHits = sessionHitsRaw
-    .filter(h => contextualQuery || (typeof h.distance === 'number' && h.distance <= 0.62))
+    .filter(h => (contextualQuery || queryInfo.isSituational) && typeof h.distance === 'number' && h.distance <= 0.62)
     .map(h => formatHit(h, sessionNs, `Active Craving (${ambient.time_of_day})`, sessionQuery));
 
   // Check if time-of-day actually matched a real habit in :session or :core (distance <= 0.62)
@@ -587,21 +610,21 @@ async function recallForRecommendation(userId, mediaType, contextualQuery = null
     spotlightMemories.push(mem);
   };
 
-  // 1. If there is a genuine active session craving, spotlight it first
-  if (sessionHits.length > 0) {
-    pushUnique(sessionHits[0]);
-  }
-
-  // 2. Spotlight 1 rotated atomic facet from :core
+  // 1. Spotlight 1 rotated atomic facet from :core first (so permanent preferences always lead)
   if (coreHits.length > 0) {
     const chosenCore = coreHits[currentTraversalIdx % coreHits.length];
     pushUnique(chosenCore);
   }
 
-  // 3. Spotlight 1 rotated category taste anchor from :{mediaType}
+  // 2. Spotlight 1 rotated category taste anchor from :{mediaType}
   if (categoryHits.length > 0) {
     const firstCat = categoryHits[currentTraversalIdx % categoryHits.length];
     pushUnique(firstCat);
+  }
+
+  // 3. If an explicit contextualQuery or situational probe matched a close session craving, include it without overriding core/category anchors
+  if (sessionHits.length > 0) {
+    pushUnique(sessionHits[0]);
   }
 
   // Effective angle: if Probe 4 (situational time-of-day) was used but the user has NO time-of-day habit stored,
@@ -736,9 +759,10 @@ async function inspectLiveWalrus({ userId, jobIds = [], query = null, category =
     }));
   }
 
+  const { accountId, serverUrl } = getMemwalEnvConfig();
   return {
-    account_id: process.env.MEMWAL_ACCOUNT_ID || '0x48b30fecc266bef51e01ae32c4f610bbe2910ed09a4c022e27383999aa331d55',
-    relayer_url: process.env.MEMWAL_SERVER_URL || 'https://relayer.memory.walrus.xyz',
+    account_id: accountId,
+    relayer_url: serverUrl,
     user_id: activeUserId,
     namespaces: userNamespaces,
     recent_writes: resolvedWrites.slice(0, 15),
