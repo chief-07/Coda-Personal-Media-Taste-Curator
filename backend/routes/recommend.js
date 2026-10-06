@@ -130,7 +130,7 @@ router.post('/', async (req, res) => {
     const walrusRec = await walrusMemoryService.curateWithWalrusMemory({
       userId: isMemoriesEnabled ? userId : null,
       mediaType: requested_media_type,
-      currentMemory: isMemoriesEnabled ? current_memory : (isWatchlist ? { watchlist: current_memory?.watchlist || [] } : {}),
+      currentMemory: isWatchlist ? { watchlist: current_memory?.watchlist || [] } : {},
       contextualState: isMemoriesEnabled ? contextualState : null,
       watchlistOnly: isWatchlist,
       memoriesEnabled: isMemoriesEnabled

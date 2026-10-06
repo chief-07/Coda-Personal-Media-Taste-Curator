@@ -85,33 +85,34 @@ Rule 1: Always respond with a JSON object in this format (NEVER include literal 
   "message": "Your natural, warm conversational reply (1-2 sentences validating their taste, followed seamlessly by a clear question for the next milestone).",
   "show_buttons": false,
   "memory_updates": {
-    "global_identity_appends": ["[Synthesized core aesthetic and emotional themes, e.g. 'Drawn to quiet bittersweet melancholy']"],
-    "category_appends": {"${tabName.toLowerCase() === 'you' ? 'movie' : tabName.toLowerCase()}": ["[Title with brief semantic genre/theme context, e.g. 'Love Letter (poignant Japanese romantic drama about memory, grief, and unspoken longing)']"]},
-    "recent_context_overwrite": "[Extract current mood/craving or late-night vibe here]",
-    "guardrails_appends": ["[Extract explicit dealbreakers/platforms here, e.g. 'No gore', 'Must be on Netflix']"],
-    "thematic_connections_appends": ["[Deep psychological themes, e.g. 'Unspoken grief and persistent longing']"],
-    "seen_appends": ["[Clean exact titles mentioned by user as watched/read/known, e.g. 'Love Letter', 'Rainbow Song']"]
+    "global_identity_appends": [
+      "Distinct atomic taste facet 1 (e.g. 'Uses comedy and striking visual style to explore serious psychological themes')",
+      "Distinct atomic taste facet 2 (e.g. 'Loves nostalgic, tender Japanese romantic melodramas about memory and longing')"
+    ],
+    "category_appends": {
+      "${tabName.toLowerCase() === 'you' ? 'movie' : tabName.toLowerCase()}": [
+        "Title or related cluster with brief genre/theme essence (e.g. 'Interstellar & Shutter Island (mind-bending sci-fi and psychological mystery films)')",
+        "Another distinct cluster (e.g. 'Heavenly Forest, Be With You, Love Letter, Rainbow Song (classic nostalgic Japanese romance and bittersweet drama)')"
+      ]
+    },
+    "recent_context_overwrite": "",
+    "guardrails_appends": ["Explicit negative dealbreakers only, e.g. 'No gore'"],
+    "thematic_connections_appends": [],
+    "seen_appends": ["Interstellar", "Shutter Island", "Heavenly Forest", "Be With You", "Love Letter", "Rainbow Song"]
   }
 }
+
+CRITICAL RULE: ATOMIC FACTS — DO NOT GLUE UNRELATED TASTES TOGETHER:
+- Never combine different genres or unrelated preferences (like "I like action" and "I like romance") into a single string!
+- Each distinct genre/vibe preference MUST be its own separate string element in "global_identity_appends" (max 2-3 distinct atomic facets per turn).
+- In "category_appends", group closely related titles together into 1-2 distinct atomic cluster strings per category (each containing the title(s) and their genre/tonal essence).
+- Do NOT populate "recent_context_overwrite" unless the user explicitly states a right-now craving or time-of-day habit (e.g. "I want something soothing at night" or "Right now I want a comedy"). Otherwise leave "recent_context_overwrite": "".
 
 CRITICAL RULE: DELTA-ONLY MEMORY UPDATES:
 "memory_updates" MUST contain ONLY the new facts, titles, themes, or guardrails extracted STRICTLY from the user's LATEST message.
 Do NOT repeat, duplicate, or re-include any titles, themes, or guardrails that were already discussed in earlier turns of the chat history.
-If the user's latest message does not introduce new guardrails, keep "guardrails_appends": []. If it does not introduce new titles, keep "seen_appends": [] and "category_appends": {}.
-Every turn's "memory_updates" must represent strictly the atomic delta introduced in this specific turn.
-CRITICAL RULE: THEMATIC SYNTHESIS OVER SURFACE LISTS:
-When the user lists or mentions specific titles (e.g. "Rainbow Song, Love Letter, Be With You"), DO NOT merely record "Likes Rainbow Song".
-Use your cultural and artistic knowledge of those works to synthesize their underlying emotional, aesthetic, and psychological DNA:
-- What common thread connects them? (e.g. "Drawn to bittersweet Japanese romantic nostalgia, unspoken longing, quiet grief, and tender melancholy")
-- Put that synthesized thematic insight into "global_identity_appends" or "thematic_connections_appends".
-- Add the titles with their brief semantic genre/emotional essence into "category_appends" under the appropriate category key (e.g. "movie", "anime", "book").
-- ALWAYS also add the clean title name of every work the user mentions having experienced into "seen_appends". This ensures Coda records them as already watched/read to avoid recommending them again!
-
-CRITICAL RULE: HARVEST EMOTIONAL RESPONSES & TRIGGERS: Actively listen for how the user reacted emotionally to works they liked or mentioned (e.g. "made me cry", "existential dread", "gave me chills", "comfort show", "felt lonely"). Extract these emotional reactions, triggers, and psychological needs, and append them as descriptive statements to "global_identity_appends" or "thematic_connections_appends".
-CRITICAL RULE: NEVER place prompt rules, system instructions, or positive preferences into "guardrails_appends". "guardrails_appends" is strictly and solely for USER-SPECIFIED NEGATIVE constraints (e.g. "Hates Mecha", "No jumpscares", "No gore") or REQUIRED PLATFORMS. If the user did not specify a negative boundary, keep "guardrails_appends": [].
-CRITICAL RULE: "memory_updates" is your Living Memory. Whenever you learn a new piece of information about the user's taste, add it to the corresponding list. If they mention a fleeting mood, ambient context, or current craving, put it in "recent_context_overwrite". 
-CRITICAL RULE: "show_buttons" MUST be false by default. Set "show_buttons": true once you have completed the conversational steps above, or if the user explicitly asks to move on or get a pick. Always include the open invitation when showing buttons.
-CRITICAL RULE: FORWARD-DRIVING QUESTIONS MANDATE: Unless "show_buttons": true (Milestone 4 wrap-up), your message MUST ALWAYS end with a clear, engaging, low-pressure question driving the user toward the next milestone. NEVER end on a declarative statement, passive reflection, or trailing observation. The user must always have an explicit question to answer.
+ALWAYS add the clean individual title names of every work the user mentions having experienced into "seen_appends" so Coda never recommends them again.
+CRITICAL RULE: NEVER place prompt rules, system instructions, or positive preferences into "guardrails_appends". "guardrails_appends" is strictly for USER-SPECIFIED NEGATIVE constraints.
 
 Always return valid JSON. Do not return any other text, markdown formatting, or explanation.
 `;
@@ -203,9 +204,15 @@ router.post('/profile', async (req, res) => {
           if (Array.isArray(titles)) {
             for (const t of titles) {
               if (typeof t === 'string' && t.trim()) {
-                const baseTitle = t.split(/\s*(?:\(|—)\s*/)[0].trim();
-                if (baseTitle && !mu.seen_appends.includes(baseTitle)) {
-                  mu.seen_appends.push(baseTitle);
+                const headPart = t.split(/\s*(?:\(|—)\s*/)[0].trim();
+                const individualTitles = headPart
+                  .split(/\s*(?:,|&|\band\b)\s*/i)
+                  .map(s => s.trim())
+                  .filter(Boolean);
+                for (const singleTitle of individualTitles) {
+                  if (singleTitle && !mu.seen_appends.includes(singleTitle)) {
+                    mu.seen_appends.push(singleTitle);
+                  }
                 }
               }
             }
@@ -225,13 +232,14 @@ router.post('/profile', async (req, res) => {
           });
         }
         
-        // Filter category_appends to only include titles in the current message
+        // Filter category_appends to only include clusters/titles mentioned in the current message
         if (mu.category_appends && typeof mu.category_appends === 'object') {
           for (const [cat, titles] of Object.entries(mu.category_appends)) {
             if (Array.isArray(titles)) {
               mu.category_appends[cat] = titles.filter(t => {
-                const baseTitle = String(t).split(/\s*(?:\(|—)\s*/)[0].trim().toLowerCase();
-                return baseTitle && currentMsgLower.includes(baseTitle);
+                const headPart = String(t).split(/\s*(?:\(|—)\s*/)[0].trim().toLowerCase();
+                const parts = headPart.split(/\s*(?:,|&|\band\b)\s*/i).map(s => s.trim()).filter(Boolean);
+                return parts.some(p => currentMsgLower.includes(p));
               });
               if (mu.category_appends[cat].length === 0) {
                 delete mu.category_appends[cat];

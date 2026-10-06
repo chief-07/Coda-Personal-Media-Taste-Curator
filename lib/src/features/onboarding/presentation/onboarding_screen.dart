@@ -11,9 +11,11 @@ import 'package:go_router/go_router.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/core/providers/shared_preferences_provider.dart';
+import 'package:coda/src/core/providers/user_id_provider.dart';
 import 'package:coda/src/core/theme/ambient_bloom.dart';
 import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
 import 'package:coda/src/features/recommendation/application/audio_player_controller.dart';
+import 'package:coda/src/features/session/application/archived_sessions_controller.dart';
 
 const _askRecommendation = Recommendation(
   id: 'ask-coda',
@@ -147,6 +149,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final onboardingState = ref.watch(onboardingControllerProvider);
     final messages = onboardingState.messages;
     final isLoading = onboardingState.isLoading;
+    final isCreatingNewAccount =
+        ref.watch(sharedPreferencesProvider).getBool('coda_creating_new_account') == true;
 
     ref.listen(onboardingControllerProvider, (previous, next) {
       if (previous?.messages.length != next.messages.length ||
@@ -284,26 +288,66 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           recommendation: rec,
                           isKnockoutLayer: false,
                           scrollController: _topScrollController,
-                        messages: messages,
-                        isLoading: isLoading,
+                          messages: messages,
+                          isLoading: isLoading,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: _PromptBar(
-                      isKnockoutLayer: false,
-                      chatController: _chatController,
-                      chatFocusNode: _chatFocusNode,
-                      onSend: _sendMessage,
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: _PromptBar(
+                        isKnockoutLayer: false,
+                        chatController: _chatController,
+                        chatFocusNode: _chatFocusNode,
+                        onSend: _sendMessage,
+                      ),
                     ),
-                  ),
-                ],
+                    if (isCreatingNewAccount)
+                      Positioned(
+                        top: MediaQuery.of(context).padding.top + 28,
+                        right: 24,
+                        child: GestureDetector(
+                          onTap: () async {
+                            final router = GoRouter.of(context);
+                            await ref.read(userIdProvider.notifier).cancelNewAccountCreation();
+                            ref.invalidate(livingMemoryProvider);
+                            ref.invalidate(onboardingControllerProvider);
+                            ref.invalidate(archivedSessionsProvider);
+                            ref.invalidate(selectedMediaTypeProvider);
+                            ref.invalidate(activeSessionProvider);
+                            ref.invalidate(homeRecommendationProvider);
+                            router.go('/home');
+                          },
+                          child: ClipOval(
+                            child: BackdropFilter(
+                              filter: dart_ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withValues(alpha: 0.08),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.16),
+                                    width: 1.2,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  PhosphorIconsBold.arrowLeft,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
           ],
         ),
       ),

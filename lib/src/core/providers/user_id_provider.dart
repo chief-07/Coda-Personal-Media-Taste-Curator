@@ -6,6 +6,8 @@ import 'package:coda/src/core/providers/shared_preferences_provider.dart';
 class UserIdNotifier extends Notifier<String> {
   static const _key = 'coda_user_id';
   static const _accountsListKey = 'coda_accounts_list';
+  static const _creatingNewAccountKey = 'coda_creating_new_account';
+  static const _previousAccountIdKey = 'coda_previous_account_id';
   static const _defaultMediaTypes = [
     'anime',
     'movie',
@@ -31,8 +33,9 @@ class UserIdNotifier extends Notifier<String> {
       prefs.setString(_key, userId);
     }
 
+    final isCreatingNew = prefs.getBool(_creatingNewAccountKey) == true;
     final accounts = List<String>.from(prefs.getStringList(_accountsListKey) ?? []);
-    if (!accounts.contains(userId)) {
+    if (!isCreatingNew && !accounts.contains(userId)) {
       accounts.add(userId);
       prefs.setStringList(_accountsListKey, accounts);
     }
@@ -42,8 +45,9 @@ class UserIdNotifier extends Notifier<String> {
 
   List<String> getAccounts() {
     final prefs = ref.read(sharedPreferencesProvider);
+    final isCreatingNew = prefs.getBool(_creatingNewAccountKey) == true;
     final accounts = List<String>.from(prefs.getStringList(_accountsListKey) ?? []);
-    if (!accounts.contains(state)) {
+    if (!isCreatingNew && !accounts.contains(state)) {
       accounts.add(state);
     }
     return accounts;
@@ -171,35 +175,78 @@ class UserIdNotifier extends Notifier<String> {
     }
   }
 
-  /// Creates a new account while preserving the previous account's snapshot
-  /// in the accounts list so the user can cycle between them anytime.
+  /// Begins creating a new account: snapshots the current account, enters
+  /// new-account onboarding mode (so the user can press Back to return to
+  /// their previous account), and only commits the new account to the accounts
+  /// list once onboarding completes.
   Future<String> createNewAccount() async {
     final prefs = ref.read(sharedPreferencesProvider);
     final currentId = state;
 
-    // 1. Snapshot the current account before switching away
+    // 1. Snapshot the current account before leaving it
     await _saveAccountSnapshot(prefs, currentId);
 
-    // 2. Generate the new account ID
+    // 2. Ensure the current account is recorded in the accounts list
+    final accounts = List<String>.from(prefs.getStringList(_accountsListKey) ?? []);
+    if (!accounts.contains(currentId)) {
+      accounts.add(currentId);
+      await prefs.setStringList(_accountsListKey, accounts);
+    }
+
+    // 3. Record previous account ID & mark that we are in new-account onboarding
+    await prefs.setString(_previousAccountIdKey, currentId);
+    await prefs.setBool(_creatingNewAccountKey, true);
+
+    // 4. Generate the new account ID & clear working state for fresh onboarding
     final random = Random();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final randomPart =
         List.generate(8, (_) => random.nextInt(16).toRadixString(16)).join('');
     final newId = 'user_${timestamp}_$randomPart';
 
-    // 3. Persist both old and new accounts in the accounts list
-    final accounts = List<String>.from(prefs.getStringList(_accountsListKey) ?? []);
-    if (!accounts.contains(currentId)) {
-      accounts.add(currentId);
-    }
-    accounts.add(newId);
-    await prefs.setStringList(_accountsListKey, accounts);
-
-    // 4. Clear active working state for the fresh account & set newId active
     await _clearWorkingStateForNewAccount(prefs);
     await prefs.setString(_key, newId);
     state = newId;
     return newId;
+  }
+
+  /// Cancels new-account onboarding and restores the previous account untouched.
+  Future<void> cancelNewAccountCreation() async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final prevId = prefs.getString(_previousAccountIdKey);
+    final unfinishedId = state;
+
+    await prefs.remove(_creatingNewAccountKey);
+    await prefs.remove(_previousAccountIdKey);
+
+    final accounts = List<String>.from(prefs.getStringList(_accountsListKey) ?? []);
+    accounts.remove(unfinishedId);
+
+    if (prevId != null && prevId.isNotEmpty) {
+      if (!accounts.contains(prevId)) {
+        accounts.add(prevId);
+      }
+      await prefs.setStringList(_accountsListKey, accounts);
+      await _restoreAccountSnapshot(prefs, prevId);
+      await prefs.setString(_key, prevId);
+      state = prevId;
+    }
+  }
+
+  /// Commits the newly onboarded account into the saved accounts list.
+  Future<void> completeNewAccountOnboarding() async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.remove(_creatingNewAccountKey);
+    await prefs.remove(_previousAccountIdKey);
+
+    final accounts = List<String>.from(prefs.getStringList(_accountsListKey) ?? []);
+    if (!accounts.contains(state)) {
+      accounts.add(state);
+      await prefs.setStringList(_accountsListKey, accounts);
+    }
+    await _saveAccountSnapshot(prefs, state);
+    // Notify listeners that the committed accounts list updated
+    state = state;
   }
 
   /// Switches to an existing account, saving the current account's snapshot
@@ -207,6 +254,9 @@ class UserIdNotifier extends Notifier<String> {
   /// Returns true if the target account has already completed onboarding.
   Future<bool> switchToAccount(String targetUserId) async {
     final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.remove(_creatingNewAccountKey);
+    await prefs.remove(_previousAccountIdKey);
+
     if (targetUserId == state) {
       return prefs.getBool('coda_onboarding_completed') == true;
     }
@@ -230,7 +280,6 @@ class UserIdNotifier extends Notifier<String> {
   }
 
   /// Cycles to the next account in the saved accounts list.
-  /// Returns true if the newly active account has completed onboarding.
   Future<bool> cycleNextAccount() async {
     final accounts = getAccounts();
     if (accounts.length <= 1) {
@@ -250,9 +299,10 @@ final userIdProvider = NotifierProvider<UserIdNotifier, String>(() {
 final userAccountsListProvider = Provider<List<String>>((ref) {
   final activeId = ref.watch(userIdProvider);
   final prefs = ref.watch(sharedPreferencesProvider);
+  final isCreatingNew = prefs.getBool('coda_creating_new_account') == true;
   final accounts =
       List<String>.from(prefs.getStringList('coda_accounts_list') ?? []);
-  if (!accounts.contains(activeId)) {
+  if (!isCreatingNew && !accounts.contains(activeId)) {
     accounts.add(activeId);
   }
   return accounts;

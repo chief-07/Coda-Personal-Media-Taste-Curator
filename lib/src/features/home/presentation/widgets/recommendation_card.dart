@@ -299,55 +299,118 @@ class _CardLayout extends ConsumerWidget {
     );
   }
 
+  Widget _buildCaretIcon(Color color) {
+    return Icon(
+      Icons.arrow_forward_ios_rounded,
+      size: 30,
+      weight: 900,
+      color: color,
+      shadows: [
+        Shadow(
+          offset: const Offset(0.5, 0),
+          blurRadius: 0.5,
+          color: color,
+        ),
+        Shadow(
+          offset: const Offset(-0.5, 0),
+          blurRadius: 0.5,
+          color: color,
+        ),
+        Shadow(
+          offset: const Offset(0, 0.5),
+          blurRadius: 0.5,
+          color: color,
+        ),
+        Shadow(
+          offset: const Offset(0, -0.5),
+          blurRadius: 0.5,
+          color: color,
+        ),
+      ],
+    );
+  }
+
   Widget _buildHeroText(Color color) {
-    final cleanBlurb = recommendation.codaBlurb.replaceAll('**', '').replaceAll('*', '').trim();
-    return Text.rich(
-      TextSpan(
-        children: [
-          TextSpan(text: cleanBlurb),
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 4.0),
-              child: Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 30, // Reduced caret size
-                weight: 900, // Increase caret weight
-                color: color,
-                shadows: [
-                  Shadow(
-                    offset: const Offset(0.5, 0),
-                    blurRadius: 0.5,
-                    color: color,
-                  ),
-                  Shadow(
-                    offset: const Offset(-0.5, 0),
-                    blurRadius: 0.5,
-                    color: color,
-                  ),
-                  Shadow(
-                    offset: const Offset(0, 0.5),
-                    blurRadius: 0.5,
-                    color: color,
-                  ),
-                  Shadow(
-                    offset: const Offset(0, -0.5),
-                    blurRadius: 0.5,
-                    color: color,
-                  ),
-                ],
+    final cleanBlurb =
+        recommendation.codaBlurb.replaceAll('**', '').replaceAll('*', '').trim();
+    final textStyle = GoogleFonts.inter(
+      color: color,
+      fontSize: 30,
+      fontWeight: FontWeight.w900,
+      height: 1.2,
+      letterSpacing: 1.5,
+    );
+
+    final tp = TextPainter(
+      text: TextSpan(text: '$cleanBlurb   ', style: textStyle),
+      maxLines: 3,
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: 330);
+
+    if (!tp.didExceedMaxLines) {
+      return Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(text: cleanBlurb),
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: _buildCaretIcon(color),
               ),
             ),
+          ],
+        ),
+        maxLines: 3,
+        style: textStyle,
+      );
+    }
+
+    // Overflows 3 lines: render lines 1-2 crisp, fade the trailing end of line 3
+    // via dstIn alpha mask so the knockout cutout dissolves into the card background,
+    // and place the caret on top at 100% opacity so it is never hidden by the fade.
+    final baseText = Text(
+      cleanBlurb,
+      maxLines: 3,
+      overflow: TextOverflow.clip,
+      style: textStyle,
+    );
+
+    return Stack(
+      children: [
+        // Top 2 lines at full knockout opacity
+        ClipRect(
+          clipper: const _VerticalFractionClipper(0.0, 0.666),
+          child: baseText,
+        ),
+        // 3rd line with horizontal fade-off into card background
+        ClipRect(
+          clipper: const _VerticalFractionClipper(0.666, 1.0),
+          child: ShaderMask(
+            shaderCallback: (Rect bounds) {
+              return const LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Colors.white,
+                  Colors.white,
+                  Colors.transparent,
+                  Colors.transparent,
+                ],
+                stops: [0.0, 0.42, 0.84, 1.0],
+              ).createShader(bounds);
+            },
+            blendMode: BlendMode.dstIn,
+            child: baseText,
           ),
-        ],
-      ),
-      style: GoogleFonts.inter(
-        color: color,
-        fontSize: 30, // Reduced text size
-        fontWeight: FontWeight.w900, // Maximum standard weight
-        height: 1.2, // Tweaked line spacing to 1.2
-        letterSpacing: 1.5, // Increased letter spacing
-      ),
+        ),
+        // Caret always above the fade at full opacity
+        Positioned(
+          right: 2,
+          bottom: 3,
+          child: _buildCaretIcon(color),
+        ),
+      ],
     );
   }
 
@@ -661,5 +724,28 @@ class _PosterWithTrailerState extends State<_PosterWithTrailer> with SingleTicke
       );
     }
     return poster;
+  }
+}
+
+class _VerticalFractionClipper extends CustomClipper<Rect> {
+  final double topFraction;
+  final double bottomFraction;
+
+  const _VerticalFractionClipper(this.topFraction, this.bottomFraction);
+
+  @override
+  Rect getClip(Size size) {
+    return Rect.fromLTRB(
+      0,
+      size.height * topFraction,
+      size.width,
+      size.height * bottomFraction,
+    );
+  }
+
+  @override
+  bool shouldReclip(covariant _VerticalFractionClipper oldClipper) {
+    return oldClipper.topFraction != topFraction ||
+        oldClipper.bottomFraction != bottomFraction;
   }
 }

@@ -30,7 +30,11 @@ final codaRouter = GoRouter(
       final container = ProviderScope.containerOf(context);
       final prefs = container.read(sharedPreferencesProvider);
 
-      final onboardingCompleted = prefs.getBool('coda_onboarding_completed') == true;
+      final isCreatingNewAccount =
+          prefs.getBool('coda_creating_new_account') == true ||
+          state.uri.queryParameters['newAccount'] == 'true';
+      final onboardingCompleted = !isCreatingNewAccount &&
+          (prefs.getBool('coda_onboarding_completed') == true);
       final isGoingToOnboarding = state.matchedLocation == '/onboarding' || state.matchedLocation == '/taste-profile';
       final isGoingToShareReceive = state.matchedLocation == '/share-receive';
       

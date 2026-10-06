@@ -13,6 +13,7 @@ import 'package:coda/src/core/providers/api_config.dart';
 import 'package:coda/src/features/home/presentation/widgets/sparkle_loader.dart';
 import 'package:coda/src/features/home/presentation/widgets/walrus_memory_sheet.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
+import 'package:coda/src/core/providers/user_id_provider.dart';
 
 class TasteProfileTabNotifier extends Notifier<String> {
   @override
@@ -487,6 +488,7 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                                 },
                                 onLater: () async {
                                     await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
+                                    await ref.read(userIdProvider.notifier).completeNewAccountOnboarding();
                                     await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
                                     if (isLastTab) {
                                       await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();
@@ -541,6 +543,7 @@ class _TasteProfileCardState extends ConsumerState<TasteProfileCard> {
                             },
                             onLater: () async {
                                   await ref.read(sharedPreferencesProvider).setBool('coda_onboarding_completed', true);
+                                  await ref.read(userIdProvider.notifier).completeNewAccountOnboarding();
                                   await ref.read(tasteProfileControllerProvider.notifier).harmonizeTabMemory(widget.tab);
                                   if (isLastTab) {
                                     await ref.read(tasteProfileControllerProvider.notifier).harmonizeAllMemory();

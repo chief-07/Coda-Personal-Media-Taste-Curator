@@ -129,18 +129,18 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                     const SizedBox(width: 8),
                     TextButton(
                       onPressed: () async {
+                        final router = GoRouter.of(context);
                         Navigator.pop(dialogCtx);
                         ref.read(audioPlayerControllerProvider.notifier).pause();
                         await ref.read(userIdProvider.notifier).createNewAccount();
                         ref.invalidate(livingMemoryProvider);
                         ref.invalidate(onboardingControllerProvider);
+                        ref.read(onboardingControllerProvider.notifier).reset();
                         ref.invalidate(archivedSessionsProvider);
                         ref.invalidate(selectedMediaTypeProvider);
                         ref.invalidate(activeSessionProvider);
                         ref.invalidate(homeRecommendationProvider);
-                        if (context.mounted) {
-                          context.go('/onboarding');
-                        }
+                        router.go('/onboarding?newAccount=true');
                       },
                       child: Text(
                         'Create',
