@@ -194,12 +194,11 @@ class _WalrusMemorySheetContentState
     return 'coda:$userId:${clean.isEmpty ? "core" : clean}';
   }
 
-  String _shortNamespaceSegment(String rawNs) {
+  String _shortNamespaceSegment(String rawNs, String userId) {
     final trimmed = rawNs.trim();
-    if (trimmed.contains(':')) {
-      return ':${trimmed.split(':').last}';
-    }
-    return ':$trimmed';
+    final seg = trimmed.contains(':') ? trimmed.split(':').last : trimmed;
+    final shortUser = _middleTruncate(userId, head: 5, tail: 4);
+    return '$shortUser:$seg';
   }
 
   String _middleTruncate(String value, {int head = 8, int tail = 6}) {
@@ -446,22 +445,21 @@ class _WalrusMemorySheetContentState
         : _buildRecalledBlobsList(effectiveUserId);
 
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
         child: Container(
           width: double.infinity,
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.78,
           ),
-          padding: EdgeInsets.fromLTRB(22, 12, 22, 24 + bottomPad),
+          padding: EdgeInsets.fromLTRB(24, 12, 24, 36 + bottomPad),
           decoration: BoxDecoration(
-            color: const Color(0xFF121316).withValues(alpha: 0.78),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            color: Colors.white.withValues(alpha: 0.07),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             border: Border(
               top: BorderSide(
                 color: Colors.white.withValues(alpha: 0.12),
-                width: 1,
               ),
             ),
           ),
@@ -472,11 +470,11 @@ class _WalrusMemorySheetContentState
               // Drag handle
               Center(
                 child: Container(
-                  width: 36,
+                  width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(bottom: 18),
+                  margin: const EdgeInsets.only(bottom: 20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.22),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -492,9 +490,9 @@ class _WalrusMemorySheetContentState
                           : 'Recalled from Walrus',
                       style: GoogleFonts.inter(
                         color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
                       ),
                     ),
                   ),
@@ -507,6 +505,9 @@ class _WalrusMemorySheetContentState
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.12),
+                        ),
                       ),
                       child: Icon(
                         PhosphorIcons.x(PhosphorIconsStyle.bold),
@@ -533,7 +534,7 @@ class _WalrusMemorySheetContentState
                         Text(
                           'QUERY',
                           style: GoogleFonts.inter(
-                            color: Colors.white.withValues(alpha: 0.42),
+                            color: Colors.white.withValues(alpha: 0.45),
                             fontSize: 10.5,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.0,
@@ -543,7 +544,7 @@ class _WalrusMemorySheetContentState
                         Text(
                           effectiveQuery,
                           style: GoogleFonts.inter(
-                            color: Colors.white.withValues(alpha: 0.88),
+                            color: Colors.white.withValues(alpha: 0.90),
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             height: 1.4,
@@ -558,7 +559,7 @@ class _WalrusMemorySheetContentState
                           Text(
                             displayBlobs.length == 1 ? 'MEMORY' : 'MEMORIES',
                             style: GoogleFonts.inter(
-                              color: Colors.white.withValues(alpha: 0.42),
+                              color: Colors.white.withValues(alpha: 0.45),
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1.0,
@@ -583,7 +584,7 @@ class _WalrusMemorySheetContentState
 
   Widget _buildMinimalMemoryRow(Map<String, dynamic> m, String userId) {
     final ns = _formatNamespace(userId, (m['namespace'] ?? 'core').toString());
-    final shortNs = _shortNamespaceSegment(ns);
+    final shortNs = _shortNamespaceSegment(ns, userId);
     final text =
         (m['display_text'] ?? m['text'] ?? m['content'] ?? '').toString().trim();
 
@@ -599,12 +600,12 @@ class _WalrusMemorySheetContentState
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(14),
+        color: Colors.white.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.09),
+          color: Colors.white.withValues(alpha: 0.12),
         ),
       ),
       child: Column(

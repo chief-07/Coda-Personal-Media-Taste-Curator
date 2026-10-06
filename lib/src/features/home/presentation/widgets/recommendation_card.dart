@@ -362,7 +362,7 @@ class _CardLayout extends ConsumerWidget {
                 WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 4.0),
+                    padding: const EdgeInsets.only(left: 10.0),
                     child: _buildCaretIcon(color),
                   ),
                 ),
@@ -373,7 +373,7 @@ class _CardLayout extends ConsumerWidget {
           );
         }
 
-        // Measure the exact width of line 3 so the fade and caret hug the actual end of the text
+        // Measure the exact width of line 3 so the fade and caret follow the actual end of the text
         final tpText = TextPainter(
           text: TextSpan(text: cleanBlurb, style: textStyle),
           maxLines: 3,
@@ -384,14 +384,14 @@ class _CardLayout extends ConsumerWidget {
         final rawLine3Width =
             metrics.length >= 3 ? metrics[2].width : maxWidth;
 
-        // Fade over the last 48px of actual text on line 3, leaving room for the caret if near the right edge
-        final fadeEndPx = rawLine3Width.clamp(48.0, maxWidth - 20.0);
-        final fadeStartPx = (fadeEndPx - 48.0).clamp(0.0, fadeEndPx);
+        // Fade over the last 52px of actual text on line 3, reserving room at the right edge for the caret
+        final fadeEndPx = rawLine3Width.clamp(48.0, maxWidth - 28.0);
+        final fadeStartPx = (fadeEndPx - 52.0).clamp(0.0, fadeEndPx);
         final stopStart = (fadeStartPx / maxWidth).clamp(0.0, 1.0);
         final stopEnd = (fadeEndPx / maxWidth).clamp(0.0, 1.0);
 
-        // Place the caret close to the start of the fade / right at the tail end of the text
-        final caretLeftPx = (fadeEndPx - 14.0).clamp(0.0, maxWidth - 24.0);
+        // Place the caret naturally spaced a few pixels after the faded end of the words
+        final caretLeftPx = (fadeEndPx + 4.0).clamp(0.0, maxWidth - 22.0);
 
         final baseText = SizedBox(
           width: maxWidth,
