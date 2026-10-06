@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:coda/src/app/router.dart';
 import 'package:coda/src/core/memory/living_memory.dart';
 import 'package:coda/src/features/home/application/home_recommendation_controller.dart';
 import 'package:coda/src/features/onboarding/application/onboarding_controller.dart';
@@ -66,7 +67,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
 
     if (!mounted) return;
     if (!isOnboarded) {
-      context.go('/onboarding');
+      codaRouter.go('/onboarding?newAccount=true');
     }
   }
 
@@ -129,18 +130,21 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                     const SizedBox(width: 8),
                     TextButton(
                       onPressed: () async {
-                        final router = GoRouter.of(context);
-                        Navigator.pop(dialogCtx);
-                        ref.read(audioPlayerControllerProvider.notifier).pause();
-                        await ref.read(userIdProvider.notifier).createNewAccount();
-                        ref.invalidate(livingMemoryProvider);
-                        ref.invalidate(onboardingControllerProvider);
-                        ref.read(onboardingControllerProvider.notifier).reset();
-                        ref.invalidate(archivedSessionsProvider);
-                        ref.invalidate(selectedMediaTypeProvider);
-                        ref.invalidate(activeSessionProvider);
-                        ref.invalidate(homeRecommendationProvider);
-                        router.go('/onboarding?newAccount=true');
+                        Navigator.of(dialogCtx).pop();
+                        try {
+                          ref.read(audioPlayerControllerProvider.notifier).pause();
+                          await ref.read(userIdProvider.notifier).createNewAccount();
+                          ref.invalidate(livingMemoryProvider);
+                          ref.read(onboardingControllerProvider.notifier).reset();
+                          ref.invalidate(archivedSessionsProvider);
+                          ref.invalidate(selectedMediaTypeProvider);
+                          ref.invalidate(activeSessionProvider);
+                          ref.invalidate(homeRecommendationProvider);
+                        } catch (e) {
+                          debugPrint('Create account setup warning: $e');
+                        } finally {
+                          codaRouter.go('/onboarding?newAccount=true');
+                        }
                       },
                       child: Text(
                         'Create',

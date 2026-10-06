@@ -311,14 +311,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         child: GestureDetector(
                           onTap: () async {
                             final router = GoRouter.of(context);
-                            await ref.read(userIdProvider.notifier).cancelNewAccountCreation();
-                            ref.invalidate(livingMemoryProvider);
-                            ref.invalidate(onboardingControllerProvider);
-                            ref.invalidate(archivedSessionsProvider);
-                            ref.invalidate(selectedMediaTypeProvider);
-                            ref.invalidate(activeSessionProvider);
-                            ref.invalidate(homeRecommendationProvider);
-                            router.go('/home');
+                            try {
+                              await ref.read(userIdProvider.notifier).cancelNewAccountCreation();
+                              ref.invalidate(livingMemoryProvider);
+                              ref.invalidate(onboardingControllerProvider);
+                              ref.invalidate(archivedSessionsProvider);
+                              ref.invalidate(selectedMediaTypeProvider);
+                              ref.invalidate(activeSessionProvider);
+                              ref.invalidate(homeRecommendationProvider);
+                            } catch (e) {
+                              debugPrint('Cancel new account warning: $e');
+                            } finally {
+                              router.go('/home');
+                            }
                           },
                           child: ClipOval(
                             child: BackdropFilter(

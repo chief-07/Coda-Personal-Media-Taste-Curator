@@ -65,52 +65,51 @@ class UserIdNotifier extends Notifier<String> {
     return types;
   }
 
+  Future<void> _saveValueByType(
+    SharedPreferences prefs,
+    String sourceKey,
+    String targetKey,
+  ) async {
+    try {
+      final Object? val = prefs.get(sourceKey);
+      if (val == null) {
+        await prefs.remove(targetKey);
+      } else if (val is String) {
+        await prefs.setString(targetKey, val);
+      } else if (val is bool) {
+        await prefs.setBool(targetKey, val);
+      } else if (val is int) {
+        await prefs.setInt(targetKey, val);
+      } else if (val is double) {
+        await prefs.setDouble(targetKey, val);
+      } else if (val is List) {
+        await prefs.setStringList(
+          targetKey,
+          val.map((e) => e.toString()).toList(),
+        );
+      }
+    } catch (_) {}
+  }
+
   Future<void> _saveAccountSnapshot(
     SharedPreferences prefs,
     String accountId,
   ) async {
-    Future<void> saveStr(String key) async {
-      final val = prefs.getString(key);
-      final snapKey = 'acct_${accountId}_$key';
-      if (val != null) {
-        await prefs.setString(snapKey, val);
-      } else {
-        await prefs.remove(snapKey);
-      }
-    }
+    Future<void> saveKey(String key) =>
+        _saveValueByType(prefs, key, 'acct_${accountId}_$key');
 
-    Future<void> saveStrList(String key) async {
-      final val = prefs.getStringList(key);
-      final snapKey = 'acct_${accountId}_$key';
-      if (val != null) {
-        await prefs.setStringList(snapKey, val);
-      } else {
-        await prefs.remove(snapKey);
-      }
-    }
-
-    Future<void> saveBool(String key) async {
-      final val = prefs.getBool(key);
-      final snapKey = 'acct_${accountId}_$key';
-      if (val != null) {
-        await prefs.setBool(snapKey, val);
-      } else {
-        await prefs.remove(snapKey);
-      }
-    }
-
-    await saveStr('living_memory_v1');
-    await saveStr('coda_selected_media_type');
-    await saveStr('coda_active_session_recommendation');
-    await saveStrList('coda_onboarding_chips');
-    await saveStrList('coda_archived_sessions_v1');
-    await saveBool('coda_onboarding_completed');
+    await saveKey('living_memory_v1');
+    await saveKey('coda_selected_media_type');
+    await saveKey('coda_active_session_recommendation');
+    await saveKey('coda_onboarding_chips');
+    await saveKey('coda_archived_sessions_v1');
+    await saveKey('coda_onboarding_completed');
 
     final allTypes = _collectAllTypeNames(prefs, accountId);
     for (final type in allTypes) {
-      await saveStr('coda_active_pick_$type');
-      await saveStr('coda_buffer_pick_$type');
-      await saveStrList('coda_recommendation_queue_$type');
+      await saveKey('coda_active_pick_$type');
+      await saveKey('coda_buffer_pick_$type');
+      await saveKey('coda_recommendation_queue_$type');
     }
   }
 
@@ -118,45 +117,21 @@ class UserIdNotifier extends Notifier<String> {
     SharedPreferences prefs,
     String accountId,
   ) async {
-    Future<void> restoreStr(String key) async {
-      final snapVal = prefs.getString('acct_${accountId}_$key');
-      if (snapVal != null) {
-        await prefs.setString(key, snapVal);
-      } else {
-        await prefs.remove(key);
-      }
-    }
-
-    Future<void> restoreStrList(String key) async {
-      final snapVal = prefs.getStringList('acct_${accountId}_$key');
-      if (snapVal != null) {
-        await prefs.setStringList(key, snapVal);
-      } else {
-        await prefs.remove(key);
-      }
-    }
-
-    Future<void> restoreBool(String key) async {
-      final snapVal = prefs.getBool('acct_${accountId}_$key');
-      if (snapVal != null) {
-        await prefs.setBool(key, snapVal);
-      } else {
-        await prefs.remove(key);
-      }
-    }
+    Future<void> restoreKey(String key) =>
+        _saveValueByType(prefs, 'acct_${accountId}_$key', key);
 
     final allTypes = _collectAllTypeNames(prefs, accountId);
-    await restoreStr('living_memory_v1');
-    await restoreStr('coda_selected_media_type');
-    await restoreStr('coda_active_session_recommendation');
-    await restoreStrList('coda_onboarding_chips');
-    await restoreStrList('coda_archived_sessions_v1');
-    await restoreBool('coda_onboarding_completed');
+    await restoreKey('living_memory_v1');
+    await restoreKey('coda_selected_media_type');
+    await restoreKey('coda_active_session_recommendation');
+    await restoreKey('coda_onboarding_chips');
+    await restoreKey('coda_archived_sessions_v1');
+    await restoreKey('coda_onboarding_completed');
 
     for (final type in allTypes) {
-      await restoreStr('coda_active_pick_$type');
-      await restoreStr('coda_buffer_pick_$type');
-      await restoreStrList('coda_recommendation_queue_$type');
+      await restoreKey('coda_active_pick_$type');
+      await restoreKey('coda_buffer_pick_$type');
+      await restoreKey('coda_recommendation_queue_$type');
     }
   }
 
@@ -183,19 +158,19 @@ class UserIdNotifier extends Notifier<String> {
     final prefs = ref.read(sharedPreferencesProvider);
     final currentId = state;
 
-    // 1. Snapshot the current account before leaving it
+    // 1. Record previous account ID & mark that we are in new-account onboarding immediately
+    await prefs.setString(_previousAccountIdKey, currentId);
+    await prefs.setBool(_creatingNewAccountKey, true);
+
+    // 2. Snapshot the current account before leaving it
     await _saveAccountSnapshot(prefs, currentId);
 
-    // 2. Ensure the current account is recorded in the accounts list
+    // 3. Ensure the current account is recorded in the accounts list
     final accounts = List<String>.from(prefs.getStringList(_accountsListKey) ?? []);
     if (!accounts.contains(currentId)) {
       accounts.add(currentId);
       await prefs.setStringList(_accountsListKey, accounts);
     }
-
-    // 3. Record previous account ID & mark that we are in new-account onboarding
-    await prefs.setString(_previousAccountIdKey, currentId);
-    await prefs.setBool(_creatingNewAccountKey, true);
 
     // 4. Generate the new account ID & clear working state for fresh onboarding
     final random = Random();

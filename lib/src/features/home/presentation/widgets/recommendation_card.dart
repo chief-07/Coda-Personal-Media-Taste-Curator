@@ -341,76 +341,105 @@ class _CardLayout extends ConsumerWidget {
       letterSpacing: 1.5,
     );
 
-    final tp = TextPainter(
-      text: TextSpan(text: '$cleanBlurb   ', style: textStyle),
-      maxLines: 3,
-      textDirection: TextDirection.ltr,
-    )..layout(maxWidth: 330);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth =
+            (constraints.maxWidth.isFinite && constraints.maxWidth > 0)
+                ? constraints.maxWidth
+                : 330.0;
 
-    if (!tp.didExceedMaxLines) {
-      return Text.rich(
-        TextSpan(
+        final tpWithCaret = TextPainter(
+          text: TextSpan(text: '$cleanBlurb   ', style: textStyle),
+          maxLines: 3,
+          textDirection: TextDirection.ltr,
+        )..layout(maxWidth: maxWidth);
+
+        if (!tpWithCaret.didExceedMaxLines) {
+          return Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(text: cleanBlurb),
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 4.0),
+                    child: _buildCaretIcon(color),
+                  ),
+                ),
+              ],
+            ),
+            maxLines: 3,
+            style: textStyle,
+          );
+        }
+
+        // Measure the exact width of line 3 so the fade and caret hug the actual end of the text
+        final tpText = TextPainter(
+          text: TextSpan(text: cleanBlurb, style: textStyle),
+          maxLines: 3,
+          textDirection: TextDirection.ltr,
+        )..layout(maxWidth: maxWidth);
+
+        final metrics = tpText.computeLineMetrics();
+        final rawLine3Width =
+            metrics.length >= 3 ? metrics[2].width : maxWidth;
+
+        // Fade over the last 48px of actual text on line 3, leaving room for the caret if near the right edge
+        final fadeEndPx = rawLine3Width.clamp(48.0, maxWidth - 20.0);
+        final fadeStartPx = (fadeEndPx - 48.0).clamp(0.0, fadeEndPx);
+        final stopStart = (fadeStartPx / maxWidth).clamp(0.0, 1.0);
+        final stopEnd = (fadeEndPx / maxWidth).clamp(0.0, 1.0);
+
+        // Place the caret close to the start of the fade / right at the tail end of the text
+        final caretLeftPx = (fadeEndPx - 14.0).clamp(0.0, maxWidth - 24.0);
+
+        final baseText = SizedBox(
+          width: maxWidth,
+          child: Text(
+            cleanBlurb,
+            maxLines: 3,
+            overflow: TextOverflow.clip,
+            style: textStyle,
+          ),
+        );
+
+        return Stack(
           children: [
-            TextSpan(text: cleanBlurb),
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: _buildCaretIcon(color),
+            // Top 2 lines at full knockout opacity
+            ClipRect(
+              clipper: const _VerticalFractionClipper(0.0, 0.666),
+              child: baseText,
+            ),
+            // 3rd line with tight horizontal fade-off at the end of the text
+            ClipRect(
+              clipper: const _VerticalFractionClipper(0.666, 1.0),
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: const [
+                      Colors.white,
+                      Colors.white,
+                      Colors.transparent,
+                      Colors.transparent,
+                    ],
+                    stops: [0.0, stopStart, stopEnd, 1.0],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.dstIn,
+                child: baseText,
               ),
             ),
+            // Caret always above the fade at 100% opacity, hugging the faded end of line 3
+            Positioned(
+              left: caretLeftPx,
+              bottom: 4,
+              child: _buildCaretIcon(color),
+            ),
           ],
-        ),
-        maxLines: 3,
-        style: textStyle,
-      );
-    }
-
-    // Overflows 3 lines: render lines 1-2 crisp, fade the trailing end of line 3
-    // via dstIn alpha mask so the knockout cutout dissolves into the card background,
-    // and place the caret on top at 100% opacity so it is never hidden by the fade.
-    final baseText = Text(
-      cleanBlurb,
-      maxLines: 3,
-      overflow: TextOverflow.clip,
-      style: textStyle,
-    );
-
-    return Stack(
-      children: [
-        // Top 2 lines at full knockout opacity
-        ClipRect(
-          clipper: const _VerticalFractionClipper(0.0, 0.666),
-          child: baseText,
-        ),
-        // 3rd line with horizontal fade-off into card background
-        ClipRect(
-          clipper: const _VerticalFractionClipper(0.666, 1.0),
-          child: ShaderMask(
-            shaderCallback: (Rect bounds) {
-              return const LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Colors.white,
-                  Colors.white,
-                  Colors.transparent,
-                  Colors.transparent,
-                ],
-                stops: [0.0, 0.42, 0.84, 1.0],
-              ).createShader(bounds);
-            },
-            blendMode: BlendMode.dstIn,
-            child: baseText,
-          ),
-        ),
-        // Caret always above the fade at full opacity
-        Positioned(
-          right: 2,
-          bottom: 3,
-          child: _buildCaretIcon(color),
-        ),
-      ],
+        );
+      },
     );
   }
 
