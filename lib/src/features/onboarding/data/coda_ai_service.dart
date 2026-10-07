@@ -271,7 +271,6 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
         'isUser': msg.isUser,
         'text': msg.text ?? "",
       }).toList(),
-      'currentMemory': currentMemory.toJson(),
       'tabName': tabName,
     });
 
@@ -298,7 +297,6 @@ Always return valid JSON. Do not return any other text, markdown formatting, or 
 
     final body = jsonEncode({
       'userId': userId,
-      'currentMemory': currentMemory.toJson(),
     });
 
     final targetUrl = '${getApiBaseUrl()}/api/onboarding/harmonize_all';

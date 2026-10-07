@@ -154,26 +154,14 @@ class RecommendationService {
     bool memoriesEnabled = true,
     String? ambientContext,
   }) async {
-    // Build seen list including exclusions only when memories are enabled
-    Map<String, dynamic> fallbackMemory;
-    if (memoriesEnabled) {
-      final finalSeen = List<String>.from(memory.seen);
-      for (final title in additionalExclusions) {
-        if (!finalSeen.contains(title)) finalSeen.add(title);
-      }
-      fallbackMemory = memory.toJson();
-      fallbackMemory['seen'] = finalSeen;
-    } else {
-      // Amnesia mode: zero user memory, zero seen exclusions (only watchlist if watchlist mode is explicitly on)
-      fallbackMemory = watchlistOnly
-          ? {'watchlist': memory.toJson()['watchlist'] ?? {}}
-          : <String, dynamic>{};
-    }
+    final Map<String, dynamic> productState = watchlistOnly
+        ? {'watchlist': memory.toJson()['watchlist'] ?? {}}
+        : <String, dynamic>{};
 
     final payload = {
       'userId': memoriesEnabled ? userId : null,
       'requested_media_type': selectedMediaType.name, // The user explicitly tapped this tab
-      'current_memory': fallbackMemory,
+      if (watchlistOnly) 'current_memory': productState,
       if (ambientContext != null && memoriesEnabled) 'contextualState': ambientContext,
       'limit': limit,
       'watchlist_only': watchlistOnly,
@@ -207,7 +195,7 @@ class RecommendationService {
     }
   }
 
-  /// Sends feedback for a rejected recommendation to refine the profile
+  /// Sends feedback for a rejected recommendation to refine the profile via Walrus Memory
   Future<MemoryUpdates?> refineTaste({
     required LivingMemory memory,
     required String title,
@@ -216,7 +204,6 @@ class RecommendationService {
   }) async {
     final payload = {
       'userId': userId,
-      'current_memory': memory.toJson(),
       'recommendation_title': title,
       'media_type': mediaType,
       'feedback_reason': reason,
@@ -287,11 +274,8 @@ class RecommendationService {
   }) async {
     final payload = {
       'userId': memoriesEnabled ? userId : null,
-      'current_memory': memoriesEnabled
-          ? memory.toJson()
-          : (watchlistOnly
-              ? {'watchlist': memory.toJson()['watchlist'] ?? []}
-              : <String, dynamic>{}),
+      if (watchlistOnly)
+        'current_memory': {'watchlist': memory.toJson()['watchlist'] ?? {}},
       'chat_history': chatHistory,
       'user_message': userMessage,
       'watchlist_only': watchlistOnly,
@@ -335,7 +319,6 @@ class RecommendationService {
   }) async {
     final payload = {
       'userId': memoriesEnabled ? userId : null,
-      'current_memory': memoriesEnabled ? memory.toJson() : <String, dynamic>{},
       'title': title,
       'media_type': mediaType,
       'coda_blurb': codaBlurb,
@@ -379,7 +362,6 @@ class RecommendationService {
   }) async {
     final payload = {
       'userId': memoriesEnabled ? userId : null,
-      'current_memory': memoriesEnabled ? memory.toJson() : <String, dynamic>{},
       'title': title,
       'media_type': mediaType,
       'coda_blurb': codaBlurb,
@@ -513,7 +495,6 @@ extension RecommendationServiceMatch on RecommendationService {
     final payload = {
       'title': title,
       'userId': userId,
-      'current_memory': memory.toJson(),
     };
 
     final targetUrl = '${getApiBaseUrl()}/api/recommend/vibe-check';
@@ -545,7 +526,7 @@ extension RecommendationServiceMatch on RecommendationService {
   }) async {
     final payload = {
       'title': title,
-      'current_memory': memory.toJson(),
+      'userId': userId,
     };
 
     final targetUrl = '${getApiBaseUrl()}/api/recommend/promote';

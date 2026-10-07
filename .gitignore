@@ -56,7 +56,7 @@ backend/.env
 
 # Coda agent brain and log dumps
 brain/
-backend/logs/*.txt
+backend/logs/
 
 # Coda cache, temporary, and scratch files
 backend/cache/
@@ -67,4 +67,8 @@ android/build/
 
 backend/certs/
 backend/archive_legacy_qdrant/
-e2e_test_report.md
+backend/data/pending_synthesis/
+backend/data/completed_synthesis/
+*e2e_test_report.md
+backend/groq_test_report.md
+coda.md

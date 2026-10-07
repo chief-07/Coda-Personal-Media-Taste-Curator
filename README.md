@@ -4,7 +4,7 @@
 > **Tracks**: Best Chatbot • Beyond the Big Two (Google Gemini + Groq) • Best Article • Bug Bounty  
 > 🌐 **Live Web & PWA App (Cloudflare Pages)**: **[https://coda-88k.pages.dev](https://coda-88k.pages.dev)**  
 > ⚡ **Live Curation & Walrus Engine (Render)**: **[https://coda-personal-media-taste-curator.onrender.com](https://coda-personal-media-taste-curator.onrender.com)**  
-> 🔗 **Walrus Mainnet Account Object**: **[`0x48b30fecc266bef51e01ae32c4f610bbe2910ed09a4c022e27383999aa331d55`](https://suiscan.xyz/mainnet/object/0x48b30fecc266bef51e01ae32c4f610bbe2910ed09a4c022e27383999aa331d55)** (**504+ Mainnet Blobs** across **89 Namespaces** & **17+ Multi-User Profiles**)
+> 🔗 **Walrus Mainnet Account Object**: **[`0x48b30fecc266bef51e01ae32c4f610bbe2910ed09a4c022e27383999aa331d55`](https://suiscan.xyz/mainnet/object/0x48b30fecc266bef51e01ae32c4f610bbe2910ed09a4c022e27383999aa331d55)** (**551+ Mainnet Blobs** across **95 Namespaces** & **17+ Multi-User Profiles**)
 
 **Coda is a personal media curator that remembers your taste using Walrus Memory.** Built for **Movies, Anime, TV Shows, Video Games, Books, Visual Novels, and Manga**, Coda replaces noisy streaming grids and generic AI bullet lists with a perceptive friend who remembers who you are across sessions—delivering **one high-conviction pick at a time**, complete with its atmospheric soundtrack playing softly in the background, a preview trailer, and a personal letter of recommendation grounded **100% in your Walrus Protocol Memory**.
 
@@ -26,7 +26,7 @@ Choosing what art to let into your head isn't a utility task—it's an emotional
 
 ## 2. How Walrus Memory Is Used Across Every Surface of Coda
 
-Coda is not a media app with a memory feature bolted on—**Walrus Memory (`@mysten-incubation/memwal`) is the entire cognitive foundation of the app.** During curation, Gemini receives **zero local memory fallback**: 100% of your taste facets, favorite benchmarks, dealbreakers, and watched/rejected history are recalled live from Walrus Mainnet. Without Walrus Memory, Coda is completely blind.
+Coda is not a media app with a memory feature bolted on—**Walrus Memory (`@mysten-incubation/memwal`) is the entire cognitive foundation of the app.** Across **every memory-aware LLM endpoint** (`/api/recommend`, `/api/recommend/chat`, `/api/recommend/ask`, `/api/recommend/feedback`, `/api/onboarding/harmonize`, `/api/onboarding/harmonize_all`, and `/api/recommend/swipe`), Gemini and Groq receive **zero local cognitive memory from the client**: 100% of your taste facets, favorite benchmarks, dealbreakers, and watched/rejected history are recalled live from Walrus Mainnet (with non-cognitive product state such as your saved `watchlist` when `watchlistOnly` is enabled as the sole exception). The Flutter client's local `LivingMemory` acts strictly as a UI state cache. Without Walrus Memory, Coda is completely blind.
 
 ### A. Conversational Onboarding (`POST /api/chat` & `POST /api/onboarding/profile`)
 - Instead of a sterile genre checklist, Coda conducts a natural voice/text conversation across 4 milestones (emotional headspace, anchor titles & creators, guardrails & boundaries, and situational habits).
@@ -53,9 +53,9 @@ When curating a recommendation for any media tab, Coda runs a multi-stage Walrus
 
 ### D. All Three Conversational Chat Surfaces (Bidirectional Recall + Live Memory Extraction)
 Every chat surface in Coda both **recalls** relevant Walrus memories to ground its replies and **extracts & stores** new atomic memories when you reveal a preference or boundary:
-- **Pitch Screen Chat (`POST /api/recommend/chat`)**: Ask Coda whether a recommended work's pacing, tone, or content fits you. Coda recalls your Walrus profile to answer honestly and seals any new preferences you mention during the discussion.
+- **Pitch Screen Chat (`POST /api/recommend/chat`)**: Ask Coda whether a recommended work's pacing, tone, or content fits you. Coda recalls your Walrus profile (`:core`, `:<category>`, `:guardrails`, `:session`) with zero local memory injected to answer honestly and seals any new preferences you mention during the discussion.
 - **Ask Coda (`POST /api/recommend/ask`)**: Tell Coda what you're craving right now (*"Give me a tight 90-minute thriller"* or *"I never watch slow-burn dramas on weeknights"*). Coda recalls your Walrus soul + guardrails to curate on the spot and routes durable preferences to `:core` / `:guardrails` and active cravings to `:session`.
-- **Post-Session Reflection Chat**: After completing a work (`Start Session → Complete`), Coda debriefs with you on what landed emotionally and records your post-experience takeaways into Walrus.
+- **Post-Session Reflection Chat (`POST /api/onboarding/harmonize`)**: After completing a work (`Start Session → Complete`), Coda recalls your Walrus memories, debriefs with you on what landed emotionally, and seals your post-experience takeaways directly into Walrus.
 
 ### E. Card Swipes & Custom Feedback Prompt Box (`POST /api/recommend/swipe` & `/feedback`)
 Every physical action on a card directly updates your Walrus namespaces:
@@ -67,14 +67,14 @@ Every physical action on a card directly updates your Walrus namespaces:
 
 ## 3. Multi-User Memory Model & Namespace-Partitioned Architecture
 
-Coda supports multiple distinct user profiles on the same deployment or device via **per-account token authentication (`X-Coda-Token`)** and **namespace-partitioned Walrus storage**:
+Each Coda account gets its own logically isolated Walrus Memory namespace set under Coda's shared Sui Mainnet `MemWalAccount` (`0x48b30fec...`), protected by **per-account token authentication (`X-Coda-Token`)**:
 
 1. **Per-Account Token Identity Boundary ([`backend/middleware/userAuth.js`](backend/middleware/userAuth.js) & [`user_id_provider.dart`](lib/src/core/providers/user_id_provider.dart))**:
    - The backend does **not** blindly trust raw `userId` strings from the client.
    - When an account (`user_<timestamp>_<hex>`) is created in Coda, the client generates a 128-bit per-account token (`tok_<32-hex>`) persisted per account snapshot (`acct_<userId>_coda_user_token`) and sends it via the `X-Coda-Token` HTTP header on all API requests.
    - On the backend, `verifyUserIdentity` validates the `userId` format (`/^[a-zA-Z0-9_-]{3,80}$/`), binds `userId → HMAC-SHA256(token)` on first use, and rejects any unauthenticated or mismatched-token attempt to read or mutate another user's `userId` (`401/403`).
 2. **Logical Namespace Partitioning on Walrus**:
-   - Under Coda's Sui Mainnet `MemWalAccount` (`0x48b30fec...`), each user's memories are logically isolated into four structured namespaces:
+   - Each Coda account gets its own logically isolated Walrus Memory namespace set (`coda:<userId>:core`, `coda:<userId>:<category>`, `coda:<userId>:guardrails`, `coda:<userId>:session`) under Coda's Mainnet `MemWalAccount`:
 
 | Partitioned Walrus Namespace | Cognitive Role & Query Strategy | Example Atomic Blob Stored on Walrus |
 | :--- | :--- | :--- |
@@ -161,7 +161,7 @@ All Coda memories are sealed and stored on **Walrus Mainnet** via the official M
 - **Network**: **Mainnet** (`https://relayer.memory.walrus.xyz/config` → `network: "mainnet"`, `suiGrpcUrl: "https://mysten-rpc.mainnet.sui.io"`)
 - **Walrus Memory Account / Agent ID**: [`0x48b30fecc266bef51e01ae32c4f610bbe2910ed09a4c022e27383999aa331d55`](https://suiscan.xyz/mainnet/object/0x48b30fecc266bef51e01ae32c4f610bbe2910ed09a4c022e27383999aa331d55)
 - **MemWal Mainnet Move Package ID**: [`0xe7c16fbea0560e7057e2bf7422feaa4fb313749fc69c9e9092fac7a33b81d7f5`](https://suiscan.xyz/mainnet/object/0xe7c16fbea0560e7057e2bf7422feaa4fb313749fc69c9e9092fac7a33b81d7f5)
-- **Total Mainnet Blobs Sealed**: **504+ atomic memory blobs** across **89 namespaces**
+- **Total Mainnet Blobs Sealed**: **551+ atomic memory blobs** across **95 namespaces**
 - **Multi-User Proof**: **17 distinct user accounts** with $\ge 10$ Mainnet memories each (exceeding the DeepSurge requirement of $\ge 3$ users with $\ge 10$ memories each):
 
 | User Account (`userId`) | Mainnet Blobs | Partitioned Namespaces on Walrus Mainnet |

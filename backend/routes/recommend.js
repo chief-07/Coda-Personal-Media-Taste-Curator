@@ -6,7 +6,6 @@ const crypto = require('crypto');
 const axios = require('axios');
 
 const llmService = require('../services/llmService');
-const userSoulService = require('../services/userSoulService');
 const walrusMemoryService = require('../services/walrusMemoryService');
 
 // ── Image Proxy ──────────────────────────────────────────────────────────────
@@ -258,36 +257,29 @@ Return JSON strictly formatted as:
 
 /**
  * Feedback Endpoint.
- * Ingests user feedback on a recommendation and persists guardrails to Walrus Protocol.
+ * Recalls the user's current Walrus memories, refines taste from rejection feedback via Gemini,
+ * and persists new guardrails/facets directly to Walrus Protocol.
  */
 router.post('/feedback', async (req, res) => {
   try {
-    const { userId, current_memory, recommendation_title, media_type, feedback_reason } = req.body;
+    const { userId, recommendation_title, media_type, feedback_reason } = req.body;
 
-    const authoritativeMemory = current_memory && typeof current_memory === 'object'
-      ? { ...current_memory }
-      : {};
+    let walrusMemories = [];
+    if (userId) {
+      try {
+        const normType = walrusMemoryService.normalizeCategory(media_type || 'movie');
+        const recallRes = await walrusMemoryService.recallForRecommendation(userId, normType, recommendation_title || feedback_reason || '');
+        walrusMemories = recallRes.allMemories || [];
+      } catch (e) {
+        console.warn('[Feedback Engine] Walrus recall warning:', e.message);
+      }
+    }
 
     const updates = await llmService.refineTasteFromFeedback(
-      authoritativeMemory, recommendation_title, media_type, feedback_reason
+      walrusMemories, recommendation_title, media_type, feedback_reason
     );
 
     if (userId && updates) {
-      if (updates.global_identity_appends?.length > 0) {
-        authoritativeMemory.globalIdentity = [...(authoritativeMemory.globalIdentity || []), ...updates.global_identity_appends];
-      }
-      if (updates.guardrails_appends?.length > 0) {
-        authoritativeMemory.guardrails = [...(authoritativeMemory.guardrails || []), ...updates.guardrails_appends];
-      }
-      if (updates.category_appends) {
-        authoritativeMemory.categoryProfiles = authoritativeMemory.categoryProfiles || {};
-        for (const [cat, items] of Object.entries(updates.category_appends)) {
-          authoritativeMemory.categoryProfiles[cat] = [...(authoritativeMemory.categoryProfiles[cat] || []), ...items];
-        }
-      }
-      if (updates.recent_context_overwrite) {
-        authoritativeMemory.recentContext = updates.recent_context_overwrite;
-      }
       console.log(`[Feedback Engine] Context shift applied for user ${userId}: "${updates.recent_context_overwrite || 'guardrail/identity update'}"`);
     }
 
@@ -341,64 +333,29 @@ router.post('/swipe', async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const soul = await userSoulService.getUserMemory(userId);
-    const livingMemoryJson = {
-      ...(soul.permanent_soul || {}),
-      ...(soul.transient_memory || {})
-    };
-
     let savedMemoryStr = '';
+    let walrusWrite = null;
 
     if (action === 'loved') {
-      livingMemoryJson.loved_titles = livingMemoryJson.loved_titles || [];
-      if (!livingMemoryJson.loved_titles.includes(title)) {
-        livingMemoryJson.loved_titles.push(title);
-      }
-
-      livingMemoryJson.globalIdentity = livingMemoryJson.globalIdentity || [];
-      const entry = `Highly values: ${title} (loved work)`;
-      if (!livingMemoryJson.globalIdentity.includes(entry)) {
-        livingMemoryJson.globalIdentity.push(entry);
-      }
-      livingMemoryJson.seen = livingMemoryJson.seen || [];
-      if (!livingMemoryJson.seen.includes(title)) {
-        livingMemoryJson.seen.push(title);
-      }
-
-      await userSoulService.syncLivingMemory(userId, livingMemoryJson);
-
-      // Persist directly to Walrus Protocol
       try {
         const mediaType = req.body.media_type || req.body.mediaType || 'movie';
-        const walrusRes = await walrusMemoryService.rememberLovedTitle(userId, title, mediaType);
-        if (walrusRes?.savedMemory) savedMemoryStr = walrusRes.savedMemory;
+        walrusWrite = await walrusMemoryService.rememberLovedTitle(userId, title, mediaType);
+        if (walrusWrite?.savedMemory) savedMemoryStr = walrusWrite.savedMemory;
       } catch (err) {
         console.warn('[Swipe Engine] Walrus loved memory error:', err.message);
       }
     } else if (action === 'not_for_me') {
-      livingMemoryJson.notForMe = livingMemoryJson.notForMe || [];
-      if (!livingMemoryJson.notForMe.includes(title)) {
-        livingMemoryJson.notForMe.push(title);
-      }
-      await userSoulService.syncLivingMemory(userId, livingMemoryJson);
-
       try {
         const mediaType = req.body.media_type || req.body.mediaType || 'movie';
-        const walrusRes = await walrusMemoryService.rememberFeedbackGuardrail(userId, title, mediaType, 'Not for me');
-        if (walrusRes?.savedMemory) savedMemoryStr = walrusRes.savedMemory;
+        walrusWrite = await walrusMemoryService.rememberFeedbackGuardrail(userId, title, mediaType, 'Not for me');
+        if (walrusWrite?.savedMemory) savedMemoryStr = walrusWrite.savedMemory;
       } catch (err) {
         console.warn('[Swipe Engine] Walrus not_for_me error:', err.message);
       }
     } else if (action === 'seen') {
-      livingMemoryJson.seen = livingMemoryJson.seen || [];
-      if (!livingMemoryJson.seen.includes(title)) {
-        livingMemoryJson.seen.push(title);
-      }
-      await userSoulService.syncLivingMemory(userId, livingMemoryJson);
-
       try {
-        const walrusRes = await walrusMemoryService.rememberSeenTitle(userId, title);
-        if (walrusRes?.savedMemory) savedMemoryStr = walrusRes.savedMemory;
+        walrusWrite = await walrusMemoryService.rememberSeenTitle(userId, title);
+        if (walrusWrite?.savedMemory) savedMemoryStr = walrusWrite.savedMemory;
       } catch (err) {
         console.warn('[Swipe Engine] Walrus seen error:', err.message);
       }
@@ -407,7 +364,13 @@ router.post('/swipe', async (req, res) => {
     }
     
     console.log(`[Swipe Engine] Processed '${action}' for ${title} (User: ${userId}, Walrus: "${savedMemoryStr}")`);
-    res.json({ status: 'success', action, title, saved_memory: savedMemoryStr });
+    res.json({
+      status: 'success',
+      action,
+      title,
+      saved_memory: savedMemoryStr,
+      walrus_writes: walrusWrite ? [walrusWrite] : [],
+    });
   } catch (error) {
     console.error('[Swipe Error]:', error);
     res.status(500).json({ error: 'Swipe processing failed' });
@@ -416,12 +379,12 @@ router.post('/swipe', async (req, res) => {
 
 /**
  * Recommendation Discussion Chat Endpoint.
- * Recalls authentic Walrus Protocol memories for the title and chat context.
+ * Recalls authentic Walrus Protocol memories for the title and chat context (zero local memory sent to LLM).
  * Employs a strict server-side firewall to prevent exploratory questions from creating false-positive memory saves.
  */
 router.post('/chat', async (req, res) => {
   try {
-    const { userId, current_memory, title, media_type, coda_blurb, pitch_paragraphs, chat_history, user_message, memories_enabled } = req.body;
+    const { userId, title, media_type, coda_blurb, pitch_paragraphs, chat_history, user_message, memories_enabled } = req.body;
     const isMemoriesEnabled = memories_enabled !== false && memories_enabled !== 'false';
     
     let walrusMemories = [];
@@ -470,7 +433,7 @@ router.post('/chat', async (req, res) => {
     }
 
     const response = await llmService.discussRecommendation(
-      isMemoriesEnabled ? (current_memory || {}) : {}, title, media_type, coda_blurb || "",
+      {}, title, media_type, coda_blurb || "",
       pitch_paragraphs || [], chat_history || [], user_message, isMemoriesEnabled ? walrusMemories : []
     );
 
@@ -507,29 +470,6 @@ router.post('/chat', async (req, res) => {
       } catch (err) {
         console.warn('[Chat Engine] Walrus save warning:', err.message);
       }
-
-      if (current_memory) {
-        if (updates.global_identity_appends) {
-          current_memory.globalIdentity = [...(current_memory.globalIdentity || []), ...updates.global_identity_appends];
-        }
-        if (updates.guardrails_appends) {
-          current_memory.guardrails = [...(current_memory.guardrails || []), ...updates.guardrails_appends];
-        }
-        if (updates.media_reflections_appends) {
-          current_memory.media_reflections = [...(current_memory.media_reflections || []), ...updates.media_reflections_appends];
-        }
-        if (updates.seen_appends) {
-          current_memory.seen = [...(current_memory.seen || []), ...updates.seen_appends];
-        }
-        if (updates.not_for_me_appends) {
-          current_memory.notForMe = [...(current_memory.notForMe || []), ...updates.not_for_me_appends];
-        }
-        if (updates.recent_context_overwrite) {
-          current_memory.recentContext = updates.recent_context_overwrite;
-        }
-        
-        await userSoulService.syncLivingMemory(userId, current_memory);
-      }
     }
 
     res.json({
@@ -549,19 +489,20 @@ router.post('/chat', async (req, res) => {
 
 /**
  * Ask Coda Conversational Curation Endpoint.
- * Recalls memories from Walrus Protocol and curates matches or recommendations via Google Gemini.
+ * Recalls memories strictly from Walrus Protocol and curates matches or recommendations via Google Gemini.
  */
 router.post('/ask', async (req, res) => {
   try {
     const { current_memory, chat_history, user_message, userId, contextualState, watchlist_only, memories_enabled } = req.body;
     const isMemoriesEnabled = memories_enabled !== false && memories_enabled !== 'false';
     const isWatchlist = watchlist_only === true || watchlist_only === 'true';
+    const watchlistState = isWatchlist ? { watchlist: current_memory?.watchlist || [] } : {};
 
     let walrusMemories = [];
     let askRecalledMemory = null;
     if (userId && isMemoriesEnabled) {
       try {
-        const [coreMem, sessionMem] = await Promise.all([
+        const [coreMem, sessionMem, guardMem] = await Promise.all([
           walrusMemoryService.recallMemories({
             query: user_message,
             namespace: walrusMemoryService.formatNamespace(userId, 'core'),
@@ -573,13 +514,23 @@ router.post('/ask', async (req, res) => {
             namespace: walrusMemoryService.formatNamespace(userId, 'session'),
             limit: 2,
             maxDistance: 0.74
+          }).catch(() => []),
+          walrusMemoryService.recallMemories({
+            query: user_message,
+            namespace: walrusMemoryService.formatNamespace(userId, 'guardrails'),
+            limit: 3,
+            maxDistance: 0.88
           }).catch(() => [])
         ]);
-        walrusMemories = [...coreMem, ...sessionMem].map(m => ({
+        walrusMemories = [...coreMem, ...sessionMem, ...guardMem].map(m => ({
           ...m,
           blob_id: m.blob_id || m.blobId || null,
           namespace: m.namespace || walrusMemoryService.formatNamespace(userId, 'core'),
-          category: (m.namespace && m.namespace.includes('session')) ? 'Active Craving' : 'Core Emotional DNA',
+          category: (m.namespace && m.namespace.includes('guardrails'))
+            ? 'Guardrail Protocol'
+            : (m.namespace && m.namespace.includes('session'))
+              ? 'Active Craving'
+              : 'Core Emotional DNA',
         }));
         if (walrusMemories.length > 0) {
           askRecalledMemory = walrusMemories[0].text || walrusMemories[0].content || null;
@@ -590,7 +541,7 @@ router.post('/ask', async (req, res) => {
     }
 
     const parsed = await llmService.handleAskChat(
-      isMemoriesEnabled ? (current_memory || {}) : {},
+      watchlistState,
       chat_history || [],
       user_message,
       isWatchlist,
@@ -631,7 +582,7 @@ router.post('/ask', async (req, res) => {
       const walrusRec = await walrusMemoryService.curateWithWalrusMemory({
         userId: isMemoriesEnabled ? userId : null,
         mediaType: parsed.media_type,
-        currentMemory: isMemoriesEnabled ? current_memory : (isWatchlist ? { watchlist: current_memory?.watchlist || [] } : {}),
+        currentMemory: watchlistState,
         contextualState: isMemoriesEnabled ? contextualState : null,
         specificAsk: parsed.recommendation_query,
         watchlistOnly: isWatchlist,
@@ -702,7 +653,7 @@ Return JSON:
       const walrusRec = await walrusMemoryService.curateWithWalrusMemory({
         userId: isMemoriesEnabled ? userId : null,
         mediaType: 'movie',
-        currentMemory: isMemoriesEnabled ? current_memory : (isWatchlist ? { watchlist: current_memory?.watchlist || [] } : {}),
+        currentMemory: watchlistState,
         contextualState: isMemoriesEnabled ? contextualState : null,
         specificAsk: matchTarget,
         watchlistOnly: isWatchlist,
@@ -841,7 +792,7 @@ Return JSON:
  */
 router.post('/promote', async (req, res) => {
   try {
-    const { title, userId, current_memory, media_type } = req.body;
+    const { title, userId, media_type } = req.body;
     if (!title) {
       return res.status(400).json({ error: 'Title is required' });
     }
@@ -852,7 +803,7 @@ router.post('/promote', async (req, res) => {
     const walrusRec = await walrusMemoryService.curateWithWalrusMemory({
       userId,
       mediaType: type,
-      currentMemory: current_memory,
+      currentMemory: {},
       specificAsk: title
     });
 

@@ -315,46 +315,61 @@ router.post('/formats', async (req, res) => {
 
 router.post('/harmonize', async (req, res) => {
   try {
-    const { chatHistory, currentMemory, tabName } = req.body;
-    const harmonized = await harmonizeMemory(chatHistory, currentMemory, tabName);
+    const { chatHistory, tabName, userId } = req.body;
+    const walrusMemoryService = require('../services/walrusMemoryService');
+    let walrusMemories = [];
+    if (userId) {
+      const cat = tabName && tabName.toLowerCase() !== 'you'
+        ? walrusMemoryService.normalizeCategory(tabName)
+        : 'movie';
+      const recalled = await walrusMemoryService.recallForRecommendation(userId, cat, tabName || 'taste').catch(() => ({ allMemories: [] }));
+      walrusMemories = recalled.allMemories || [];
+    }
 
-    // Log the local harmonization pass
+    const harmonized = await harmonizeMemory(chatHistory, walrusMemories, tabName);
+
     loggerService.logHarmonization({
       type: 'Tab',
       tabName,
-      inputMemory: currentMemory || {},
+      inputMemory: { walrus_recalled_count: walrusMemories.length },
       researchContext: null,
       outputMemory: harmonized
     });
 
-    const userId = req.body.userId;
-    // Walrus is authoritative; no legacy sync needed
+    if (userId && harmonized) {
+      await walrusMemoryService.routeAndSaveLivingMemory(userId, {
+        global_identity_appends: harmonized.global_identity_overwrite || [],
+        category_appends: harmonized.category_profiles_overwrite || {},
+        guardrails_appends: harmonized.guardrails_appends || [],
+        recent_context_overwrite: harmonized.recent_context_overwrite || '',
+      }).catch(() => []);
+    }
 
     res.json(harmonized);
   } catch (e) {
     console.error("[Harmonize Route Error]:", e);
-    // Return original memory on failure
-    res.json(req.body.currentMemory || {});
+    res.json({});
   }
 });
 
 router.post('/harmonize_all', async (req, res) => {
   try {
-    const { currentMemory, userId } = req.body;
-    const harmonized = await harmonizeAllMemory(currentMemory);
-    
-    const mergedMemory = {
-      ...currentMemory,
-      globalIdentity: harmonized.global_identity_overwrite || currentMemory?.globalIdentity || [],
-      categoryProfiles: harmonized.category_profiles_overwrite || currentMemory?.categoryProfiles || {},
-      soul_graph: harmonized.soul_graph || currentMemory?.soul_graph || null,
-      guardrails: currentMemory?.guardrails || [],
-      media_reflections: currentMemory?.media_reflections || [],
-      seen: currentMemory?.seen || [],
-      notForMe: currentMemory?.notForMe || [],
-      watchlist: currentMemory?.watchlist || [],
-      recentContext: currentMemory?.recentContext || '',
-    };
+    const { userId } = req.body;
+    const walrusMemoryService = require('../services/walrusMemoryService');
+    let walrusMemories = [];
+    if (userId) {
+      const recalled = await walrusMemoryService.recallForRecommendation(userId, 'movie', 'overall taste profile').catch(() => ({ allMemories: [] }));
+      walrusMemories = recalled.allMemories || [];
+    }
+
+    const harmonized = await harmonizeAllMemory(walrusMemories);
+    if (userId && harmonized) {
+      await walrusMemoryService.routeAndSaveLivingMemory(userId, {
+        global_identity_appends: harmonized.global_identity_overwrite || [],
+        category_appends: harmonized.category_profiles_overwrite || {},
+        guardrails_appends: harmonized.guardrails_appends || [],
+      }).catch(() => []);
+    }
     res.json(harmonized);
   } catch (e) {
     console.error("[Harmonize All Route Error]:", e);
